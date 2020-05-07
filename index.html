@@ -5,7 +5,6 @@
     <title>FLO Messenger</title>
     <style>
         /* Root */
-
         :root {
             --accent-light: #AFD0EF;
             --accent-color: #398AD7;
@@ -131,10 +130,11 @@
             justify-content: center;
             background: var(--accent-color);
             z-index: 4;
+            padding-bottom: 2rem;
         }
 
         #loading-screen .appName {
-            top: 8rem;
+            top: 5rem;
             position: fixed;
             display: flex;
             z-index: 5;
@@ -157,7 +157,7 @@
         }
 
         #sign-in-box {
-            height: 25rem;
+            height: 30rem;
             width: 25rem;
             background: rgba(var(--rgb-bw), 1);
             z-index: inherit;
@@ -191,12 +191,12 @@
 
         #sign-in-box input,
         #sign-in-box button:first-child {
-            text-shadow: 0 0 0 var(--accent-dark);
-            border-color: var(--accent-dark);
+            text-shadow: 0 0 0 var(--alt-dark);
+    border-color: var(--alt-dark);
         }
 
         #sign-in-box input {
-            height: 2.5rem;
+            height: 3.5rem;
             width: 20rem;
         }
 
@@ -205,8 +205,8 @@
         }
 
         #sign-in-box button {
-            height: 5rem;
-            width: 9rem;
+            height: rem;
+            width: 6rem;
         }
 
         #sign-in-box button:last-child {
@@ -267,20 +267,11 @@
             display: inline-flex;
         }
 
-        .appName h1 {
+        .appName img {
+            max-width:100%;
+            max-height:100%
             margin: 1rem 0 0 1rem;
             padding: 0;
-            color: var(--alt-color);
-            font: italic bold 3rem/1rem Georgia, serif;
-            text-shadow: -2.5px 2.5px rgba(var(--rgb-bw), 0.5);
-        }
-
-        .appName h2 {
-            margin-bottom: 0;
-            padding: 0;
-            color: var(--alt-color);
-            font: italic bold 1.5rem Georgia, serif;
-            text-shadow: -2.5px 2.5px rgba(var(--rgb-bw), 0.5);
         }
 
         header .right-end {
@@ -1024,33 +1015,37 @@
 
     <header>
         <div class="appName">
-            <h1>M</h1>
-            <h2>essenger</h2>
+            <img src="flomessenger-smaller.png" alt="" style="" />
         </div>
         <div class="right-end">
             <span id="greet-tag">Hi XZYDACCFFFFFFFFFF</span>
             <span id="refresh-inbox" data-title="Refresh Inbox"><b>&#x21BB;</b></span>
             <span id="settings" data-title="Settings"><b>&#x2699;</b></span>
         </div>
-
     </header>
 
     <div id="loading-screen" class="hide">
-        <div class="appName">
-            <h1>M</h1>
-            <h2>essenger</h2>
-        </div>
         <div class="loader">
             <div></div>
             <div></div>
         </div>
+        
         <div id="sign-in-box" class="hide">
-            <div>
-                <div>
-                    <span>SIGN IN</span>
+            <div class="appName">
+                <img src="flomessenger.png" alt="" />
+            </div>
+            
+            <div style='margin-top:10rem; '>
+                <div><input placeholder="Private Key" type="password" style="font-size: 1rem;"></div>
+                <div style="margin: 0rem 0; display: flex; flex-direction: row; justify-content: space-between;">
+                    <button style="font-size: 1rem;">&#x1F511; Sign In</button>
+                    <button style="font-size: 1rem;">&#x1F464; Guest</button>
                 </div>
-                <div><input type="password"></div>
-                <div><button>&#x1F511; Sign In</button><button>&#x1F464; Guest</button></div>
+                <p style="color: lightgray; font-size: 0.9rem; line-height: 1.6; text-align: left; margin: 2rem 1rem;">
+                    Don't have a private key? get it 
+                    <a href="https://flo-webwallet.duckdns.org/" target="_blank">HERE</a>
+                    <br> or you can sign as guest.
+                </p>
             </div>
         </div>
         <div id="startup-load-msg"></div>
