@@ -133,9 +133,18 @@
             padding-bottom: 2rem;
         }
 
+        #loading-screen .brand {
+            top: 2rem;
+            left: 2rem;
+            position: absolute;
+            z-index: 5;
+            transform: scale(1.5);
+        }
+
         #loading-screen .appName {
             top: 5rem;
             position: fixed;
+
             display: flex;
             z-index: 5;
         }
@@ -176,7 +185,7 @@
             font: italic bold 1.5rem Georgia, serif;
         }
 
-        #sign-in-box input,
+        #sign-in-box input[type="password"],
         #sign-in-box button {
             margin: 1rem;
             padding: 0.5rem;
@@ -189,19 +198,25 @@
 
         }
 
-        #sign-in-box input,
+        #sign-in-box input[type="password"],
         #sign-in-box button:first-child {
             text-shadow: 0 0 0 var(--alt-dark);
     border-color: var(--alt-dark);
         }
 
+
         #sign-in-box input {
             height: 3.5rem;
+
             width: 20rem;
         }
 
-        #sign-in-box input:focus {
+        #sign-in-box input[type="password"]:focus {
             box-shadow: -0.1rem -0.1rem var(--accent-dark)
+        }
+
+        #sign-in-box input[type="password"]::placeholder {
+            font-size: 1rem;
         }
 
         #sign-in-box button {
@@ -212,6 +227,17 @@
         #sign-in-box button:last-child {
             text-shadow: 0 0 0 var(--alt-dark);
             border-color: var(--alt-dark);
+        }
+
+        #sign-in-box input[type="button"] {
+            background: transparent;
+            border: none;
+            color: var(--alt-dark);
+            text-decoration: underline;
+        }
+
+        #sign-in-box input[type="button"]:hover {
+            color: var(--alt-color);
         }
 
         .loader {
@@ -257,6 +283,40 @@
             position: relative;
             display: flex;
             background: var(--header);
+        }
+
+        .brand {
+            margin-top: 0.5rem;
+            margin-left: 2rem;
+            display: flex;
+        }
+
+        .brand .logo {
+            background: var(--alt-color);
+            border-radius: 0.3rem;
+            padding: 0.1rem 0.1rem 0 0.2rem;
+            height: 2.5rem;
+        }
+
+        .brand .name {
+            margin-top: 0.5rem;
+            background: var(--alt-color);
+            color: var(--accent-dark);
+            text-shadow: 0px 0px rgba(var(--rgb-bw), 0.5);
+            border-radius: 0 0.2rem 0.2rem 0;
+            padding: 0.1rem 0.2rem;
+            height: 1.3rem;
+            font: bold 1rem Georgia, serif;
+        }
+
+        .brand .logo svg {
+            width: auto;
+            height: 2.5rem;
+        }
+
+        .brand .logo svg path {
+            fill: var(--accent-dark) !important;
+            stroke: var(--alt-dark);
         }
 
         header .appName {
@@ -358,6 +418,15 @@
             font-weight: bold;
         }
 
+        #confirmation span {
+            display: block;
+            margin: 0 1rem;
+            font-style: normal;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            text-align: center;
+        }
+
         #confirmation div {
             text-align: center;
         }
@@ -453,14 +522,14 @@
         }
 
         #contact-list {
-            height: 29rem;
+            max-height: 29rem;
             overflow-y: scroll;
         }
 
         .contact-card {
             padding: 1rem;
             background: rgba(var(--rgb-bw), 0);
-            overflow:hidden;
+            overflow: hidden;
         }
 
         .contact-card:hover {
@@ -471,10 +540,6 @@
             padding: 0.3rem 0.5rem;
         }
 
-        .unread span:nth-child(1) {
-            background-color: var(--accent-dark);
-        }
-
         .contact-card span:nth-child(1) {
             border-radius: 0.5rem;
             background-color: var(--alt-dark);
@@ -482,7 +547,7 @@
         }
 
         .contact-card span:nth-child(2) {
-            white-space: nowrap; 
+            white-space: nowrap;
         }
 
         .contact-card span:nth-child(3) {
@@ -492,6 +557,10 @@
             font-style: italic;
             font-weight: bold;
             font-size: 0.65rem;
+        }
+
+        .contact-card.unread span:nth-child(1) {
+            background-color: var(--accent-dark) !important;
         }
 
         /* Conversations */
@@ -525,7 +594,7 @@
             font-weight: bold;
             display: block;
             white-space: nowrap;
-            overflow:hidden;
+            overflow: hidden;
         }
 
         #receiver-floID {
@@ -586,14 +655,16 @@
             align-items: center;
         }
 
-        .input-container input, .input-container textarea, .input-container button{
+        .input-container input,
+        .input-container textarea,
+        .input-container button {
             height: 2rem;
             border-radius: 0.2rem;
             border: 0.1rem solid rgba(var(--rgb-bw), 0.2);
             padding: 0.2rem;
         }
 
-        .input-container textarea{
+        .input-container textarea {
             height: 15rem;
             resize: none;
         }
@@ -668,7 +739,7 @@
         #settings-screen {
             border: 0.2rem solid var(--accent-dark);
             text-align: center;
-            width: 25rem;
+            width: 28rem;
         }
 
         #settings-screen h4 {
@@ -697,7 +768,9 @@
         }
 
         #settings-screen label,
-        #settings-screen input[type="button"] {
+        #settings-screen input[type="button"],
+        #settings-screen input[type="text"] {
+            margin: 0 0.5rem;
             font-size: 0.9rem;
             display: inline-block;
             height: 2rem;
@@ -707,6 +780,24 @@
             background: var(--foreground);
             padding: 0.5rem;
             cursor: pointer;
+        }
+
+        #settings-screen input[type="text"] {
+            width: 24rem;
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 0.5rem 0.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        #settings-screen input[type="text"]::selection {
+            color: var(--accent-color);
+            background-color: transparent;
+        }
+
+        #settings-screen input[type="text"]::placeholder {
+            color: var(--accent-color);
+            font-size: 0.9rem;
         }
 
         #settings-screen label:hover,
@@ -746,6 +837,10 @@
             border-bottom: 0.1rem solid var(--alt-color);
         }
 
+        .mail-card.unread {
+            background: var(--accent-light) !important;
+        }
+
         .mail-card:hover {
             background: var(--alt-color);
         }
@@ -773,8 +868,8 @@
             font-size: 0.8rem;
             font-style: italic;
             overflow: hidden;
-            text-overflow: ellipsis; 
-            white-space: nowrap; 
+            text-overflow: ellipsis;
+            white-space: nowrap;
             margin-left: 5rem;
         }
 
@@ -786,19 +881,19 @@
         }
 
         /* Mail view */
-        #mail-view{
+        #mail-view {
             max-height: 32rem;
             width: 50rem;
             overflow-y: scroll;
             position: relative;
         }
 
-        .mail-content{
+        .mail-content {
             margin: 2rem;
             border-bottom: 0.2rem dashed var(--alt-dark);
         }
 
-        .mail-content span:nth-child(1){
+        .mail-content span:nth-child(1) {
             display: block;
             font-weight: bold;
             font-size: 1.2rem;
@@ -806,19 +901,20 @@
             margin-bottom: 0.5rem;
             color: var(--accent-dark)
         }
-        .mail-content span:nth-child(2){
+
+        .mail-content span:nth-child(2) {
             display: inline-block;
             font-size: 0.8rem;
         }
 
-        .mail-content span:nth-child(3){
+        .mail-content span:nth-child(3) {
             margin-left: 0.5rem;
             font-weight: bold;
             display: inline-block;
             font-size: 0.9rem;
         }
 
-        .mail-content span:nth-child(4){
+        .mail-content span:nth-child(4) {
             margin-left: 0.5rem;
             font-style: italic;
             display: inline-block;
@@ -826,28 +922,28 @@
             max-width: 25rem;
             max-height: 0.7rem;
             overflow: hidden;
-            text-overflow: ellipsis; 
-            white-space: nowrap; 
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        .mail-content span:nth-child(4):hover{
+        .mail-content span:nth-child(4):hover {
             max-height: 1.5rem;
             overflow-y: auto;
-            white-space: normal; 
+            white-space: normal;
         }
 
-        .mail-content span:nth-child(5){
-            float:right;
+        .mail-content span:nth-child(5) {
+            float: right;
             font-size: 0.8rem;
             text-align: right;
         }
 
-        .mail-content p{
+        .mail-content p {
             display: block;
             white-space: pre-wrap;
         }
 
-        #prev-mail{
+        #prev-mail {
             margin: 0.5rem 1rem;
             float: right;
             font-size: 0.8rem;
@@ -857,13 +953,13 @@
             color: var(--accent-color)
         }
 
-        #prev-mail:hover{
+        #prev-mail:hover {
             font-weight: bold;
         }
 
         /* Compose and Reply mail */
 
-        .compose-mail{
+        .compose-mail {
             width: 30rem;
             height: auto;
             border: 0.1rem solid var(--alt-dark);
@@ -871,40 +967,58 @@
             bottom: 0;
         }
 
-        #new-mail{
+        #new-mail {
             position: absolute;
             right: 0;
         }
 
-        #reply-mail{
+        #reply-mail {
             position: sticky;
         }
 
-        .compose-head{
+        .compose-head {
             background: var(--alt-dark);
-            padding:0.5rem;
-            color:var(--alt-light);
+            padding: 0.5rem;
+            color: var(--alt-light);
             cursor: pointer;
         }
 
-        .compose-body{
-            display: none;
-            background:var(--alt-light);
+        .compose-head span {
+            float: right;
+            padding: 0 0.2rem;
         }
 
-        .compose-body.active{
+        .compose-head:hover span {
+            background: rgba(var(--rgb-bw), 0.3);
+        }
+
+        .compose-head span::after {
+            content: '\1F5D6';
+        }
+
+        .compose-head.active span::after {
+            content: '\1F5D5';
+        }
+
+        .compose-body {
+            display: none;
+            background: var(--alt-light);
+        }
+
+        .compose-head.active+.compose-body {
             display: block;
         }
 
-        .compose-mail-form{
-            margin:0;
+        .compose-mail-form {
+            margin: 0;
             padding: 0.5rem;
         }
 
-        .compose-mail input, .compose-mail-form textarea{
-            margin:0.5rem;
+        .compose-mail input,
+        .compose-mail-form textarea {
+            margin: 0.5rem;
             width: 28rem;
-        }      
+        }
 
         .compose-mail button {
             margin: 0.5rem 0.5rem 0.5rem 1rem;
@@ -912,19 +1026,19 @@
             color: var(--alt-dark);
         }
 
-        .compose-mail button[type="submit"]{
+        .compose-mail button[type="submit"] {
             width: 22rem;
         }
 
-        .compose-mail button[type="reset"]{
+        .compose-mail button[type="reset"] {
             width: 3rem;
+            font-weight: bold;
         }
 
         .compose-mail button:hover,
         .compose-mail button:focus {
             background: rgba(var(--rgb-bw), 0.1);
         }
-
     </style>
 
 <script id="floGlobals">
@@ -950,39 +1064,50 @@
         application: "messenger",
         pubKeys: {},
         contacts: {},
-        lastReceived: '0'
+        appendix: {}
     }
 </script>
 <script id="onLoadStartUp">
     function onLoadStartUp() {
+        privKeyNotSecured = true;
         //display loading screen
         document.getElementById("loading-screen").classList.remove("hide")
+        document.getElementById("sign-in-box").classList.add("hide")
+        document.getElementById("settings-screen").parentNode.classList.add("hide")
         //clear Rendered Elements
         let elementsToReset = ["startup-load-msg", 'mail-list', 'contact-list', 'conversation-body',
-            'receiver-floID', 'receiver-name', "backup-info", "restore-info"
+            'receiver-floID', 'receiver-name', "backup-info"
         ]
         elementsToReset.forEach(e => clearElement(document.getElementById(e)))
         //set the custom Privkey input
-        floDapps.setCustomPrivKeyInput(() => {
+        floDapps.setCustomPrivKeyInput((type) => {
             return new Promise((resolve, reject) => {
-                let signInBox = document.getElementById("sign-in-box")
+                let signInBox = document.forms["sign-in-box"]
                 signInBox.classList.remove('hide')
-                let buttons = signInBox.getElementsByTagName('button');
-                buttons[0].onclick = () => {
-                    let keyInput = signInBox.getElementsByTagName('input')[0];
-                    let key = keyInput.value;
-                    keyInput.value = '';
-                    buttons[0].onclick = null;
-                    buttons[1].onclick = null;
+                signInBox["sign-in"].onclick = () => {
+                    let key = signInBox["key"].value;
+                    signInBox["key"].value = '';
+                    signInBox["sign-in"].onclick = null;
+                    signInBox["guest-login"].onclick = null;
                     signInBox.classList.add('hide')
                     resolve(key)
                 }
-                buttons[1].onclick = () => {
-                    signInBox.getElementsByTagName('input')[0].value = '';
-                    buttons[0].onclick = null;
-                    buttons[1].onclick = null;
-                    signInBox.classList.add('hide')
-                    reject(null)
+                if (type === "PRIVATE_KEY") {
+                    signInBox["key"].setAttribute("placeholder", "Private Key")
+                    signInBox["guest-login"].classList.remove("hide");
+                    signInBox["remove-account"].classList.add("hide");
+                    signInBox["guest-login"].onclick = () => {
+                        signInBox["key"].value = '';
+                        signInBox["sign-in"].onclick = null;
+                        signInBox["guest-login"].onclick = null;
+                        signInBox.classList.add('hide')
+                        reject(null)
+                    }
+                } else if (type === "PIN/Password") {
+                    signInBox["key"].setAttribute("placeholder", "Password")
+                    signInBox["guest-login"].classList.add("hide");
+                    signInBox["remove-account"].classList.remove("hide");
+                    privKeyNotSecured = false;
                 }
             })
         })
@@ -994,10 +1119,14 @@
             //load messages from IDB and render them
             reactor.dispatchEvent("startUpSuccessLog", `Loading Data! Please Wait...`)
             messenger.loadDataFromIDB().then(data => {
-                floGlobals.lastReceived = data["_lastReceived_"] || floGlobals.lastReceived;
+                floGlobals.pubKeys = data.pubKeys;
+                floGlobals.contacts = data.contacts;
+                floGlobals.settings = data.settings;
+                floGlobals.appendix = data.appendix;
                 renderContactList(floGlobals.contacts)
-                renderMessages(data.messages, true)
-                renderMailList(data.mails)
+                renderMessages(data.messages, false)
+                renderMailList(data.mails, false)
+                renderMarked(data.marked)
                 reactor.dispatchEvent("startUpSuccessLog", `Load Successful!`)
                 //hide loading screen
                 document.getElementById("loading-screen").classList.add("hide")
@@ -1011,9 +1140,21 @@
 </script>
 </head>
 
-<body onload="onLoadStartUp();">
+<body onload="onLoadStartUp()">
 
     <header>
+        <div class="brand">
+            <div class="logo">
+                <svg width="100" height="130" viewBox="0 0 100 130">
+                    <g id="layer1" transform="translate(470,140)">
+                        <path transform="translate(-350,-850)" id="path5165"
+                            d="M -166.99971,804.55875 V 484.41291 H 153.14614 473.29202 V 804.55875 1124.7046 H 153.14614 -166.99971 Z m 639.93893,0 V 484.76569 H 153.14614 -166.64693 v 319.79306 319.79305 h 319.79307 319.79308 z m -168.4514,189.02282 m 10.5778,-228.53393 m -37.9181,8.56292 z m -332.434261,52.76162 c -0.12935,-0.12935 -0.23519,-1.28253 -0.23519,-2.56262 0,-6.67058 -5.44905,-13.20481 -16.4463,-19.72158 -1.96345,-1.1635 -4.3447,-2.4643 -5.29166,-2.89067 -4.957,-2.23185 -12.62447,-6.25072 -15.28525,-8.0117 -12.030489,-7.96211 -12.658389,-16.35177 -1.98645,-26.54198 1.73209,-1.65391 4.64828,-4.43585 6.48042,-6.1821 6.95926,-6.63302 10.68624,-12.58985 11.25673,-17.99167 l 0.22355,-2.11667 -1.9948,2.35011 c -3.79112,4.46638 -7.61404,7.1861 -11.52814,8.20141 -2.21719,0.57513 -2.64903,0.29106 -3.26536,-2.14806 l -0.46168,-1.82711 -2.28178,1.4509 c -2.41829,1.5377 -6.723749,3.18611 -7.521859,2.87985 -0.26212,-0.10059 -0.6859,-1.05542 -0.94173,-2.12185 -0.25584,-1.06643 -0.57694,-2.00805 -0.71357,-2.09249 -0.13663,-0.0844 -0.87878,0.3031 -1.64922,0.8612 -1.94063,1.40579 -3.46509,2.15893 -5.81469,2.8727 -2.51574,0.76424 -2.8946,0.5237 -3.62066,-2.29869 -0.88387,-3.43588 -0.92652,-3.36547 2.03806,-3.36547 6.83587,0 13.43345,-5.38116 19.896059,-16.22778 2.20502,-3.70081 3.98333,-7.22308 3.98333,-7.88969 0,-1.65984 2.6604,-0.47757 8.74073,3.88434 0.44177,0.31692 0.84002,0.51434 0.885,0.4387 0.62242,-1.04661 2.02564,-4.11571 2.02146,-4.4213 -0.0103,-0.75676 1.09171,-0.826 2.39614,-0.15054 0.71638,0.37096 2.5618,1.54517 4.10094,2.60937 l 2.79843,1.9349 0.97993,-1.81886 c 0.53896,-1.00037 0.98623,-2.08598 0.99393,-2.41245 0.0309,-1.3126 1.35752,-1.06195 4.32379,0.81695 8.04593,5.09648 12.84596,10.33008 15.13027,16.49691 0.65604,1.77111 0.54891,7.26086 -0.18316,9.38529 -1.79642,5.21312 -4.92116,9.58274 -11.10003,15.52222 -10.2817,9.88334 -11.67023,11.50598 -12.92312,15.10198 -0.68891,1.97729 -0.66829,5.81002 0.0404,7.52091 0.62466,1.50789 2.49336,3.99328 4.16986,5.54596 2.19595,2.03378 6.9095,4.82907 13.96149,8.27964 17.53725,8.58104 24.94403,14.81547 27.39109,23.05562 0.506,1.70388 0.50176,1.87158 -0.0577,2.28064 -0.71748,0.52463 -5.11519,1.57632 -5.52706,1.32176 -0.1578,-0.0975 -0.28691,-1.24175 -0.28691,-2.54272 0,-5.44225 -3.46174,-10.63587 -10.63355,-15.95345 -4.28094,-3.17412 -6.86259,-4.60768 -19.35256,-10.74621 -8.02659,-3.94489 -13.56038,-8.39151 -15.44245,-12.40863 -0.79591,-1.6988 -0.96172,-2.53931 -0.96172,-4.87494 0,-2.42145 0.15442,-3.14785 1.08741,-5.11528 1.21505,-2.56222 3.52772,-5.46919 6.89222,-8.66337 9.99629,-9.49026 11.81397,-11.48021 14.18898,-15.53373 2.29842,-3.92278 2.87861,-5.90728 2.87861,-9.84596 0,-3.92937 -0.49788,-5.6762 -2.54551,-8.93109 -1.8328,-2.91338 -8.45442,-9.23697 -9.67231,-9.23697 -0.43533,0 -2.1296,3.4982 -1.88553,3.89311 0.11519,0.18638 1.08106,1.16322 2.14638,2.17076 4.62673,4.37576 6.94442,9.15024 6.92646,14.26857 -0.0223,6.34079 -3.45437,12.37338 -11.41304,20.0606 -9.7573,9.4245 -11.14838,10.9574 -12.50702,13.78212 -2.47712,5.15014 -1.60256,9.72788 2.65929,13.9197 2.6136,2.57065 6.13507,4.85438 11.78566,7.64316 11.49487,5.67317 12.94902,6.46058 17.33578,9.38711 7.7164,5.14782 12.40171,10.85444 13.10107,15.95683 l 0.20905,1.52525 -1.54375,0.40093 c -0.84906,0.22051 -2.08448,0.54356 -2.74536,0.71789 -0.66089,0.17434 -1.31163,0.24898 -1.44609,0.16588 -0.13446,-0.0831 -0.3448,-1.4521 -0.46742,-3.04221 -0.26667,-3.45806 -1.40409,-6.14134 -3.94386,-9.30386 -3.96382,-4.93576 -9.19258,-8.50743 -21.29726,-14.54777 -10.55708,-5.26806 -14.28068,-7.62481 -17.44215,-11.0395 -3.01368,-3.25504 -3.88596,-5.42067 -3.69007,-9.16134 0.23445,-4.47716 2.12333,-7.63031 7.8192,-13.05278 8.17821,-7.78566 11.42793,-11.23684 13.39849,-14.2291 1.10432,-1.67689 2.09734,-3.32853 2.20672,-3.67032 0.10937,-0.34177 0.33606,-0.93891 0.50374,-1.32697 0.7565,-1.75067 1.39503,-4.69838 1.39503,-6.44002 0,-2.55009 -1.43409,-6.695 -3.23286,-9.3438 l -1.45314,-2.13983 -0.52062,1.02432 c -0.28634,0.56338 -0.96031,1.75163 -1.4977,2.64056 l -0.97709,1.61622 1.06017,2.44072 c 0.94532,2.17632 1.06006,2.82288 1.05923,5.9685 -7e-4,3.32326 -0.081,3.71278 -1.3819,6.71897 -2.5028,5.78351 -6.08366,10.11439 -15.51794,18.76826 -5.95936,5.46639 -8.3221,9.472 -8.29561,14.06375 0.0168,2.90596 1.30197,5.60636 3.9078,8.21083 2.8565,2.85503 6.15357,4.89263 14.68085,9.0728 7.6367,3.7436 13.15045,6.8861 16.95694,9.66442 3.2897,2.40112 7.59877,6.96715 8.90278,9.43366 1.27429,2.41032 2.20493,5.48363 1.83953,6.07484 -0.12755,0.2064 -1.3702,0.6907 -2.76143,1.07623 -2.89845,0.8032 -2.70184,0.77276 -3.00882,0.46578 z m -41.33331,-82.80985 c 4.23101,-2.09108 7.92503,-5.83754 12.53542,-12.7134 l 1.87844,-2.80148 -2.0919,-1.91409 c -2.52447,-2.30991 -4.72208,-3.76207 -5.08615,-3.36088 -0.14704,0.16203 -1.02759,1.80273 -1.95679,3.64599 -3.56684,7.07558 -6.30491,11.4598 -9.998129,16.00908 l -2.2568,2.77991 2.13626,-0.15453 c 1.543029,-0.11161 2.886999,-0.52555 4.839649,-1.4906 z m 10.43136,0.54182 c 2.0284,-0.77999 7.31893,-4.77496 8.55423,-6.45945 l 0.69272,-0.9446 -1.4792,-2.986 c -1.32469,-2.67412 -2.64562,-4.48681 -2.97976,-4.08907 -0.0669,0.0797 -0.72265,1.25608 -1.45719,2.61427 -1.84339,3.40851 -4.45047,7.27559 -6.98968,10.36783 l -2.14053,2.60672 1.91711,-0.17701 c 1.05442,-0.0974 2.80145,-0.51707 3.8823,-0.93269 z m 13.86858,-13.83041 c 0.70178,-1.17807 1.27596,-2.21029 1.27596,-2.29383 0,-0.26334 -2.57037,-2.6013 -4.51637,-4.108 -2.11433,-1.63702 -2.27705,-1.58756 -3.40635,1.0354 l -0.64041,1.48745 2.78226,2.98903 c 1.53024,1.64397 2.88277,2.99868 3.00561,3.01047 0.12284,0.0118 0.79753,-0.94244 1.4993,-2.12052 z"
+                            style="fill:#000000;stroke-width:0.35277778" />
+                    </g>
+                </svg>
+            </div>
+            <div class="name">Ranchimall</div>
+        </div>
         <div class="appName">
             <img src="flomessenger-smaller.png" alt="" style="" />
         </div>
@@ -1025,6 +1166,7 @@
     </header>
 
     <div id="loading-screen" class="hide">
+
         <div class="loader">
             <div></div>
             <div></div>
@@ -1046,8 +1188,9 @@
                     <a href="https://flo-webwallet.duckdns.org/" target="_blank">HERE</a>
                     <br> or you can sign as guest.
                 </p>
+
             </div>
-        </div>
+        </form>
         <div id="startup-load-msg"></div>
     </div>
 
@@ -1075,7 +1218,7 @@
                 <span id="prev-mail">View Previous Mail</span>
                 <div id="reply-mail" class="compose-mail hide">
                     <div class="compose-head">
-                        Reply Mail
+                        Reply Mail <span></span>
                     </div>
                     <div class="compose-body">
                         <form id="reply-mail-form" class="compose-mail-form input-container"
@@ -1083,7 +1226,7 @@
                             <input type="text" name="subject" placeholder="Subject" />
                             <textarea name="content" placeholder="Type a mail"></textarea>
                             <button type="submit">&#x21A9;&#x2709; Reply</button>
-                            <button type="reset">&#x2716;</button>
+                            <button type="reset">&#x232B;</button>
                         </form>
                     </div>
                 </div>
@@ -1095,15 +1238,17 @@
                 <h4>Settings</h4>
                 <div>
                     <input type="button" id="backup-data" value="&#x25BC; Backup Data" />
+                    <input type="file" id="restore-data" accept=".json" /><label for="restore-data">&#x25B2; Restore
+                        Data</label>
                     <span id="backup-info"></span>
                 </div>
                 <div>
-                    <input type="file" id="restore-data" accept=".json" /><label for="restore-data">&#x25B2; Restore
-                        Data</label>
-                    <span id="restore-info"></span>
+                    <input type="text" id="view-privkey" title="Click to Copy" placeholder="&#x25C9; View Private Key" readonly/>
+                    <input type="button" id="secure-key" value="&#x26BF; Secure Private Key" />
                 </div>
                 <div>
                     <input type="button" id="sign-out" value="&#x219A; Sign Out" />
+                    <input type="button" id="clear-data" value="&#x2620; Clear Data" />
                 </div>
             </div>
         </div>
@@ -1112,6 +1257,22 @@
             <div id="confirmation" class="popup-container">
                 <fieldset>
                     <legend></legend>
+                    <span></span>
+                    <div class="input-container i-2">
+                        <input type="submit" value="Ok" />
+                        <input type="reset" value="Cancel" />
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+
+        <div class="popup-overlay hide">
+            <div id="prompt-input" class="popup-container">
+                <fieldset>
+                    <legend></legend>
+                    <div class="input-container i-1">
+                        <input type="text" placeholder="Value" />
+                    </div>
                     <div class="input-container i-2">
                         <input type="submit" value="Ok" />
                         <input type="reset" value="Cancel" />
@@ -1135,7 +1296,7 @@
             <div id="mail-list"></div>
             <div id="new-mail" class="compose-mail">
                 <div class="compose-head">
-                    New Mail
+                    New Mail <span></span>
                 </div>
                 <div class="compose-body">
                     <form id="new-mail-form" class="compose-mail-form input-container"
@@ -1144,7 +1305,7 @@
                         <input type="text" name="subject" placeholder="Subject" />
                         <textarea name="content" placeholder="Type a mail"></textarea>
                         <button type="submit">&#x2709;&#x27A0; Send</button>
-                        <button type="reset">&#x2716;</button>
+                        <button type="reset">&#x232B;</button>
                     </form>
                 </div>
             </div>
@@ -1169,8 +1330,7 @@
                     <input type="text" name="message" placeholder="Type a message..." autocomplete="off" />
                     <button type="submit">&#x27A4;</button>
                 </form>
-                <span class="asterisk-notation hide" id="warn-no-encryption">*Sending messages not encrypted for
-                    this user!</span>
+                <span class="asterisk-notation hide" id="warn-no-encryption">*Sending messages not encrypted until the recipient replies!</span>
             </div>
         </section>
     </section>
@@ -1190,11 +1350,11 @@
         })
 
         document.getElementById("new-mail").children[0].addEventListener('click', function (e) {
-            this.nextElementSibling.classList.toggle("active");
+            this.classList.toggle("active");
         })
 
         document.getElementById("reply-mail").children[0].addEventListener('click', function (e) {
-            this.nextElementSibling.classList.toggle("active");
+            this.classList.toggle("active");
         })
 
         document.getElementById("prev-mail").addEventListener('click', function (e) {
@@ -1217,24 +1377,59 @@
                 floID = e.target.parentNode.getAttribute("name");
             let toInput = document.forms["new-mail-form"]["to"]
             let tmp = toInput.value.trim();
-            if (tmp == '')
-                tmp = floID;
-            else
-                tmp += `, ${floID}`;
+            if (!tmp.includes(floID)) {
+                if (tmp == '')
+                    tmp = floID;
+                else
+                    tmp += `, ${floID}`;
+            }
             toInput.value = tmp;
-            document.getElementById("new-mail").children[1].classList.add("active");
+            document.getElementById("new-mail").children[0].classList.add("active");
             return false;
         });
 
         document.getElementById("sign-out").addEventListener('click', function (e) {
-            getConfirmation('Signing out will delete all stored! Are you sure you want to Sign out?').then(
+            getConfirmation('Sign Out?',
+                '**Remember to store your PRIVATE-KEY** \nAre you sure you want to Sign out?', "Sign-Out",
+                "Stay Signed-In").then(
                 result => {
                     floDapps.logout().then(result => {
                         showMessage("Successfully Signed out")
-                        document.getElementById("settings-screen").parentNode.classList.add("hide");
+                        setTimeout(onLoadStartUp, 2000)
+                    }).catch(error => showMessage("Signout Unsuccessful", "error", error))
+                }).catch(error => {})
+        });
+
+        document.forms["sign-in-box"]["remove-account"].addEventListener('click', function (e) {
+            getConfirmation('Remove Account?',
+                '**Remember to store your PRIVATE-KEY**\n*Private-Key will be needed to signIn again*\nAre you sure you want to remove account?',
+                "Remove").then(result => {
+                floDapps.logout().then(result => {
+                    showMessage("Removed Account")
+                    setTimeout(onLoadStartUp, 2000)
+                }).catch(error => showMessage("Remove Unsuccessful", "error", error))
+            }).catch(error => {})
+        });
+
+        document.getElementById("secure-key").addEventListener('click', function (e) {
+            getPromptInput("Secure Private-Key", 'Enter Password', false).then(value => {
+                floDapps.securePrivKey(value).then(result => {
+                    privKeyNotSecured = false;
+                    showMessage("Private Key secured");
+                }).catch(error => showMessage("Securing Failed", "error", error))
+            }).catch(error => {})
+        });
+
+        document.getElementById("clear-data").addEventListener('click', function (e) {
+            getConfirmation('Clear Data?',
+                `Are you sure you want to clear stored data from the browser? \n**This can't be undone**\nMake sure you have stored the PRIVATE-KEY and Backuped the data.`,
+                "Clear").then(
+                result => {
+                    floDapps.clearUserData().then(result => {
+                        showMessage("Successfully Cleared local data")
                         setTimeout(onLoadStartUp, 2000)
                     }).catch(error => showMessage(error, "error"))
-                })
+                }).catch(error => {})
         });
 
         document.getElementById('show-message').children[1].addEventListener("click", function (e) {
@@ -1254,6 +1449,8 @@
                     showMessage(
                         `${Object.keys(data.messages).length} New Messages And ${Object.keys(data.mails).length} New Mails`
                     )
+                    if(privKeyNotSecured)
+                    setTimeout( () => showMessage("Private key is not secured with password. Remember to secure the private key in settings", "warn"), 5000)
                 }).catch(error => showMessage(error, "error"))
                 .finally(_ => this.classList.remove("active"))
         })
@@ -1261,6 +1458,21 @@
         document.getElementById('settings').addEventListener("click", function (e) {
             document.getElementById("settings-screen").parentNode.classList.remove('hide')
         })
+
+        document.getElementById("view-privkey").addEventListener("mouseover", function (e) {
+            this.value = myPrivKey;
+        })
+
+        document.getElementById("view-privkey").addEventListener("mouseout", function (e) {
+            this.value = "";
+        });
+
+        document.getElementById("view-privkey").addEventListener("click", function (e) {
+            this.select();
+            this.setSelectionRange(0, 52);
+            document.execCommand("copy");
+            showMessage("Private Key copied to clipboard!", "warn")
+        });
 
         document.getElementById("backup-data").addEventListener("click", function (e) {
             let backupInfoText = document.getElementById("backup-info")
@@ -1284,7 +1496,7 @@
 
         document.getElementById("restore-data").addEventListener("change", function (e) {
             let file = this.files[0]
-            let restoreInfoText = document.getElementById("restore-info");
+            let restoreInfoText = document.getElementById("backup-info");
             restoreInfoText.classList.remove("error");
             restoreInfoText.textContent = `Retrieving backup data! Please wait...`;
             if (!file) {
@@ -1293,8 +1505,9 @@
                 return;
             }
             messenger.parseBackup(file).then(data => {
-                getConfirmation(
-                    `Restore ${Object.keys(data.contacts).length} Contacts, ${Object.keys(data.messages).length} Messages and ${Object.keys(data.mails).length} Mails?`
+                getConfirmation('Restore Data?',
+                    `Found:\n ${Object.keys(data.contacts).length} Contacts,\n ${Object.keys(data.messages).length} Messages,\n ${Object.keys(data.mails).length} Mails\nRestore Data?`,
+                    "Restore"
                 ).then(result => {
                     restoreInfoText.textContent = `Restoring data! Please wait...`;
                     messenger.restoreData(data).then(result => {
@@ -1338,11 +1551,14 @@
             return element;
         }
 
-        function getConfirmation(message) {
+        function getConfirmation(title, message, trueBtn = "Ok", falseBtn = "Cancel") {
             let confirmation = document.getElementById("confirmation");
-            confirmation.getElementsByTagName("legend")[0].textContent = message;
+            confirmation.getElementsByTagName("legend")[0].textContent = title;
+            confirmation.getElementsByTagName("span")[0].textContent = message;
             confirmation.parentNode.classList.remove("hide");
-            let options = confirmation.getElementsByTagName("input")
+            let options = confirmation.getElementsByTagName("input");
+            options[0].value = trueBtn;
+            options[1].value = falseBtn;
             return new Promise((resolve, reject) => {
                 let interval = setInterval(() => {
                     if (confirmation.parentNode.classList.contains("hide")) {
@@ -1365,6 +1581,42 @@
             })
         }
 
+        function getPromptInput(title, message, showText = true, trueBtn = "Ok", falseBtn = "Cancel") {
+            let promptInput = document.getElementById("prompt-input");
+            promptInput.getElementsByTagName("legend")[0].textContent = title;
+            promptInput.parentNode.classList.remove("hide");
+            let inputs = promptInput.getElementsByTagName("input");
+            inputs[0].setAttribute("placeholder", message)
+            if (showText)
+                inputs[0].setAttribute("type", "text")
+            else
+                inputs[0].setAttribute("type", "password")
+            inputs[1].value = trueBtn;
+            inputs[2].value = falseBtn;
+            return new Promise((resolve, reject) => {
+                let interval = setInterval(() => {
+                    if (promptInput.parentNode.classList.contains("hide")) {
+                        inputs[1].onclick = null;
+                        inputs[2].onclick = null;
+                        clearInterval(interval);
+                        reject(false);
+                    }
+                }, 1000)
+                inputs[1].onclick = () => {
+                    clearInterval(interval);
+                    let value = inputs[0].value;
+                    inputs[0].value = '';
+                    promptInput.parentNode.classList.add("hide")
+                    resolve(value)
+                }
+                inputs[2].onclick = () => {
+                    clearInterval(interval);
+                    promptInput.parentNode.classList.add("hide")
+                    reject(true)
+                }
+            })
+        }
+
         function showMessage(message, mode = "normal", log = "") {
             if (mode === "error")
                 console.error(message, log)
@@ -1375,7 +1627,7 @@
             let bg = {
                 normal: '#00C853',
                 error: '#D32F2F',
-                warn: '#FFCC00',
+                warn: '#FFAA00',
                 cool: '#08B6CE'
             }
             let banner = document.getElementById('show-message')
@@ -1439,6 +1691,13 @@
             getConversationElement(floID).appendChild(msgBox)
         }
 
+        function renderMarked(data) {
+            for (let d in data) {
+                let element = document.getElementsByName(d)[0]
+                data[d].forEach(mark => element.classList.add(mark))
+            }
+        }
+
         function getConversationElement(floID, name = "#null") {
             let element = document.getElementById(floID)
             if (!element) {
@@ -1450,10 +1709,10 @@
             return element;
         }
 
-        function renderMessages(data, init = false) {
+        function renderMessages(data, markUnread = true) {
             for (m in data) {
                 renderMessageBox(data[m].floID, data[m].message, data[m].time, data[m].category)
-                if (!init)
+                if (markUnread)
                     document.getElementsByName(data[m].floID)[0].classList.add("unread");
             }
         }
@@ -1471,12 +1730,13 @@
             else
                 document.getElementById("warn-no-encryption").classList.remove("hide");
             document.getElementsByName(floID)[0].classList.remove("unread");
+            messenger.removeMark(floID, "unread");
         }
 
-        function renderMailCard(mailID, subject, timestamp, category, floID) {
+        function renderMailCard(mailRef, subject, timestamp, category, floID) {
             let mailCard = document.createElement("div");
             mailCard.setAttribute("class", "mail-card");
-            mailCard.setAttribute("name", mailID);
+            mailCard.setAttribute("name", mailRef);
             let dateTime = new Date(timestamp).toString();
             let dateTag = document.createElement("span");
             dateTag.textContent = dateTime.slice(4, 10);
@@ -1496,68 +1756,72 @@
             mailList.insertBefore(mailCard, mailList.firstChild);
         }
 
-        function renderMailList(mails) {
-            for (m in mails)
-                renderMailCard(m, mails[m].subject, mails[m].time, mails[m].category, mails[m].floID);
+        function renderMailList(mails, markUnread = true) {
+            for (m in mails) {
+                renderMailCard(mails[m].ref, mails[m].subject, mails[m].time, mails[m].category, mails[m].floID);
+                if (markUnread)
+                    document.getElementsByName(mails[m].ref)[0].classList.add("unread");
+            }
         }
 
-        function viewMail(mailID, newView = true) {
+        function viewMail(mailRef, newView = true) {
             //clear the container and display popup (if needed)
             if (newView)
                 clearElement(document.getElementById("mail-container")).parentNode.parentNode.classList.remove("hide");
 
-            Promise.all([compactIDB.readData("mails", mailID), compactIDB.readData("mailContent", mailID)]).then(
-                results => {
-                    //create mail content
-                    let mailContent = document.createElement("div");
-                    mailContent.setAttribute("class", "mail-content");
-                    //add subject
-                    let subjectTag = document.createElement("span");
-                    subjectTag.textContent = results[0].subject;
-                    mailContent.appendChild(subjectTag);
-                    //add category
-                    let categoryTag = document.createElement("span");
-                    categoryTag.textContent = results[0].category;
-                    mailContent.appendChild(categoryTag);
-                    //add name (if available)  
-                    if (Array.isArray(results[0].floID))
-                        results[0].floID = results[0].floID.join(", ")
-                    let nameTag = document.createElement("span");
-                    nameTag.textContent = floGlobals.contacts[results[0].floID] || ' ';
-                    mailContent.appendChild(nameTag);
-                    //add floID
-                    let floIDTag = document.createElement("span");
-                    floIDTag.textContent = `<${results[0].floID}>`;
-                    mailContent.appendChild(floIDTag);
-                    //add data n time
-                    let timeTag = document.createElement("span");
-                    timeTag.textContent = new Date(results[0].time).toString().slice(4, 21);
-                    mailContent.appendChild(timeTag);
-                    //add mail content
-                    let contentTag = document.createElement("p");
-                    contentTag.textContent = results[1];
-                    mailContent.appendChild(contentTag);
-                    //append the contents to mail container
-                    document.getElementById("mail-container").appendChild(mailContent);
-                    //add prop for previous mail (if available)
-                    let prevMail = document.getElementById("prev-mail");
-                    prevMail.dataset["value"] = results[0].parentMailID;
-                    prevMail.style.display = results[0].parentMailID ? 'block' : 'none';
-                    //set values for reply mail form if new view
-                    if (newView) {
-                        if (results[0].floID.includes(','))
-                            document.getElementById("reply-mail").classList.add("hide");
-                        else {
-                            let replyForm = document.forms["reply-mail-form"];
-                            replyForm.reset();
-                            replyForm.dataset["to"] = results[0].floID;
-                            replyForm.dataset["parentMailID"] = mailID;
-                            replyForm["subject"].value = results[0].subject.startsWith("Re: ") ? results[0]
-                                .subject : `Re: ${results[0].subject}`;
-                            document.getElementById("reply-mail").classList.remove("hide");
-                        }
+            messenger.getMail(mailRef).then(result => {
+                //create mail content
+                let mailContent = document.createElement("div");
+                mailContent.setAttribute("class", "mail-content");
+                //add subject
+                let subjectTag = document.createElement("span");
+                subjectTag.textContent = result.subject;
+                mailContent.appendChild(subjectTag);
+                //add category
+                let categoryTag = document.createElement("span");
+                categoryTag.textContent = result.category;
+                mailContent.appendChild(categoryTag);
+                //add name (if available)  
+                if (Array.isArray(result.floID))
+                    result.floID = result.floID.join(", ")
+                let nameTag = document.createElement("span");
+                nameTag.textContent = floGlobals.contacts[result.floID] || ' ';
+                mailContent.appendChild(nameTag);
+                //add floID
+                let floIDTag = document.createElement("span");
+                floIDTag.textContent = `<${result.floID}>`;
+                mailContent.appendChild(floIDTag);
+                //add data n time
+                let timeTag = document.createElement("span");
+                timeTag.textContent = new Date(result.time).toString().slice(4, 21);
+                mailContent.appendChild(timeTag);
+                //add mail content
+                let contentTag = document.createElement("p");
+                contentTag.textContent = result.content;
+                mailContent.appendChild(contentTag);
+                //append the contents to mail container
+                document.getElementById("mail-container").appendChild(mailContent);
+                //add prop for previous mail (if available)
+                let prevMail = document.getElementById("prev-mail");
+                prevMail.dataset["value"] = result.prevRef;
+                prevMail.style.display = result.prevRef ? 'block' : 'none';
+                //set values for reply mail form if new view
+                if (newView) {
+                    if (result.floID.includes(','))
+                        document.getElementById("reply-mail").classList.add("hide");
+                    else {
+                        let replyForm = document.forms["reply-mail-form"];
+                        replyForm.reset();
+                        replyForm.dataset["to"] = result.floID;
+                        replyForm.dataset["prevRef"] = mailRef;
+                        replyForm["subject"].value = result.subject.startsWith("Re: ") ? result
+                            .subject : `Re: ${result.subject}`;
+                        document.getElementById("reply-mail").classList.remove("hide");
                     }
-                }).catch(error => showMessage("Unable to read mail", "error", error))
+                }
+                document.getElementsByName(mailRef)[0].classList.remove("unread");
+                messenger.removeMark(mailRef, "unread");
+            }).catch(error => showMessage("Unable to read mail", "error", error))
         }
 
         function sendMail() {
@@ -1590,7 +1854,7 @@
                                 });
                         else
                             showMessage(`${Object.keys(result.success).length} Mail(s) sent!`)
-                        renderMailCard(result.data.time, result.data.subject, result.data.time, result.data
+                        renderMailCard(result.data.ref, result.data.subject, result.data.time, result.data
                             .category, result.data.floID);
                         form.reset();
                     }
@@ -1605,10 +1869,10 @@
             let recipient = form.dataset.to;
             let subject = form["subject"].value;
             let content = form["content"].value;
-            let parentMailID = form.dataset.parentMailID;
-            messenger.replyMail(parentMailID, subject, content, recipient).then(data => {
+            let prevRef = form.dataset.prevRef;
+            messenger.replyMail(prevRef, subject, content, recipient).then(data => {
                 showMessage(`Mail replied!`);
-                renderMailCard(data.time, data.subject, data.time, data.category, data.floID);
+                renderMailCard(data.ref, data.subject, data.time, data.category, data.floID);
                 form.reset();
             }).catch(error => showMessage("Failed to send mail!", "error", error))
         }
@@ -8591,1269 +8855,1316 @@ Bitcoin.Util = {
 </script>
 
 <script id="floCrypto">
-  /* FLO Crypto Operators*/
-  const floCrypto = {
+    /* FLO Crypto Operators*/
+    const floCrypto = {
 
-    util:{
-        p: BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 16),
+        util: {
+            p: BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 16),
 
-        ecparams: EllipticCurve.getSECCurveByName("secp256k1"),
+            ecparams: EllipticCurve.getSECCurveByName("secp256k1"),
 
-        exponent1: function () {
-            return this.p.add(BigInteger.ONE).divide(BigInteger("4"))
-        },
+            exponent1: function () {
+                return this.p.add(BigInteger.ONE).divide(BigInteger("4"))
+            },
 
-        calculateY: function (x) {
-            let p = this.p;
-            let exp = this.exponent1();
-            // x is x value of public key in BigInteger format without 02 or 03 or 04 prefix
-            return x.modPow(BigInteger("3"), p).add(BigInteger("7")).mod(p).modPow(exp, p)
-        },
-        getUncompressedPublicKey: function (compressedPublicKey) {
-            const p = this.p;
-            // Fetch x from compressedPublicKey
-            let pubKeyBytes = Crypto.util.hexToBytes(compressedPublicKey);
-            const prefix = pubKeyBytes.shift() // remove prefix
-            let prefix_modulus = prefix % 2;
-            pubKeyBytes.unshift(0) // add prefix 0
-            let x = new BigInteger(pubKeyBytes)
-            let xDecimalValue = x.toString()
-            // Fetch y
-            let y = this.calculateY(x);
-            let yDecimalValue = y.toString();
-            // verify y value
-            let resultBigInt = y.mod(BigInteger("2"));
-            let check = resultBigInt.toString() % 2;
-            if (prefix_modulus !== check) {
-                yDecimalValue = y.negate().mod(p).toString();
+            calculateY: function (x) {
+                let p = this.p;
+                let exp = this.exponent1();
+                // x is x value of public key in BigInteger format without 02 or 03 or 04 prefix
+                return x.modPow(BigInteger("3"), p).add(BigInteger("7")).mod(p).modPow(exp, p)
+            },
+            getUncompressedPublicKey: function (compressedPublicKey) {
+                const p = this.p;
+                // Fetch x from compressedPublicKey
+                let pubKeyBytes = Crypto.util.hexToBytes(compressedPublicKey);
+                const prefix = pubKeyBytes.shift() // remove prefix
+                let prefix_modulus = prefix % 2;
+                pubKeyBytes.unshift(0) // add prefix 0
+                let x = new BigInteger(pubKeyBytes)
+                let xDecimalValue = x.toString()
+                // Fetch y
+                let y = this.calculateY(x);
+                let yDecimalValue = y.toString();
+                // verify y value
+                let resultBigInt = y.mod(BigInteger("2"));
+                let check = resultBigInt.toString() % 2;
+                if (prefix_modulus !== check) {
+                    yDecimalValue = y.negate().mod(p).toString();
+                }
+                return {
+                    x: xDecimalValue,
+                    y: yDecimalValue
+                };
+            },
+
+            getSenderPublicKeyString: function () {
+                privateKey = ellipticCurveEncryption.senderRandom();
+                senderPublicKeyString = ellipticCurveEncryption.senderPublicString(privateKey);
+                return {
+                    privateKey: privateKey,
+                    senderPublicKeyString: senderPublicKeyString
+                }
+            },
+
+            deriveSharedKeySender: function (receiverCompressedPublicKey, senderPrivateKey) {
+                try {
+                    let receiverPublicKeyString = this.getUncompressedPublicKey(receiverCompressedPublicKey);
+                    var senderDerivedKey = ellipticCurveEncryption.senderSharedKeyDerivation(
+                        receiverPublicKeyString.x, receiverPublicKeyString.y, senderPrivateKey);
+                    return senderDerivedKey;
+                } catch (error) {
+                    return new Error(error);
+                }
+            },
+
+            deriveReceiverSharedKey: function (senderPublicKeyString, receiverPrivateKey) {
+                return ellipticCurveEncryption.receiverSharedKeyDerivation(
+                    senderPublicKeyString.XValuePublicString, senderPublicKeyString.YValuePublicString,
+                    receiverPrivateKey);
+            },
+
+            getReceiverPublicKeyString: function (privateKey) {
+                return ellipticCurveEncryption.receiverPublicString(privateKey);
+            },
+
+            deriveSharedKeyReceiver: function (senderPublicKeyString, receiverPrivateKey) {
+                try {
+                    return ellipticCurveEncryption.receiverSharedKeyDerivation(senderPublicKeyString
+                        .XValuePublicString,
+                        senderPublicKeyString.YValuePublicString, receiverPrivateKey);
+
+                } catch (error) {
+                    return new Error(error);
+                }
+            },
+
+            wifToDecimal: function (pk_wif, isPubKeyCompressed = false) {
+                let pk = Bitcoin.Base58.decode(pk_wif)
+                pk.shift()
+                pk.splice(-4, 4)
+                //If the private key corresponded to a compressed public key, also drop the last byte (it should be 0x01).
+                if (isPubKeyCompressed == true) pk.pop()
+                pk.unshift(0)
+                privateKeyDecimal = BigInteger(pk).toString()
+                privateKeyHex = Crypto.util.bytesToHex(pk)
+                return {
+                    privateKeyDecimal: privateKeyDecimal,
+                    privateKeyHex: privateKeyHex
+                }
             }
+        },
+
+        //generate a random Interger within range
+        randInt: function (min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        },
+
+        //generate a random String within length (options : alphaNumeric chars only)
+        randString: function (length, alphaNumeric = false) {
+            var result = '';
+            if (alphaNumeric)
+                var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            else
+                var characters =
+                    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_+-./*?@#&$<>=[]{}():';
+            for (var i = 0; i < length; i++)
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            return result;
+        },
+
+        //Encrypt Data using public-key
+        encryptData: function (data, receiverCompressedPublicKey) {
+            var senderECKeyData = this.util.getSenderPublicKeyString();
+            var senderDerivedKey = this.util.deriveSharedKeySender(receiverCompressedPublicKey, senderECKeyData
+                .privateKey);
+            let senderKey = senderDerivedKey.XValue + senderDerivedKey.YValue;
+            let secret = Crypto.AES.encrypt(data, senderKey);
             return {
-                x: xDecimalValue,
-                y: yDecimalValue
+                secret: secret,
+                senderPublicKeyString: senderECKeyData.senderPublicKeyString
             };
         },
 
-        getSenderPublicKeyString: function () {
-            privateKey = ellipticCurveEncryption.senderRandom();
-            senderPublicKeyString = ellipticCurveEncryption.senderPublicString(privateKey);
-            return {
-                privateKey: privateKey,
-                senderPublicKeyString: senderPublicKeyString
-            }
+        //Decrypt Data using private-key
+        decryptData: function (data, myPrivateKey) {
+            var receiverECKeyData = {};
+            if (typeof myPrivateKey !== "string") throw new Error("No private key found.");
+
+            let privateKey = this.util.wifToDecimal(myPrivateKey, true);
+            if (typeof privateKey.privateKeyDecimal !== "string") throw new Error(
+                "Failed to detremine your private key.");
+            receiverECKeyData.privateKey = privateKey.privateKeyDecimal;
+
+            var receiverDerivedKey = this.util.deriveReceiverSharedKey(data.senderPublicKeyString,
+                receiverECKeyData
+                .privateKey);
+
+            let receiverKey = receiverDerivedKey.XValue + receiverDerivedKey.YValue;
+            let decryptMsg = Crypto.AES.decrypt(data.secret, receiverKey);
+            return decryptMsg;
         },
 
-        deriveSharedKeySender: function (receiverCompressedPublicKey, senderPrivateKey) {
+        //Sign data using private-key
+        signData: function (data, privateKeyHex) {
+            var key = new Bitcoin.ECKey(privateKeyHex);
+            key.setCompressed(true);
+
+            var privateKeyArr = key.getBitcoinPrivateKeyByteArray();
+            privateKey = BigInteger.fromByteArrayUnsigned(privateKeyArr);
+            var messageHash = Crypto.SHA256(data);
+
+            var messageHashBigInteger = new BigInteger(messageHash);
+            var messageSign = Bitcoin.ECDSA.sign(messageHashBigInteger, key.priv);
+
+            var sighex = Crypto.util.bytesToHex(messageSign);
+            return sighex;
+        },
+
+        //Verify signatue of the data using public-key
+        verifySign: function (data, signatureHex, publicKeyHex) {
+            var msgHash = Crypto.SHA256(data);
+            var messageHashBigInteger = new BigInteger(msgHash);
+
+            var sigBytes = Crypto.util.hexToBytes(signatureHex);
+            var signature = Bitcoin.ECDSA.parseSig(sigBytes);
+
+            var publicKeyPoint = this.util.ecparams.getCurve().decodePointHex(publicKeyHex);
+
+            var verify = Bitcoin.ECDSA.verifyRaw(messageHashBigInteger, signature.r, signature.s,
+                publicKeyPoint);
+            return verify;
+        },
+
+        //Generates a new flo ID and returns private-key, public-key and floID
+        generateNewID: function () {
             try {
-                let receiverPublicKeyString = this.getUncompressedPublicKey(receiverCompressedPublicKey);
-                var senderDerivedKey = ellipticCurveEncryption.senderSharedKeyDerivation(
-                receiverPublicKeyString.x, receiverPublicKeyString.y, senderPrivateKey);
-                return senderDerivedKey;
-            } catch (error) {
-                return new Error(error);
+                var key = new Bitcoin.ECKey(false);
+                key.setCompressed(true);
+                return {
+                    floID: key.getBitcoinAddress(),
+                    pubKey: key.getPubKeyHex(),
+                    privKey: key.getBitcoinWalletImportFormat()
+                }
+            } catch (e) {
+                console.error(e);
             }
         },
 
-        deriveReceiverSharedKey: function (senderPublicKeyString, receiverPrivateKey) {
-            return ellipticCurveEncryption.receiverSharedKeyDerivation(
-                senderPublicKeyString.XValuePublicString, senderPublicKeyString.YValuePublicString,
-                receiverPrivateKey);
+        //Returns public-key from private-key
+        getPubKeyHex: function (privateKeyHex) {
+            if(!privateKeyHex)
+                return null;
+            var key = new Bitcoin.ECKey(privateKeyHex);
+            if (key.priv == null) 
+                return null;
+            key.setCompressed(true);
+            var pubkeyHex = key.getPubKeyHex();
+            return pubkeyHex;
         },
 
-        getReceiverPublicKeyString: function (privateKey) {
-            return ellipticCurveEncryption.receiverPublicString(privateKey);
-        },
-
-        deriveSharedKeyReceiver: function (senderPublicKeyString, receiverPrivateKey) {
+        //Returns flo-ID from public-key
+        getFloIDfromPubkeyHex: function (pubkeyHex) {
             try {
-                return ellipticCurveEncryption.receiverSharedKeyDerivation(senderPublicKeyString.XValuePublicString,
-                senderPublicKeyString.YValuePublicString, receiverPrivateKey);
-
-            } catch (error) {
-                return new Error(error);
+                var key = new Bitcoin.ECKey().setPub(pubkeyHex);
+                var floID = key.getBitcoinAddress();
+                return floID;
+            } catch (e) {
+                console.error(e);
             }
         },
 
-        wifToDecimal: function (pk_wif, isPubKeyCompressed = false) {
-            let pk = Bitcoin.Base58.decode(pk_wif)
-            pk.shift()
-            pk.splice(-4, 4)
-            //If the private key corresponded to a compressed public key, also drop the last byte (it should be 0x01).
-            if (isPubKeyCompressed == true) pk.pop()
-            pk.unshift(0)
-            privateKeyDecimal = BigInteger(pk).toString()
-            privateKeyHex = Crypto.util.bytesToHex(pk)
-            return {
-                privateKeyDecimal: privateKeyDecimal,
-                privateKeyHex: privateKeyHex
+        //Verify the private-key for the given public-key or flo-ID
+        verifyPrivKey: function (privateKeyHex, pubKey_floID, isfloID = true) {
+            try {
+                var key = new Bitcoin.ECKey(privateKeyHex);
+                if (key.priv == null)
+                    return false;
+                key.setCompressed(true);
+                if (isfloID && pubKey_floID == key.getBitcoinAddress())
+                    return true;
+                else if (!isfloID && pubKey_floID == key.getPubKeyHex())
+                    return true;
+                else
+                    return false;
+            } catch (e) {
+                console.error(e);
             }
-        }
-    },
+        },
 
-    //generate a random Interger within range
-    randInt: function(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    },
-
-    //generate a random String within length (options : alphaNumeric chars only)
-    randString: function (length, alphaNumeric = false) {
-        var result = '';
-        if(alphaNumeric)
-            var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        else
-            var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_+-./*?@#&$<>=[]{}():';
-        for ( var i = 0; i < length; i++ ) 
-            result += characters.charAt(Math.floor(Math.random() * characters.length));
-        return result;
-    },
-
-    //Encrypt Data using public-key
-    encryptData: function (data, receiverCompressedPublicKey) {
-      var senderECKeyData = this.util.getSenderPublicKeyString();
-      var senderDerivedKey = this.util.deriveSharedKeySender(receiverCompressedPublicKey, senderECKeyData.privateKey);
-      let senderKey = senderDerivedKey.XValue + senderDerivedKey.YValue;
-      let secret = Crypto.AES.encrypt(data, senderKey);
-      return {
-        secret: secret,
-        senderPublicKeyString: senderECKeyData.senderPublicKeyString
-      };
-    },
-
-    //Decrypt Data using private-key
-    decryptData: function (data, myPrivateKey) {
-      var receiverECKeyData = {};
-      if (typeof myPrivateKey !== "string") throw new Error("No private key found.");
-
-      let privateKey = this.util.wifToDecimal(myPrivateKey, true);
-      if (typeof privateKey.privateKeyDecimal !== "string") throw new Error(
-        "Failed to detremine your private key.");
-      receiverECKeyData.privateKey = privateKey.privateKeyDecimal;
-
-      var receiverDerivedKey = this.util.deriveReceiverSharedKey(data.senderPublicKeyString, receiverECKeyData
-        .privateKey);
-
-      let receiverKey = receiverDerivedKey.XValue + receiverDerivedKey.YValue;
-      let decryptMsg = Crypto.AES.decrypt(data.secret, receiverKey);
-      return decryptMsg;
-    },
-
-    //Sign data using private-key
-    signData: function (data, privateKeyHex) {
-      var key = new Bitcoin.ECKey(privateKeyHex);
-      key.setCompressed(true);
-
-      var privateKeyArr = key.getBitcoinPrivateKeyByteArray();
-      privateKey = BigInteger.fromByteArrayUnsigned(privateKeyArr);
-      var messageHash = Crypto.SHA256(data);
-
-      var messageHashBigInteger = new BigInteger(messageHash);
-      var messageSign = Bitcoin.ECDSA.sign(messageHashBigInteger, key.priv);
-
-      var sighex = Crypto.util.bytesToHex(messageSign);
-      return sighex;
-    },
-
-    //Verify signatue of the data using public-key
-    verifySign: function (data, signatureHex, publicKeyHex) {
-      var msgHash = Crypto.SHA256(data);
-      var messageHashBigInteger = new BigInteger(msgHash);
-
-      var sigBytes = Crypto.util.hexToBytes(signatureHex);
-      var signature = Bitcoin.ECDSA.parseSig(sigBytes);
-
-      var publicKeyPoint = this.util.ecparams.getCurve().decodePointHex(publicKeyHex);
-
-      var verify = Bitcoin.ECDSA.verifyRaw(messageHashBigInteger, signature.r, signature.s,
-        publicKeyPoint);
-      return verify;
-    },
-
-    //Generates a new flo ID and returns private-key, public-key and floID
-    generateNewID: function () {
-      try {
-        var key = new Bitcoin.ECKey(false);
-        key.setCompressed(true);
-        return {
-          floID: key.getBitcoinAddress(),
-          pubKey: key.getPubKeyHex(),
-          privKey: key.getBitcoinWalletImportFormat()
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    },
-
-    //Returns public-key from private-key
-    getPubKeyHex: function (privateKeyHex) {
-      var key = new Bitcoin.ECKey(privateKeyHex);
-      if (key.priv == null) {
-        console.error("Invalid Private key");
-        return;
-      }
-      key.setCompressed(true);
-      var pubkeyHex = key.getPubKeyHex();
-      return pubkeyHex;
-    },
-
-    //Returns flo-ID from public-key
-    getFloIDfromPubkeyHex: function (pubkeyHex) {
-      try{
-        var key = new Bitcoin.ECKey().setPub(pubkeyHex);
-        var floID = key.getBitcoinAddress();
-        return floID;
-      }catch (e) {
-        console.error(e);
-      }
-    },
-
-    //Verify the private-key for the given public-key or flo-ID
-    verifyPrivKey: function (privateKeyHex, pubKey_floID, isfloID = true) {
-      try {
-        var key = new Bitcoin.ECKey(privateKeyHex);
-        if (key.priv == null)
-          return false;
-        key.setCompressed(true);
-        if (isfloID && pubKey_floID == key.getBitcoinAddress())
-          return true;
-        else if (!isfloID && pubKey_floID == key.getPubKeyHex())
-          return true;
-        else
-          return false;
-      } catch (e) {
-        console.error(e);
-      }
-    },
-
-    //Check if the given Address is valid or not
-    validateAddr: function (inpAddr) {
-      try {
-        var addr = new Bitcoin.Address(inpAddr);
-        return true;
-      } catch {
-        return false;
-      }
-    },
-
-    //Split the str using shamir's Secret and Returns the shares 
-    createShamirsSecretShares: function (str, total_shares, threshold_limit) {
-        try{
-            if (str.length > 0) {
-                var strHex = shamirSecretShare.str2hex(str);
-                var shares = shamirSecretShare.share(strHex, total_shares, threshold_limit);
-                return shares;
+        //Check if the given Address is valid or not
+        validateAddr: function (inpAddr) {
+            try {
+                var addr = new Bitcoin.Address(inpAddr);
+                return true;
+            } catch {
+                return false;
             }
-            return false;
-        }catch{
-            return false
-        }
-    },
+        },
 
-    //Verifies the shares and str
-    verifyShamirsSecret: function (sharesArray, str) {
-        return (str && this.retrieveShamirSecret(sharesArray) === str)
-    },
-
-    //Returns the retrived secret by combining the shamirs shares
-    retrieveShamirSecret: function (sharesArray) {
-        try{
-            if (sharesArray.length > 0) {
-                var comb = shamirSecretShare.combine(sharesArray.slice(0, sharesArray.length));
-                comb = shamirSecretShare.hex2str(comb);
-                return comb;
+        //Split the str using shamir's Secret and Returns the shares 
+        createShamirsSecretShares: function (str, total_shares, threshold_limit) {
+            try {
+                if (str.length > 0) {
+                    var strHex = shamirSecretShare.str2hex(str);
+                    var shares = shamirSecretShare.share(strHex, total_shares, threshold_limit);
+                    return shares;
+                }
+                return false;
+            } catch {
+                return false
             }
-            return false;
-        }catch{
-            return false
+        },
+
+        //Verifies the shares and str
+        verifyShamirsSecret: function (sharesArray, str) {
+            return (str && this.retrieveShamirSecret(sharesArray) === str)
+        },
+
+        //Returns the retrived secret by combining the shamirs shares
+        retrieveShamirSecret: function (sharesArray) {
+            try {
+                if (sharesArray.length > 0) {
+                    var comb = shamirSecretShare.combine(sharesArray.slice(0, sharesArray.length));
+                    comb = shamirSecretShare.hex2str(comb);
+                    return comb;
+                }
+                return false;
+            } catch {
+                return false;
+            }
         }
     }
-  }
 </script>
 <script id="floBlockchainAPI">
-  /* FLO Blockchain Operator to send/receive data from blockchain using API calls*/
-  const floBlockchainAPI = {
+    /* FLO Blockchain Operator to send/receive data from blockchain using API calls*/
+    const floBlockchainAPI = {
 
-    util: {
-        serverList: floGlobals.apiURL[floGlobals.blockchain].slice(0),
-        curPos: floCrypto.randInt(0, floGlobals.apiURL[floGlobals.blockchain].length),
-        fetch_retry: function(apicall){
-            return new Promise((resolve,reject) => {
-                this.serverList.splice(this.curPos, 1);
-                this.curPos = floCrypto.randInt(0, this.serverList.length)
-                this.fetch_api(apicall)
-                    .then(result => resolve(result))
-                    .catch(error => reject(error));
-            })
-        },
-        fetch_api: function(apicall){
-            return new Promise((resolve, reject) => {
-                if(this.serverList.length === 0)
-                    reject("No floSight server working")
-                else{
-                    fetch(this.serverList[this.curPos] + apicall).then(response  => {
-                        if(response.ok)
-                            response.json().then(data => resolve(data));
-                        else{
+        util: {
+            serverList: floGlobals.apiURL[floGlobals.blockchain].slice(0),
+            curPos: floCrypto.randInt(0, floGlobals.apiURL[floGlobals.blockchain].length),
+            fetch_retry: function (apicall) {
+                return new Promise((resolve, reject) => {
+                    this.serverList.splice(this.curPos, 1);
+                    this.curPos = floCrypto.randInt(0, this.serverList.length)
+                    this.fetch_api(apicall)
+                        .then(result => resolve(result))
+                        .catch(error => reject(error));
+                })
+            },
+            fetch_api: function (apicall) {
+                return new Promise((resolve, reject) => {
+                    if (this.serverList.length === 0)
+                        reject("No floSight server working")
+                    else {
+                        fetch(this.serverList[this.curPos] + apicall).then(response => {
+                            if (response.ok)
+                                response.json().then(data => resolve(data));
+                            else {
+                                this.fetch_retry(apicall)
+                                    .then(result => resolve(result))
+                                    .catch(error => reject(error));
+                            }
+                        }).catch(error => {
                             this.fetch_retry(apicall)
                                 .then(result => resolve(result))
                                 .catch(error => reject(error));
+                        })
+                    }
+                })
+            }
+        },
+
+        //Promised function to get data from API
+        promisedAPI: function (apicall) {
+            return new Promise((resolve, reject) => {
+                console.log(apicall)
+                this.util.fetch_api(apicall)
+                    .then(result => resolve(result))
+                    .catch(error => reject(error));
+            });
+        },
+
+        //Get balance for the given Address
+        getBalance: function (addr) {
+            return new Promise((resolve, reject) => {
+                this.promisedAPI(`api/addr/${addr}/balance`)
+                    .then(balance => resolve(parseFloat(balance)))
+                    .catch(error => reject(error));
+            });
+        },
+
+        //Write Data into blockchain
+        writeData: function (senderAddr, Data, PrivKey, receiverAddr = floGlobals.adminID) {
+            return new Promise((resolve, reject) => {
+                this.sendTx(senderAddr, receiverAddr, floGlobals.sendAmt, PrivKey, Data)
+                    .then(txid => resolve(txid))
+                    .catch(error => reject(error))
+            });
+        },
+
+        //Send Tx to blockchain 
+        sendTx: function (senderAddr, receiverAddr, sendAmt, PrivKey, floData = '') {
+            return new Promise((resolve, reject) => {
+                if (!floCrypto.validateAddr(senderAddr))
+                    reject(`Invalid address : ${senderAddr}`);
+                else if (!floCrypto.validateAddr(receiverAddr))
+                    reject(`Invalid address : ${receiverAddr}`);
+                if (PrivKey.length < 1 || !floCrypto.verifyPrivKey(PrivKey, senderAddr))
+                    reject("Invalid Private key!");
+                else if (typeof sendAmt !== 'number' || sendAmt <= 0)
+                    reject(`Invalid sendAmt : ${sendAmt}`);
+                else {
+                    var trx = bitjs.transaction();
+                    var utxoAmt = 0.0;
+                    var fee = floGlobals.fee;
+                    this.promisedAPI(`api/addr/${senderAddr}/utxo`).then(utxos => {
+                        for (var i = utxos.length - 1;
+                            (i >= 0) && (utxoAmt < sendAmt + fee); i--) {
+                            if (utxos[i].confirmations) {
+                                trx.addinput(utxos[i].txid, utxos[i].vout, utxos[i]
+                                    .scriptPubKey)
+                                utxoAmt += utxos[i].amount;
+                            } else break;
                         }
-                    }).catch(error => {
-                        this.fetch_retry(apicall)
-                            .then(result => resolve(result))
-                            .catch(error => reject(error));
-                    })
+                        if (utxoAmt < sendAmt + fee)
+                            reject("Insufficient balance!");
+                        else {
+                            trx.addoutput(receiverAddr, sendAmt);
+                            var change = utxoAmt - sendAmt - fee;
+                            if (change > 0)
+                                trx.addoutput(senderAddr, change);
+                            trx.addflodata(floData);
+                            var signedTxHash = trx.sign(PrivKey, 1);
+                            this.broadcastTx(signedTxHash)
+                                .then(txid => resolve(txid))
+                                .catch(error => reject(error))
+                        }
+                    }).catch(error => reject(error))
+                }
+            });
+        },
+
+        //Broadcast signed Tx in blockchain using API
+        broadcastTx: function (signedTxHash) {
+            return new Promise((resolve, reject) => {
+                var request = new XMLHttpRequest();
+                var url = this.util.serverList[this.util.curPos] + 'api/tx/send';
+                if (signedTxHash.length < 1)
+                    reject("Empty Signature");
+                else {
+                    var params = `{"rawtx":"${signedTxHash}"}`;
+                    request.open('POST', url, true);
+                    //Send the proper header information along with the request
+                    request.setRequestHeader('Content-type', 'application/json');
+                    request.onload = function () {
+                        if (request.readyState == 4 && request.status == 200) {
+                            console.log(request.response);
+                            resolve(JSON.parse(request.response).txid.result);
+                        } else
+                            reject(request.responseText);
+                    }
+                    request.send(params);
                 }
             })
+        },
+
+        //Read Txs of Address between from and to
+        readTxs: function (addr, from, to) {
+            return new Promise((resolve, reject) => {
+                this.promisedAPI(`api/addrs/${addr}/txs?from=${from}&to=${to}`)
+                    .then(response => resolve(response))
+                    .catch(error => reject(error))
+            });
+        },
+
+        //Read All Txs of Address (newest first)
+        readAllTxs: function (addr) {
+            return new Promise((resolve, reject) => {
+                this.promisedAPI(`api/addrs/${addr}/txs?from=0&to=1`).then(response => {
+                    this.promisedAPI(`api/addrs/${addr}/txs?from=0&to=${response.totalItems}0`)
+                        .then(response => resolve(response.items))
+                        .catch(error => reject(error));
+                }).catch(error => reject(error))
+            });
+        },
+
+        /*Read flo Data from txs of given Address
+        options can be used to filter data
+        limit       : maximum number of filtered data (default = 1000, negative  = no limit)
+        ignoreOld   : ignore old txs (default = 0)
+        sentOnly    : filters only sent data
+        pattern     : filters data that starts with a pattern
+        contains    : filters data that contains a string
+        filter      : custom filter funtion for floData (eg . filter: d => {return d[0] == '$'})
+        */
+        readData: function (addr, options = {}) {
+            options.limit = options.limit | 1000
+            options.ignoreOld = options.ignoreOld | 0
+            return new Promise((resolve, reject) => {
+                this.promisedAPI(`api/addrs/${addr}/txs?from=0&to=1`).then(response => {
+                    var newItems = response.totalItems - options.ignoreOld;
+                    this.promisedAPI(`api/addrs/${addr}/txs?from=0&to=${newItems*2}`).then(
+                        response => {
+                            if (options.limit <= 0)
+                                options.limit = response.items.length;
+                            var filteredData = [];
+                            for (i = 0; i < (response.totalItems - options.ignoreOld) &&
+                                filteredData.length < options.limit; i++) {
+                                if (options.sentOnly && response.items[i].vin[0].addr !==
+                                    addr)
+                                    continue;
+                                if (options.pattern && !response.items[i].floData
+                                    .startsWith(options.pattern, 0) && !response.items[i]
+                                    .floData.startsWith(options.pattern, 2))
+                                    continue;
+                                if (options.contains && !response.items[i].floData.includes(
+                                        options.contains))
+                                    continue;
+                                if (options.filter && !options.filter(response.items[i]
+                                        .floData))
+                                    continue;
+                                filteredData.push(response.items[i].floData);
+                            }
+                            resolve({
+                                totalTxs: response.totalItems,
+                                data: filteredData
+                            });
+                        }).catch(error => {
+                        reject(error);
+                    });
+                }).catch(error => {
+                    reject(error);
+                });
+            });
         }
-    },
-
-    //Promised function to get data from API
-    promisedAPI: function (apicall) {
-      return new Promise((resolve, reject) => {
-        console.log(apicall)
-        this.util.fetch_api(apicall)
-            .then(result => resolve(result))
-            .catch(error => reject(error));
-      });
-    },
-
-    //Get balance for the given Address
-    getBalance: function (addr) {
-      return new Promise((resolve, reject) => {
-        this.promisedAPI(`api/addr/${addr}/balance`)
-            .then(balance => resolve(parseFloat(balance)))
-            .catch(error => reject(error));
-      });
-    },
-
-    //Write Data into blockchain
-    writeData: function (senderAddr, Data, PrivKey, receiverAddr = floGlobals.adminID) {
-      return new Promise((resolve, reject) => {
-        this.sendTx(senderAddr, receiverAddr, floGlobals.sendAmt, PrivKey, Data)
-            .then(txid => resolve(txid))
-            .catch(error => reject(error))
-      });
-    },
-
-    //Send Tx to blockchain 
-    sendTx: function (senderAddr, receiverAddr, sendAmt, PrivKey, floData = '') {
-      return new Promise((resolve, reject) => {
-        if (!floCrypto.validateAddr(senderAddr))
-          reject(`Invalid address : ${senderAddr}`);
-        else if (!floCrypto.validateAddr(receiverAddr))
-          reject(`Invalid address : ${receiverAddr}`);
-        if (PrivKey.length < 1 || !floCrypto.verifyPrivKey(PrivKey, senderAddr))
-          reject("Invalid Private key!");
-        else if (typeof sendAmt !== 'number' || sendAmt <= 0)
-          reject(`Invalid sendAmt : ${sendAmt}`);
-        else {
-          var trx = bitjs.transaction();
-          var utxoAmt = 0.0;
-          var fee = floGlobals.fee;
-          this.promisedAPI(`api/addr/${senderAddr}/utxo`).then(utxos => {
-            for (var i = utxos.length - 1;
-              (i >= 0) && (utxoAmt < sendAmt + fee); i--) {
-              if (utxos[i].confirmations) {
-                trx.addinput(utxos[i].txid, utxos[i].vout, utxos[i].scriptPubKey)
-                utxoAmt += utxos[i].amount;
-              } else break;
-            }
-            if (utxoAmt < sendAmt + fee)
-              reject("Insufficient balance!");
-            else {
-              trx.addoutput(receiverAddr, sendAmt);
-              var change = utxoAmt - sendAmt - fee;
-              if (change > 0)
-                trx.addoutput(senderAddr, change);
-              trx.addflodata(floData);
-              var signedTxHash = trx.sign(PrivKey, 1);
-              this.broadcastTx(signedTxHash)
-                .then(txid => resolve(txid))
-                .catch(error => reject(error))
-            }
-          }).catch(error => reject(error))
-        }
-      });
-    },
-
-    //Broadcast signed Tx in blockchain using API
-    broadcastTx: function (signedTxHash) {
-      return new Promise((resolve, reject) => {
-        var request = new XMLHttpRequest();
-        var url = this.util.serverList[this.util.curPos] + 'api/tx/send';
-        if (signedTxHash.length < 1)
-          reject("Empty Signature");
-        else {
-          var params = `{"rawtx":"${signedTxHash}"}`;
-          request.open('POST', url, true);
-          //Send the proper header information along with the request
-          request.setRequestHeader('Content-type', 'application/json');
-          request.onload = function () {
-            if (request.readyState == 4 && request.status == 200) {
-              console.log(request.response);
-              resolve(JSON.parse(request.response).txid.result);
-            } else
-              reject(request.responseText);
-          }
-          request.send(params);
-        }
-      })
-    },
-
-    //Read Txs of Address between from and to
-    readTxs: function (addr, from, to) {
-      return new Promise((resolve, reject) => {
-        this.promisedAPI(`api/addrs/${addr}/txs?from=${from}&to=${to}`)
-            .then(response => resolve(response))
-            .catch(error => reject(error))
-      });
-    },
-
-    //Read All Txs of Address (newest first)
-    readAllTxs: function (addr) {
-      return new Promise((resolve, reject) => {
-        this.promisedAPI(`api/addrs/${addr}/txs?from=0&to=1`).then(response => {
-          this.promisedAPI(`api/addrs/${addr}/txs?from=0&to=${response.totalItems}0`)
-            .then(response => resolve(response.items))
-            .catch(error => reject(error));
-        }).catch(error => reject(error))
-      });
-    },
-
-    /*Read flo Data from txs of given Address
-    options can be used to filter data
-    limit       : maximum number of filtered data (default = 1000, negative  = no limit)
-    ignoreOld   : ignore old txs (default = 0)
-    sentOnly    : filters only sent data
-    pattern     : filters data that starts with a pattern
-    contains    : filters data that contains a string
-    filter      : custom filter funtion for floData (eg . filter: d => {return d[0] == '$'})
-    */
-    readData: function(addr,options = {}){
-        options.limit = options.limit | 1000
-        options.ignoreOld = options.ignoreOld | 0
-        return new Promise((resolve, reject) => {
-        this.promisedAPI(`api/addrs/${addr}/txs?from=0&to=1`).then(response => {
-          var newItems = response.totalItems - options.ignoreOld;
-          this.promisedAPI(`api/addrs/${addr}/txs?from=0&to=${newItems*2}`).then(response => {
-              if (options.limit <= 0) 
-                options.limit = response.items.length;
-              var filteredData = [];
-              for (i = 0; i < (response.totalItems - options.ignoreOld) && filteredData.length < options.limit; i++){
-                if(options.sentOnly && response.items[i].vin[0].addr !== addr)
-                    continue;
-                if(options.pattern && !response.items[i].floData.startsWith(options.pattern, 0) && !response.items[i].floData.startsWith(options.pattern, 2))
-                    continue;
-                if(options.contains && !response.items[i].floData.includes(options.contains))
-                    continue;
-                if(options.filter && !options.filter(response.items[i].floData))
-                    continue;
-                filteredData.push(response.items[i].floData);
-              }
-              resolve({totalTxs:response.totalItems , data:filteredData});
-          }).catch(error => {
-            reject(error);
-          });
-        }).catch(error => {
-          reject(error);
-        });
-      });
     }
-  }
 </script>
 <script id="floSupernode">
-  /* flo Supernode Operators to send/receive data from supernodes using websocket */
-  const floSupernode = {
+    /* flo Supernode Operators to send/receive data from supernodes using websocket */
+    const floSupernode = {
 
-    //kBucket object 
-    kBucket: {
-      supernodeKBucket: null,
-      decodeBase58Address: function (address) {
-        let k = bitjs.Base58.decode(address)
-        k.shift()
-        k.splice(-4, 4)
-        return Crypto.util.bytesToHex(k)
-      },
-      floIdToKbucketId: function (address) {
-        const decodedId = this.decodeBase58Address(address);
-        const nodeIdBigInt = new BigInteger(decodedId, 16);
-        const nodeIdBytes = nodeIdBigInt.toByteArrayUnsigned();
-        const nodeIdNewInt8Array = new Uint8Array(nodeIdBytes);
-        return nodeIdNewInt8Array;
-      },
-      launch: function (superNodeList = Object.keys(floGlobals.supernodes), master_floID = floGlobals.SNStorageID) {
-        return new Promise((resolve, reject) => {
-          try {
-            const SuKBucketId = this.floIdToKbucketId(master_floID);
-            const SukbOptions = {
-              localNodeId: SuKBucketId
-            }
-            this.supernodeKBucket = new BuildKBucket(SukbOptions);
-            for (var i = 0; i < superNodeList.length; i++) {
-              this.addNewNode(superNodeList[i])
-            }
-            resolve('SuperNode KBucket formed');
-          } catch (error) {
-            reject(error);
-          }
-        });
-      },
-      addContact: function (id, floID, KB = this.supernodeKBucket) {
-        const contact = {
-          id: id,
-          floID: floID
-        };
-        KB.add(contact)
-      },
-      addNewNode: function (address, KB = this.supernodeKBucket) {
-        let decodedId = address;
-        try {
-          decodedId = this.floIdToKbucketId(address);
-        } catch (e) {
-          decodedId = address;
-        }
-        this.addContact(decodedId, address, KB);
-      },
-      isNodePresent: function (flo_id, KB = this.supernodeKBucket) {
-        let kArray = KB.toArray();
-        let kArrayFloIds = kArray.map(k => k.floID);
-        if (kArrayFloIds.includes(flo_id))
-            return true;
-        else
-            return false;
-      },
- 
-      getInnerNodes: function(flo_addr1, flo_addr2, KB = this.supernodeKBucket){
-        return new Promise((resolve, reject) => {
-          let kArrayFloIds = KB.toArray().map(k => k.floID);
-          var innerNodes = []
-          if(kArrayFloIds.includes(flo_addr1) && kArrayFloIds.includes(flo_addr2)){
-            for(var i = kArrayFloIds.indexOf(flo_addr1); i!= flo_addr2; i++){
-                if(i >= kArrayFloIds.length)
-                    i = -1
+        //kBucket object 
+        kBucket: {
+            supernodeKBucket: null,
+            decodeBase58Address: function (address) {
+                let k = bitjs.Base58.decode(address)
+                k.shift()
+                k.splice(-4, 4)
+                return Crypto.util.bytesToHex(k)
+            },
+            floIdToKbucketId: function (address) {
+                const decodedId = this.decodeBase58Address(address);
+                const nodeIdBigInt = new BigInteger(decodedId, 16);
+                const nodeIdBytes = nodeIdBigInt.toByteArrayUnsigned();
+                const nodeIdNewInt8Array = new Uint8Array(nodeIdBytes);
+                return nodeIdNewInt8Array;
+            },
+            launch: function (superNodeList = Object.keys(floGlobals.supernodes), master_floID = floGlobals
+            .adminID) {
+                return new Promise((resolve, reject) => {
+                    try {
+                        const SuKBucketId = this.floIdToKbucketId(master_floID);
+                        const SukbOptions = {
+                            localNodeId: SuKBucketId
+                        }
+                        this.supernodeKBucket = new BuildKBucket(SukbOptions);
+                        for (var i = 0; i < superNodeList.length; i++) {
+                            this.addNewNode(superNodeList[i])
+                        }
+                        resolve('SuperNode KBucket formed');
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            },
+            addContact: function (id, floID, KB = this.supernodeKBucket) {
+                const contact = {
+                    id: id,
+                    floID: floID
+                };
+                KB.add(contact)
+            },
+            addNewNode: function (address, KB = this.supernodeKBucket) {
+                let decodedId = address;
+                try {
+                    decodedId = this.floIdToKbucketId(address);
+                } catch (e) {
+                    decodedId = address;
+                }
+                this.addContact(decodedId, address, KB);
+            },
+            isNodePresent: function (flo_id, KB = this.supernodeKBucket) {
+                let kArray = KB.toArray();
+                let kArrayFloIds = kArray.map(k => k.floID);
+                if (kArrayFloIds.includes(flo_id))
+                    return true;
                 else
-                    innerNodes.push(kArrayFloIds[i])
+                    return false;
+            },
+
+            getInnerNodes: function (flo_addr1, flo_addr2, KB = this.supernodeKBucket) {
+                return new Promise((resolve, reject) => {
+                    let kArrayFloIds = KB.toArray().map(k => k.floID);
+                    var innerNodes = []
+                    if (kArrayFloIds.includes(flo_addr1) && kArrayFloIds.includes(flo_addr2)) {
+                        for (var i = kArrayFloIds.indexOf(flo_addr1); i != flo_addr2; i++) {
+                            if (i >= kArrayFloIds.length)
+                                i = -1
+                            else
+                                innerNodes.push(kArrayFloIds[i])
+                        }
+                        resolve(innerNodes)
+                    } else
+                        reject('Given nodes are not in KBucket')
+                });
+            },
+
+            getOuterNodes: function (flo_addr1, flo_addr2, KB = this.supernodeKBucket) {
+                return new Promise((resolve, reject) => {
+                    let kArrayFloIds = KB.toArray().map(k => k.floID);
+                    var outterNodes = []
+                    if (kArrayFloIds.includes(flo_addr1) && kArrayFloIds.includes(flo_addr2)) {
+                        for (var i = kArrayFloIds.indexOf(flo_addr2); i != flo_addr1; i++) {
+                            if (i >= kArrayFloIds.length)
+                                i = -1
+                            else
+                                outterNodes.push(kArrayFloIds[i])
+                        }
+                        resolve(outterNodes)
+                    } else
+                        reject('Given nodes are not in KBucket')
+                });
+            },
+
+            getPrevSupernode: function (flo_addr, n = 1, KB = this.supernodeKBucket) {
+                return new Promise((resolve, reject) => {
+                    try {
+                        let kArrayFloIds = KB.toArray().map(k => k.floID);
+                        let pos = kArrayFloIds.indexOf(flo_addr)
+                        var prevSupernode = []
+                        for (var i = 1; i <= n; i++) {
+                            if (pos - i < 0)
+                                var prev = pos - i + kArrayFloIds.length
+                            else
+                                var prev = pos - i
+                            prevSupernode.push(kArrayFloIds[prev])
+                        }
+                        resolve(prevSupernode);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            },
+
+            getNextSupernode: function (flo_addr, n = 1, KB = this.supernodeKBucket) {
+                return new Promise((resolve, reject) => {
+                    try {
+                        let kArrayFloIds = KB.toArray().map(k => k.floID);
+                        let pos = kArrayFloIds.indexOf(flo_addr)
+                        var nextSupernode = []
+                        for (var i = 1; i <= n; i++) {
+                            if (pos + i >= kArrayFloIds.length)
+                                var next = pos + i - kArrayFloIds.length
+                            else
+                                var next = pos + i
+                            nextSupernode.push(kArrayFloIds[next])
+                        }
+                        resolve(nextSupernode);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            },
+
+            determineClosestSupernode: function (flo_addr, n = 1, KB = this.supernodeKBucket) {
+                return new Promise((resolve, reject) => {
+                    try {
+                        let isFloIdUint8 = flo_addr instanceof Uint8Array;
+                        if (!isFloIdUint8)
+                            flo_addr = this.floIdToKbucketId(flo_addr);
+                        var closestSupernode = KB.closest(flo_addr, n);
+                        closestSupernode = closestSupernode.map(k => k.floID);
+                        resolve(closestSupernode);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
             }
-            resolve(innerNodes)
-          }else
-            reject('Given nodes are not in KBucket')
-        });
-      },
+        },
 
-      getOuterNodes: function(flo_addr1, flo_addr2, KB = this.supernodeKBucket){
-        return new Promise((resolve, reject) => {
-          let kArrayFloIds = KB.toArray().map(k => k.floID);
-          var outterNodes = []
-          if(kArrayFloIds.includes(flo_addr1) && kArrayFloIds.includes(flo_addr2)){
-            for(var i = kArrayFloIds.indexOf(flo_addr2); i!= flo_addr1; i++){
-                if(i >= kArrayFloIds.length)
-                    i = -1
-                else
-                    outterNodes.push(kArrayFloIds[i])
-            }
-            resolve(outterNodes)
-          }else
-            reject('Given nodes are not in KBucket')
-        });
-      },
-
-      getPrevSupernode: function(flo_addr, n = 1, KB = this.supernodeKBucket){
-        return new Promise((resolve, reject) => {
-          try {
-            let kArrayFloIds = KB.toArray().map(k => k.floID);
-            let pos = kArrayFloIds.indexOf(flo_addr)
-            var prevSupernode = []
-            for(var i = 1; i <= n; i++){
-                if(pos - i < 0)
-                    var prev = pos - i + kArrayFloIds.length
-                else
-                    var prev = pos - i
-                prevSupernode.push(kArrayFloIds[prev])
-            }
-            resolve(prevSupernode);
-          } catch (error) {
-            reject(error);
-          }
-        });
-      },
-
-      getNextSupernode: function(flo_addr, n = 1, KB = this.supernodeKBucket){
-        return new Promise((resolve, reject) => {
-          try {
-            let kArrayFloIds = KB.toArray().map(k => k.floID);
-            let pos = kArrayFloIds.indexOf(flo_addr)
-            var nextSupernode = []
-            for(var i = 1; i <= n; i++){
-                if(pos + i >= kArrayFloIds.length)
-                    var next = pos + i - kArrayFloIds.length
-                else
-                    var next = pos + i
-                nextSupernode.push(kArrayFloIds[next])
-            }
-            resolve(nextSupernode);
-          } catch (error) {
-            reject(error);
-          }
-        });
-      },
-
-      determineClosestSupernode: function (flo_addr, n = 1, KB = this.supernodeKBucket) {
-        return new Promise((resolve, reject) => {
-          try {
-            let isFloIdUint8 = flo_addr instanceof Uint8Array;
-            if (!isFloIdUint8)
-              flo_addr = this.floIdToKbucketId(flo_addr);
-            var closestSupernode = KB.closest(flo_addr, n);
-            closestSupernode = closestSupernode.map(k => k.floID);
-            resolve(closestSupernode);
-          } catch (error) {
-            reject(error);
-          }
-        });
-      }
-    },
-
-    sendDataToSN(data, snfloID){
-        return new Promise((resolve, reject) => {
-            var websocket = new WebSocket("wss://" + floGlobals.supernodes[snfloID].uri + "/ws");
-            websocket.onmessage = (evt => {
-                if(evt.data == '$+'){
-                    websocket.send(data);
-                    resolve(`Data sent to supernode : ${snfloID}`);
-                }else if(evt.data == '$-'){
+        sendDataToSN(data, snfloID) {
+            return new Promise((resolve, reject) => {
+                var websocket = new WebSocket("wss://" + floGlobals.supernodes[snfloID].uri + "/ws");
+                websocket.onmessage = (evt => {
+                    if (evt.data == '$+') {
+                        websocket.send(data);
+                        resolve(`Data sent to supernode : ${snfloID}`);
+                    } else if (evt.data == '$-') {
+                        this.kBucket.getNextSupernode(snfloID).then(nextNode => {
+                            this.sendDataToSN(data, nextNode[0])
+                                .then(result => resolve(result))
+                                .catch(error => reject(error))
+                        }).catch(error => reject(error))
+                    } else {
+                        console.log(evt.data)
+                        reject(evt.data)
+                    }
+                    websocket.close();
+                })
+                websocket.onerror = (evt) => {
                     this.kBucket.getNextSupernode(snfloID).then(nextNode => {
                         this.sendDataToSN(data, nextNode[0])
                             .then(result => resolve(result))
                             .catch(error => reject(error))
                     }).catch(error => reject(error))
-                }else{
-                    console.log(evt.data)
-                    reject(evt.data)
-                }
-                websocket.close();
+                };
             })
-            websocket.onerror = (evt) => {
-                this.kBucket.getNextSupernode(snfloID).then(nextNode => {
-                    this.sendDataToSN(data, nextNode[0])
+        },
+
+        //Sends data to the supernode
+        sendData: function (data, floID) {
+            return new Promise((resolve, reject) => {
+                this.kBucket.determineClosestSupernode(floID).then(closestNode => {
+                    this.sendDataToSN(data, closestNode[0])
                         .then(result => resolve(result))
                         .catch(error => reject(error))
-                }).catch(error => reject(error))
-            };
-        })
-    },
+                }).catch(error => {
+                    reject(error);
+                });
+            });
+        },
 
-    //Sends data to the supernode
-    sendData: function (data, floID) {
-      return new Promise((resolve, reject) => {
-        this.kBucket.determineClosestSupernode(floID).then(closestNode => {
-            this.sendDataToSN(data, closestNode[0])
-                .then(result => resolve(result))
-                .catch(error => reject(error))
-        }).catch(error => {
-            reject(error);
-        });
-      });
-    },
-
-    requestDataFromSN(request, snfloID){
-        return new Promise((resolve, reject) => {
-            var websocket = new WebSocket("wss://" + floGlobals.supernodes[snfloID].uri + "/ws");
-            websocket.onmessage = (evt => {
-                if(evt.data == '$+'){
-                    websocket.send(`?${request}`);
-                }else if(evt.data == '$-'){
+        requestDataFromSN(request, snfloID) {
+            return new Promise((resolve, reject) => {
+                var websocket = new WebSocket("wss://" + floGlobals.supernodes[snfloID].uri + "/ws");
+                websocket.onmessage = (evt => {
+                    if (evt.data == '$+') {
+                        websocket.send(`?${request}`);
+                    } else if (evt.data == '$-') {
+                        this.kBucket.getNextSupernode(snfloID).then(nextNode => {
+                            this.requestDataFromSN(request, nextNode[0])
+                                .then(result => resolve(result))
+                                .catch(error => reject(error))
+                        }).catch(error => reject(error))
+                        websocket.close()
+                    } else {
+                        resolve(evt.data);
+                        websocket.close();
+                    }
+                })
+                websocket.onerror = (evt) => {
                     this.kBucket.getNextSupernode(snfloID).then(nextNode => {
                         this.requestDataFromSN(request, nextNode[0])
                             .then(result => resolve(result))
                             .catch(error => reject(error))
                     }).catch(error => reject(error))
-                    websocket.close()
-                }else{
-                    resolve(evt.data);
-                    websocket.close();
-                }
+                };
             })
-            websocket.onerror = (evt) => {
-                this.kBucket.getNextSupernode(snfloID).then(nextNode => {
-                    this.requestDataFromSN(request, nextNode[0])
+        },
+
+        //Request data from supernode
+        requestData: function (request, floID) {
+            return new Promise((resolve, reject) => {
+                this.kBucket.determineClosestSupernode(floID).then(closestNode => {
+                    this.requestDataFromSN(request, closestNode[0])
                         .then(result => resolve(result))
                         .catch(error => reject(error))
-                }).catch(error => reject(error))
-            };
-        })
-    },
-
-    //Request data from supernode
-    requestData: function (request, floID) {
-      return new Promise((resolve, reject) => {
-        this.kBucket.determineClosestSupernode(floID).then(closestNode => {
-            this.requestDataFromSN(request, closestNode[0])
-                .then(result => resolve(result))
-                .catch(error => reject(error))
-        }).catch(error => {
-            reject(error);
-        });
-      });
-    }
-  }
-
-  /**Kademlia DHT K-bucket implementation as a binary tree.
-   * Implementation of a Kademlia DHT k-bucket used for storing
-   * contact (peer node) information.
-   *
-   * @extends EventEmitter
-   */
-   function BuildKBucket(options = {}) {
-    /**
-     * `options`:
-     *   `distance`: Function
-     *     `function (firstId, secondId) { return distance }` An optional
-     *     `distance` function that gets two `id` Uint8Arrays
-     *     and return distance (as number) between them.
-     *   `arbiter`: Function (Default: vectorClock arbiter)
-     *     `function (incumbent, candidate) { return contact; }` An optional
-     *     `arbiter` function that givent two `contact` objects with the same `id`
-     *     returns the desired object to be used for updating the k-bucket. For
-     *     more details, see [arbiter function](#arbiter-function).
-     *   `localNodeId`: Uint8Array An optional Uint8Array representing the local node id.
-     *     If not provided, a local node id will be created via `randomBytes(20)`.
-     *     `metadata`: Object (Default: {}) Optional satellite data to include
-     *     with the k-bucket. `metadata` property is guaranteed not be altered by,
-     *     it is provided as an explicit container for users of k-bucket to store
-     *     implementation-specific data.
-     *   `numberOfNodesPerKBucket`: Integer (Default: 20) The number of nodes
-     *     that a k-bucket can contain before being full or split.
-     *     `numberOfNodesToPing`: Integer (Default: 3) The number of nodes to
-     *     ping when a bucket that should not be split becomes full. KBucket will
-     *     emit a `ping` event that contains `numberOfNodesToPing` nodes that have
-     *     not been contacted the longest.
-     *
-     * @param {Object=} options optional
-     */
-
-    this.localNodeId = options.localNodeId || window.crypto.getRandomValues(new Uint8Array(20))
-    this.numberOfNodesPerKBucket = options.numberOfNodesPerKBucket || 20
-    this.numberOfNodesToPing = options.numberOfNodesToPing || 3
-    this.distance = options.distance || this.distance
-    // use an arbiter from options or vectorClock arbiter by default
-    this.arbiter = options.arbiter || this.arbiter
-    this.metadata = Object.assign({}, options.metadata)
-
-    this.createNode = function () {
-      return {
-        contacts: [],
-        dontSplit: false,
-        left: null,
-        right: null
-      }
-    }
-
-    this.ensureInt8 = function (name, val) {
-      if (!(val instanceof Uint8Array)) {
-        throw new TypeError(name + ' is not a Uint8Array')
-      }
-    }
-
-    /**
-     * @param  {Uint8Array} array1
-     * @param  {Uint8Array} array2
-     * @return {Boolean}
-     */
-    this.arrayEquals = function (array1, array2) {
-      if (array1 === array2) {
-        return true
-      }
-      if (array1.length !== array2.length) {
-        return false
-      }
-      for (let i = 0, length = array1.length; i < length; ++i) {
-        if (array1[i] !== array2[i]) {
-          return false
+                }).catch(error => {
+                    reject(error);
+                });
+            });
         }
-      }
-      return true
     }
 
-    this.ensureInt8('option.localNodeId as parameter 1', this.localNodeId)
-    this.root = this.createNode()
-
-    /**
-     * Default arbiter function for contacts with the same id. Uses
-     * contact.vectorClock to select which contact to update the k-bucket with.
-     * Contact with larger vectorClock field will be selected. If vectorClock is
-     * the same, candidat will be selected.
+    /**Kademlia DHT K-bucket implementation as a binary tree.
+     * Implementation of a Kademlia DHT k-bucket used for storing
+     * contact (peer node) information.
      *
-     * @param  {Object} incumbent Contact currently stored in the k-bucket.
-     * @param  {Object} candidate Contact being added to the k-bucket.
-     * @return {Object}           Contact to updated the k-bucket with.
+     * @extends EventEmitter
      */
-    this.arbiter = function (incumbent, candidate) {
-      return incumbent.vectorClock > candidate.vectorClock ? incumbent : candidate
-    }
+    function BuildKBucket(options = {}) {
+        /**
+         * `options`:
+         *   `distance`: Function
+         *     `function (firstId, secondId) { return distance }` An optional
+         *     `distance` function that gets two `id` Uint8Arrays
+         *     and return distance (as number) between them.
+         *   `arbiter`: Function (Default: vectorClock arbiter)
+         *     `function (incumbent, candidate) { return contact; }` An optional
+         *     `arbiter` function that givent two `contact` objects with the same `id`
+         *     returns the desired object to be used for updating the k-bucket. For
+         *     more details, see [arbiter function](#arbiter-function).
+         *   `localNodeId`: Uint8Array An optional Uint8Array representing the local node id.
+         *     If not provided, a local node id will be created via `randomBytes(20)`.
+         *     `metadata`: Object (Default: {}) Optional satellite data to include
+         *     with the k-bucket. `metadata` property is guaranteed not be altered by,
+         *     it is provided as an explicit container for users of k-bucket to store
+         *     implementation-specific data.
+         *   `numberOfNodesPerKBucket`: Integer (Default: 20) The number of nodes
+         *     that a k-bucket can contain before being full or split.
+         *     `numberOfNodesToPing`: Integer (Default: 3) The number of nodes to
+         *     ping when a bucket that should not be split becomes full. KBucket will
+         *     emit a `ping` event that contains `numberOfNodesToPing` nodes that have
+         *     not been contacted the longest.
+         *
+         * @param {Object=} options optional
+         */
 
-    /**
-     * Default distance function. Finds the XOR
-     * distance between firstId and secondId.
-     *
-     * @param  {Uint8Array} firstId  Uint8Array containing first id.
-     * @param  {Uint8Array} secondId Uint8Array containing second id.
-     * @return {Number}              Integer The XOR distance between firstId
-     *                               and secondId.
-     */
-    this.distance = function (firstId, secondId) {
-      let distance = 0
-      let i = 0
-      const min = Math.min(firstId.length, secondId.length)
-      const max = Math.max(firstId.length, secondId.length)
-      for (; i < min; ++i) {
-        distance = distance * 256 + (firstId[i] ^ secondId[i])
-      }
-      for (; i < max; ++i) distance = distance * 256 + 255
-      return distance
-    }
+        this.localNodeId = options.localNodeId || window.crypto.getRandomValues(new Uint8Array(20))
+        this.numberOfNodesPerKBucket = options.numberOfNodesPerKBucket || 20
+        this.numberOfNodesToPing = options.numberOfNodesToPing || 3
+        this.distance = options.distance || this.distance
+        // use an arbiter from options or vectorClock arbiter by default
+        this.arbiter = options.arbiter || this.arbiter
+        this.metadata = Object.assign({}, options.metadata)
 
-    /**
-     * Adds a contact to the k-bucket.
-     *
-     * @param {Object} contact the contact object to add
-     */
-    this.add = function (contact) {
-      this.ensureInt8('contact.id', (contact || {}).id)
-
-      let bitIndex = 0
-      let node = this.root
-
-      while (node.contacts === null) {
-        // this is not a leaf node but an inner node with 'low' and 'high'
-        // branches; we will check the appropriate bit of the identifier and
-        // delegate to the appropriate node for further processing
-        node = this._determineNode(node, contact.id, bitIndex++)
-      }
-
-      // check if the contact already exists
-      const index = this._indexOf(node, contact.id)
-      if (index >= 0) {
-        this._update(node, index, contact)
-        return this
-      }
-
-      if (node.contacts.length < this.numberOfNodesPerKBucket) {
-        node.contacts.push(contact)
-        return this
-      }
-
-      // the bucket is full
-      if (node.dontSplit) {
-        // we are not allowed to split the bucket
-        // we need to ping the first this.numberOfNodesToPing
-        // in order to determine if they are alive
-        // only if one of the pinged nodes does not respond, can the new contact
-        // be added (this prevents DoS flodding with new invalid contacts)
-        return this
-      }
-
-      this._split(node, bitIndex)
-      return this.add(contact)
-    }
-
-    /**
-     * Get the n closest contacts to the provided node id. "Closest" here means:
-     * closest according to the XOR metric of the contact node id.
-     *
-     * @param  {Uint8Array} id  Contact node id
-     * @param  {Number=} n      Integer (Default: Infinity) The maximum number of
-     *                          closest contacts to return
-     * @return {Array}          Array Maximum of n closest contacts to the node id
-     */
-    this.closest = function (id, n = Infinity) {
-      this.ensureInt8('id', id)
-
-      if ((!Number.isInteger(n) && n !== Infinity) || n <= 0) {
-        throw new TypeError('n is not positive number')
-      }
-
-      let contacts = []
-
-      for (let nodes = [this.root], bitIndex = 0; nodes.length > 0 && contacts.length < n;) {
-        const node = nodes.pop()
-        if (node.contacts === null) {
-          const detNode = this._determineNode(node, id, bitIndex++)
-          nodes.push(node.left === detNode ? node.right : node.left)
-          nodes.push(detNode)
-        } else {
-          contacts = contacts.concat(node.contacts)
+        this.createNode = function () {
+            return {
+                contacts: [],
+                dontSplit: false,
+                left: null,
+                right: null
+            }
         }
-      }
 
-      return contacts
-        .map(a => [this.distance(a.id, id), a])
-        .sort((a, b) => a[0] - b[0])
-        .slice(0, n)
-        .map(a => a[1])
+        this.ensureInt8 = function (name, val) {
+            if (!(val instanceof Uint8Array)) {
+                throw new TypeError(name + ' is not a Uint8Array')
+            }
+        }
+
+        /**
+         * @param  {Uint8Array} array1
+         * @param  {Uint8Array} array2
+         * @return {Boolean}
+         */
+        this.arrayEquals = function (array1, array2) {
+            if (array1 === array2) {
+                return true
+            }
+            if (array1.length !== array2.length) {
+                return false
+            }
+            for (let i = 0, length = array1.length; i < length; ++i) {
+                if (array1[i] !== array2[i]) {
+                    return false
+                }
+            }
+            return true
+        }
+
+        this.ensureInt8('option.localNodeId as parameter 1', this.localNodeId)
+        this.root = this.createNode()
+
+        /**
+         * Default arbiter function for contacts with the same id. Uses
+         * contact.vectorClock to select which contact to update the k-bucket with.
+         * Contact with larger vectorClock field will be selected. If vectorClock is
+         * the same, candidat will be selected.
+         *
+         * @param  {Object} incumbent Contact currently stored in the k-bucket.
+         * @param  {Object} candidate Contact being added to the k-bucket.
+         * @return {Object}           Contact to updated the k-bucket with.
+         */
+        this.arbiter = function (incumbent, candidate) {
+            return incumbent.vectorClock > candidate.vectorClock ? incumbent : candidate
+        }
+
+        /**
+         * Default distance function. Finds the XOR
+         * distance between firstId and secondId.
+         *
+         * @param  {Uint8Array} firstId  Uint8Array containing first id.
+         * @param  {Uint8Array} secondId Uint8Array containing second id.
+         * @return {Number}              Integer The XOR distance between firstId
+         *                               and secondId.
+         */
+        this.distance = function (firstId, secondId) {
+            let distance = 0
+            let i = 0
+            const min = Math.min(firstId.length, secondId.length)
+            const max = Math.max(firstId.length, secondId.length)
+            for (; i < min; ++i) {
+                distance = distance * 256 + (firstId[i] ^ secondId[i])
+            }
+            for (; i < max; ++i) distance = distance * 256 + 255
+            return distance
+        }
+
+        /**
+         * Adds a contact to the k-bucket.
+         *
+         * @param {Object} contact the contact object to add
+         */
+        this.add = function (contact) {
+            this.ensureInt8('contact.id', (contact || {}).id)
+
+            let bitIndex = 0
+            let node = this.root
+
+            while (node.contacts === null) {
+                // this is not a leaf node but an inner node with 'low' and 'high'
+                // branches; we will check the appropriate bit of the identifier and
+                // delegate to the appropriate node for further processing
+                node = this._determineNode(node, contact.id, bitIndex++)
+            }
+
+            // check if the contact already exists
+            const index = this._indexOf(node, contact.id)
+            if (index >= 0) {
+                this._update(node, index, contact)
+                return this
+            }
+
+            if (node.contacts.length < this.numberOfNodesPerKBucket) {
+                node.contacts.push(contact)
+                return this
+            }
+
+            // the bucket is full
+            if (node.dontSplit) {
+                // we are not allowed to split the bucket
+                // we need to ping the first this.numberOfNodesToPing
+                // in order to determine if they are alive
+                // only if one of the pinged nodes does not respond, can the new contact
+                // be added (this prevents DoS flodding with new invalid contacts)
+                return this
+            }
+
+            this._split(node, bitIndex)
+            return this.add(contact)
+        }
+
+        /**
+         * Get the n closest contacts to the provided node id. "Closest" here means:
+         * closest according to the XOR metric of the contact node id.
+         *
+         * @param  {Uint8Array} id  Contact node id
+         * @param  {Number=} n      Integer (Default: Infinity) The maximum number of
+         *                          closest contacts to return
+         * @return {Array}          Array Maximum of n closest contacts to the node id
+         */
+        this.closest = function (id, n = Infinity) {
+            this.ensureInt8('id', id)
+
+            if ((!Number.isInteger(n) && n !== Infinity) || n <= 0) {
+                throw new TypeError('n is not positive number')
+            }
+
+            let contacts = []
+
+            for (let nodes = [this.root], bitIndex = 0; nodes.length > 0 && contacts.length < n;) {
+                const node = nodes.pop()
+                if (node.contacts === null) {
+                    const detNode = this._determineNode(node, id, bitIndex++)
+                    nodes.push(node.left === detNode ? node.right : node.left)
+                    nodes.push(detNode)
+                } else {
+                    contacts = contacts.concat(node.contacts)
+                }
+            }
+
+            return contacts
+                .map(a => [this.distance(a.id, id), a])
+                .sort((a, b) => a[0] - b[0])
+                .slice(0, n)
+                .map(a => a[1])
+        }
+
+        /**
+         * Counts the total number of contacts in the tree.
+         *
+         * @return {Number} The number of contacts held in the tree
+         */
+        this.count = function () {
+            // return this.toArray().length
+            let count = 0
+            for (const nodes = [this.root]; nodes.length > 0;) {
+                const node = nodes.pop()
+                if (node.contacts === null) nodes.push(node.right, node.left)
+                else count += node.contacts.length
+            }
+            return count
+        }
+
+        /**
+         * Determines whether the id at the bitIndex is 0 or 1.
+         * Return left leaf if `id` at `bitIndex` is 0, right leaf otherwise
+         *
+         * @param  {Object} node     internal object that has 2 leafs: left and right
+         * @param  {Uint8Array} id   Id to compare localNodeId with.
+         * @param  {Number} bitIndex Integer (Default: 0) The bit index to which bit
+         *                           to check in the id Uint8Array.
+         * @return {Object}          left leaf if id at bitIndex is 0, right leaf otherwise.
+         */
+        this._determineNode = function (node, id, bitIndex) {
+            // *NOTE* remember that id is a Uint8Array and has granularity of
+            // bytes (8 bits), whereas the bitIndex is the bit index (not byte)
+
+            // id's that are too short are put in low bucket (1 byte = 8 bits)
+            // (bitIndex >> 3) finds how many bytes the bitIndex describes
+            // bitIndex % 8 checks if we have extra bits beyond byte multiples
+            // if number of bytes is <= no. of bytes described by bitIndex and there
+            // are extra bits to consider, this means id has less bits than what
+            // bitIndex describes, id therefore is too short, and will be put in low
+            // bucket
+            const bytesDescribedByBitIndex = bitIndex >> 3
+            const bitIndexWithinByte = bitIndex % 8
+            if ((id.length <= bytesDescribedByBitIndex) && (bitIndexWithinByte !== 0)) {
+                return node.left
+            }
+
+            const byteUnderConsideration = id[bytesDescribedByBitIndex]
+
+            // byteUnderConsideration is an integer from 0 to 255 represented by 8 bits
+            // where 255 is 11111111 and 0 is 00000000
+            // in order to find out whether the bit at bitIndexWithinByte is set
+            // we construct (1 << (7 - bitIndexWithinByte)) which will consist
+            // of all bits being 0, with only one bit set to 1
+            // for example, if bitIndexWithinByte is 3, we will construct 00010000 by
+            // (1 << (7 - 3)) -> (1 << 4) -> 16
+            if (byteUnderConsideration & (1 << (7 - bitIndexWithinByte))) {
+                return node.right
+            }
+
+            return node.left
+        }
+
+        /**
+         * Get a contact by its exact ID.
+         * If this is a leaf, loop through the bucket contents and return the correct
+         * contact if we have it or null if not. If this is an inner node, determine
+         * which branch of the tree to traverse and repeat.
+         *
+         * @param  {Uint8Array} id The ID of the contact to fetch.
+         * @return {Object|Null}   The contact if available, otherwise null
+         */
+        this.get = function (id) {
+            this.ensureInt8('id', id)
+
+            let bitIndex = 0
+
+            let node = this.root
+            while (node.contacts === null) {
+                node = this._determineNode(node, id, bitIndex++)
+            }
+
+            // index of uses contact id for matching
+            const index = this._indexOf(node, id)
+            return index >= 0 ? node.contacts[index] : null
+        }
+
+        /**
+         * Returns the index of the contact with provided
+         * id if it exists, returns -1 otherwise.
+         *
+         * @param  {Object} node    internal object that has 2 leafs: left and right
+         * @param  {Uint8Array} id  Contact node id.
+         * @return {Number}         Integer Index of contact with provided id if it
+         *                          exists, -1 otherwise.
+         */
+        this._indexOf = function (node, id) {
+            for (let i = 0; i < node.contacts.length; ++i) {
+                if (this.arrayEquals(node.contacts[i].id, id)) return i
+            }
+
+            return -1
+        }
+
+        /**
+         * Removes contact with the provided id.
+         *
+         * @param  {Uint8Array} id The ID of the contact to remove.
+         * @return {Object}        The k-bucket itself.
+         */
+        this.remove = function (id) {
+            this.ensureInt8('the id as parameter 1', id)
+
+            let bitIndex = 0
+            let node = this.root
+
+            while (node.contacts === null) {
+                node = this._determineNode(node, id, bitIndex++)
+            }
+
+            const index = this._indexOf(node, id)
+            if (index >= 0) {
+                const contact = node.contacts.splice(index, 1)[0]
+            }
+
+            return this
+        }
+
+        /**
+         * Splits the node, redistributes contacts to the new nodes, and marks the
+         * node that was split as an inner node of the binary tree of nodes by
+         * setting this.root.contacts = null
+         *
+         * @param  {Object} node     node for splitting
+         * @param  {Number} bitIndex the bitIndex to which byte to check in the
+         *                           Uint8Array for navigating the binary tree
+         */
+        this._split = function (node, bitIndex) {
+            node.left = this.createNode()
+            node.right = this.createNode()
+
+            // redistribute existing contacts amongst the two newly created nodes
+            for (const contact of node.contacts) {
+                this._determineNode(node, contact.id, bitIndex).contacts.push(contact)
+            }
+
+            node.contacts = null // mark as inner tree node
+
+            // don't split the "far away" node
+            // we check where the local node would end up and mark the other one as
+            // "dontSplit" (i.e. "far away")
+            const detNode = this._determineNode(node, this.localNodeId, bitIndex)
+            const otherNode = node.left === detNode ? node.right : node.left
+            otherNode.dontSplit = true
+        }
+
+        /**
+         * Returns all the contacts contained in the tree as an array.
+         * If this is a leaf, return a copy of the bucket. `slice` is used so that we
+         * don't accidentally leak an internal reference out that might be
+         * accidentally misused. If this is not a leaf, return the union of the low
+         * and high branches (themselves also as arrays).
+         *
+         * @return {Array} All of the contacts in the tree, as an array
+         */
+        this.toArray = function () {
+            let result = []
+            for (const nodes = [this.root]; nodes.length > 0;) {
+                const node = nodes.pop()
+                if (node.contacts === null) nodes.push(node.right, node.left)
+                else result = result.concat(node.contacts)
+            }
+            return result
+        }
+
+        /**
+         * Updates the contact selected by the arbiter.
+         * If the selection is our old contact and the candidate is some new contact
+         * then the new contact is abandoned (not added).
+         * If the selection is our old contact and the candidate is our old contact
+         * then we are refreshing the contact and it is marked as most recently
+         * contacted (by being moved to the right/end of the bucket array).
+         * If the selection is our new contact, the old contact is removed and the new
+         * contact is marked as most recently contacted.
+         *
+         * @param  {Object} node    internal object that has 2 leafs: left and right
+         * @param  {Number} index   the index in the bucket where contact exists
+         *                          (index has already been computed in a previous
+         *                          calculation)
+         * @param  {Object} contact The contact object to update.
+         */
+        this._update = function (node, index, contact) {
+            // sanity check
+            if (!this.arrayEquals(node.contacts[index].id, contact.id)) {
+                throw new Error('wrong index for _update')
+            }
+
+            const incumbent = node.contacts[index]
+            const selection = this.arbiter(incumbent, contact)
+            // if the selection is our old contact and the candidate is some new
+            // contact, then there is nothing to do
+            if (selection === incumbent && incumbent !== contact) return
+
+            node.contacts.splice(index, 1) // remove old contact
+            node.contacts.push(selection) // add more recent contact version
+
+        }
     }
-
-    /**
-     * Counts the total number of contacts in the tree.
-     *
-     * @return {Number} The number of contacts held in the tree
-     */
-    this.count = function () {
-      // return this.toArray().length
-      let count = 0
-      for (const nodes = [this.root]; nodes.length > 0;) {
-        const node = nodes.pop()
-        if (node.contacts === null) nodes.push(node.right, node.left)
-        else count += node.contacts.length
-      }
-      return count
-    }
-
-    /**
-     * Determines whether the id at the bitIndex is 0 or 1.
-     * Return left leaf if `id` at `bitIndex` is 0, right leaf otherwise
-     *
-     * @param  {Object} node     internal object that has 2 leafs: left and right
-     * @param  {Uint8Array} id   Id to compare localNodeId with.
-     * @param  {Number} bitIndex Integer (Default: 0) The bit index to which bit
-     *                           to check in the id Uint8Array.
-     * @return {Object}          left leaf if id at bitIndex is 0, right leaf otherwise.
-     */
-    this._determineNode = function (node, id, bitIndex) {
-      // *NOTE* remember that id is a Uint8Array and has granularity of
-      // bytes (8 bits), whereas the bitIndex is the bit index (not byte)
-
-      // id's that are too short are put in low bucket (1 byte = 8 bits)
-      // (bitIndex >> 3) finds how many bytes the bitIndex describes
-      // bitIndex % 8 checks if we have extra bits beyond byte multiples
-      // if number of bytes is <= no. of bytes described by bitIndex and there
-      // are extra bits to consider, this means id has less bits than what
-      // bitIndex describes, id therefore is too short, and will be put in low
-      // bucket
-      const bytesDescribedByBitIndex = bitIndex >> 3
-      const bitIndexWithinByte = bitIndex % 8
-      if ((id.length <= bytesDescribedByBitIndex) && (bitIndexWithinByte !== 0)) {
-        return node.left
-      }
-
-      const byteUnderConsideration = id[bytesDescribedByBitIndex]
-
-      // byteUnderConsideration is an integer from 0 to 255 represented by 8 bits
-      // where 255 is 11111111 and 0 is 00000000
-      // in order to find out whether the bit at bitIndexWithinByte is set
-      // we construct (1 << (7 - bitIndexWithinByte)) which will consist
-      // of all bits being 0, with only one bit set to 1
-      // for example, if bitIndexWithinByte is 3, we will construct 00010000 by
-      // (1 << (7 - 3)) -> (1 << 4) -> 16
-      if (byteUnderConsideration & (1 << (7 - bitIndexWithinByte))) {
-        return node.right
-      }
-
-      return node.left
-    }
-
-    /**
-     * Get a contact by its exact ID.
-     * If this is a leaf, loop through the bucket contents and return the correct
-     * contact if we have it or null if not. If this is an inner node, determine
-     * which branch of the tree to traverse and repeat.
-     *
-     * @param  {Uint8Array} id The ID of the contact to fetch.
-     * @return {Object|Null}   The contact if available, otherwise null
-     */
-    this.get = function (id) {
-      this.ensureInt8('id', id)
-
-      let bitIndex = 0
-
-      let node = this.root
-      while (node.contacts === null) {
-        node = this._determineNode(node, id, bitIndex++)
-      }
-
-      // index of uses contact id for matching
-      const index = this._indexOf(node, id)
-      return index >= 0 ? node.contacts[index] : null
-    }
-
-    /**
-     * Returns the index of the contact with provided
-     * id if it exists, returns -1 otherwise.
-     *
-     * @param  {Object} node    internal object that has 2 leafs: left and right
-     * @param  {Uint8Array} id  Contact node id.
-     * @return {Number}         Integer Index of contact with provided id if it
-     *                          exists, -1 otherwise.
-     */
-    this._indexOf = function (node, id) {
-      for (let i = 0; i < node.contacts.length; ++i) {
-        if (this.arrayEquals(node.contacts[i].id, id)) return i
-      }
-
-      return -1
-    }
-
-    /**
-     * Removes contact with the provided id.
-     *
-     * @param  {Uint8Array} id The ID of the contact to remove.
-     * @return {Object}        The k-bucket itself.
-     */
-    this.remove = function (id) {
-      this.ensureInt8('the id as parameter 1', id)
-
-      let bitIndex = 0
-      let node = this.root
-
-      while (node.contacts === null) {
-        node = this._determineNode(node, id, bitIndex++)
-      }
-
-      const index = this._indexOf(node, id)
-      if (index >= 0) {
-        const contact = node.contacts.splice(index, 1)[0]
-      }
-
-      return this
-    }
-
-    /**
-     * Splits the node, redistributes contacts to the new nodes, and marks the
-     * node that was split as an inner node of the binary tree of nodes by
-     * setting this.root.contacts = null
-     *
-     * @param  {Object} node     node for splitting
-     * @param  {Number} bitIndex the bitIndex to which byte to check in the
-     *                           Uint8Array for navigating the binary tree
-     */
-    this._split = function (node, bitIndex) {
-      node.left = this.createNode()
-      node.right = this.createNode()
-
-      // redistribute existing contacts amongst the two newly created nodes
-      for (const contact of node.contacts) {
-        this._determineNode(node, contact.id, bitIndex).contacts.push(contact)
-      }
-
-      node.contacts = null // mark as inner tree node
-
-      // don't split the "far away" node
-      // we check where the local node would end up and mark the other one as
-      // "dontSplit" (i.e. "far away")
-      const detNode = this._determineNode(node, this.localNodeId, bitIndex)
-      const otherNode = node.left === detNode ? node.right : node.left
-      otherNode.dontSplit = true
-    }
-
-    /**
-     * Returns all the contacts contained in the tree as an array.
-     * If this is a leaf, return a copy of the bucket. `slice` is used so that we
-     * don't accidentally leak an internal reference out that might be
-     * accidentally misused. If this is not a leaf, return the union of the low
-     * and high branches (themselves also as arrays).
-     *
-     * @return {Array} All of the contacts in the tree, as an array
-     */
-    this.toArray = function () {
-      let result = []
-      for (const nodes = [this.root]; nodes.length > 0;) {
-        const node = nodes.pop()
-        if (node.contacts === null) nodes.push(node.right, node.left)
-        else result = result.concat(node.contacts)
-      }
-      return result
-    }
-
-    /**
-     * Updates the contact selected by the arbiter.
-     * If the selection is our old contact and the candidate is some new contact
-     * then the new contact is abandoned (not added).
-     * If the selection is our old contact and the candidate is our old contact
-     * then we are refreshing the contact and it is marked as most recently
-     * contacted (by being moved to the right/end of the bucket array).
-     * If the selection is our new contact, the old contact is removed and the new
-     * contact is marked as most recently contacted.
-     *
-     * @param  {Object} node    internal object that has 2 leafs: left and right
-     * @param  {Number} index   the index in the bucket where contact exists
-     *                          (index has already been computed in a previous
-     *                          calculation)
-     * @param  {Object} contact The contact object to update.
-     */
-    this._update = function (node, index, contact) {
-      // sanity check
-      if (!this.arrayEquals(node.contacts[index].id, contact.id)) {
-        throw new Error('wrong index for _update')
-      }
-
-      const incumbent = node.contacts[index]
-      const selection = this.arbiter(incumbent, contact)
-      // if the selection is our old contact and the candidate is some new
-      // contact, then there is nothing to do
-      if (selection === incumbent && incumbent !== contact) return
-
-      node.contacts.splice(index, 1) // remove old contact
-      node.contacts.push(selection) // add more recent contact version
-
-    }
-  }
-
 </script>
 <script id="compactIDB">
-  /* Compact IndexedDB operations */
+    /* Compact IndexedDB operations */
 
-  window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-  window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
-  window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+    window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+    window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+    window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
 
-  if (!window.indexedDB)
-    window.alert("Your browser doesn't support a stable version of IndexedDB.")
+    if (!window.indexedDB)
+        window.alert("Your browser doesn't support a stable version of IndexedDB.")
 
-  const compactIDB = {
+    const compactIDB = {
 
-    setDefaultDB: function (dbName) {
-      this.dbName = dbName;
-    },
+        setDefaultDB: function (dbName) {
+            this.dbName = dbName;
+        },
 
-    initDB: function (dbName, objectStores = {}) {
-      return new Promise((resolve, reject) => {
-        this.dbName = this.dbName || dbName;
-        var idb = indexedDB.open(dbName);
-        idb.onerror = (event) => {
-          reject("Error in opening IndexedDB!");
-        };
-        idb.onupgradeneeded = (event) => {
-          var db = event.target.result;
-          for (obs in objectStores) {
-            var objectStore = db.createObjectStore(obs, objectStores[obs].options || {});
-            if (objectStores[obs].indexes && typeof objectStores[obs].indexes === 'object')
-              for (i in objectStores[obs].indexes)
-                objectStore.createIndex(i, i, objectStores[obs].indexes[i] || {});
-          }
+        initDB: function (dbName, objectStores = {}, version = null, removeStores = []) {
+            return new Promise((resolve, reject) => {
+                this.dbName = this.dbName || dbName;
+                var idb = version ? indexedDB.open(dbName, version) : indexedDB.open(dbName);
+                idb.onerror = (event) => {
+                    reject("Error in opening IndexedDB!");
+                };
+                idb.onupgradeneeded = (event) => {
+                    var db = event.target.result;
+                    for (let obs in objectStores) {
+                        var objectStore = db.createObjectStore(obs, objectStores[obs].options ||
+                        {});
+                        if (objectStores[obs].indexes && typeof objectStores[obs].indexes ===
+                            'object')
+                            for (let i in objectStores[obs].indexes)
+                                objectStore.createIndex(i, i, objectStores[obs].indexes[i] || {});
+                    }
+                    if (version)
+                        removeStores.forEach(obs => db.deleteObjectStore(obs));
+                }
+                idb.onsuccess = (event) => {
+                    var db = event.target.result;
+                    if (JSON.stringify(Object.values(db.objectStoreNames).sort()) === JSON
+                        .stringify(Object.keys(objectStores).sort()))
+                        resolve("Initiated IndexedDB");
+                    else {
+                        let removeObs = [];
+                        Object.values(db.objectStoreNames).forEach(obs => {
+                            if (obs in objectStores)
+                                delete objectStores[obs]
+                            else
+                                removeObs.push(obs)
+                        })
+                        this.initDB(dbName, objectStores, db.version + 1, removeObs)
+                            .then(result => resolve(result))
+                            .catch(error => reject(error))
+                    }
+                    db.close();
+                }
+            });
+        },
+
+        openDB: function (dbName = this.dbName) {
+            return new Promise((resolve, reject) => {
+                var idb = indexedDB.open(dbName);
+                idb.onerror = (event) => reject("Error in opening IndexedDB!");
+                idb.onsuccess = (event) => resolve(event.target.result);
+            });
+        },
+
+        deleteDB: function (dbName = this.dbName) {
+            return new Promise((resolve, reject) => {
+                var deleteReq = indexedDB.deleteDatabase(dbName);;
+                deleteReq.onerror = (event) => reject("Error deleting database!");
+                deleteReq.onsuccess = (event) => resolve("Database deleted successfully");
+            });
+        },
+
+        writeData: function (obsName, data, key = false, dbName = this.dbName) {
+            return new Promise((resolve, reject) => {
+                this.openDB(dbName).then(db => {
+                    var obs = db.transaction(obsName, "readwrite").objectStore(obsName);
+                    let writeReq = (key ? obs.put(data, key) : obs.put(data));
+                    writeReq.onsuccess = (evt) => resolve(`Write data Successful`);
+                    writeReq.onerror = (evt) => reject(
+                        `Write data unsuccessful [${evt.target.error.name}] ${evt.target.error.message}`
+                    );
+                    db.close();
+                }).catch(error => reject(error));
+            });
+        },
+
+        addData: function (obsName, data, key = false, dbName = this.dbName) {
+            return new Promise((resolve, reject) => {
+                this.openDB(dbName).then(db => {
+                    var obs = db.transaction(obsName, "readwrite").objectStore(obsName);
+                    let addReq = (key ? obs.add(data, key) : obs.add(data));
+                    addReq.onsuccess = (evt) => resolve(`Add data successful`);
+                    addReq.onerror = (evt) => reject(
+                        `Add data unsuccessful [${evt.target.error.name}] ${evt.target.error.message}`
+                    );
+                    db.close();
+                }).catch(error => reject(error));
+            });
+        },
+
+        removeData: function (obsName, key, dbName = this.dbName) {
+            return new Promise((resolve, reject) => {
+                this.openDB(dbName).then(db => {
+                    var obs = db.transaction(obsName, "readwrite").objectStore(obsName);
+                    let delReq = obs.delete(key);
+                    delReq.onsuccess = (evt) => resolve(`Removed Data ${key}`);
+                    delReq.onerror = (evt) => reject(
+                        `Remove data unsuccessful [${evt.target.error.name}] ${evt.target.error.message}`
+                    );
+                    db.close();
+                }).catch(error => reject(error));
+            });
+        },
+
+        clearData: function (obsName, dbName = this.dbName) {
+            return new Promise((resolve, reject) => {
+                this.openDB(dbName).then(db => {
+                    var obs = db.transaction(obsName, "readwrite").objectStore(obsName);
+                    let clearReq = obs.clear();
+                    clearReq.onsuccess = (evt) => resolve(`Clear data Successful`);
+                    clearReq.onerror = (evt) => reject(`Clear data Unsuccessful`);
+                    db.close();
+                }).catch(error => reject(error));
+            });
+        },
+
+        readData: function (obsName, key, dbName = this.dbName) {
+            return new Promise((resolve, reject) => {
+                this.openDB(dbName).then(db => {
+                    var obs = db.transaction(obsName, "readonly").objectStore(obsName);
+                    let getReq = obs.get(key);
+                    getReq.onsuccess = (evt) => resolve(evt.target.result);
+                    getReq.onerror = (evt) => reject(
+                        `Read data unsuccessful [${evt.target.error.name}] ${evt.target.error.message}`
+                    );
+                    db.close();
+                }).catch(error => reject(error));
+            });
+        },
+
+        readAllData: function (obsName, dbName = this.dbName) {
+            return new Promise((resolve, reject) => {
+                this.openDB(dbName).then(db => {
+                    var obs = db.transaction(obsName, "readonly").objectStore(obsName);
+                    var tmpResult = {}
+                    let curReq = obs.openCursor();
+                    curReq.onsuccess = (evt) => {
+                        var cursor = evt.target.result;
+                        if (cursor) {
+                            tmpResult[cursor.primaryKey] = cursor.value;
+                            cursor.continue();
+                        } else
+                            resolve(tmpResult);
+                    }
+                    curReq.onerror = (evt) => reject(
+                        `Read-All data unsuccessful [${evt.target.error.name}] ${evt.target.error.message}`
+                    );
+                    db.close();
+                }).catch(error => reject(error));
+            });
+        },
+
+        searchData: function (obsName, patternEval, dbName = this.dbName) {
+            return new Promise((resolve, reject) => {
+                this.openDB(dbName).then(db => {
+                    var obs = db.transaction(obsName, "readonly").objectStore(obsName);
+                    var filteredResult = {}
+                    let curReq = obs.openCursor();
+                    curReq.onsuccess = (evt) => {
+                        var cursor = evt.target.result;
+                        if (cursor) {
+                            if (patternEval(cursor.primaryKey, cursor.value))
+                                filteredResult[cursor.primaryKey] = cursor.value;
+                            cursor.continue();
+                        } else
+                            resolve(filteredResult);
+                    }
+                    curReq.onerror = (evt) => reject(
+                        `Search unsuccessful [${evt.target.error.name}] ${evt.target.error.message}`
+                    );
+                    db.close();
+                }).catch(error => reject(error));
+            });
         }
-        idb.onsuccess = (event) => {
-          var db = event.target.result;
-          if (JSON.stringify(Object.values(db.objectStoreNames).sort()) === JSON.stringify(Object.keys(
-              objectStores).sort()))
-            resolve("Initiated IndexedDB");
-          else
-            reject("IndexedDB already exist with different ObjectStores!");
-          db.close();
-        }
-      });
-    },
-
-    openDB: function (dbName = this.dbName) {
-      return new Promise((resolve, reject) => {
-        var idb = indexedDB.open(dbName);
-        idb.onerror = (event) => reject("Error in opening IndexedDB!");
-        idb.onsuccess = (event) => resolve(event.target.result);
-      });
-    },
-
-    deleteDB: function (dbName = this.dbName) {
-      return new Promise((resolve, reject) => {
-        var deleteReq = indexedDB.deleteDatabase(dbName);;
-        deleteReq.onerror = (event) => reject("Error deleting database!");
-        deleteReq.onsuccess = (event) => resolve("Database deleted successfully");
-      });
-    },
-
-    writeData: function (obsName, data, key = false, dbName = this.dbName) {
-      return new Promise((resolve, reject) => {
-        this.openDB(dbName).then(db => {
-          var obs = db.transaction(obsName, "readwrite").objectStore(obsName);
-          let writeReq = (key ? obs.put(data, key) : obs.put(data));
-          writeReq.onsuccess = (evt) => resolve(`Write data Successful`);
-          writeReq.onerror = (evt) => reject(
-            `Write data unsuccessful [${evt.target.error.name}] ${evt.target.error.message}`);
-          db.close();
-        }).catch(error => reject(error));
-      });
-    },
-
-    addData: function (obsName, data, key = false, dbName = this.dbName) {
-      return new Promise((resolve, reject) => {
-        this.openDB(dbName).then(db => {
-          var obs = db.transaction(obsName, "readwrite").objectStore(obsName);
-          let addReq = (key ? obs.add(data, key) : obs.add(data));
-          addReq.onsuccess = (evt) => resolve(`Add data successful`);
-          addReq.onerror = (evt) => reject(
-            `Add data unsuccessful [${evt.target.error.name}] ${evt.target.error.message}`);
-          db.close();
-        }).catch(error => reject(error));
-      });
-    },
-
-    removeData: function (obsName, key, dbName = this.dbName) {
-      return new Promise((resolve, reject) => {
-        this.openDB(dbName).then(db => {
-          var obs = db.transaction(obsName, "readwrite").objectStore(obsName);
-          let delReq = obs.delete(key);
-          delReq.onsuccess = (evt) => resolve(`Removed Data ${key}`);
-          delReq.onerror = (evt) => reject(
-            `Remove data unsuccessful [${evt.target.error.name}] ${evt.target.error.message}`);
-          db.close();
-        }).catch(error => reject(error));
-      });
-    },
-
-    readData: function (obsName, key, dbName = this.dbName) {
-      return new Promise((resolve, reject) => {
-        this.openDB(dbName).then(db => {
-          var obs = db.transaction(obsName, "readonly").objectStore(obsName);
-          let getReq = obs.get(key);
-          getReq.onsuccess = (evt) => resolve(evt.target.result);
-          getReq.onerror = (evt) => reject(
-            `Read data unsuccessful [${evt.target.error.name}] ${evt.target.error.message}`);
-          db.close();
-        }).catch(error => reject(error));
-      });
-    },
-
-    readAllData: function (obsName, dbName = this.dbName) {
-      return new Promise((resolve, reject) => {
-        this.openDB(dbName).then(db => {
-          var obs = db.transaction(obsName, "readonly").objectStore(obsName);
-          var tmpResult = {}
-          let curReq = obs.openCursor();
-          curReq.onsuccess = (evt) => {
-            var cursor = evt.target.result;
-            if (cursor) {
-              tmpResult[cursor.primaryKey] = cursor.value;
-              cursor.continue();
-            } else
-              resolve(tmpResult);
-          }
-          curReq.onerror = (evt) => reject(
-            `Read-All data unsuccessful [${evt.target.error.name}] ${evt.target.error.message}`);
-          db.close();
-        }).catch(error => reject(error));
-      });
-    },
-
-    searchData: function (obsName, patternEval, dbName = this.dbName) {
-      return new Promise((resolve, reject) => {
-        this.openDB(dbName).then(db => {
-          var obs = db.transaction(obsName, "readonly").objectStore(obsName);
-          var filteredResult = {}
-          let curReq = obs.openCursor();
-          curReq.onsuccess = (evt) => {
-            var cursor = evt.target.result;
-            if (cursor) {
-              if (patternEval(cursor.primaryKey, cursor.value))
-                filteredResult[cursor.primaryKey] = cursor.value;
-              cursor.continue();
-            } else
-              resolve(filteredResult);
-          }
-          curReq.onerror = (evt) => reject(
-            `Search unsuccessful [${evt.target.error.name}] ${evt.target.error.message}`);
-          db.close();
-        }).catch(error => reject(error));
-      });
     }
-  }
 </script>
 <script id="floDapps_customized_for_messenger">
     /* General functions for FLO Dapps*/
@@ -9875,27 +10186,31 @@ Bitcoin.Util = {
                             }
                         },
                         //login credentials
-                        credentials: {},
-                        //for apps
-                        pubKeys: {},
-                        contacts: {},
-                        messages: {},
-                        mails: {},
-                        mailContent: {}
+                        credentials: {}
                     }
                     compactIDB.initDB(floGlobals.application, obj).then(result => {
+                        compactIDB.setDefaultDB(floGlobals.application);
                         resolve("IndexedDB App Storage Initated Successfully")
                     }).catch(error => reject(error));
                 })
             },
 
-            privKeyInput: function () {
+            initUserDB: function () {
                 return new Promise((resolve, reject) => {
-                    var privKey = prompt("Enter Private Key: ")
-                    if (privKey === null)
-                        reject(null)
-                    else
-                        resolve(privKey)
+                    var obj = {
+                        pubKeys: {},
+                        contacts: {},
+                        messages: {},
+                        mails: {},
+                        mailContent: {},
+                        mailRef: {},
+                        marked: {},
+                        appendix: {},
+                    }
+                    compactIDB.initDB(`${floGlobals.application}_${myFloID}`, obj).then(result => {
+                        compactIDB.setDefaultDB(`${floGlobals.application}_${myFloID}`);
+                        resolve("User Storage Initated Successfully")
+                    }).catch(error => reject(error));
                 })
             },
 
@@ -9938,7 +10253,7 @@ Bitcoin.Util = {
 
                 loadDataFromIDB: function () {
                     return new Promise((resolve, reject) => {
-                        var loadData = ["pubKeys", "contacts"]
+                        var loadData = []
                         var promises = []
                         for (var i = 0; i < loadData.length; i++)
                             promises[i] = compactIDB.readAllData(loadData[i])
@@ -9952,7 +10267,19 @@ Bitcoin.Util = {
 
                 getCredentials: function () {
 
-                    var readSharesFromIDB = function (indexArr) {
+                    const defaultInput = function (type) {
+                        return new Promise((resolve, reject) => {
+                            let inputVal = prompt(`Enter ${type}: `)
+                            if (inputVal === null)
+                                reject(null)
+                            else
+                                resolve(inputVal)
+                        })
+                    }
+
+                    const inputFn = this.getCredentials.privKeyInput || defaultInput;
+
+                    const readSharesFromIDB = function (indexArr) {
                         return new Promise((resolve, reject) => {
                             var promises = []
                             for (var i = 0; i < indexArr.length; i++)
@@ -9967,7 +10294,7 @@ Bitcoin.Util = {
                         })
                     }
 
-                    var writeSharesToIDB = function (shares, i = 0, resultIndexes = []) {
+                    const writeSharesToIDB = function (shares, i = 0, resultIndexes = []) {
                         return new Promise((resolve, reject) => {
                             if (i >= shares.length)
                                 return resolve(resultIndexes)
@@ -9983,17 +10310,16 @@ Bitcoin.Util = {
                         })
                     }
 
-                    var getPrivateKeyCredentials = function () {
+                    const getPrivateKeyCredentials = function () {
                         return new Promise((resolve, reject) => {
-                            var indexArr = localStorage.getItem(
-                                `${floGlobals.application}#privKey`)
+                            var indexArr = localStorage.getItem(`${floGlobals.application}#privKey`)
                             if (indexArr) {
                                 readSharesFromIDB(JSON.parse(indexArr))
                                     .then(result => resolve(result))
                                     .catch(error => reject(error))
                             } else {
                                 var privKey;
-                                floDapps.util.privKeyInput().then(result => {
+                                inputFn("PRIVATE_KEY").then(result => {
                                     try {
                                         if (!result)
                                             return reject("Empty Private Key")
@@ -10009,9 +10335,8 @@ Bitcoin.Util = {
                                     privKey = floCrypto.generateNewID().privKey
                                 }).finally(_ => {
                                     var threshold = floCrypto.randInt(10, 20)
-                                    writeSharesToIDB(floCrypto
-                                        .createShamirsSecretShares(
-                                            privKey, threshold, threshold)).then(
+                                    writeSharesToIDB(floCrypto.createShamirsSecretShares(
+                                        privKey, threshold, threshold)).then(
                                         resultIndexes => {
                                             //store index keys in localStorage
                                             localStorage.setItem(
@@ -10020,13 +10345,11 @@ Bitcoin.Util = {
                                             //also add a dummy privatekey to the IDB
                                             var randomPrivKey = floCrypto
                                                 .generateNewID().privKey
-                                            var randomThreshold = floCrypto.randInt(
-                                                10,
+                                            var randomThreshold = floCrypto.randInt(10,
                                                 20)
                                             writeSharesToIDB(floCrypto
                                                 .createShamirsSecretShares(
-                                                    randomPrivKey,
-                                                    randomThreshold,
+                                                    randomPrivKey, randomThreshold,
                                                     randomThreshold))
                                             //resolve private Key
                                             resolve(privKey)
@@ -10036,12 +10359,36 @@ Bitcoin.Util = {
                         })
                     }
 
+                    const checkIfPinRequired = function (key) {
+                        return new Promise((resolve, reject) => {
+                            if (key.length == 52)
+                                resolve(key)
+                            else {
+                                inputFn("PIN/Password").then(pwd => {
+                                    try {
+                                        let privKey = Crypto.AES.decrypt(key, pwd);
+                                        resolve(privKey)
+                                    } catch (error) {
+                                        reject("Access Denied: Incorrect PIN/Password")
+                                    }
+                                }).catch(error => reject(
+                                    "Access Denied: PIN/Password required"))
+                            }
+                        })
+                    }
+
                     return new Promise((resolve, reject) => {
-                        getPrivateKeyCredentials().then(privKey => {
-                            myPrivKey = privKey
-                            myPubKey = floCrypto.getPubKeyHex(myPrivKey)
-                            myFloID = floCrypto.getFloIDfromPubkeyHex(myPubKey)
-                            resolve('Login Credentials loaded successful')
+                        getPrivateKeyCredentials().then(key => {
+                            checkIfPinRequired(key).then(privKey => {
+                                try {
+                                    myPrivKey = privKey
+                                    myPubKey = floCrypto.getPubKeyHex(myPrivKey)
+                                    myFloID = floCrypto.getFloIDfromPubkeyHex(myPubKey)
+                                    resolve('Login Credentials loaded successful')
+                                } catch (error) {
+                                    reject("Corrupted Private Key")
+                                }
+                            }).catch(error => reject(error))
                         }).catch(error => reject(error))
                     })
                 }
@@ -10070,8 +10417,9 @@ Bitcoin.Util = {
 
         launchStartUp: function () {
             return new Promise((resolve, reject) => {
+                reactor.dispatchEvent("startUpSuccessLog", 'Initating App Storage')
                 this.util.initIndexedDB().then(log => {
-                    console.log(log)
+                    reactor.dispatchEvent("startUpSuccessLog", 'App Storage Initaion Sucessful')
                     this.util.callStartUpFunction.total = Object.keys(this.util
                         .startUpFunctions).length
                     this.util.callStartUpFunction.completed = 0
@@ -10079,23 +10427,67 @@ Bitcoin.Util = {
                     var promises = []
                     for (fn in this.util.startUpFunctions)
                         promises.push(this.util.callStartUpFunction(fn))
-                    Promise.all(promises)
-                        .then(results => resolve('App Startup finished successful'))
-                        .catch(errors => reject('App StartUp failed'))
+                    Promise.all(promises).then(results => {
+                        reactor.dispatchEvent("startUpSuccessLog",
+                            'Initating User Database')
+                        this.util.initUserDB().then(log => {
+                            reactor.dispatchEvent("startUpSuccessLog",
+                                'User Database Initated sucessfully')
+                            resolve('App Startup finished successful')
+                        }).catch(errors => {
+                            reactor.dispatchEvent("startUpErrorLog",
+                                `Failed to initate User Database`)
+                            reject('App StartUp failed')
+                        })
+                    }).catch(errors => reject('App StartUp failed'))
+                }).catch(errors => {
+                    reactor.dispatchEvent("startUpErrorLog", `Failed to initate App Storage`)
+                    reject('App StartUp failed')
                 })
             })
         },
 
         setCustomPrivKeyInput: function (customFn) {
-            this.util.privKeyInput = customFn
+            this.util.startUpFunctions.getCredentials.privKeyInput = customFn
         },
 
         logout: function () {
             return new Promise((resolve, reject) => {
-                compactIDB.deleteDB().then(result => {
-                    console.log(result)
+                compactIDB.clearData("credentials", floGlobals.application).then(result => {
+                    localStorage.removeItem(`${floGlobals.application}#privKey`);
+                    floGlobals.appendix = floGlobals.contacts = floGlobals.pubKeys = undefined;
+                    myPrivKey = myPubKey = myFloID = undefined;
+                    resolve(`Successfully logged out!`);
+                }).catch(error => reject(error))
+            });
+        },
+
+        securePrivKey: function (pwd) {
+            return new Promise((resolve, reject) => {
+                let indexArr = localStorage.getItem(`${floGlobals.application}#privKey`)
+                if (!indexArr)
+                    return reject("PrivKey not found");
+                indexArr = JSON.parse(indexArr)
+                let encryptedKey = Crypto.AES.encrypt(myPrivKey, pwd);
+                let threshold = indexArr.length;
+                let shares = floCrypto.createShamirsSecretShares(encryptedKey, threshold, threshold)
+                let promises = [];
+                for (var i = 0; i < threshold; i++)
+                    promises.push(compactIDB.writeData("credentials", shares[i], indexArr[i], floGlobals
+                        .application));
+                Promise.all(promises)
+                    .then(results => resolve("Private Key Secured"))
+                    .catch(error => reject(error))
+            })
+        },
+
+        clearUserData: function () {
+            return new Promise((resolve, reject) => {
+                let promises = [compactIDB.deleteDB(), this.logout()]
+                Promise.all(promises).then(results => {
+                    console.log(results)
                     localStorage.removeItem(`${floGlobals.application}#privKey`)
-                    resolve("Logout Sucessful")
+                    resolve("Local data cleared Sucessful")
                 }).catch(error => reject(error))
             })
         }
@@ -10189,9 +10581,10 @@ Bitcoin.Util = {
                         time: Date.now(),
                         floID: receiver,
                         category: "sent",
-                        message: message
+                        message: Crypto.AES.encrypt(message, floGlobals.appendix.AESKey)
                     }
-                    compactIDB.writeData("messages", data, `${data.time}`)
+                    compactIDB.addData("messages", JSON.parse(JSON.stringify(data)), `${data.time}`)
+                    data.message = message;
                     resolve(data)
                 } catch (error) {
                     reject(error)
@@ -10207,7 +10600,8 @@ Bitcoin.Util = {
                 }
                 let mail = {
                     subject: subject,
-                    content: content
+                    content: content,
+                    ref: floCrypto.randString(32, true)
                 }
                 for (let i = 0; i < recipients.length; i++) {
                     try {
@@ -10225,21 +10619,24 @@ Bitcoin.Util = {
                     time: Date.now(),
                     floID: Object.keys(result.success),
                     category: "sentTo",
-                    subject: subject
+                    subject: subject,
+                    ref: mail.ref
                 }
-                compactIDB.writeData("mails", data, `${data.time}`)
-                compactIDB.writeData("mailContent", content, `${data.time}`)
+                compactIDB.addData("mails", data, `${data.time}`)
+                compactIDB.addData("mailContent", Crypto.AES.encrypt(content, floGlobals.appendix.AESKey), `${data.time}`)
+                compactIDB.addData("mailRef", `${data.time}`, mail.ref)
                 result.data = data
                 resolve(result)
             })
         },
 
-        replyMail(parentMailID, subject, content, recipient) {
+        replyMail(prevRef, subject, content, recipient) {
             return new Promise(async (resolve, reject) => {
                 let mail = {
-                    parentMailID: parentMailID,
+                    prevRef: prevRef,
                     subject: subject,
-                    content: content
+                    content: content,
+                    ref: floCrypto.randString(32, true)
                 }
                 try {
                     if (recipient in floGlobals.pubKeys)
@@ -10250,11 +10647,13 @@ Bitcoin.Util = {
                         time: Date.now(),
                         floID: recipient,
                         category: "replyTo",
-                        parentMailID: parentMailID,
-                        subject: subject
+                        prevRef: prevRef,
+                        subject: subject,
+                        ref: mail.ref
                     }
-                    compactIDB.writeData("mails", data, `${data.time}`)
-                    compactIDB.writeData("mailContent", content, `${data.time}`)
+                    compactIDB.addData("mails", data, `${data.time}`)
+                    compactIDB.addData("mailContent", Crypto.AES.encrypt(content,floGlobals.appendix.AESKey) , `${data.time}`)
+                    compactIDB.addData("mailRef", `${data.time}`, mail.ref)
                     resolve(data)
                 } catch (error) {
                     reject(error)
@@ -10267,7 +10666,7 @@ Bitcoin.Util = {
                 var request = {
                     receiverID: myFloID,
                     application: floGlobals.application,
-                    lowerVectorClock: floGlobals.lastReceived + 1,
+                    lowerVectorClock: floGlobals.appendix.lastReceived + 1,
                 }
                 floSupernode.requestData(JSON.stringify(request), request.receiverID).then(response => {
                     let dataSet = JSON.parse(response);
@@ -10312,38 +10711,81 @@ Bitcoin.Util = {
                             if (typeof tmp === "string") {
                                 //process as message
                                 data.category = "received"
-                                data.message = tmp;
+                                data.message = Crypto.AES.encrypt(tmp, floGlobals.appendix.AESKey);
                                 newInbox.messages[vc] = data;
-                                compactIDB.writeData("messages", data, vc)
+                                compactIDB.addData("messages", JSON.parse(JSON.stringify(data)), vc)
+                                data.message = tmp;
+                                this.addMark(data.floID, "unread")
                             } else if (typeof tmp === "object") {
                                 //process as mail
                                 data.subject = tmp.subject;
-                                if (tmp.parentMailID) {
-                                    data.parentMailID = tmp.parentMailID;
+                                data.ref = tmp.ref;
+                                if (tmp.prevRef) {
+                                    data.prevRef = tmp.prevRef;
                                     data.category = "replyFrom";
                                 } else
                                     data.category = "receivedFrom"
                                 newInbox.mails[vc] = data;
-                                compactIDB.writeData("mails", data, vc);
-                                compactIDB.writeData("mailContent", tmp.content, vc);
+                                compactIDB.addData("mails", data, vc);
+                                compactIDB.addData("mailContent", Crypto.AES.encrypt(tmp.content,
+                                    floGlobals.appendix.AESKey), vc);
+                                compactIDB.addData("mailRef", vc, data.ref)
+                                this.addMark(data.ref, "unread")
                             }
                         } catch (error) {
                             console.error(error)
                         } finally {
-                            floGlobals.lastReceived = vc;
+                            floGlobals.appendix.lastReceived = vc;
                         }
                     }
+                    compactIDB.writeData("appendix", floGlobals.appendix.lastReceived,
+                        "lastReceived");
                     resolve(newInbox)
                 }).catch(error => reject(error))
             })
         },
 
-        getMail(mailID) {
+        getMail(mailRef) {
             return new Promise((resolve, reject) => {
-                compactIDB.readData("mailContent", mailID)
-                    .then(result => resolve(result))
-                    .catch(error => reject(error))
+                compactIDB.readData("mailRef", mailRef).then(result => {
+                    let promises = [compactIDB.readData("mails", result), compactIDB.readData("mailContent", result)]
+                    Promise.all(promises).then(results => {
+                        results[0].content = Crypto.AES.decrypt(results[1], floGlobals.appendix.AESKey);
+                        resolve(results[0]);
+                    }).catch(error => reject(error))
+                }).catch(error => reject(error))
             });
+        },
+
+        addMark(key, mark) {
+            return new Promise((resolve, reject) => {
+                compactIDB.readData("marked", key).then(result => {
+                    if (!result)
+                        result = [mark];
+                    else if (!result.includes(mark))
+                        result.push(mark);
+                    else
+                        return resolve("Mark already exist");
+                    compactIDB.writeData("marked", result, key)
+                        .then(result => resolve(result))
+                        .catch(error => reject(error))
+                }).catch(error => reject(error))
+            })
+        },
+
+        removeMark(key, mark) {
+            return new Promise((resolve, reject) => {
+                compactIDB.readData("marked", key).then(result => {
+                    if (!result || !result.includes(mark))
+                        return resolve("Mark doesnot exist")
+                    else {
+                        result.splice(result.indexOf(mark), 1); //remove the mark from the list of marks
+                        compactIDB.writeData("marked", result, key)
+                            .then(result => resolve("Mark removed"))
+                            .catch(error => reject(error))
+                    }
+                }).catch(error => reject(error))
+            })
         },
 
         storeContact(floID, name) {
@@ -10359,26 +10801,46 @@ Bitcoin.Util = {
 
         loadDataFromIDB() {
             return new Promise((resolve, reject) => {
-                let loadData = ["messages", "mails"]
+                let loadData = ["contacts", "pubKeys", "messages", "mails", "marked", "appendix"]
                 let promises = []
                 for (var i = 0; i < loadData.length; i++)
                     promises[i] = compactIDB.readAllData(loadData[i])
                 Promise.all(promises).then(results => {
-                    let result = {}
+                    let data = {}
                     for (var i = 0; i < loadData.length; i++)
-                        result[loadData[i]] = results[i]
-                    //getLastReceived
-                    let lastMessage = Object.keys(result["messages"]).slice(-1).pop() || '0';
-                    let lastMail = Object.keys(result["mails"]).slice(-1).pop() || '0';
-                    result["_lastReceived_"] = lastMessage > lastMail ? lastMessage : lastMail;
-                    resolve(result)
+                        data[loadData[i]] = results[i]
+                    data.appendix.lastReceived = data.appendix.lastReceived || '0'
+                    if (data.appendix.AESKey) {
+                        try {
+                            let AESKey = floCrypto.decryptData(data.appendix.AESKey, myPrivKey);
+                            data.appendix.AESKey = AESKey;
+                            for (let m in data.messages) {
+                                let decrypted = Crypto.AES.decrypt(data.messages[m].message,
+                                    AESKey)
+                                    
+                                data.messages[m].message = decrypted;
+                            }
+                            resolve(data)
+                        } catch (error) {
+                            reject("Corrupted AES Key");
+                        }
+                    } else {
+                        if (Object.keys(data.messages).length)
+                            return reject("AES Key not Found")
+                        let AESKey = floCrypto.randString(32);
+                        let encryptedKey = floCrypto.encryptData(AESKey, myPubKey);
+                        compactIDB.addData("appendix", encryptedKey, "AESKey").then(result => {
+                            data.appendix.AESKey = AESKey;
+                            resolve(data);
+                        }).catch(error => reject("Unable to Generate AES Key"))
+                    }
                 }).catch(error => reject(error))
             })
         },
 
         backupData() {
             return new Promise((resolve, reject) => {
-                let obs = ["contacts", "pubKeys", "messages", "mails", "mailContent"]
+                let obs = ["contacts", "pubKeys", "messages", "mails", "mailContent", "mailRef", "marked", "appendix"]
                 let promises = [];
                 obs.forEach(o => promises.push(compactIDB.readAllData(o)))
                 Promise.all(promises).then(results => {
@@ -10438,6 +10900,24 @@ Bitcoin.Util = {
                 else
                     parseData = data => new Promise((res, rej) => res(data))
                 parseData(arg).then(data => {
+                    if (data.appendix.lastReceived < floGlobals.appendix.lastReceived)
+                        data.appendix.lastReceived = floGlobals.appendix.lastReceived;
+                    let AESKey = floCrypto.decryptData(data.appendix.AESKey, myPrivKey);
+                    if (AESKey !== floGlobals.appendix.AESKey) {
+                        for (let m in data.messages) {
+                            let decrypted = Crypto.AES.decrypt(data.messages[m].message, AESKey)
+                            let encrypted = Crypto.AES.encrypt(decrypted, floGlobals.appendix
+                                .AESKey)
+                            data.messages[m].message = encrypted;
+                        }
+                        for (let m in data.mailContent) {
+                            let decrypted = Crypto.AES.decrypt(data.mailContent[m], AESKey)
+                            let encrypted = Crypto.AES.encrypt(decrypted, floGlobals.appendix
+                                .AESKey)
+                            data.mailContent[m] = encrypted;
+                        }
+                    }
+                    delete data.appendix.AESKey;
                     let promises = [];
                     for (obs in data)
                         for (value in data[obs])
