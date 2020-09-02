@@ -91,6 +91,7 @@
           width: 100%;
           padding: 1rem;
           font-size: 1rem;
+          color: rgba(var(--text-color), 1);
         }
         textarea:focus {
           outline: none;
@@ -1763,7 +1764,7 @@
                     </div>
 
                     <h4>Version</h4>
-                    <p>0.0.34</p>
+                    <p>0.0.35</p>
                 </div>
             </section>
 		</section>
@@ -5963,7 +5964,7 @@ customElements.define('sm-section', class extends HTMLElement {
         })
 
         let refreshAgain = function() {
-            if(refreshCount > 6)
+            if(refreshCount > 30)
                 refreshTimeout *= 2;
             refreshCount++;
             refresh()
