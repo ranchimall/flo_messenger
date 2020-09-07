@@ -15147,11 +15147,12 @@ Bitcoin.Util = {
         storeContact(floID, name) {
             return new Promise((resolve, reject) => {
                 if (!floCrypto.validateAddr(floID))
-                    reject("Invalid floID!")
-                else
-                    compactIDB.writeData("contacts", name, floID)
-                    .then(result => resolve(result))
-                    .catch(error => reject(error))
+                    return reject("Invalid floID!")
+                compactIDB.writeData("contacts", name, floID).then(result => {
+                    floGlobals.contacts[floID] = name;
+                    resolve(result)
+                }).catch(error => reject(error))
+                    
             });
         },
 
@@ -15290,6 +15291,64 @@ Bitcoin.Util = {
                 }).catch(error => reject(error))
             })
         },
+
+        syncContact: {
+            oldDevice() {
+                return new Promise((resolve, reject) => {
+                    let contactList = {}
+                    for(let id in floGlobals.contacts){
+                        contactList[id] = {
+                            name: floGlobals.contacts[id]
+                        }
+                    }
+                    for(let id in floGlobals.pubKeys){
+                        if(id in contactList)
+                            contactList[id].pubKey = floGlobals.pubKeys[id]
+                    }
+                    console.log(contactList)
+                    let message = Crypto.AES.encrypt(JSON.stringify(contactList), myPrivKey)
+                    var data = {
+                        senderID: myFloID,
+                        receiverID: myFloID,
+                        pubKey: myPubKey,
+                        message: message,
+                        sign: floCrypto.signData(JSON.stringify(message), myPrivKey),
+                        application: "syncData",
+                        type: "Contacts",
+                        comment: ""
+                    }
+                    floSupernode.sendData(JSON.stringify(data), data.receiverID)
+                        .then(result => resolve(result))
+                        .catch(error => reject(error))
+                })
+            },
+
+            newDevice() {
+                return new Promise((resolve, reject) => {
+                    var request = {
+                        receiverID: myFloID,
+                        senderIDs: myFloID,
+                        application: "syncData",
+                        type: "Contacts",
+                        mostRecent: true,
+                    }
+                    floSupernode.requestData(JSON.stringify(request), request.receiverID).then(response => {
+                        response = JSON.parse(response)
+                        let vc = Object.keys(response).sort().pop()
+                        let contactList = JSON.parse(Crypto.AES.decrypt(response[vc].message, myPrivKey))
+                        let promises = []
+                        for(let id in contactList){
+                            promises.push(compactIDB.writeData("contacts", contactList[id].name, id))
+                            if(contactList[id].pubKey)
+                                promises.push(compactIDB.writeData("pubKeys", contactList[id].pubKey, id))
+                        }
+                        Promise.all(promises)
+                            .then(results => resolve("Sync contacts successful"))
+                            .catch(error => reject(error))
+                    }).catch(error => reject(error))
+                })
+            }
+        }
 
     }
 </script>
