@@ -35,93 +35,97 @@
 		}
 	</script>
 	<script id="onLoadStartUp">
-		function onLoadStartUp() {
-            privKeyNotSecured = true;
-            
-            //display loading screen
-            loadingPage.classList.remove("hide-completely")
-			//clear Rendered Elements
-			let elementsToReset = [ 'inbox_mail_container', 'sent_mail_container', 'contacts_container', 'chat_container',
-				'receiver_floID', 'receiver_name', 'mail_contact_list'
-			]
-			//, "backup_info"
-			elementsToReset.forEach(e => clearElement(document.getElementById(e)))
-            
-            floDapps.setCustomPrivKeyInput((type) => {
-                return new Promise((resolve, reject) => {
-                    mainPage.classList.add('hide-completely')
-                    loadingPage.classList.add('hide-completely')
-                    signInLanding.classList.remove('hide-completely')
-                    signInButton.addEventListener('clicked', () => {
-                        let key = privateKeyInputField.value;
-                        signInPopup.hide()
-                        console.log(key)
-                        signInLanding.classList.add('hide-completely')
-                        loadingPage.classList.remove('hide-completely')
-                        resolve(key)
-                    })
-                    guestLoginButton.onclick = () => {
-                        signInLanding.classList.add('hide-completely')
-                        loadingPage.classList.remove('hide-completely')
-                        reject(null)
-                    }
-                    if (type === "PRIVATE_KEY") {
-                        privateKeyInputField.setAttribute("placeholder", "Private Key")
-                        document.getElementById("type_of_key").textContent = 'FLO private key'
-                        document.getElementById("remove_account").classList.add("hide-completely");
-                    } else if (type === "PIN/Password") {
-                        privateKeyInputField.setAttribute("placeholder", "PIN/Password")
-                        signInPopup.show()
-                        privateKeyInputField.focusIn()
-                        document.getElementById("remove_account").classList.remove("hide-completely");
-                        document.getElementById("type_of_key").textContent = 'PIN/Password'
-                        privKeyNotSecured = false;
-                    }
-                })
-            })
-          
-            //invoke the startup functions
-			floDapps.launchStartUp().then(result => {
-				console.log(result)
-				document.getElementById("greet_tag").textContent = myFloID
-                //load messages from IDB and render them
-                console.log(`Loading Data! Please Wait...`)
-                messenger.initUserDB().then(result => {
-                    console.log(result)
-                    messenger.loadDataFromIDB().then(data => {
-                        console.log(data)
-					floGlobals.appendix = data.appendix;
-					renderContactList(floGlobals.contacts)
-					renderMailContactList(floGlobals.contacts)
-					renderMessages(data.messages, false)
-					renderMailList(data.mails, false)
-                    renderMarked(data.marked)
-                    messenger.refreshInbox(renderLiveUI)
-                        .then(rqID => console.log("reqID:", rqID))
-                        .catch(e => console.error("request error:", e))
-                    console.log(`Load Successful!`)
-					//hide loading screen
-					loadingPage.classList.add("hide-completely")
-                    mainPage.classList.remove('hide-completely')
-                    chatSection.classList.add('hide-completely')
-                    mailSection.classList.add('hide-completely')
-                    //refreshAgain()
-                    document.getElementById('chat_page_button').click()
-                    if(privKeyNotSecured){
-                        notify("Private key is not secured with password. Remember to secure the private key in settings", "warn", '')
-                        document.getElementById("secure_key").textContent = 'Set password'
-                    }
-                    else{
-                        document.getElementById("secure_key").textContent = 'Change password'
-                    }
-                }).catch(error => {
-                    //console.error(`Failed to load data`)
-					notify(error, "error")
-				})
-                })
-				
-			}).catch(error => notify(error, "error"))
-        }
+	    function onLoadStartUp() {
+	        privKeyNotSecured = true;
+
+	        //display loading screen
+	        loadingPage.classList.remove("hide-completely")
+	        //clear Rendered Elements
+	        let elementsToReset = ['inbox_mail_container', 'sent_mail_container', 'contacts_container', 'chat_container',
+	            'receiver_floID', 'receiver_name', 'mail_contact_list'
+	        ]
+	        //, "backup_info"
+	        elementsToReset.forEach(e => clearElement(document.getElementById(e)))
+
+	        floDapps.setCustomPrivKeyInput((type) => {
+	            return new Promise((resolve, reject) => {
+	                mainPage.classList.add('hide-completely')
+	                loadingPage.classList.add('hide-completely')
+	                signInLanding.classList.remove('hide-completely')
+	                signInButton.addEventListener('clicked', () => {
+	                    let key = privateKeyInputField.value;
+	                    signInPopup.hide()
+	                    console.log(key)
+	                    signInLanding.classList.add('hide-completely')
+	                    loadingPage.classList.remove('hide-completely')
+	                    resolve(key)
+	                })
+	                guestLoginButton.onclick = () => {
+	                    signInLanding.classList.add('hide-completely')
+	                    loadingPage.classList.remove('hide-completely')
+	                    reject(null)
+	                }
+	                if (type === "PRIVATE_KEY") {
+	                    privateKeyInputField.setAttribute("placeholder", "Private Key")
+	                    document.getElementById("type_of_key").textContent = 'FLO private key'
+	                    document.getElementById("remove_account").classList.add("hide-completely");
+	                } else if (type === "PIN/Password") {
+	                    privateKeyInputField.setAttribute("placeholder", "PIN/Password")
+	                    signInPopup.show()
+	                    privateKeyInputField.focusIn()
+	                    document.getElementById("remove_account").classList.remove("hide-completely");
+	                    document.getElementById("type_of_key").textContent = 'PIN/Password'
+	                    privKeyNotSecured = false;
+	                }
+	            })
+	        })
+
+	        //invoke the startup functions
+	        floDapps.launchStartUp().then(result => {
+	            console.log(result)
+	            document.getElementById("greet_tag").textContent = myFloID
+	            //load messages from IDB and render them
+	            console.log(`Loading Data! Please Wait...`)
+	            messenger.initUserDB().then(result => {
+	                console.log(result)
+	                messenger.loadDataFromIDB().then(data => {
+	                    console.log(data)
+	                    floGlobals.appendix = data.appendix;
+	                    floGlobals.groups = data.groupInfo
+	                    renderContactList(floGlobals.contacts)
+	                    renderMailContactList(floGlobals.contacts)
+	                    renderMessages(data.messages, false)
+	                    renderMailList(data.mails, false)
+	                    renderMarked(data.marked)
+	                    messenger.refreshInbox(renderLiveUI)
+	                        .then(rqID => console.log("reqID:", rqID))
+	                        .catch(e => console.error("request error:", e))
+	                    messenger.refreshGroupInbox(renderGroupLiveUI)
+	                        .then(r => console.log(r))
+	                        .catch(e => console.error(e))
+	                    console.log(`Load Successful!`)
+	                    //hide loading screen
+	                    loadingPage.classList.add("hide-completely")
+	                    mainPage.classList.remove('hide-completely')
+	                    chatSection.classList.add('hide-completely')
+	                    mailSection.classList.add('hide-completely')
+	                    //refreshAgain()
+	                    document.getElementById('chat_page_button').click()
+	                    if (privKeyNotSecured) {
+	                        notify("Private key is not secured with password. Remember to secure the private key in settings",
+	                            "warn", '')
+	                        document.getElementById("secure_key").textContent = 'Set password'
+	                    } else {
+	                        document.getElementById("secure_key").textContent = 'Change password'
+	                    }
+	                }).catch(error => {
+	                    //console.error(`Failed to load data`)
+	                    notify(error, "error")
+	                })
+	            })
+
+	        }).catch(error => notify(error, "error"))
+	    }
 	</script>
 </head>
 
@@ -796,6 +800,10 @@
             }
         }
 
+        function renderGroupLiveUI(data){
+            console.log(data)
+        }
+
 		function randomHsl(saturation = 90, lightness = 50) {
             let hue = Math.random() * 360
             let color = {
@@ -1306,11 +1314,12 @@
 			typeMessage.value = ''
 			if(message.trim() === '') return
             messenger.sendMessage(message, receiver).then(data => {
-                render.messageBubble(data.floID, data.message, data.time, data.category)
-                chatContainer.scrollTo({left: 0, top: chatContainer.scrollHeight, behavior: 'smooth'})
-                refreshCount = 0;
-                refreshTimeout = 10000;
-                setTimeout(refreshAgain, refreshTimeout)
+                renderMessages(data, false)
+                //render.messageBubble(data.floID, data.message, data.time, data.category)
+                //chatContainer.scrollTo({left: 0, top: chatContainer.scrollHeight, behavior: 'smooth'})
+                //refreshCount = 0;
+                //refreshTimeout = 10000;
+                //setTimeout(refreshAgain, refreshTimeout)
             }).catch(error => notify(error, "error"));
         }
 
@@ -1426,7 +1435,7 @@
 
         function renderMessages(data, markUnread = true) {
             let floID
-            for (m in data) {
+            for (let m in data) {
                 floID = data[m].floID
                 render.messageBubble(data[m].floID, data[m].message, data[m].time, data[m].category)
                 if (markUnread)
@@ -1445,7 +1454,7 @@
                 textColor = contact.getAttribute('text-color'),
                 backgroundColor = contact.getAttribute('background-color')
             let currentConversation = document.getElementById("receiver_floID").textContent;
-            console.log(floID, floGlobals.contacts[floID], currentConversation)
+            console.log(floID, floGlobals.contacts[floID])
             if (currentConversation != "")
                 document.getElementById(currentConversation).classList.add('hide-completely')
             let currentChat = document.getElementById(floID)
@@ -9597,7 +9606,7 @@ Bitcoin.Util = {
             },
 
             liveRequest: function (floID, datareq, callback) {
-                request = {
+                let request = {
                     ...datareq.request
                 };
                 const checkFilter = (v, d, r) =>
@@ -10935,6 +10944,7 @@ Bitcoin.Util = {
                         newgroups: [],
                         keyrevoke: []
                     }
+                    console.log(dataSet)
                     for (let vc in dataSet) {
                         try {
                             //store the pubKey if not stored already
@@ -10982,13 +10992,16 @@ Bitcoin.Util = {
                                     floCrypto.verifySign(h, groupInfo.hash, groupInfo.pubKey) &&
                                     floCrypto.getFloID(groupInfo.pubKey) === groupInfo.groupID) {
                                     floGlobals.groups[groupInfo.groupID] = groupInfo
-                                    compactIDB.addData("groupInfo", groupInfo, groupInfo.groupID)
+                                    compactIDB.writeData("groupInfo", groupInfo, groupInfo.groupID)
                                     newInbox.newgroups.push(groupInfo.groupID)
                                 }
                             } else if (dataSet[vc].type === "REVOKE_KEY") {
                                 let r = JSON.parse(dataSet[vc].message);
                                 let groupInfo = floGlobals.groups[r.groupID]
                                 if (dataSet[vc].senderID === groupInfo.admin) {
+                                    if(typeof floGlobals.expiredKeys[r.groupID] !== "object")
+                                        floGlobals.expiredKeys[r.groupID] = {}
+                                    floGlobals.expiredKeys[r.groupID][vc] = groupInfo.eKey
                                     groupInfo.eKey = r.newKey;
                                     compactIDB.writeData("groupInfo", groupInfo, groupInfo.groupID)
                                     newInbox.keyrevoke.push(groupInfo.groupID)
@@ -11197,7 +11210,7 @@ Bitcoin.Util = {
 
         //group feature
 
-        createGroup(groupname) {
+        createGroup(groupname, description = '') {
             return new Promise((resolve, reject) => {
                 if (!groupname) return reject("Invalid Group Name")
                 let id = floCrypto.generateNewID();
@@ -11206,6 +11219,7 @@ Bitcoin.Util = {
                     pubKey: id.pubKey,
                     admin: myFloID,
                     name: groupname,
+                    description: description,
                     created: Date.now(),
                     members: [myFloID],
                     eKey: floCrypto.randString(16, false)
@@ -11222,7 +11236,31 @@ Bitcoin.Util = {
             })
         },
 
-        addGroupMembers(groupID, newMem = [], note = undefined) {
+        changeGroupName(groupID, description) {
+            return new Promise((resolve, reject) => {
+                let groupInfo = floGlobals.groups[groupID]
+                if (myFloID !== groupInfo.admin)
+                    return reject("Access denied: Admin only!")
+                let message = this.util.encrypt(description, groupInfo.eKey)
+                this.util.sendRaw(message, groupID, "UP_NAME", false)
+                    .then(result => resolve('Description updated'))
+                    .catch(error => reject(error))
+            })
+        },
+
+        changeGroupDescription(groupID, name) {
+            return new Promise((resolve, reject) => {
+                let groupInfo = floGlobals.groups[groupID]
+                if (myFloID !== groupInfo.admin)
+                    return reject("Access denied: Admin only!")
+                let message = this.util.encrypt(name, groupInfo.eKey)
+                this.util.sendRaw(message, groupID, "UP_DESCRIPTION", false)
+                    .then(result => resolve('Description updated'))
+                    .catch(error => reject(error))
+            })
+        },
+
+        addGroupMembers(groupID, newMem, note = undefined) {
             return new Promise((resolve, reject) => {
                 if (!Array.isArray(newMem) && typeof newMem === "string")
                     newMem = [newMem]
@@ -11238,40 +11276,60 @@ Bitcoin.Util = {
                 else if (imem2.length)
                     return reject(`Invalid Members (pubKey not available): ${imem2}`)
                 //send new newMem list to existing members
-                let message = this.util.encrypt(newMem.join("|"), key)
-                this.util.sendRaw(message, groupID, "ADD_MEMBERS", false, note).then(r => {
-                    let groupInfo = floGlobals.groups[groupID]
-                    groupInfo.members = [...new Set(groupInfo.members.concat(newMem))]
-                    //send groupInfo to new newMem
-                    groupInfo = JSON.stringify(groupInfo)
-                    let promises = newMem.map(m => this.util.sendRaw(groupInfo, m, "CREATE_GROUP",
-                        true))
-                    Promise.allSettled(promises).then(results => {
-                        let success = [],
-                            failed = [];
-                        for (let i in results)
-                            if (results[i].status === "fulfilled")
-                                success.push(newMem[i])
-                        else if (results[i].status === "rejected")
-                            failed.push(newMem[i])
-                        resolve({
-                            success,
-                            failed
-                        })
-                    })
-                }).catch(e => reject(e))
+                let groupInfo = floGlobals.groups[groupID]
+                if (myFloID !== groupInfo.admin)
+                    return reject("Access denied: Admin only!")
+                //send groupInfo to new newMem
+                let k = groupInfo.eKey
+                groupInfo = JSON.stringify(groupInfo)
+                let promises = newMem.map(m => this.util.sendRaw(groupInfo, m, "CREATE_GROUP", true))
+                Promise.allSettled(promises).then(results => {
+                    let success = [],
+                        failed = [];
+                    for (let i in results)
+                        if (results[i].status === "fulfilled")
+                            success.push(newMem[i])
+                    else if (results[i].status === "rejected")
+                        failed.push(newMem[i])
+                    console.log(success.join("|"), k)
+                    let message = this.util.encrypt(success.join("|"), k)
+                    this.util.sendRaw(message, groupID, "ADD_MEMBERS", false, note)
+                        .then(r => resolve(`Members added: ${success}`))
+                        .catch(e => reject(e))
+                })
+            })
+        },
+
+        rmGroupMembers(groupID, rmMem, note = undefined) {
+            return new Promise((resolve, reject) => {
+                if (!Array.isArray(rmMem) && typeof rmMem === "string")
+                    rmMem = [rmMem]
+                let groupInfo = floGlobals.groups[groupID]
+                let imem = rmMem.filter(m => !groupInfo.members.includes(m))
+                if (imem.length)
+                    return reject(`Invalid members: ${imem}`)
+                if (myFloID !== groupInfo.admin)
+                    return reject("Access denied: Admin only!")
+                let message = this.util.encrypt(rmMem.join("|"), groupInfo.eKey)
+                p1 = this.util.sendRaw(message, groupID, "RM_MEMBERS", false, note)
+                groupInfo.members = groupInfo.members.filter(m => !rmMem.includes(m))
+                p2 = this.revokeKey(groupID)
+                Promise.all([p1, p2])
+                    .then(r => resolve(`Members removed: ${rmMem}`))
+                    .catch(e => reject(e))
             })
         },
 
         revokeKey(groupID) {
             return new Promise((resolve, reject) => {
                 let groupInfo = floGlobals.groups[groupID]
+                if (myFloID !== groupInfo.admin)
+                    return reject("Access denied: Admin only!")
                 let newKey = floCrypto.randString(16, false);
                 Promise.all(groupInfo.members.map(m => this.util.sendRaw(JSON.stringify({
                     newKey,
                     groupID
                 }), m, "REVOKE_KEY", true))).then(result => {
-                    floGlobals.groups[groupID].eKey = newKey;
                     resolve("Group key revoked")
                 }).catch(error => reject(error))
             })
@@ -11279,41 +11337,28 @@ Bitcoin.Util = {
 
         sendGroupMessage(message, groupID) {
             return new Promise(async (resolve, reject) => {
-                let k = floGlobals.groups[receiverID].eKey
+                let k = floGlobals.groups[groupID].eKey
                 message = this.util.encrypt(message, k)
-                this.util.sendRaw(message, groupID, "GROUP_MSG", false).then(result => {
-                    let vc = Object.keys(result).pop()
-                    let data = {
-                        groupID: groupID,
-                        sender: myFloID,
-                        time: result[vc].time,
-                        category: "sent",
-                        message: this.util.encrypt(message)
-                    }
-                    compactIDB.addData("groupMsg", {
-                        ...data
-                    }, vc)
-                    data.message = message;
-                    resolve({
-                        [vc]: data
-                    });
-                }).catch(error => reject(error))
+                this.util.sendRaw(message, groupID, "GROUP_MSG", false)
+                    .then(result => resolve(`${groupID}: ${message}`))
+                    .catch(error => reject(error))
             })
         },
 
         refreshGroupInbox(UIcallback) {
             return new Promise((resolve, reject) => {
-                let callback = function (dataSet, error) {
-                    //<<<CALL BACK FOR GROUP MESSAGE
+                let callbackFn = function (dataSet, error) {
                     if (error)
                         return console.error(error)
-                    console.log(dataSet)
+                    console.info(dataSet)
                     let newInbox = {
                         messages: {}
                     }
                     let groupID = null,
-                        memberchange = false;
+                        infoChange = false;
                     for (let vc in dataSet) {
+                        if(!floGlobals.groups[dataSet[vc].receiverID].members.includes(dataSet[vc].senderID))
+                            continue;
                         try {
                             let data = {
                                 time: dataSet[vc].time,
@@ -11321,20 +11366,40 @@ Bitcoin.Util = {
                                 groupID: dataSet[vc].receiverID
                             }
                             groupID = data.groupID
+                            let ex = Object.keys(floGlobals.expiredKeys[groupID]).sort()
+                            while(ex.lenght && vc > ex[0]) ex.shift()
+                            if(ex.length)
+                                var k = floGlobals.expiredKeys[groupID][ex.shift()]
+                            else
+                                var k = floGlobals.groups[data.groupID].eKey
+                            dataSet[vc].message = messenger.util.decrypt(dataSet[vc].message, k)
                             //store the pubKey if not stored already
                             floDapps.storePubKey(dataSet[vc].senderID, dataSet[vc].pubKey)
-                            let k = floGlobals.groups[data.groupID].eKey
-                            let msg = messenger.util.decrypt(dataSet[vc].message, k)
-                            if (dataSet[vc].type === "GROUP_MSG") {
+                            if (dataSet[vc].type === "GROUP_MSG")
                                 data.message = messenger.util.encrypt(dataSet[vc].message);
-                                data.category = "received"
-                            } else if (dataSet[vc].type === "ADD_MEMBERS") {
-                                data.newMembers = dataSet[vc].message.split("|")
-                                data.note = dataSet[vc].comment
+                            else if (data.sender === floGlobals.groups[groupID].admin) {
                                 let groupInfo = floGlobals.groups[groupID]
-                                groupInfo.members = [...new Set(groupInfo.members.concat(data
-                                    .newMembers))]
-                                memberchange = true;
+                                data.admin = true;
+                                if (dataSet[vc].type === "ADD_MEMBERS") {
+                                    data.newMembers = dataSet[vc].message.split("|")
+                                    data.note = dataSet[vc].comment
+                                    groupInfo.members = [...new Set(groupInfo.members.concat(data
+                                        .newMembers))]
+                                } else if (dataSet[vc].type === "RM_MEMBERS") {
+                                    data.rmMembers = dataSet[vc].message.split("|")
+                                    data.note = dataSet[vc].comment
+                                    groupInfo.members = groupInfo.members.filter(m => !data.rmMembers
+                                        .includes(m))
+                                    if (data.rmMembers.includes(myFloID))
+                                        groupInfo.status = false
+                                } else if (dataSet[vc].type === "UP_DESCRIPTION") {
+                                    data.description = dataSet[vc].message
+                                    groupInfo.description = data.description
+                                } else if (dataSet[vc].type === "UP_NAME") {
+                                    data.name = dataSet[vc].message
+                                    groupInfo.name = data.name
+                                }
+                                infoChange = true;
                             }
                             compactIDB.addData("groupMsg", {
                                 ...data
@@ -11343,16 +11408,16 @@ Bitcoin.Util = {
                                 data.message = messenger.util.decrypt(data.message);
                             newInbox.messages[vc] = data;
                             messenger.addMark(data.groupID, "unread")
+                            if (!floGlobals.appendix[`lastReceived_${groupID}`] || 
+                            floGlobals.appendix[`lastReceived_${groupID}`] < vc)
+                                floGlobals.appendix[`lastReceived_${groupID}`] = vc;
                         } catch (error) {
                             console.log(error)
-                        } finally {
-                            if (floGlobals.appendix[`lastReceived_${groupID}`] < vc)
-                                floGlobals.appendix[`lastReceived_${groupID}`] = vc;
                         }
                     }
                     compactIDB.writeData("appendix", floGlobals.appendix[`lastReceived_${groupID}`],
                         `lastReceived_${groupID}`);
-                    if (memberchange)
+                    if (infoChange)
                         compactIDB.writeData("groupInfo", floGlobals.groups[groupID], groupID)
                     UIcallback(newInbox)
                 }
@@ -11368,13 +11433,15 @@ Bitcoin.Util = {
                             })
                         })
                 })
-                for (let groupID in floGlobal.groups) {
-                    var options = {
-                        receiverID: groupID,
-                        lowerVectorClock: floGlobals.appendix[`lastReceived_${groupID}`] + 1,
-                        callback: callbackFn
+                for (let groupID in floGlobals.groups) {
+                    if (floGlobals.groups[groupID].status !== false) {
+                        var options = {
+                            receiverID: groupID,
+                            lowerVectorClock: floGlobals.appendix[`lastReceived_${groupID}`] + 1,
+                            callback: callbackFn
+                        }
+                        promises.push(reqFn(options))
                     }
-                    promises.push(reqFn(options))
                 }
                 Promise.all(promises).then(result => {
                     let success = {},
@@ -11384,7 +11451,7 @@ Bitcoin.Util = {
                         success,
                         failed
                     })
-                }).catch(error => reject(error))
+                })
             })
         }
     }
