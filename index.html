@@ -97,12 +97,12 @@
 	                    renderMessages(data.messages, false)
 	                    renderMailList(data.mails, false)
 	                    renderMarked(data.marked)
-	                    messenger.refreshInbox(renderLiveUI)
-	                        .then(rqID => console.log("reqID:", rqID))
-	                        .catch(e => console.error("request error:", e))
-	                    messenger.refreshGroupInbox(renderGroupLiveUI)
+                        messenger.setUIcallbacks(renderDirectUI, renderGroupUI)
+	                    messenger.refreshInbox()
+	                        .then(r => console.log("DirectConn:", r))
+	                        .catch(e => console.error("Request error:", e))
+	                    messenger.refreshGroupInbox()
 	                        .then(r => console.log(r))
-	                        .catch(e => console.error(e))
 	                    console.log(`Load Successful!`)
 	                    //hide loading screen
 	                    loadingPage.classList.add("hide-completely")
@@ -786,7 +786,7 @@
         
         let currentDate, currentFloID
 
-        function renderLiveUI(data) {
+        function renderDirectUI(data) {
             console.log(data)
             renderMessages(data.messages);
             renderMailList(data.mails)
@@ -800,7 +800,7 @@
             }
         }
 
-        function renderGroupLiveUI(data){
+        function renderGroupUI(data){
             console.log(data)
         }
 
@@ -10821,7 +10821,101 @@ Bitcoin.Util = {
 
             decrypt(value, key = floGlobals.appendix.AESKey) {
                 return Crypto.AES.decrypt(value, key)
+            },
+
+            UIcallback: {
+                group: (d, e) => console.log(d, e),
+                direct: (d, e) => console.log(d, e)
+            },
+
+            groupConn(groupID) {
+                let callbackFn = function (dataSet, error) {
+                    if (error)
+                        return console.error(error)
+                    console.info(dataSet)
+                    let newInbox = {
+                        messages: {}
+                    }
+                    let infoChange = false;
+                    for (let vc in dataSet) {
+                        if(groupID !== dataSet[vc].receiverID || 
+                        !floGlobals.groups[groupID].members.includes(dataSet[vc].senderID))
+                            continue;
+                        try {
+                            let data = {
+                                time: dataSet[vc].time,
+                                sender: dataSet[vc].senderID,
+                                groupID: dataSet[vc].receiverID
+                            }
+                            let k = floGlobals.groups[groupID].eKey;
+                            if(floGlobals.expiredKeys[groupID]){
+                                var ex = Object.keys(floGlobals.expiredKeys[groupID]).sort()
+                                while(ex.lenght && vc > ex[0]) ex.shift()
+                                if(ex.length)
+                                    k = floGlobals.expiredKeys[groupID][ex.shift()]
+                            }
+                            dataSet[vc].message = messenger.util.decrypt(dataSet[vc].message, k)
+                            //store the pubKey if not stored already
+                            floDapps.storePubKey(dataSet[vc].senderID, dataSet[vc].pubKey)
+                            if (dataSet[vc].type === "GROUP_MSG")
+                                data.message = messenger.util.encrypt(dataSet[vc].message);
+                            else if (data.sender === floGlobals.groups[groupID].admin) {
+                                let groupInfo = floGlobals.groups[groupID]
+                                data.admin = true;
+                                if (dataSet[vc].type === "ADD_MEMBERS") {
+                                    data.newMembers = dataSet[vc].message.split("|")
+                                    data.note = dataSet[vc].comment
+                                    groupInfo.members = [...new Set(groupInfo.members.concat(data
+                                        .newMembers))]
+                                } else if (dataSet[vc].type === "RM_MEMBERS") {
+                                    data.rmMembers = dataSet[vc].message.split("|")
+                                    data.note = dataSet[vc].comment
+                                    groupInfo.members = groupInfo.members.filter(m => !data.rmMembers
+                                        .includes(m))
+                                    if (data.rmMembers.includes(myFloID))
+                                        groupInfo.status = false
+                                } else if (dataSet[vc].type === "UP_DESCRIPTION") {
+                                    data.description = dataSet[vc].message
+                                    groupInfo.description = data.description
+                                } else if (dataSet[vc].type === "UP_NAME") {
+                                    data.name = dataSet[vc].message
+                                    groupInfo.name = data.name
+                                }
+                                infoChange = true;
+                            }
+                            compactIDB.addData("groupMsg", {
+                                ...data
+                            }, vc)
+                            if (data.message)
+                                data.message = messenger.util.decrypt(data.message);
+                            newInbox.messages[vc] = data;
+                            messenger.addMark(data.groupID, "unread")
+                            if (!floGlobals.appendix[`lastReceived_${groupID}`] || 
+                            floGlobals.appendix[`lastReceived_${groupID}`] < vc)
+                                floGlobals.appendix[`lastReceived_${groupID}`] = vc;
+                        } catch (error) {
+                            console.log(error)
+                        }
+                    }
+                    compactIDB.writeData("appendix", floGlobals.appendix[`lastReceived_${groupID}`],
+                        `lastReceived_${groupID}`);
+                    if (infoChange)
+                        compactIDB.writeData("groupInfo", floGlobals.groups[groupID], groupID)
+                    this.UIcallback["group"](newInbox)
+                }
+                return floCloudAPI.requestApplicationData(null, {
+                            receiverID: groupID,
+                            lowerVectorClock: floGlobals.appendix[`lastReceived_${groupID}`] + 1,
+                            callback: callbackFn
+                        })
             }
+        },
+
+        setUIcallbacks(directUI = null, groupUI = null){
+            if(direct instanceof Function)
+                this.util.UIcallback["direct"] = directUI
+            if(groupUI instanceof Function)
+                this.util.UIcallback["group"] = groupUI
         },
 
         initUserDB() {
@@ -10933,7 +11027,7 @@ Bitcoin.Util = {
             })
         },
 
-        refreshInbox(UIcallback) {
+        refreshInbox() {
             return new Promise((resolve, reject) => {
                 let callbackFn = function (dataSet, error) {
                     if (error)
@@ -10983,7 +11077,7 @@ Bitcoin.Util = {
                                 compactIDB.addData("mailRef", vc, data.ref)
                                 data.content = dataSet[vc].message.content;
                                 newInbox.mails[vc] = data;
-                                this.addMark(data.ref, "unread")
+                                messenger.addMark(data.ref, "unread")
                             } else if (dataSet[vc].type === "CREATE_GROUP") {
                                 //process create group
                                 let groupInfo = JSON.parse(dataSet[vc].message);
@@ -10993,6 +11087,7 @@ Bitcoin.Util = {
                                     floCrypto.getFloID(groupInfo.pubKey) === groupInfo.groupID) {
                                     floGlobals.groups[groupInfo.groupID] = groupInfo
                                     compactIDB.writeData("groupInfo", groupInfo, groupInfo.groupID)
+                                    messenger.util.groupConn(groupInfo.groupID)
                                     newInbox.newgroups.push(groupInfo.groupID)
                                 }
                             } else if (dataSet[vc].type === "REVOKE_KEY") {
@@ -11015,7 +11110,7 @@ Bitcoin.Util = {
                         }
                     }
                     compactIDB.writeData("appendix", floGlobals.appendix.lastReceived, "lastReceived");
-                    UIcallback(newInbox)
+                    this.util.UIcallback["direct"](newInbox)
                 }
 
                 var options = {
@@ -11207,7 +11302,6 @@ Bitcoin.Util = {
             })
         },
 
-
         //group feature
 
         createGroup(groupname, description = '') {
@@ -11231,6 +11325,7 @@ Bitcoin.Util = {
                 p2 = compactIDB.addData("groupKey", this.util.encrypt(id.privKey), id.floID)
                 Promise.all([p1, p2]).then(r => {
                     floGlobals.groups[id.floID] = groupInfo;
+                    this.util.groupConn(id.floID)
                     resolve(groupInfo)
                 }).catch(e => reject(e))
             })
@@ -11345,115 +11440,36 @@ Bitcoin.Util = {
             })
         },
 
-        refreshGroupInbox(UIcallback) {
-            return new Promise((resolve, reject) => {
-                let callbackFn = function (dataSet, error) {
-                    if (error)
-                        return console.error(error)
-                    console.info(dataSet)
-                    let newInbox = {
-                        messages: {}
-                    }
-                    let groupID = null,
-                        infoChange = false;
-                    for (let vc in dataSet) {
-                        if(!floGlobals.groups[dataSet[vc].receiverID].members.includes(dataSet[vc].senderID))
-                            continue;
-                        try {
-                            let data = {
-                                time: dataSet[vc].time,
-                                sender: dataSet[vc].senderID,
-                                groupID: dataSet[vc].receiverID
-                            }
-                            groupID = data.groupID
-                            let ex = Object.keys(floGlobals.expiredKeys[groupID]).sort()
-                            while(ex.lenght && vc > ex[0]) ex.shift()
-                            if(ex.length)
-                                var k = floGlobals.expiredKeys[groupID][ex.shift()]
-                            else
-                                var k = floGlobals.groups[data.groupID].eKey
-                            dataSet[vc].message = messenger.util.decrypt(dataSet[vc].message, k)
-                            //store the pubKey if not stored already
-                            floDapps.storePubKey(dataSet[vc].senderID, dataSet[vc].pubKey)
-                            if (dataSet[vc].type === "GROUP_MSG")
-                                data.message = messenger.util.encrypt(dataSet[vc].message);
-                            else if (data.sender === floGlobals.groups[groupID].admin) {
-                                let groupInfo = floGlobals.groups[groupID]
-                                data.admin = true;
-                                if (dataSet[vc].type === "ADD_MEMBERS") {
-                                    data.newMembers = dataSet[vc].message.split("|")
-                                    data.note = dataSet[vc].comment
-                                    groupInfo.members = [...new Set(groupInfo.members.concat(data
-                                        .newMembers))]
-                                } else if (dataSet[vc].type === "RM_MEMBERS") {
-                                    data.rmMembers = dataSet[vc].message.split("|")
-                                    data.note = dataSet[vc].comment
-                                    groupInfo.members = groupInfo.members.filter(m => !data.rmMembers
-                                        .includes(m))
-                                    if (data.rmMembers.includes(myFloID))
-                                        groupInfo.status = false
-                                } else if (dataSet[vc].type === "UP_DESCRIPTION") {
-                                    data.description = dataSet[vc].message
-                                    groupInfo.description = data.description
-                                } else if (dataSet[vc].type === "UP_NAME") {
-                                    data.name = dataSet[vc].message
-                                    groupInfo.name = data.name
-                                }
-                                infoChange = true;
-                            }
-                            compactIDB.addData("groupMsg", {
-                                ...data
-                            }, vc)
-                            if (data.message)
-                                data.message = messenger.util.decrypt(data.message);
-                            newInbox.messages[vc] = data;
-                            messenger.addMark(data.groupID, "unread")
-                            if (!floGlobals.appendix[`lastReceived_${groupID}`] || 
-                            floGlobals.appendix[`lastReceived_${groupID}`] < vc)
-                                floGlobals.appendix[`lastReceived_${groupID}`] = vc;
-                        } catch (error) {
-                            console.log(error)
-                        }
-                    }
-                    compactIDB.writeData("appendix", floGlobals.appendix[`lastReceived_${groupID}`],
-                        `lastReceived_${groupID}`);
-                    if (infoChange)
-                        compactIDB.writeData("groupInfo", floGlobals.groups[groupID], groupID)
-                    UIcallback(newInbox)
-                }
+        refreshGroupInbox() {
+            return new Promise((resolve) => {
                 let promises = []
-                let reqFn = (op) => new Promise(res => {
-                    let s = f = null;
-                    floCloudAPI.requestApplicationData(null, op)
-                        .then(r => s = r).catch(e => f = e).finally(_ => {
-                            res({
-                                groupID: op.receiverID,
-                                status: s ? true : false,
-                                feedback: s || f
-                            })
-                        })
+                let reqFn = (g) => new Promise((res, rej) => {
+                    this.util.groupConn(g)
+                        .then(r => res([g, r]))
+                        .catch(e => rej([g, e]))
                 })
-                for (let groupID in floGlobals.groups) {
-                    if (floGlobals.groups[groupID].status !== false) {
-                        var options = {
-                            receiverID: groupID,
-                            lowerVectorClock: floGlobals.appendix[`lastReceived_${groupID}`] + 1,
-                            callback: callbackFn
-                        }
-                        promises.push(reqFn(options))
-                    }
-                }
-                Promise.all(promises).then(result => {
-                    let success = {},
-                        failed = {}
-                    result.forEach(r => (r.status ? success : failed)[r.groupID] = r.feedback)
-                    resolve({
-                        success,
-                        failed
+                for (let g in floGlobals.groups) 
+                    if (floGlobals.groups[g].status !== false) 
+                        promises.push(reqFn(g))
+                Promise.allSettled(promises).then(result => {
+                    let ret = {};
+                    result.forEach(r => {
+                        if(r.status === 'fulfilled')
+                            ret[r.value[0]] = {
+                                status = r.status,
+                                value = r.value[1]
+                            }
+                        else if(r.status === "rejected") 
+                            ret[r.reason[0]] = {
+                                status = r.status,
+                                reason = r.reason[1]
+                            }
                     })
+                    resolve(ret)
                 })
             })
         }
+        
     }
 </script>
 </body>
