@@ -9628,15 +9628,18 @@ Bitcoin.Util = {
                             else if (evt.data.startsWith(floID, 1))
                                 var i = 36
                             else return;
+                            let d = e = null;
                             try {
                                 let data = JSON.parse(evt.data.substring(i))
                                 let filter = {}
                                 for (let v in data)
                                     if (checkFilter(v, data[v], request))
                                         filter[v] = data[v]
-                                callback(filter, null)
+                                d = filter
                             } catch (error) {
-                                callback(null, evt.data.substring(i))
+                                e = evt.data.substring(i)
+                            } finally {
+                                callback(d, e)
                             }
                         }
                         this.liveRequest[randID] = node;
@@ -10838,8 +10841,8 @@ Bitcoin.Util = {
                     }
                     let infoChange = false;
                     for (let vc in dataSet) {
-                        if(groupID !== dataSet[vc].receiverID || 
-                        !floGlobals.groups[groupID].members.includes(dataSet[vc].senderID))
+                        if (groupID !== dataSet[vc].receiverID ||
+                            !floGlobals.groups[groupID].members.includes(dataSet[vc].senderID))
                             continue;
                         try {
                             let data = {
@@ -10848,10 +10851,10 @@ Bitcoin.Util = {
                                 groupID: dataSet[vc].receiverID
                             }
                             let k = floGlobals.groups[groupID].eKey;
-                            if(floGlobals.expiredKeys[groupID]){
+                            if (floGlobals.expiredKeys[groupID]) {
                                 var ex = Object.keys(floGlobals.expiredKeys[groupID]).sort()
-                                while(ex.lenght && vc > ex[0]) ex.shift()
-                                if(ex.length)
+                                while (ex.lenght && vc > ex[0]) ex.shift()
+                                if (ex.length)
                                     k = floGlobals.expiredKeys[groupID][ex.shift()]
                             }
                             dataSet[vc].message = messenger.util.decrypt(dataSet[vc].message, k)
@@ -10890,8 +10893,8 @@ Bitcoin.Util = {
                                 data.message = messenger.util.decrypt(data.message);
                             newInbox.messages[vc] = data;
                             messenger.addMark(data.groupID, "unread")
-                            if (!floGlobals.appendix[`lastReceived_${groupID}`] || 
-                            floGlobals.appendix[`lastReceived_${groupID}`] < vc)
+                            if (!floGlobals.appendix[`lastReceived_${groupID}`] ||
+                                floGlobals.appendix[`lastReceived_${groupID}`] < vc)
                                 floGlobals.appendix[`lastReceived_${groupID}`] = vc;
                         } catch (error) {
                             console.log(error)
@@ -10901,20 +10904,20 @@ Bitcoin.Util = {
                         `lastReceived_${groupID}`);
                     if (infoChange)
                         compactIDB.writeData("groupInfo", floGlobals.groups[groupID], groupID)
-                    this.UIcallback["group"](newInbox)
+                    messenger.util.UIcallback["group"](newInbox)
                 }
                 return floCloudAPI.requestApplicationData(null, {
-                            receiverID: groupID,
-                            lowerVectorClock: floGlobals.appendix[`lastReceived_${groupID}`] + 1,
-                            callback: callbackFn
-                        })
+                    receiverID: groupID,
+                    lowerVectorClock: floGlobals.appendix[`lastReceived_${groupID}`] + 1,
+                    callback: callbackFn
+                })
             }
         },
 
-        setUIcallbacks(directUI = null, groupUI = null){
-            if(direct instanceof Function)
+        setUIcallbacks(directUI = null, groupUI = null) {
+            if (directUI instanceof Function)
                 this.util.UIcallback["direct"] = directUI
-            if(groupUI instanceof Function)
+            if (groupUI instanceof Function)
                 this.util.UIcallback["group"] = groupUI
         },
 
@@ -11094,7 +11097,7 @@ Bitcoin.Util = {
                                 let r = JSON.parse(dataSet[vc].message);
                                 let groupInfo = floGlobals.groups[r.groupID]
                                 if (dataSet[vc].senderID === groupInfo.admin) {
-                                    if(typeof floGlobals.expiredKeys[r.groupID] !== "object")
+                                    if (typeof floGlobals.expiredKeys[r.groupID] !== "object")
                                         floGlobals.expiredKeys[r.groupID] = {}
                                     floGlobals.expiredKeys[r.groupID][vc] = groupInfo.eKey
                                     groupInfo.eKey = r.newKey;
@@ -11110,7 +11113,7 @@ Bitcoin.Util = {
                         }
                     }
                     compactIDB.writeData("appendix", floGlobals.appendix.lastReceived, "lastReceived");
-                    this.util.UIcallback["direct"](newInbox)
+                    messenger.util.UIcallback["direct"](newInbox)
                 }
 
                 var options = {
@@ -11448,28 +11451,27 @@ Bitcoin.Util = {
                         .then(r => res([g, r]))
                         .catch(e => rej([g, e]))
                 })
-                for (let g in floGlobals.groups) 
-                    if (floGlobals.groups[g].status !== false) 
+                for (let g in floGlobals.groups)
+                    if (floGlobals.groups[g].status !== false)
                         promises.push(reqFn(g))
                 Promise.allSettled(promises).then(result => {
                     let ret = {};
                     result.forEach(r => {
-                        if(r.status === 'fulfilled')
+                        if (r.status === 'fulfilled')
                             ret[r.value[0]] = {
-                                status = r.status,
-                                value = r.value[1]
+                                status: r.status,
+                                value: r.value[1]
                             }
-                        else if(r.status === "rejected") 
+                        else if (r.status === "rejected")
                             ret[r.reason[0]] = {
-                                status = r.status,
-                                reason = r.reason[1]
+                                status: r.status,
+                                reason: r.reason[1]
                             }
                     })
                     resolve(ret)
                 })
             })
         }
-        
     }
 </script>
 </body>
