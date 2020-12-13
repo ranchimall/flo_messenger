@@ -1569,10 +1569,10 @@
             let subject = subjectOfReplyMail.value;
             let content = replyMailContent.value;
             let prevRef = replyMailPopup.dataset.prevRef;
-            messenger.replyMail(prevRef, subject, content, recipient).then(data => {
+            messenger.sendMail(subject, content, recipient, prevRef).then(data => {
                 notify(`Mail replied!`);
                 replyMailPopup.hide()
-                let {ref, subject, time, category, floID, content} = data
+                let {ref, subject, time, from, to, prev, content} = data
                 sentMailContainer.prepend(render.mailCard(ref, subject, time, category, floID, content));
             }).catch(error => notify("Failed to send mail!", "error", error))
         }
@@ -10926,7 +10926,6 @@ Bitcoin.Util = {
                 var obj = {
                     messages: {},
                     mails: {},
-                    mailRef: {},
                     marked: {},
                     groupInfo: {},
                     groupMsg: {},
@@ -10961,72 +10960,38 @@ Bitcoin.Util = {
             })
         },
 
-        sendMail(subject, content, recipients) {
+        sendMail(subject, content, recipients, prev = null) {
             return new Promise(async (resolve, reject) => {
-                let result = {
-                    success: {},
-                    error: {}
-                }
+                if (!Array.isArray(recipients))
+                    recipients = [recipients]
                 let mail = {
                     subject: subject,
                     content: content,
-                    ref: floCrypto.randString(32, true)
+                    ref: Date.now() + floCrypto.randString(8, true),
+                    prev: prev
                 }
-                for (let i = 0; i < recipients.length; i++) {
-                    try {
-                        if (recipients[i] in floGlobals.pubKeys)
-                            result.success[recipients[i]] = await this.util.sendEncrypted(mail,
-                                recipients[i]);
-                        else
-                            result.success[recipients[i]] = await this.util.sendEncoded(mail,
-                                recipients[i]);
-                    } catch (error) {
-                        result.error[recipients[i]] = error;
-                    }
-                }
-                let data = {
-                    time: Date.now(),
-                    floID: Object.keys(result.success),
-                    category: "sentTo",
-                    subject: subject,
-                    ref: mail.ref
-                }
-                compactIDB.addData("mails", data, `${data.time}`)
-                compactIDB.addData("mailContent", this.util.encrypt(content), `${data.time}`)
-                compactIDB.addData("mailRef", `${data.time}`, mail.ref)
-                result.data = data
-                resolve(result)
-            })
-        },
-
-        replyMail(prevRef, subject, content, recipient) {
-            return new Promise(async (resolve, reject) => {
-                let mail = {
-                    prevRef: prevRef,
-                    subject: subject,
-                    content: content,
-                    ref: floCrypto.randString(32, true)
-                }
-                try {
-                    if (recipient in floGlobals.pubKeys)
-                        await this.util.sendEncrypted(mail, recipient);
-                    else
-                        await this.util.sendEncoded(mail, recipient);
-                    let data = {
-                        time: Date.now(),
-                        floID: recipient,
-                        category: "replyTo",
-                        prevRef: prevRef,
-                        subject: subject,
-                        ref: mail.ref
-                    }
-                    compactIDB.addData("mails", data, `${data.time}`)
-                    compactIDB.addData("mailContent", this.util.encrypt(content), `${data.time}`)
-                    compactIDB.addData("mailRef", `${data.time}`, mail.ref)
-                    resolve(data)
-                } catch (error) {
-                    reject(error)
-                }
+                let promises = recipients.map(r => this.util.sendRaw(JSON.stringify(mail), r, "MAIL"))
+                Promise.allSettled(promises).then(results => {
+                    mail.time = Date.now();
+                    mail.from = myFloID
+                    mail.to = []
+                    results.forEach(r => {
+                        if (r.status === "fulfilled") {
+                            let vc = Object.keys(r.value).pop()
+                            mail.to.push(r.value[vc].receiverID)
+                        }
+                    })
+                    if (mail.to.length === 0)
+                        return reject(results)
+                    mail.content = this.util.encrypt(content)
+                    compactIDB.addData("mails", {
+                        ...mail
+                    }, mail.ref)
+                    mail.content = content
+                    resolve({
+                        [mail.ref]: mail
+                    });
+                })
             })
         },
 
@@ -11046,41 +11011,42 @@ Bitcoin.Util = {
                         try {
                             //store the pubKey if not stored already
                             floDapps.storePubKey(dataSet[vc].senderID, dataSet[vc].pubKey)
-                            let data = {
-                                time: dataSet[vc].time,
-                                floID: dataSet[vc].senderID,
-                            }
                             if (dataSet[vc].message instanceof Object && "secret" in dataSet[vc]
                                 .message)
                                 dataSet[vc].message = floCrypto.decryptData(dataSet[vc].message,
                                     myPrivKey)
                             if (dataSet[vc].type === "MESSAGE") {
                                 //process as message
-                                data.category = "received"
-                                data.message = messenger.util.encrypt(dataSet[vc].message);
+                                let dm = {
+                                    time: dataSet[vc].time,
+                                    floID: dataSet[vc].senderID,
+                                    category: "received",
+                                    message: messenger.util.encrypt(dataSet[vc].message)
+                                }
                                 compactIDB.addData("messages", {
-                                    ...data
+                                    ...dm
                                 }, vc)
-                                data.message = dataSet[vc].message;
-                                newInbox.messages[vc] = data;
-                                messenger.addMark(data.floID, "unread")
+                                dm.message = dataSet[vc].message;
+                                newInbox.messages[vc] = dm;
+                                messenger.addMark(dm.floID, "unread")
                             } else if (dataSet[vc].type === "MAIL") {
                                 //process as mail
-                                data.subject = dataSet[vc].message.subject;
-                                data.ref = dataSet[vc].message.ref;
-                                if (dataSet[vc].message.prevRef) {
-                                    data.prevRef = dataSet[vc].message.prevRef;
-                                    data.category = "replyFrom";
-                                } else
-                                    data.category = "receivedFrom"
-                                data.content = messenger.util.encrypt(dataSet[vc].message.content)
+                                let data = JSON.parse(dataSet[vc].message);
+                                let mail = {
+                                    time: dataSet[vc].time,
+                                    from: dataSet[vc].senderID,
+                                    to: [myFloID],
+                                    subject: data.subject,
+                                    content: messenger.util.encrypt(data.content),
+                                    ref: data.ref,
+                                    prev: data.prev
+                                }
                                 compactIDB.addData("mails", {
-                                    ...data
-                                }, vc);
-                                compactIDB.addData("mailRef", vc, data.ref)
-                                data.content = dataSet[vc].message.content;
-                                newInbox.mails[vc] = data;
-                                messenger.addMark(data.ref, "unread")
+                                    ...mail
+                                }, mail.ref);
+                                mail.content = dataSet[vc].message.content;
+                                newInbox.mails[mail.ref] = mail;
+                                messenger.addMark(mail.ref, "unread")
                             } else if (dataSet[vc].type === "CREATE_GROUP") {
                                 //process create group
                                 let groupInfo = JSON.parse(dataSet[vc].message);
@@ -11129,13 +11095,9 @@ Bitcoin.Util = {
 
         getMail(mailRef) {
             return new Promise((resolve, reject) => {
-                compactIDB.readData("mailRef", mailRef).then(result => {
-                    let promises = [compactIDB.readData("mails", result), compactIDB.readData(
-                        "mailContent", result)]
-                    Promise.all(promises).then(results => {
-                        results[0].content = Crypto.AES.decrypt(results[1]);
-                        resolve(results[0]);
-                    }).catch(error => reject(error))
+                compactIDB.readData("mails", mailRef).then(mail => {
+                    mail.content = this.util.decrypt(mail.content)
+                    resolve(mail)
                 }).catch(error => reject(error))
             });
         },
@@ -11176,32 +11138,48 @@ Bitcoin.Util = {
             return floDapps.storeContact(floID, name)
         },
 
-        loadDataFromIDB() {
+        loadDataFromIDB(dataList = 'default') {
             return new Promise((resolve, reject) => {
-                let loadData = ["messages", "mails", "marked", "groupMsg", "groupInfo", "appendix"]
+                if (dataList === 'default')
+                    dataList = ["messages", "mails", "marked", "groupMsg", "groupInfo", "appendix"]
+                else if (dataList === 'all')
+                    dataList = ["messages", "mails", "marked", "groupMsg", "groupInfo", "groupKey",
+                        "appendix"
+                    ]
                 let promises = []
-                for (var i = 0; i < loadData.length; i++)
-                    promises[i] = compactIDB.readAllData(loadData[i])
+                for (var i = 0; i < dataList.length; i++)
+                    promises[i] = compactIDB.readAllData(dataList[i])
                 Promise.all(promises).then(results => {
                     let data = {}
-                    for (var i = 0; i < loadData.length; i++)
-                        data[loadData[i]] = results[i]
+                    for (var i = 0; i < dataList.length; i++)
+                        data[dataList[i]] = results[i]
                     data.appendix.lastReceived = data.appendix.lastReceived || '0'
                     if (data.appendix.AESKey) {
                         try {
                             let AESKey = floCrypto.decryptData(data.appendix.AESKey, myPrivKey);
                             data.appendix.AESKey = AESKey;
-                            for (let m in data.messages) {
-                                let decrypted = Crypto.AES.decrypt(data.messages[m].message,
-                                    AESKey)
-                                data.messages[m].message = decrypted;
-                            }
+                            if ("messages" in dataList)
+                                for (let m in data.messages)
+                                    data.messages[m].message = this.util.decrypt(data.messages[m]
+                                        .message, AESKey)
+                            if ("mails" in dataList)
+                                for (let m in data.mails)
+                                    data.mails[m].content = this.util.decrypt(data.mails[m].content,
+                                        AESKey)
+                            if ("groupKey" in dataList)
+                                for (let k in data.groupKeys)
+                                    data.groupKeys[k] = this.util.decrypt(data.groupKeys[k], AESKey)
+                            if ("groupMsg" in dataList)
+                                for (let m in data.groupMsg)
+                                    if (datdata.groupMsg[m].message)
+                                        data.groupMsg[m].message = this.util.decrypt(data.groupMsg[
+                                            m].message, AESKey)
                             resolve(data)
                         } catch (error) {
                             reject("Corrupted AES Key");
                         }
                     } else {
-                        if (Object.keys(data.messages).length)
+                        if (Object.keys(data.messages).length || Object.keys(data.mails).length)
                             return reject("AES Key not Found")
                         let AESKey = floCrypto.randString(32);
                         let encryptedKey = floCrypto.encryptData(AESKey, myPubKey);
@@ -11216,24 +11194,16 @@ Bitcoin.Util = {
 
         backupData() {
             return new Promise((resolve, reject) => {
-                let obs = ["contacts", "pubKeys", "messages", "mails", "mailContent", "mailRef", "marked",
-                    "appendix"
-                ]
-                let promises = [];
-                obs.forEach(o => promises.push(compactIDB.readAllData(o)))
-                Promise.all(promises).then(results => {
-                    let data = {}
-                    for (let i = 0; i < obs.length; i++)
-                        data[obs[i]] = results[i]
-                    results = undefined;
+                this.loadDataFromIDB("all").then(data => {
+                    delete data.appendix.AESKey;
                     data = btoa(unescape(encodeURIComponent(JSON.stringify(data))))
-                    data = {
+                    let blobData = {
                         floID: myFloID,
                         pubKey: myPubKey,
-                        data: floCrypto.encryptData(data, myPubKey),
+                        data: this.util.encrypt(data, myPrivKey),
                     }
-                    data.sign = floCrypto.signData(JSON.stringify(data.data), myPrivKey);
-                    resolve(new Blob([JSON.stringify(data)], {
+                    blobData.sign = floCrypto.signData(blobData.data, myPrivKey);
+                    resolve(new Blob([JSON.stringify(blobData)], {
                         type: 'application/json'
                     }));
                 }).catch(error => reject(error))
@@ -11245,14 +11215,14 @@ Bitcoin.Util = {
                 if (blob instanceof Blob || blob instanceof File) {
                     let reader = new FileReader();
                     reader.onload = evt => {
-                        var data = JSON.parse(evt.target.result);
-                        if (!floCrypto.verifySign(JSON.stringify(data.data), data.sign, data.pubKey))
+                        var blobData = JSON.parse(evt.target.result);
+                        if (!floCrypto.verifySign(blobData.data, blobData.sign, blobData.pubKey))
                             reject("Corrupted Backup file: Signature verification failed");
-                        else if (myFloID !== data.floID || myPubKey !== data.pubKey)
+                        else if (myFloID !== blobData.floID || myPubKey !== blobData.pubKey)
                             reject("Invalid Backup file: Incorrect floID");
                         else {
                             try {
-                                data = floCrypto.decryptData(data.data, myPrivKey);
+                                let data = this.util.decrypt(blobData.data, myPrivKey)
                                 try {
                                     data = JSON.parse(decodeURIComponent(escape(atob(data))));
                                     resolve(data)
@@ -11272,32 +11242,28 @@ Bitcoin.Util = {
 
         restoreData(arg) {
             return new Promise((resolve, reject) => {
-                let parseData;
                 if (arg instanceof Blob || arg instanceof File)
-                    parseData = this.parseBackup
+                    var parseData = this.parseBackup
                 else
-                    parseData = data => new Promise((res, rej) => res(data))
+                    var parseData = data => new Promise((res, rej) => res(data))
                 parseData(arg).then(data => {
-                    if (data.appendix.lastReceived < floGlobals.appendix.lastReceived)
-                        data.appendix.lastReceived = floGlobals.appendix.lastReceived;
-                    let AESKey = floCrypto.decryptData(data.appendix.AESKey, myPrivKey);
-                    if (AESKey !== floGlobals.appendix.AESKey) {
-                        for (let m in data.messages) {
-                            let decrypted = this.util.decrypt(data.messages[m].message, AESKey)
-                            let encrypted = this.util.encrypt(decrypted)
-                            data.messages[m].message = encrypted;
-                        }
-                        for (let m in data.mailContent) {
-                            let decrypted = this.util.decrypt(data.mailContent[m], AESKey)
-                            let encrypted = this.util.encrypt(decrypted)
-                            data.mailContent[m] = encrypted;
-                        }
-                    }
-                    delete data.appendix.AESKey;
+                    for (let m in data.messages)
+                        data.messages[m].message = this.util.encrypt(data.messages[m].message)
+                    for (let m in data.mail)
+                        data.mails[m].content = this.util.encrypt(data.mails[m].content)
+                    for (let k in data.groupKeys)
+                        data.groupKeys[k] = this.util.encrypt(data.groupKeys[k])
+                    for (let m in data.groupMsg)
+                        if (datdata.groupMsg[m].message)
+                            data.groupMsg[m].message = this.util.encrypt(data.groupMsg[m].message)
+                    for (let l in data.appendix)
+                        if (l.startsWith('lastReceived') && data.appendix[l] < floGlobals.appendix[
+                                l])
+                            data.appendix[l] = floGlobals.appendix[l]
                     let promises = [];
-                    for (obs in data)
-                        for (value in data[obs])
-                            promises.push(compactIDB.writeData(obs, data[obs][value], value));
+                    for (let obs in data)
+                        for (let k in data[obs])
+                            promises.push(compactIDB.writeData(obs, data[obs][k], k));
                     Promise.all(promises)
                         .then(results => resolve("Restore Successful"))
                         .catch(error => reject("Restore Failed: Unable to write to IDB"))
