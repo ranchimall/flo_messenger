@@ -98,10 +98,10 @@
 	                    renderMailList(data.mails, false)
 	                    renderMarked(data.marked)
                         messenger.setUIcallbacks(renderDirectUI, renderGroupUI)
-	                    messenger.refreshInbox()
+	                    messenger.requestDirectInbox()
 	                        .then(r => console.log("DirectConn:", r))
 	                        .catch(e => console.error("Request error:", e))
-	                    messenger.refreshGroupInbox()
+	                    messenger.requestGroupInbox()
 	                        .then(r => console.log(r))
 	                    console.log(`Load Successful!`)
 	                    //hide loading screen
@@ -685,7 +685,7 @@
                 messageTemplate = document.getElementById('message_template'),
                 mailTemplate = document.getElementById('mail_template')
 		const render = {
-			mailCard(mailRef, subject, timestamp, category, floID, content, markUnread){
+			mailCard(floID, ref, subject, timestamp, content, markUnread){
                 let card = mailCardTemplate.content.cloneNode(true),
                     cardContainer = card.querySelector('.mail-card'),
                     time = new Date(timestamp).toString(),
@@ -694,7 +694,6 @@
                     dateTime
                 minutes = minutes.length === 1 ? `0${minutes}` : minutes  
                 let finalHours = hours - 12 > 0 ? `${hours - 12}:${minutes} pm` : `${hours}:${minutes} am`
-
                 if(new Date().getDate() === new Date(timestamp).getDate())
                     dateTime = finalHours
                 else
@@ -702,18 +701,30 @@
                 let mailSummery = content.split(' ')
                 mailSummery.splice(16)
                 mailSummery = mailSummery.join(' ')
-                cardContainer.setAttribute("name", mailRef);
-                if (Array.isArray(floID))
-                    floID = floID.join(",");
+                cardContainer.setAttribute("name", ref);
+                let contact;
+                if(Array.isArray(floID)){
+                    for(let f of floID)
+                        if(floGlobals.contacts[f]){
+                            contact = floGlobals.contacts[f]
+                            break;
+                        }
+                    contact = contact || `${floID[0].substring(12)}...`;
+                    if(floID.length > 1)
+                        contact = `${contact} & ${floID.length - 1} others(s)`
+                    floID = floID.join(', ')
+                } else
+                    contact = floGlobals.contacts[floID] || floID
                 if(markUnread)
                     cardContainer.classList.add('unread')
-                card.querySelector('.sender').textContent = floGlobals.contacts[floID] || floID
+                card.querySelector('.sender').textContent = contact
                 card.querySelector('.subject').textContent = subject
                 card.querySelector('.date').textContent = dateTime
                 card.querySelector('.description').textContent = mailSummery
                 return card
             },
-            mail(senderName, floID, timestamp, category, subject, content){
+            
+            mail(from, to, subject, timestamp, content){
                 let card = mailTemplate.content.cloneNode(true),
                     cardContainer = card.querySelector('.mail'),
                     time = new Date(timestamp).toString(),
@@ -722,17 +733,27 @@
                     dateTime
                 minutes = minutes.length === 1 ? `0${minutes}` : minutes  
                 let finalHours = hours - 12 > 0 ? `${hours - 12}:${minutes} pm` : `${hours}:${minutes} am`
-
                 if(new Date().getDate() === new Date(timestamp).getDate())
                     dateTime = finalHours
                 else
                     dateTime = time.slice(4, 10)
-                if (Array.isArray(floID))
-                    floID = floID.join(",");
-                if(category === 'receivedFrom')
-                    card.querySelector('.sender-name').textContent = `From : ${senderName}`
-                if(category === 'sentTo')
-                    card.querySelector('.sender-name').textContent = `To : ${senderName}`
+                let senderName, floID
+                if(from === myFloID){
+                    let count = 0, list = [];
+                    to.forEach(f => floGlobals.contacts[f] ? list.push(floGlobals.contacts[f]): count++)
+                    senderName = `To : ${list.join(', ')}`
+                    if(count){
+                        if(list.length)
+                            senderName = `${senderName} & ${count} other(s)`
+                        else
+                            senderName = `${senderName} ${count} Unknown people`
+                    }
+                    floID = to.join(', ')
+                } else {
+                    senderName = `From : ${floGlobals.contacts[from] || ''}`;
+                    floID = from
+                }
+                card.querySelector('.sender-name').textContent = senderName
                 card.querySelector('.flo-id').textContent = floID
                 card.querySelector('.mail-subject').textContent = subject
                 card.querySelector('.date').textContent = dateTime;
@@ -1153,7 +1174,7 @@
                 'Are you sure you want to Sign out?', "Sign Out",
                 "Stay Signed In").then(
                 result => {
-                    floDapps.logout().then(result => {
+                    floDapps.clearCredentials().then(result => {
                         notify("Successfully Signed out", 'success')
                         setTimeout(onLoadStartUp, 2000)
                     }).catch(error => notify("Signout Unsuccessful", "error", error))
@@ -1164,7 +1185,7 @@
             getConfirmation('Remove Account?',
                 '**Remember to store your PRIVATE-KEY**\n*Private-Key will be needed to signIn again*\nAre you sure you want to remove account?',
                 "Remove").then(result => {
-                floDapps.logout().then(result => {
+                floDapps.clearCredentials().then(result => {
                     notify("Removed Account")
                     setTimeout(onLoadStartUp, 2000)
                 }).catch(error => notify("Remove Unsuccessful", "error", error))
@@ -1223,7 +1244,7 @@
             return
             if(refreshing) return;
             refreshing = true
-            messenger.refreshInbox().then(data => {
+            messenger.requestDirectInbox().then(data => {
                 renderMessages(data.messages)
                 renderMailList(data.mails)
                 if(Object.keys(data.messages).length && activePage.button !== chatPageButton){
@@ -1431,8 +1452,6 @@
             return element;
         }
 
-        let frag = document.createDocumentFragment()
-
         function renderMessages(data, markUnread = true) {
             let floID
             for (let m in data) {
@@ -1471,18 +1490,19 @@
             messenger.removeMark(floID, "unread");
         }
 
-        let sentMailFrag = document.createDocumentFragment()
         function renderMailList(mails, markUnread = true) {
-            for (m in mails) {
-                let { ref, subject, time, category, floID, content} = mails[m]
-                if(category === 'receivedFrom' || category === 'replyFrom')
-                    frag.prepend(render.mailCard(ref, subject, time, category, floID, content, markUnread));
-                if(category === 'sentTo' || category === 'replyTo')
-                    sentMailFrag.prepend(render.mailCard(ref, subject, time, category, floID, content, markUnread));
+            let inboxMailFrag = document.createDocumentFragment()
+            let sentMailFrag = document.createDocumentFragment()
+            for (let m in mails) {
+                let { from, to, prev, ref, subject, time, content } = mails[m]
+                if(from === myFloID)
+                    sentMailFrag.prepend(render.mailCard(to, ref, subject, time, content, markUnread))
+                else if(to.includes(myFloID))
+                    inboxMailFrag.prepend(render.mailCard(from, ref, subject, time, content, markUnread))
             }
-            inboxMailContainer.prepend(frag)
+            inboxMailContainer.prepend(inboxMailFrag)
             sentMailContainer.prepend(sentMailFrag)
-            if(inboxMailContainer.children.length){
+            if(inboxMailContainer.children.length || sentMailContainer.children.length){
                 document.getElementById('no_mails').classList.add('hide-completely')
                 document.getElementById('all_mail_container').classList.remove('hide-completely')
             }
@@ -1498,26 +1518,19 @@
                 clearElement(document.getElementById("mail_container"))
 
             messenger.getMail(mailRef).then(result => {
-                let {floID, time, category, subject, content, prevRef} = result
-                //add name (if available)  
-                let senderName = floGlobals.contacts[floID] || ' ';
+                let { from, to, prev, ref, subject, time, content } = result
                 //append the contents to mail container
-                document.getElementById("mail_container").append(render.mail(senderName, floID, time, category, subject, content));
+                document.getElementById("mail_container").append(render.mail(from, to, subject, time, content));
                 //add prop for previous mail (if available)
                 let prevMail = document.getElementById("prev_mail");
-                prevMail.dataset["value"] = prevRef;
-                prevMail.style.display = prevRef ? 'block' : 'none';
+                prevMail.dataset["value"] = prev;
+                prevMail.style.display = prev ? 'block' : 'none';
                 //set values for reply mail form if new view
                 if (newView) {
-                    if (floID.includes(','))
-                        document.getElementById("show_reply_popup").classList.add("hide-completely");
-                    else {
-                        replyMailPopup.dataset["to"] = floID;
-                        replyMailPopup.dataset["prevRef"] = mailRef;
-                        subjectOfReplyMail.value = subject.startsWith("Re: ") ? result
-                            .subject : `Re: ${subject}`;
-                        document.getElementById("show_reply_popup").classList.remove("hide-completely");
-                    }
+                    replyMailPopup.dataset["to"] = (from === myFloID ? to.join(',') : from)
+                    replyMailPopup.dataset["prev"] = mailRef;
+                    subjectOfReplyMail.value = subject.startsWith("Re: ") ? subject : `Re: ${subject}`;
+                    document.getElementById("show_reply_popup").classList.remove("hide-completely");
                 }
                 messenger.removeMark(mailRef, "unread");
             }).catch(error => notify("Unable to read mail", "error", error))
@@ -1539,25 +1552,9 @@
                         recipients.push(tmp);
                 })
                 messenger.sendMail(subject, content, recipients).then(result => {
-                    console.log(result);
-                    let sucessCount = Object.keys(result.success).length;
-                    let errorCount = Object.keys(result.error).length
-                    if (!sucessCount)
-                        notify("Failed to send mail!", "error", result)
-                    else {
-                        if (errorCount)
-                            notify(
-                                `${Object.keys(result.success).length} Mail(s) sent! (${Object.keys(result.error).length} failed)`,
-                                "warn", {
-                                    sent: result.success,
-                                    failed: result.error
-                                });
-                        else
-                            notify(`${Object.keys(result.success).length} Mail(s) sent!`)
-                        let {ref, subject, time, category, floID, content} = result.data
-                        sentMailContainer.prepend(render.mailCard(ref, subject, time, category, floID, content));
-                        composeMailPopup.hide()
-                    }
+                    notify(`Mail(s) sent!`)
+                    renderMailList(result)
+                    composeMailPopup.hide()
                 }).catch(error => notify("Failed to send mail!", "error", error))
             } catch (error) {
                 notify(error, "error")
@@ -1566,15 +1563,16 @@
 
         function replyMail() {
             let recipient = replyMailPopup.dataset.to;
+            if(recipient.includes(','))
+                recipient = recipient.split(',')
             let subject = subjectOfReplyMail.value;
             let content = replyMailContent.value;
-            let prevRef = replyMailPopup.dataset.prevRef;
-            messenger.sendMail(subject, content, recipient, prevRef).then(data => {
+            let prev = replyMailPopup.dataset.prev;
+            messenger.sendMail(subject, content, recipient, prev).then(result => {
                 notify(`Mail replied!`);
+                renderMailList(result)
                 replyMailPopup.hide()
-                let {ref, subject, time, from, to, prev, content} = data
-                sentMailContainer.prepend(render.mailCard(ref, subject, time, category, floID, content));
-            }).catch(error => notify("Failed to send mail!", "error", error))
+            }).catch(error => notify("Failed to reply mail!", "error", error))
         }
     </script>
 
@@ -9205,7 +9203,7 @@ Bitcoin.Util = {
         }
     }
 </script>
-<script id="compactIDB" version="2.0.0">
+<script id="compactIDB" version="2.0.1">
     /* Compact IndexedDB operations */
 
     window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
@@ -9221,43 +9219,65 @@ Bitcoin.Util = {
             this.defaultDB = dbName;
         },
 
-        initDB: function (dbName, objectStores = {}, version = null, removeStores = []) {
+        upgradeDB: function (dbName, aList = null, dList = null) {
             return new Promise((resolve, reject) => {
-                this.defaultDB = this.defaultDB || dbName;
-                var idb = version ? indexedDB.open(dbName, version) : indexedDB.open(dbName);
-                idb.onerror = (event) => {
-                    reject("Error in opening IndexedDB!");
-                };
-                idb.onupgradeneeded = (event) => {
-                    var db = event.target.result;
-                    for (let obs in objectStores) {
-                        var objectStore = db.createObjectStore(obs, objectStores[obs].options ||
-                        {});
-                        if (objectStores[obs].indexes && typeof objectStores[obs].indexes ===
-                            'object')
-                            for (let i in objectStores[obs].indexes)
-                                objectStore.createIndex(i, i, objectStores[obs].indexes[i] || {});
+                this.getDBversion(dbName).then(version => {
+                    var idb = indexedDB.open(dbName, version + 1);
+                    idb.onerror = (event) => reject("Error in opening IndexedDB");
+                    idb.onupgradeneeded = (event) => {
+                        let db = event.target.result;
+                        if (aList instanceof Object) {
+                            if (Array.isArray(aList)) {
+                                let tmp = {}
+                                aList.forEach(o => tmp[o] = {})
+                                aList = tmp
+                            }
+                            for (let o in aList) {
+                                let obs = db.createObjectStore(o, aList[o].options || {});
+                                if (aList[o].indexes instanceof Object)
+                                    for (let i in aList[o].indexes)
+                                        obs.createIndex(i, i, aList[o].indexes || {});
+                            }
+                        }
+                        if (Array.isArray(dList))
+                            dList.forEach(o => db.deleteObjectStore(o));
+                        resolve('Database upgraded')
                     }
-                    if (version)
-                        removeStores.forEach(obs => db.deleteObjectStore(obs));
-                }
+                    idb.onsuccess = (event) => event.target.result.close();
+                }).catch(error => reject(error))
+            })
+        },
+
+        initDB: function (dbName, objectStores = {}) {
+            return new Promise((resolve, reject) => {
+                if (!(objectStores instanceof Object))
+                    return reject('ObjectStores must be an object or array')
+                this.defaultDB = this.defaultDB || dbName;
+                var idb = indexedDB.open(dbName);
+                idb.onerror = (event) => reject("Error in opening IndexedDB");
                 idb.onsuccess = (event) => {
                     var db = event.target.result;
-                    if (JSON.stringify(Object.values(db.objectStoreNames).sort()) === JSON
-                        .stringify(Object.keys(objectStores).sort()))
+                    let cList = Object.values(db.objectStoreNames);
+                    var obs = {},
+                        a_obs = {},
+                        d_obs = [];
+                    if (!Array.isArray(objectStores))
+                        var obs = objectStores
+                    else
+                        objectStores.forEach(o => obs[o] = {})
+                    let nList = Object.keys(obs)
+                    for (let o of nList)
+                        if (!cList.includes(o))
+                            a_obs[o] = obs[o]
+                    for (let o of cList)
+                        if (!nList.includes(o))
+                            d_obs.push(o)
+                    if (!Object.keys(a_obs).length && !d_obs.length)
                         resolve("Initiated IndexedDB");
-                    else {
-                        let removeObs = [];
-                        Object.values(db.objectStoreNames).forEach(obs => {
-                            if (obs in objectStores)
-                                delete objectStores[obs]
-                            else
-                                removeObs.push(obs)
-                        })
-                        this.initDB(dbName, objectStores, db.version + 1, removeObs)
-                            .then(result => resolve(result))
-                            .catch(error => reject(error))
-                    }
+                    else
+                        this.upgradeDB(dbName, a_obs, d_obs)
+                        .then(result => resolve(result))
+                        .catch(error => reject(error))
                     db.close();
                 }
             });
@@ -9266,7 +9286,12 @@ Bitcoin.Util = {
         openDB: function (dbName = this.defaultDB) {
             return new Promise((resolve, reject) => {
                 var idb = indexedDB.open(dbName);
-                idb.onerror = (event) => reject("Error in opening IndexedDB!");
+                idb.onerror = (event) => reject("Error in opening IndexedDB");
+                idb.onupgradeneeded = (event) => {
+                    event.target.result.close();
+                    this.deleteDB(dbName)
+                    reject("Datebase not found")
+                }
                 idb.onsuccess = (event) => resolve(event.target.result);
             });
         },
@@ -9277,6 +9302,15 @@ Bitcoin.Util = {
                 deleteReq.onerror = (event) => reject("Error deleting database!");
                 deleteReq.onsuccess = (event) => resolve("Database deleted successfully");
             });
+        },
+
+        getDBversion: function (dbName = this.defaultDB) {
+            return new Promise((resolve, reject) => {
+                this.openDB(dbName).then(db => {
+                    resolve(db.version)
+                    db.close()
+                }).catch(error => reject(error))
+            })
         },
 
         writeData: function (obsName, data, key = false, dbName = this.defaultDB) {
@@ -10933,6 +10967,7 @@ Bitcoin.Util = {
                     appendix: {},
                 }
                 compactIDB.initDB(`${floGlobals.application}_${myFloID}`, obj).then(result => {
+                    console.info(result)
                     compactIDB.setDefaultDB(`${floGlobals.application}_${myFloID}`);
                     resolve("Messenger UserDB Initated Successfully")
                 }).catch(error => reject(error));
@@ -10995,7 +11030,7 @@ Bitcoin.Util = {
             })
         },
 
-        refreshInbox() {
+        requestDirectInbox() {
             return new Promise((resolve, reject) => {
                 let callbackFn = function (dataSet, error) {
                     if (error)
@@ -11044,7 +11079,7 @@ Bitcoin.Util = {
                                 compactIDB.addData("mails", {
                                     ...mail
                                 }, mail.ref);
-                                mail.content = dataSet[vc].message.content;
+                                mail.content = data.content;
                                 newInbox.mails[mail.ref] = mail;
                                 messenger.addMark(mail.ref, "unread")
                             } else if (dataSet[vc].type === "CREATE_GROUP") {
@@ -11158,18 +11193,18 @@ Bitcoin.Util = {
                         try {
                             let AESKey = floCrypto.decryptData(data.appendix.AESKey, myPrivKey);
                             data.appendix.AESKey = AESKey;
-                            if ("messages" in dataList)
+                            if (dataList.includes("messages"))
                                 for (let m in data.messages)
                                     data.messages[m].message = this.util.decrypt(data.messages[m]
                                         .message, AESKey)
-                            if ("mails" in dataList)
+                            if (dataList.includes("mails"))
                                 for (let m in data.mails)
                                     data.mails[m].content = this.util.decrypt(data.mails[m].content,
                                         AESKey)
-                            if ("groupKey" in dataList)
+                            if (dataList.includes("groupKey"))
                                 for (let k in data.groupKeys)
                                     data.groupKeys[k] = this.util.decrypt(data.groupKeys[k], AESKey)
-                            if ("groupMsg" in dataList)
+                            if (dataList.includes("groupMsg"))
                                 for (let m in data.groupMsg)
                                     if (datdata.groupMsg[m].message)
                                         data.groupMsg[m].message = this.util.decrypt(data.groupMsg[
@@ -11409,7 +11444,7 @@ Bitcoin.Util = {
             })
         },
 
-        refreshGroupInbox() {
+        requestGroupInbox() {
             return new Promise((resolve) => {
                 let promises = []
                 let reqFn = (g) => new Promise((res, rej) => {
