@@ -1218,7 +1218,7 @@
             getConfirmation('Clear Data?',
                 `Are you sure you want to clear stored data?`, "Clear").then(
                 result => {
-                    floDapps.clearUserData().then(result => {
+                    messenger.clearUserData().then(result => {
                         notify("Successfully Cleared local data", 'success')
                         setTimeout(onLoadStartUp, 2000)
                     }).catch(error => notify(error, "error"))
@@ -1301,6 +1301,7 @@
                 return;
             }
             messenger.parseBackup(file).then(data => {
+                debugger;
                 getConfirmation('Restore Data?',
                     `Found: ${Object.keys(data.contacts).length} Contacts,\n ${Object.keys(data.messages).length} Messages, ${Object.keys(data.mails).length} Mails.`,
                     "Restore"
@@ -8767,7 +8768,7 @@ Bitcoin.Util = {
         }
     }
 </script>
-<script id="floBlockchainAPI" version="2.0.0">
+<script id="floBlockchainAPI" version="2.0.1">
     /* FLO Blockchain Operator to send/receive data from blockchain using API calls*/
     const floBlockchainAPI = {
 
@@ -9128,6 +9129,14 @@ Bitcoin.Util = {
             })
         },
 
+        getTx: function (txid) {
+            return new Promise((resolve, reject) => {
+                this.promisedAPI(`api/tx/${txid}`)
+                    .then(response => resolve(response))
+                    .catch(error => reject(error))
+            })
+        },
+
         //Read Txs of Address between from and to
         readTxs: function (addr, from, to) {
             return new Promise((resolve, reject) => {
@@ -9219,28 +9228,29 @@ Bitcoin.Util = {
             this.defaultDB = dbName;
         },
 
-        upgradeDB: function (dbName, aList = null, dList = null) {
+        upgradeDB: function (dbName, createList = null, deleteList = null) {
             return new Promise((resolve, reject) => {
                 this.getDBversion(dbName).then(version => {
                     var idb = indexedDB.open(dbName, version + 1);
                     idb.onerror = (event) => reject("Error in opening IndexedDB");
                     idb.onupgradeneeded = (event) => {
                         let db = event.target.result;
-                        if (aList instanceof Object) {
-                            if (Array.isArray(aList)) {
+                        if (createList instanceof Object) {
+                            if (Array.isArray(createList)) {
                                 let tmp = {}
-                                aList.forEach(o => tmp[o] = {})
-                                aList = tmp
+                                createList.forEach(o => tmp[o] = {})
+                                createList = tmp
                             }
-                            for (let o in aList) {
-                                let obs = db.createObjectStore(o, aList[o].options || {});
-                                if (aList[o].indexes instanceof Object)
-                                    for (let i in aList[o].indexes)
-                                        obs.createIndex(i, i, aList[o].indexes || {});
+                            for (let o in createList) {
+                                let obs = db.createObjectStore(o, createList[o].options ||
+                                    {});
+                                if (createList[o].indexes instanceof Object)
+                                    for (let i in createList[o].indexes)
+                                        obs.createIndex(i, i, createList[o].indexes || {});
                             }
                         }
-                        if (Array.isArray(dList))
-                            dList.forEach(o => db.deleteObjectStore(o));
+                        if (Array.isArray(deleteList))
+                            deleteList.forEach(o => db.deleteObjectStore(o));
                         resolve('Database upgraded')
                     }
                     idb.onsuccess = (event) => event.target.result.close();
@@ -9439,7 +9449,7 @@ Bitcoin.Util = {
         }
     }
 </script>
-<script id="floCloudAPI" version="2.0.2">
+<script id="floCloudAPI" version="2.0.2c">
     /* FLO Cloud operations to send/request application data*/
     const floCloudAPI = {
 
@@ -9583,25 +9593,35 @@ Bitcoin.Util = {
                 }
             },
 
+            inactive: [],
             connect(snID) {
                 return new Promise((resolve, reject) => {
                     if (!(snID in floGlobals.supernodes))
                         return reject(`${snID} is not a supernode`)
+                    let inactive = this.inactive
+                    if (inactive.includes(snID))
+                        return reject(`${snID} is not active`)
                     var wsConn = new WebSocket("wss://" + floGlobals.supernodes[snID].uri + "/ws");
                     wsConn.onmessage = (evt) => {
                         if (evt.data == '$+')
                             resolve(wsConn)
                         else if (evt.data == '$-') {
                             wsConn.close();
+                            inactive.push(snID)
                             reject(`${snID} is not active`)
                         }
                     }
-                    wsConn.onerror = evt => reject(`${snID} is unavailable`)
+                    wsConn.onerror = evt => {
+                        inactive.push(snID)
+                        reject(`${snID} is unavailable`)
+                    }
                 })
             },
 
             connectActive(snID, reverse = false) {
                 return new Promise((resolve, reject) => {
+                    if (this.inactive.length === this.kBucket.SNCO.length)
+                        return reject('Cloud offline')
                     if (!(snID in floGlobals.supernodes))
                         snID = this.kBucket.closestNode(snID);
                     this.connect(snID)
@@ -9924,9 +9944,9 @@ Bitcoin.Util = {
                     message = floCrypto.encryptData(JSON.stringify(message), encryptionKey)
                 }
                 this.sendApplicationData(message, type, options).then(result => {
-                    options.comment = null;
-                    var fk = this.util.filterKey(type, options)
-                    this.util.storeGeneral(fk, result)
+                    //options.comment = null;
+                    //var fk = this.util.filterKey(type, options)
+                    //this.util.storeGeneral(fk, result)
                     resolve(result)
                 }).catch(error => reject(error))
             })
@@ -9938,11 +9958,12 @@ Bitcoin.Util = {
                 var fk = this.util.filterKey(type, options)
                 options.lowerVectorClock = options.lowerVectorClock || floGlobals.lastVC[fk] + 1;
                 if (options.callback instanceof Function) {
-                    options.callback = (d, e) => {
+                    let new_options = Object.create(options)
+                    new_options.callback = (d, e) => {
                         this.util.storeGeneral(fk, d);
                         options.callback(d, e)
                     }
-                    this.requestApplicationData(type, options)
+                    this.requestApplicationData(type, new_options)
                         .then(result => resolve(result))
                         .catch(error => reject(error))
                 } else {
@@ -9977,8 +9998,9 @@ Bitcoin.Util = {
                     options.lowerVectorClock = floGlobals.lastVC[objectName] + 1
                     delete options.mostRecent;
                     if (callback) {
-                        options.callback = callback;
-                        this.requestApplicationData(objectName, options)
+                        let new_options = Object.create(options)
+                        new_options.callback = callback;
+                        this.requestApplicationData(objectName, new_options)
                             .then(result => resolve(result))
                             .catch(error => reject(error))
                     } else {
@@ -10202,7 +10224,7 @@ Bitcoin.Util = {
         }
     }
 </script>
-<script id="floDapps" version="2.0.1">
+<script id="floDapps" version="2.0.1a">
     /* General functions for FLO Dapps*/
     const floDapps = {
 
@@ -10647,10 +10669,10 @@ Bitcoin.Util = {
                 }
                 options.callback = (d, e) => {
                     for (let v in d) {
-                        try{
+                        try {
                             if (d[v].message instanceof Object && "secret" in d[v].message)
                                 d[v].message = floCrypto.decryptData(d[v].message, myPrivKey)
-                        }catch(error){}
+                        } catch (error) {}
                         compactIDB.writeData("messages", d[v], v, `floDapps#${myFloID}`)
                         floGlobals.messages[v] = d[v]
                     }
@@ -10698,11 +10720,11 @@ Bitcoin.Util = {
             })
         },
 
-        deleteUserData: function(credentials = false) {
+        deleteUserData: function (credentials = false) {
             return new Promise((resolve, reject) => {
                 let p = []
                 p.push(compactIDB.deleteDB(`floDapps#${myFloID}`))
-                if(credentials)
+                if (credentials)
                     p.push(this.clearCredentials())
                 Promise.all(p)
                     .then(result => resolve('User database(local) deleted'))
@@ -10710,7 +10732,7 @@ Bitcoin.Util = {
             })
         },
 
-        deleteAppData: function() {
+        deleteAppData: function () {
             return new Promise((resolve, reject) => {
                 compactIDB.deleteDB(floGlobals.application).then(result => {
                     localStorage.removeItem(`${floGlobals.application}#privKey`)
@@ -10730,7 +10752,7 @@ Bitcoin.Util = {
                 let threshold = indexArr.length;
                 let shares = floCrypto.createShamirsSecretShares(encryptedKey, threshold, threshold)
                 let promises = [];
-                let overwriteFn = (share, index) => 
+                let overwriteFn = (share, index) =>
                     compactIDB.writeData("credentials", share, index, floGlobals.application);
                 for (var i = 0; i < threshold; i++)
                     promises.push(overwriteFn(shares[i], indexArr[i]));
@@ -10810,14 +10832,14 @@ Bitcoin.Util = {
                         let vc = Object.keys(response).sort().pop()
                         let sync = JSON.parse(Crypto.AES.decrypt(response[vc].message, myPrivKey))
                         let promises = []
-                        let store = (key, val, obs) => 
-                            promises.push(compactIDB.writeData(obs, val, key, `floDapps#${floID}`))
-                        ["contacts", "pubKeys", "messages"].forEach(c => {
-                            for (let i in sync[c]) {
-                                store(i, sync[c][i], c)
-                                floGlobals[c][i] = sync[c][i]
-                            }
-                        })
+                        let store = (key, val, obs) =>
+                            promises.push(compactIDB.writeData(obs, val, key, `floDapps#${floID}`))[
+                                "contacts", "pubKeys", "messages"].forEach(c => {
+                                for (let i in sync[c]) {
+                                    store(i, sync[c][i], c)
+                                    floGlobals[c][i] = sync[c][i]
+                                }
+                            })
                         Promise.all(promises)
                             .then(results => resolve("Sync data successful"))
                             .catch(error => reject(error))
@@ -11231,6 +11253,8 @@ Bitcoin.Util = {
             return new Promise((resolve, reject) => {
                 this.loadDataFromIDB("all").then(data => {
                     delete data.appendix.AESKey;
+                    data.contacts = floGlobals.contacts;
+                    data.pubKeys = floGlobals.pubKeys;
                     data = btoa(unescape(encodeURIComponent(JSON.stringify(data))))
                     let blobData = {
                         floID: myFloID,
@@ -11296,13 +11320,39 @@ Bitcoin.Util = {
                                 l])
                             data.appendix[l] = floGlobals.appendix[l]
                     let promises = [];
-                    for (let obs in data)
+                    for (let obs in data) {
+                        let writeFn;
+                        switch (obs) {
+                            case "contacts":
+                                writeFn = (k, v) => floDapps.storeContact(k, v);
+                                break;
+                            case "pubKeys":
+                                writeFn = (k, v) => floDapps.storePubKey(k, v);
+                                break;
+                            default:
+                                writeFn = (k, v) => compactIDB.writeData(obs, v, k);
+                                break;
+                        }
                         for (let k in data[obs])
-                            promises.push(compactIDB.writeData(obs, data[obs][k], k));
+                            promises.push(writeFn(k, data[obs][k]));
+                    }
+
                     Promise.all(promises)
                         .then(results => resolve("Restore Successful"))
                         .catch(error => reject("Restore Failed: Unable to write to IDB"))
                 }).catch(error => reject(error))
+            })
+        },
+
+        clearUserData() {
+            return new Promise((resolve, reject) => {
+                let promises = [
+                    compactIDB.deleteDB(),
+                    floDapps.clearCredentials()
+                ]
+                Promise.all(promises)
+                    .then(result => resolve("User Data cleared"))
+                    .catch(error => reject(error))
             })
         },
 
