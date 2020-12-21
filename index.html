@@ -6,135 +6,31 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FLO Messenger</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/dist/main.css">
-    <script id="floGlobals">
-		/* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
-		const floGlobals = {
-	
-			//Required for all
-			blockchain: "FLO",
-	
-			//Required for blockchain API operators
-			apiURL: {
-				FLO: ['https://explorer.mediciland.com/', 'https://livenet.flocha.in/',
-					'https://flosight.duckdns.org/', 'http://livenet-explorer.floexperiments.com/'
-				],
-				FLO_TEST: ['https://testnet-flosight.duckdns.org/', 'https://testnet.flocha.in/']
-			},
-	
-			//Required for Supernode operations
-			SNStorageID: "FNaN9McoBAEFUjkRmNQRYLmBF8SpS7Tgfk",
-			supernodes: {}, //each supnernode must be stored as floID : {uri:<uri>,pubKey:<publicKey>}
-	
-			//for app
-            application: "messenger",
-            adminID: "FMRsefPydWznGWneLqi4ABeQAJeFvtS3aQ",
-			pubKeys: {},
-			contacts: {},
-			appendix: {}
-		}
-	</script>
-	<script id="onLoadStartUp">
-	    function onLoadStartUp() {
-	        privKeyNotSecured = true;
-
-	        //display loading screen
-	        loadingPage.classList.remove("hide-completely")
-	        //clear Rendered Elements
-	        let elementsToReset = ['inbox_mail_container', 'sent_mail_container', 'contacts_container', 'chat_container',
-	            'receiver_floID', 'receiver_name', 'mail_contact_list'
-	        ]
-	        //, "backup_info"
-	        elementsToReset.forEach(e => clearElement(document.getElementById(e)))
-
-	        floDapps.setCustomPrivKeyInput((type) => {
-	            return new Promise((resolve, reject) => {
-	                mainPage.classList.add('hide-completely')
-	                loadingPage.classList.add('hide-completely')
-	                signInLanding.classList.remove('hide-completely')
-	                signInButton.addEventListener('clicked', () => {
-	                    let key = privateKeyInputField.value;
-	                    signInPopup.hide()
-	                    console.log(key)
-	                    signInLanding.classList.add('hide-completely')
-	                    loadingPage.classList.remove('hide-completely')
-	                    resolve(key)
-	                })
-	                guestLoginButton.onclick = () => {
-	                    signInLanding.classList.add('hide-completely')
-	                    loadingPage.classList.remove('hide-completely')
-	                    reject(null)
-	                }
-	                if (type === "PRIVATE_KEY") {
-	                    privateKeyInputField.setAttribute("placeholder", "Private Key")
-	                    document.getElementById("type_of_key").textContent = 'FLO private key'
-	                    document.getElementById("remove_account").classList.add("hide-completely");
-	                } else if (type === "PIN/Password") {
-	                    privateKeyInputField.setAttribute("placeholder", "PIN/Password")
-	                    signInPopup.show()
-	                    privateKeyInputField.focusIn()
-	                    document.getElementById("remove_account").classList.remove("hide-completely");
-	                    document.getElementById("type_of_key").textContent = 'PIN/Password'
-	                    privKeyNotSecured = false;
-	                }
-	            })
-	        })
-
-	        //invoke the startup functions
-	        floDapps.launchStartUp().then(result => {
-	            console.log(result)
-	            document.getElementById("greet_tag").textContent = myFloID
-	            //load messages from IDB and render them
-	            console.log(`Loading Data! Please Wait...`)
-	            messenger.initUserDB().then(result => {
-	                console.log(result)
-	                messenger.loadDataFromIDB().then(data => {
-	                    console.log(data)
-	                    floGlobals.appendix = data.appendix;
-	                    floGlobals.groups = data.groupInfo
-	                    renderContactList(floGlobals.contacts)
-	                    renderMailContactList(floGlobals.contacts)
-	                    renderMessages(data.messages, false)
-	                    renderMailList(data.mails, false)
-	                    renderMarked(data.marked)
-                        messenger.setUIcallbacks(renderDirectUI, renderGroupUI)
-	                    messenger.requestDirectInbox()
-	                        .then(r => console.log("DirectConn:", r))
-	                        .catch(e => console.error("Request error:", e))
-	                    messenger.requestGroupInbox()
-	                        .then(r => console.log(r))
-	                    console.log(`Load Successful!`)
-	                    //hide loading screen
-	                    loadingPage.classList.add("hide-completely")
-	                    mainPage.classList.remove('hide-completely')
-	                    chatSection.classList.add('hide-completely')
-	                    mailSection.classList.add('hide-completely')
-	                    //refreshAgain()
-	                    document.getElementById('chat_page_button').click()
-	                    if (privKeyNotSecured) {
-	                        notify("Private key is not secured with password. Remember to secure the private key in settings",
-	                            "warn", '')
-	                        document.getElementById("secure_key").textContent = 'Set password'
-	                    } else {
-	                        document.getElementById("secure_key").textContent = 'Change password'
-	                    }
-	                }).catch(error => {
-	                    //console.error(`Failed to load data`)
-	                    notify(error, "error")
-	                })
-	            })
-
-	        }).catch(error => notify(error, "error"))
-	    }
-	</script>
+    <link rel="stylesheet" href="css/main.min.css">
 </head>
 
 <body data-theme="light" onload="onLoadStartUp()">
-	<audio id="notification_sound">
-		<source src="https://rmservices.duckdns.org/files/notification-sound.mp3" type="audio/mpeg">
-		<source src="https://rmservices.duckdns.org/files/notification-sound.ogg" type="audio/ogg">
-	</audio>
-	<sm-notifications id="notifications"></sm-notifications>
+    <audio id="notification_sound">
+        <source src="https://rmservices.duckdns.org/files/notification-sound.mp3" type="audio/mpeg">
+        <source src="https://rmservices.duckdns.org/files/notification-sound.ogg" type="audio/ogg">
+    </audio>
+    <sm-popup id="confirmation_popup">
+        <h4 id="confirm_title"></h4>
+        <p id="confirm_message"></p>
+        <div class="flex align-center">
+            <sm-button variant="no-outline" class="cancel-btn">Cancel</sm-button>
+            <sm-button variant="no-outline" class="submit-btn">OK</button>
+        </div>
+    </sm-popup>
+    <sm-popup id="prompt">
+        <h4 id="prompt_message"></h4>
+        <sm-input id="prompt_field"></sm-input>
+        <div class="flex align-center">
+            <sm-button variant="no-outline" class="cancel-btn">Cancel</sm-button>
+            <sm-button variant="no-outline" class="submit-btn">OK</button>
+        </div>
+    </sm-popup>
+    <sm-notifications id="show_message"></sm-notifications>
 	<div id="sign_in_page" class="page hide-completely">
 		<header class="logo-section">
 			<svg class="main-logo" viewBox="0 0 27.25 32">
@@ -302,22 +198,6 @@
         <div class="shadow"></div>
         <h4>Getting everything ready, Hang on.</h4>
     </div>
-	<sm-popup id="confirmation">
-        <h4 class="title"></h4>
-        <p class="message"></p>
-        <div class="flex">
-            <sm-button class="justify-right">ok</sm-button>
-            <sm-button>cancel</sm-button>
-        </div>
-    </sm-popup>
-    <sm-popup id="prompt">
-        <h4 class="title"></h4>
-       <sm-input></sm-input>
-        <div class="flex align-center">
-            <sm-button class="justify-right">Ok</sm-button>
-            <sm-button>Cancel</sm-button>
-        </div>
-    </sm-popup>
 	<sm-popup id="add_contact_popup">
 		<header class="flex align-center" slot="header">
 			<svg class="icon" viewBox="0 0 64 64" onclick="this.closest('sm-popup').hide()">
@@ -328,7 +208,7 @@
 			<h4>Add contact</h4>
 			<sm-button id="add_contact_button" variant="primary" disabled>Add</sm-button>
 		</header>
-		<sm-input id="add_contact_floID" placeholder="FLO address" animate required></sm-input>
+		<sm-input id="add_contact_floID" floId placeholder="FLO address" animate required></sm-input>
 		<sm-input id="add_contact_name" placeholder="Name" animate required></sm-input>
 	</sm-popup>
 	<sm-popup id="compose_mail_popup">
@@ -342,7 +222,7 @@
 			<sm-button id="send_mail_button" variant="primary" disabled>Send</sm-button>
         </header>
         <div id="auto_complete_contact" class="flex direction-column">
-            <sm-input id="send_mail_to" placeholder="To" animate required></sm-input>
+            <sm-input id="send_mail_to" floId placeholder="To" animate required></sm-input>
             <div id="mail_contact_list" class="hide-completely contact-list"></div>
         </div>
 		<sm-input id="subject_of_mail" placeholder="Subject" animate></sm-input>
@@ -424,18 +304,17 @@
                 <h4 class="label">FLO Messenger</h4>
 			</div>
 			<div class="navbar-item flex badge align-center active" data-notifications="0" id="chat_page_button" data-target="chat_page">
-				<svg class="icon" viewBox="0 0 64 64">
-					<path
-						d="M47.28,16.8,29.6,34.64a3.3,3.3,0,0,1-3.59.71L2.5,25.42a3.28,3.28,0,0,1,.26-6.13L59.21.87A3.28,3.28,0,0,1,63.32,5l-18.93,56a3.26,3.26,0,0,1-6.12.18l-6.4-15.68" />
-				</svg>
+				<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 64 64">
+                    <path d="M21.31,51a6.62,6.62,0,0,0,6.62,6.62H52.1A6.62,6.62,0,0,0,58.72,51V27.74l4.41-7.55H51"/>
+                    <path d="M5.33,37.51V14L.87,6.4H36.44a6.69,6.69,0,0,1,6.68,6.69V37.51a6.69,6.69,0,0,1-6.68,6.69H12A6.69,6.69,0,0,1,5.33,37.51Z"/>
+                 </svg>
 				<h5 class="label">Chat</h5>
 			</div>
 			<div class="navbar-item flex badge align-center" id="mail_page_button" data-notifications="0" data-target="mail_page">
-				<svg class="icon" viewBox="0 0 64 64">
-					<title>mail</title>
-					<path d="M63.5,34.58V49.67A5.36,5.36,0,0,1,58.14,55H5.86A5.36,5.36,0,0,1,.5,49.67V34.58"/>
-					<path d="M63.5,14.33V17.2l-32,20.38L.5,17.19V14.33A5.36,5.36,0,0,1,5.86,9H58.14A5.36,5.36,0,0,1,63.5,14.33Z"/>
-					</svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 64 64">
+                    <rect x="0.5" y="5.72" width="63" height="52.56" rx="5"/>
+                    <polyline points="12.25 21.36 32.03 32.03 51.75 21.42"/>
+                </svg>
 				<h5 class="label">Mail</h5>
 			</div>
 			<div class="navbar-item flex align-center"  data-target="settings_page">
@@ -453,17 +332,25 @@
 		<section id="chat_page" class="grid page">
 			<div id="contacts" class="grid">
 				<header class="grid">
-                    <div class="flex align-center">
-                        <h4>Contacts</h4>
-                        <sm-button class="round" variant="outlined" id="show_contact_popup_button">
-                            <svg class="icon" viewBox="0 0 64 64">
-                                <line x1="32" x2="32" y2="64" />
-                                <line x1="64" y1="32" y2="32" />
-                            </svg>
-                            Add Contact
-                        </sm-button>
+                    <div class="grid align-center">
+                        <h4>Direct Messages</h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" id="new_message_button" class="icon" viewBox="0 0 64 64">
+                            <title>Send new message</title>
+                            <path d="M55.76,20.13,59,23.34l3.5-3.48a3.26,3.26,0,0,0,.05-4.63l0-.05-.59-.56a3.3,3.3,0,0,0-4.67,0l-21.1,21a2.34,2.34,0,0,0-.63,1.19l-.9,4.63a.8.8,0,0,0,.66.91.57.57,0,0,0,.26,0l4.65-.88a2.36,2.36,0,0,0,1.22-.61l15.7-15.63"/>
+                            <path d="M48.05,49.79a6,6,0,0,1-6,6H6.47a6,6,0,0,1-6-6V14.21a6,6,0,0,1,6-6H42"/>
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" id="show_contact_popup_button" onclick="showPopup('add_contact_popup')" class="icon" viewBox="0 0 64 64">
+                            <title>Add contact</title>
+                            <path d="M21.7,5.73c6.88,0,11.78,4.64,11.78,12.44S29.58,32.6,22,32.6,10.59,26,10.59,18.25,15.48,5.81,22.36,5.81"/>
+                            <path d="M16.56,33C14.49,36.91,7.85,38.9,3,41.06,1,41.89-.69,52.67,1.63,52.67A40.31,40.31,0,0,0,22.53,58,36.52,36.52,0,0,0,42.6,52.67c2.32,0,.66-10.7-1.33-11.61C36.38,38.9,29.75,36.91,27.67,33"/>
+                            <line x1="54.32" y1="12.32" x2="54.32" y2="31.68"/>
+                            <line x1="64" y1="22" x2="44.64" y2="22"/>
+                        </svg>
+                        <sm-menu align-options="right">
+                            <sm-menu-option>Create a group</sm-menu-option>
+                        </sm-menu>
                     </div>
-                    <sm-input id="search_contacts" class="round" type="search" placeholder="Search Contacts">
+                    <sm-input id="search_contacts" type="search" placeholder="Search Contacts">
                         <svg slot="icon" class="icon" viewBox="0 0 64 64">
                             <title>Search</title>
                             <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
@@ -501,11 +388,9 @@
 				</section>
 				<footer class="flex">
                     <sm-textarea id="type_message" placeholder="Type a message" class="rest"></sm-textarea>
-                    <sm-button variant="primary" class="round" id="send_message_button" disabled>
-                        <svg class="icon" viewBox="-4 0 64 64">
-                            <path d="M35.32,32.09,19.74,32a1.66,1.66,0,0,1-1.36-.82L.91,4.19c-1.15-1.78.31-4.36,2-3.53L31.63,14.78,62.37,29.9a2.51,2.51,0,0,1,0,4.2L31.63,49.22,2.92,63.34c-1.7.83-3.16-1.75-2-3.53L9.07,47.2"/>
-                        </svg>
-                    </sm-button>
+                    <svg xmlns="http://www.w3.org/2000/svg" id="send_message_button" class="icon" viewBox="0 0 64 64">
+                        <path d="M63.34,31,3.07,4.71A2.19,2.19,0,0,0,.18,7.58L8.94,28.29,42.18,32,8.94,35.71.18,56.42a2.19,2.19,0,0,0,2.89,2.87L63.34,33A1.09,1.09,0,0,0,63.34,31Z"/>
+                    </svg>
 				</footer>
 			</div>
 		</section>
@@ -516,13 +401,6 @@
                         <sm-tab>Inbox</sm-tab>
                         <sm-tab>Sent</sm-tab>
                     </sm-tab-header>
-                    <sm-button class="round" variant="outlined" onclick="refresh()">
-                        <svg class="icon" viewBox="0 0 64 64">
-                            <polyline points="42.99 0.16 50.25 21.23 28.78 27.7"/>
-                            <path d="M56.61,44.63A24.65,24.65,0,0,1,50,56.24a25.1,25.1,0,0,1-35.31,0,24.67,24.67,0,0,1,0-35,25.1,25.1,0,0,1,35.31,0"/>
-                        </svg>
-                        refresh
-                    </sm-button>
 				</header>
                 <sm-button variant="primary" id="new_mail_button" class="fab">
                     <svg class="icon" viewBox="0 0 64 64">
@@ -607,7 +485,7 @@
                     <h4>Enter key is send</h4>
                     <div class="flex">
                         <p>If this toggle is ON then pressing 'Enter' key will send messages</p>
-                        <sm-switch id="enter_is_send" class="justify-right"></sm-switch>
+                        <sm-switch id="is_enter_send_toggle" class="justify-right"></sm-switch>
                     </div>
 
                     <h4>Version</h4>
@@ -617,76 +495,559 @@
 		</section>
     </main>
     <script src="components.js"></script>
-	<script>
-		//Checks for internet connection status
-		if (!navigator.onLine)
-			notify('There seems to be a problem connecting to the internet.', 'error', true)
-		window.addEventListener('offline', () => {
-			notify('There seems to be a problem connecting to the internet.', 'error', true)
-		})
-		window.addEventListener('online', () => {
-			notify('We are back online.')
-		})
+    <script id="standard_UI_functions">
+        //Checks for internet connection status
+        if (!navigator.onLine)
+            notify('There seems to be a problem connecting to the internet.', 'error', '', true)
+        window.addEventListener('offline', () => {
+            notify('There seems to be a problem connecting to the internet.', 'error', true, true)
+        })
+        window.addEventListener('online', () => {
+            notifications.clearAll()
+            notify('We are back online.', '', '', true)
+        })
 
-	</script>
+        const   themeSwitcher = document.getElementById('theme_switcher'),
+                hapticFeedbackSwitcher = document.getElementById('haptic_feedback_switcher')
+
+        if (localStorage.theme === "dark") {
+            nightlight()
+            themeSwitcher.checked = true;
+        } else {
+            daylight()
+            themeSwitcher.checked = false;
+        }
+
+        function daylight() {
+            document.body.setAttribute("data-theme", "light");
+        }
+
+        function nightlight() {
+            document.body.setAttribute("data-theme", "dark");
+        }
+        themeSwitcher.addEventListener('change', function (e) {
+            if (this.checked) {
+                nightlight();
+                localStorage.setItem("theme", "dark");
+            }
+            else {
+                daylight();
+                localStorage.setItem("theme", "light");
+            }
+        })
+
+        if(hapticFeedbackSwitcher){
+            let isHapticOn
+            if(localStorage.getItem('haptic') === null)
+                localStorage.setItem("haptic", "on");
+        
+            if (localStorage.haptic === "on") {
+                isHapticOn = true
+                hapticFeedbackSwitcher.checked = true;
+            } else {
+                isHapticOn = false
+                hapticFeedbackSwitcher.checked = false;
+            }
+            hapticFeedbackSwitcher.addEventListener('change', function (e) {
+                if (this.checked) {
+                    isHapticOn = true
+                    localStorage.setItem("haptic", "on");
+                }
+                else {
+                    isHapticOn = false
+                    localStorage.setItem("haptic", "off");
+                }
+            })
+        }
+
+        const domRefs = {}
+
+        function getRef(elementId){
+            if(!domRefs.elementId)
+                domRefs[elementId] = document.getElementById(elementId)
+            return domRefs[elementId]
+        }
+
+        // function required for popups or modals to appear
+        class Stack {
+            constructor() {
+                this.items = [];
+            }
+            push(element) {
+                this.items.push(element);
+            }
+            pop() {
+                if (this.items.length == 0)
+                    return "Underflow";
+                return this.items.pop();
+            }
+            peek() {
+                return this.items[this.items.length - 1];
+            }
+        }
+        let popupStack = new Stack(),
+            zIndex = 10;
+
+        async function showPopup(popup, pinned) {
+            zIndex++
+            getRef(popup).setAttribute('style', `z-index: ${zIndex}`)
+            popupStack = getRef(popup).show(pinned, popupStack)
+            return getRef(popup);
+        }
+
+        // hides the popup or modal 
+        function hidePopup() {
+            if (popupStack.peek() === undefined)
+                return;
+            popupStack.peek().popup.hide()
+        }
+
+        document.addEventListener('popupopened', async e => {
+            let thisPopup = e.detail.popup,
+                firstInput = thisPopup.querySelector('sm-input')
+
+            //pushes popup as seprate entry in history
+            history.pushState({type: 'popup'}, null, null)
+
+            if (window.innerWidth > 720 && firstInput)
+                firstInput.focusIn()
+        })
+
+        document.addEventListener('popupclosed', e => {
+            popupStack = e.detail.popupStack
+            let thisPopup = e.detail.popup
+        })
+
+        window.addEventListener('popstate', e => {
+            if(!e.state) return
+            console.log(e.state)
+            if(e.state.type === 'popup'){
+                hidePopup()
+            }
+            else if(e.state.type === 'page'){
+                showPage(e.state.id)
+            }
+        })
+
+        function setAttributes(el, attrs) {
+            for (var key in attrs) {
+                el.setAttribute(key, attrs[key]);
+            }
+        }
+
+        function randomHsl(saturation = 80, lightness = 80) {
+            let hue = Math.random() * 360
+            let color = {
+                primary: `hsla( ${hue}, ${saturation}%, ${lightness}%, 1)`,
+                light: `hsla( ${hue}, ${saturation}%, 90%, 0.6)`
+            }
+            return color;
+        }
+
+        function clearElements(array = []) {
+            array.forEach(item => {
+                document.getElementById(item).innerHTML = ``
+            })
+        }
+
+        let notifications = document.getElementById('show_message');
+        //Function for displaying toast notifications. pass in error for mode param if you want to show an error.
+        function notify(message, mode, pinned, sound) {
+
+            if (mode === 'error')
+                console.error(message)
+            else
+                console.log(message)
+            notifications.push(message, mode, pinned)
+            if (navigator.onLine && sound) {
+                notificationSound.currentTime = 0;
+                notificationSound.play();
+            }
+        }
+
+        // displays a popup for asking permission. Use this instead of JS confirm
+        let confirmation = (title, message, cancelText = 'Cancel', confirmText = 'OK') => {
+            return new Promise(resolve => {
+                showPopup('confirmation_popup')
+                getRef('confirm_title').textContent = title;
+                getRef('confirm_message').textContent = message;
+                let cancelButton = getRef('confirmation_popup').children[2].children[0],
+                    submitButton = getRef('confirmation_popup').children[2].children[1]
+                console.log(cancelButton, submitButton)    
+                submitButton.textContent = confirmText
+                cancelButton.textContent = cancelText 
+                submitButton.onclick = () => {
+                    hidePopup()
+                    resolve(true);
+                }
+                cancelButton.onclick = () => {
+                    hidePopup()
+                    resolve(false);
+                }
+            })
+        }
+
+        // displays a popup for asking user input. Use this instead of JS prompt
+        let askPrompt = function (message, defaultVal) {
+            return new Promise(resolve => {
+                let popup = document.getElementById('prompt'),
+                    input = popup.querySelector('sm-input');
+                if (defaultVal)
+                    input.value = defaultVal;
+                showPopup('prompt')
+                input.focus()
+                input.addEventListener('keyup', e => {
+                    if (e.key === 'Enter') {
+                        resolve(input.value);
+                        popup.hide()
+                    }
+                })
+                popup.querySelector('#prompt_message').textContent = message;
+                popup.querySelector('.submit-btn').onclick = () => {
+                    popup.hide()
+                    resolve(input.value);
+                }
+                popup.querySelector('.cancel-btn').onclick = () => {
+                    popup.hide()
+                    resolve(null);
+                }
+            })
+        }
+
+        const currentYear = new Date().getFullYear()
+        function formatedTime(time, relative) {
+            try {
+                if (String(time).indexOf('_'))
+                    time = String(time).split('_')[0]
+                let timeFrag = new Date(parseInt(time)).toString().split(' '),
+                    day = timeFrag[0],
+                    month = timeFrag[1],
+                    date = timeFrag[2],
+                    year = timeFrag[3],
+                    minutes = new Date(parseInt(time)).getMinutes(),
+                    hours = new Date(parseInt(time)).getHours(),
+                    currentTime = new Date().toString().split(' ')
+                minutes = minutes < 10 ? `0${minutes}` : minutes
+                let finalHours = ``;
+                if (hours > 12)
+                    finalHours = `${hours - 12}:${minutes}`
+                else if (hours === 0)
+                    finalHours = `12:${minutes}`
+                else
+                    finalHours = `${hours}:${minutes}`
+
+                finalHours = hours >= 12 ? `${finalHours} PM` : `${finalHours} AM`
+                if (relative) {
+                    if (year == currentYear) {
+                        if (currentTime[1] === month && date === currentTime[2])
+                            return `Today at ${finalHours}`;
+                        else
+                            return ` ${date} ${month}`;
+
+                    }
+                }
+                else
+                    return `${month} ${date} ${year}`;
+            } catch (e) {
+                console.error(e);
+                return time;
+            }
+        }
+
+        function areInputsValid(parent) {
+            let allInputs = parent.querySelectorAll("sm-input:not([disabled])"),
+                inputsFilled = [...allInputs].every(input => {
+                    if (input.hasAttribute('floId')) {
+                        if (floCrypto.validateAddr(input.value.trim())) return true
+                    }
+                    else if (input.hasAttribute('privateKey')) {
+                        if (floCrypto.getPubKeyHex(input.value.trim())) return true
+                    }
+                    else
+                        return input.isValid
+                })
+            let allRadios = parent.querySelectorAll("input[type='radio']")
+            if (allRadios.length)
+                return inputsFilled && parent.querySelector('[checked]')
+            else
+                return inputsFilled
+        }
+
+        function formValidation(formElement) {
+            let parent = formElement.closest('sm-popup') || formElement.closest('form'),
+                submitBtn
+            if(parent)
+                submitBtn = parent.querySelector("button[type='submit'], sm-button[variant='primary']");
+            if (!submitBtn) return;
+            if (areInputsValid(parent))
+                submitBtn.disabled = false;
+            else
+                submitBtn.disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            document.addEventListener('input', e => {
+                if (e.target.closest('sm-input')) {
+                    let input = e.target.closest('sm-input')
+                    formValidation(input)
+                    if (input.value === '')
+                        input.setValidity('')
+                    let validityState = input.validity
+                    if (input.hasAttribute('floId')) {
+                        if (floCrypto.validateAddr(input.value.trim()) || input.value.trim() === '')
+                            input.setValidity('')
+                        else
+                            input.setValidity('Invalid FLO address.')
+                    }
+                    else if (input.hasAttribute('privateKey')) {
+                        if (floCrypto.getPubKeyHex(input.value.trim()) || input.value.trim() === '')
+                            input.setValidity('')
+                        else
+                            input.setValidity('Invalid FLO private key.')
+                    }
+                }
+            })
+            document.addEventListener('keyup', (e) => {
+                if (e.target.closest('sm-input')) {
+                    if (e.key === 'Enter') {
+                        let parent = e.target.closest('sm-popup') || e.target.closest('form')
+                        parent.querySelector("button[type='submit'], sm-button[variant='primary']")
+                            .click();
+                    }
+                }
+                if(e.code === 'Escape'){
+                    hidePopup()
+                }
+            })
+
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.closest('sm-button, .interact')) {
+                    createRipple(e, e.target.closest('sm-button, .interact'))
+                }
+            })
+
+            function createRipple(event, target) {
+                const circle = document.createElement("span");
+                const diameter = Math.max(target.clientWidth, target.clientHeight);
+                const radius = diameter / 2;
+                circle.style.width = circle.style.height = `${diameter}px`;
+                circle.style.left = `${event.clientX - (target.getBoundingClientRect().left + radius)}px`;
+                circle.style.top = `${event.clientY - (target.getBoundingClientRect().top + radius)}px`;
+                circle.classList.add("ripple");
+                const rippleAnimation = circle.animate([
+
+                    {
+                        transform: 'scale(3)',
+                        opacity: 0
+                    }
+                ],
+                    {
+                        duration: 1000,
+                        fill: "forwards",
+                        easing: 'ease-out'
+                    })
+                target.append(circle);
+                rippleAnimation.onfinish = () => {
+                    circle.remove()
+                }
+            }
+        })
+        /*const   credentialsSection = document.getElementById('credentials_section'),
+                generateFloId = document.getElementById('generate_flo_id'),
+                generatedId = document.getElementById('generated_id'),
+                generatedKey = document.getElementById('generated_key'),
+                signInBtn = document.getElementById('sign_in_btn'),
+                signInWithBtn = document.getElementById('sign_in_with'),
+                privateKeyInput = document.getElementById('get_priv_key_field')
+
+        function generateId() {
+            generateFloId.classList.add('hide-completely')
+            credentialsSection.classList.remove('hide-completely')
+            let { floID, privKey } = floCrypto.generateNewID()
+            generatedId.textContent = floID
+            generatedKey.textContent = privKey
+            privateKeyInput.value = privKey
+        }
+
+        const   signInButton = document.getElementById('sign_in_button'),
+                signOutButton = document.getElementById('sign_out_button')
+        
+        const signIn = () => {
+            return new Promise((resolve, reject) => {
+                signInBtn.onclick = () => {
+                    resolve(privateKeyInput.value)
+                    hidePopup()
+                }
+                signInWithBtn.onclick = () => {
+                    resolve(privateKeyInput.value)
+                    hidePopup()
+                }
+            })
+        }
+
+        async function signOut() {
+            if (await confirmation('Do you want to sign out?', 'Stay', 'Sign Out')) {
+                await floDapps.clearCredentials()
+                setTimeout(() => {
+                    onLoadStartUp()
+                    notifications.clearAll()
+                    signInButton.classList.remove('hide-completely')
+                    signOutButton.classList.add('hide-completely')
+                }, 500);
+            }
+        }*/
+       async function loadPage(){
+            if(location.hash === ''){
+                if(history.length === 2)
+                    history.pushState({type: 'page', id: 'homepage'}, null, '')
+                if(isFirstLoad){
+                    renderLatestArticles(floDapps.getNextGeneralData('articles', '0'), true)
+                    isFirstLoad = false
+                }
+                showPage('homepage')
+            }
+            else{
+                if(history.length === 2)
+                    history.pushState({type: 'page', id: 'article_page', articleId: location.hash.slice(1)}, null, ``)
+                renderArticle(location.hash.slice(1))
+            }
+        }
+    </script>
+        <script id="floGlobals">
+            /* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
+            const floGlobals = {
+        
+                //Required for all
+                blockchain: "FLO",
+        
+                //Required for blockchain API operators
+                apiURL: {
+                    FLO: ['https://explorer.mediciland.com/', 'https://livenet.flocha.in/',
+                        'https://flosight.duckdns.org/', 'http://livenet-explorer.floexperiments.com/'
+                    ],
+                    FLO_TEST: ['https://testnet-flosight.duckdns.org/', 'https://testnet.flocha.in/']
+                },
+        
+                //Required for Supernode operations
+                SNStorageID: "FNaN9McoBAEFUjkRmNQRYLmBF8SpS7Tgfk",
+                supernodes: {}, //each supnernode must be stored as floID : {uri:<uri>,pubKey:<publicKey>}
+        
+                //for app
+                application: "messenger",
+                adminID: "FMRsefPydWznGWneLqi4ABeQAJeFvtS3aQ",
+                pubKeys: {},
+                contacts: {},
+                appendix: {}
+            }
+        </script>
+        <script id="onLoadStartUp">
+            function onLoadStartUp() {
+                privKeyNotSecured = true;
+    
+                //display loading screen
+                getRef('loading_page').classList.remove("hide-completely")
+                //clear Rendered Elements
+                let elementsToReset = ['inbox_mail_container', 'sent_mail_container', 'contacts_container', 'chat_container',
+                    'receiver_floID', 'receiver_name', 'mail_contact_list'
+                ]
+                //, "backup_info"
+                elementsToReset.forEach(e => clearElement(document.getElementById(e)))
+    
+                floDapps.setCustomPrivKeyInput((type) => {
+                    return new Promise((resolve, reject) => {
+                        mainPage.classList.add('hide-completely')
+                        getRef('loading_page').classList.add('hide-completely')
+                        getRef('sign_in_page').classList.remove('hide-completely')
+                        getRef('sign_in_button').addEventListener('clicked', () => {
+                            let key = getRef('private_key_input_field').value;
+                            hidePopup()
+                            console.log(key)
+                            getRef('sign_in_page').classList.add('hide-completely')
+                            getRef('loading_page').classList.remove('hide-completely')
+                            resolve(key)
+                        })
+                        getRef('guest_login_button').onclick = () => {
+                            getRef('sign_in_page').classList.add('hide-completely')
+                            getRef('loading_page').classList.remove('hide-completely')
+                            reject(null)
+                        }
+                        if (type === "PRIVATE_KEY") {
+                            getRef('private_key_input_field').setAttribute("placeholder", "Private Key")
+                            document.getElementById("type_of_key").textContent = 'FLO private key'
+                            document.getElementById("remove_account").classList.add("hide-completely");
+                        } else if (type === "PIN/Password") {
+                            getRef('private_key_input_field').setAttribute("placeholder", "PIN/Password")
+                            showPopup('sign_in_popup')
+                            document.getElementById("remove_account").classList.remove("hide-completely");
+                            document.getElementById("type_of_key").textContent = 'PIN/Password'
+                            privKeyNotSecured = false;
+                        }
+                    })
+                })
+    
+                //invoke the startup functions
+                floDapps.launchStartUp().then(result => {
+                    console.log(result)
+                    document.getElementById("greet_tag").textContent = myFloID
+                    //load messages from IDB and render them
+                    console.log(`Loading Data! Please Wait...`)
+                    messenger.initUserDB().then(result => {
+                        console.log(result)
+                        messenger.loadDataFromIDB().then(data => {
+                            console.log(data)
+                            floGlobals.appendix = data.appendix;
+                            floGlobals.groups = data.groupInfo
+                            renderContactList(floGlobals.contacts)
+                            renderMailContactList(floGlobals.contacts)
+                            renderMessages(data.messages, false)
+                            renderMailList(data.mails, false)
+                            renderMarked(data.marked)
+                            messenger.setUIcallbacks(renderDirectUI, renderGroupUI)
+                            messenger.requestDirectInbox()
+                                .then(r => console.log("DirectConn:", r))
+                                .catch(e => console.error("Request error:", e))
+                            messenger.requestGroupInbox()
+                                .then(r => console.log(r))
+                            console.log(`Load Successful!`)
+                            //hide loading screen
+                            getRef('loading_page').classList.add("hide-completely")
+                            mainPage.classList.remove('hide-completely')
+                            getRef('chat').classList.add('hide-completely')
+                            getRef('mail').classList.add('hide-completely')
+                            document.getElementById('chat_page_button').click()
+                            if (privKeyNotSecured) {
+                                notify("Private key is not secured with password. Remember to secure the private key in settings",
+                                    "warn", '')
+                                document.getElementById("secure_key").textContent = 'Set password'
+                            } else {
+                                document.getElementById("secure_key").textContent = 'Change password'
+                            }
+                        }).catch(error => {
+                            //console.error(`Failed to load data`)
+                            notify(error, "error")
+                        })
+                    })
+    
+                }).catch(error => notify(error, "error"))
+            }
+        </script>
 	<script>
 		let isSignInOpen = false,
-			activePage = {	page: document.getElementById('chat_page'),
-				button: document.getElementById('chat_page_button')},
-			activeChatPage = document.getElementById('contacts'),
+			activePage = {
+                page: document.getElementById('chat_page'),
+                button: document.getElementById('chat_page_button')
+            },
+            activeChatPage = document.getElementById('contacts'),
             activeMailPage = document.getElementById('mails'),
             activeChat,
-            activeMail,
-            refreshCount = 0,
-            refreshTimeout = 20000;
+            activeMail
 
-
-		const	openSignInButton = document.getElementById('open_sign_in_button'),
-				closeSignInButton = document.getElementById('close_sign_in_button'),
-				signInButton = document.getElementById('sign_in_button'),
-				guestLoginButton = document.getElementById('guest_login_button'),
-				signInLanding = document.getElementById('sign_in_page'),
-				privateKeyInputField = document.getElementById('private_key_input_field'),
-				loadingPage = document.getElementById('loading_page')
-		
-		const   allmailsSection = document.getElementById('mails'),
-				allContactsSection = document.getElementById('contacts'),
-				mailSection = document.getElementById('mail'),		
-				chatSection = document.getElementById('chat'),
-				searchContacts = document.getElementById('search_contacts'),
-				chatPageButton = document.getElementById('chat_page_button'),
-				mailPageButton = document.getElementById('mail_page_button'),
-				mainNavbar = document.getElementById('main_navbar')	
-
-		const	mainPage = document.querySelector('main'),
-				contactsContainer = document.getElementById("contacts_container"),
-				inboxMailContainer = document.getElementById("inbox_mail_container"),
-				sentMailContainer = document.getElementById("sent_mail_container"),
-				addContactButton = document.getElementById('add_contact_button'),
-				addContactName = document.getElementById('add_contact_name'),
-				chatContainer = document.getElementById('chat_container'),
-				typeMessage = document.getElementById('type_message'),
-				addContactFloID = document.getElementById('add_contact_floID'),
-				signInPopup = document.getElementById('sign_in_popup'),
-				composeMailPopup = document.getElementById('compose_mail_popup'),
-				sendMailTo = document.getElementById('send_mail_to'),
-				mailContactList = document.getElementById('mail_contact_list'),
-				addContactPopup = document.getElementById('add_contact_popup'),
-				allInputs = document.querySelectorAll('sm-popup sm-input, sm-popup textarea')
-                
-        const   replyMailPopup = document.getElementById('reply_mail_popup'),
-                subjectOfReplyMail = document.getElementById('subject_of_reply_mail'),
-                replyMailContent = document.getElementById('reply_mail_content'),
-                replyMailButton = document.getElementById('reply_mail_button')
+		const	mainPage = document.querySelector('main')
 
 		// render elements 
-		const mailCardTemplate = document.getElementById('mail_card_template'),
-				contactTemplate = document.getElementById('contact_template'),
-                messageTemplate = document.getElementById('message_template'),
-                mailTemplate = document.getElementById('mail_template')
 		const render = {
 			mailCard(floID, ref, subject, timestamp, content, markUnread){
-                let card = mailCardTemplate.content.cloneNode(true),
+                let card = getRef('mail_card_template').content.cloneNode(true),
                     cardContainer = card.querySelector('.mail-card'),
                     time = new Date(timestamp).toString(),
                     minutes = String(new Date(timestamp).getMinutes()),
@@ -725,7 +1086,7 @@
             },
             
             mail(from, to, subject, timestamp, content){
-                let card = mailTemplate.content.cloneNode(true),
+                let card = getRef('mail_template').content.cloneNode(true),
                     cardContainer = card.querySelector('.mail'),
                     time = new Date(timestamp).toString(),
                     minutes = String(new Date(timestamp).getMinutes()),
@@ -761,7 +1122,7 @@
                 return card
             },
             contactCard(floID, name){
-                let card = contactTemplate.content.cloneNode(true),
+                let card = getRef('contact_template').content.cloneNode(true),
                         cardContainer = card.querySelector('.contact')
                 cardContainer.setAttribute("name", name || 'Unknown')
                 cardContainer.setAttribute("flo-id", floID)
@@ -774,11 +1135,11 @@
                 cardContainer.setAttribute("background-color", randomColor.light)
                 initial.setAttribute(`style`, `color: ${randomColor.primary};`)
                 let duplicateCard = card.cloneNode(true);
-                contactsContainer.append(card);
-                mailContactList.append(duplicateCard);
+                getRef('contacts_container').append(card);
+                getRef('mail_contact_list').append(duplicateCard);
             },
-            messageBubble(floID, message, timestamp, category){
-                let card = messageTemplate.content.cloneNode(true),
+            messageBubble(floID, message, timestamp, category, unconfirmed = false){
+                let card = getRef('message_template').content.cloneNode(true),
                     cardContainer = card.querySelector('.message'),
                     time = new Date(timestamp).toString(),
                     minutes = String(new Date(timestamp).getMinutes()),
@@ -786,6 +1147,10 @@
                     year = new Date(timestamp).getFullYear()
                 minutes = minutes.length === 1 ? `0${minutes}` : minutes
                 let finalHours = hours - 12 > 0 ? `${hours - 12}:${minutes} pm` : `${hours}:${minutes} am`
+
+                cardContainer.id = `${floID}_${timestamp}`
+                if(unconfirmed)
+                    cardContainer.classList.add('unconfirmed')
 
                 cardContainer.classList.add(category)
                 cardContainer.children[0].textContent = message
@@ -811,12 +1176,12 @@
             console.log(data)
             renderMessages(data.messages);
             renderMailList(data.mails)
-            if(Object.keys(data.messages).length && activePage.button !== chatPageButton){
-                    chatPageButton.setAttribute('data-notifications', Object.keys(data.messages).length)
+            if(Object.keys(data.messages).length && activePage.button !== getRef('chat_page_button')){
+                    getRef('chat_page_button').setAttribute('data-notifications', Object.keys(data.messages).length)
                     notify(`${Object.keys(data.messages).length} new message(s)`)
                 }
-            if(Object.keys(data.mails).length && activePage.button !== mailPageButton){
-                mailPageButton.setAttribute('data-notifications', Object.keys(data.mails).length)
+            if(Object.keys(data.mails).length && activePage.button !== getRef('mail_page_button')){
+                getRef('mail_page_button').setAttribute('data-notifications', Object.keys(data.mails).length)
                 notify(`${Object.keys(data.mails).length} new mail(s)`)
             }
         }
@@ -825,62 +1190,23 @@
             console.log(data)
         }
 
-		function randomHsl(saturation = 90, lightness = 50) {
-            let hue = Math.random() * 360
-            let color = {
-                primary: `hsla( ${hue}, ${saturation}%, ${lightness}%, 1)`,
-                light : `hsla( ${hue}, ${saturation}%, ${lightness + 50}%, 0.6)` 
-            }
-            return color;
-        }
-
-		openSignInButton.addEventListener('clicked', () => {
+		getRef('open_sign_in_button').addEventListener('clicked', () => {
 			isSignInOpen = true;
-            signInPopup.show()
-            privateKeyInputField.focusIn()
-		})
-
-		function checkInput(element){
-			let parent = element.closest('sm-popup'),
-				inputs = parent.querySelectorAll('sm-input, textarea')
-            if(!parent.querySelector('sm-button[variant="primary"]')) return
-            if([...inputs].every(input => {
-				if(input.tagName === 'SM-INPUT' && input.isValid){
-					return true
-				}	
-				else if(input.tagName !== 'SM-INPUT' && input.checkValidity()){
-					return true
-				}
-			})){
-				parent.querySelector('sm-button[variant="primary"]').disabled = false
-			}
-			else
-				parent.querySelector('sm-button[variant="primary"]').disabled = true
-		}
-
-		document.addEventListener('input', e => {
-			if(e.target.closest('sm-popup')){
-				checkInput(e.target)
-            }
+            showPopup('sign_in_popup')
 		})
         
 		document.addEventListener('keyup', e => {
-            if(e.target.closest('sm-input') && e.target.closest('sm-popup')){
-                if(e.code === 'Enter'){
-                    e.target.closest('sm-popup').querySelector('sm-button[variant="primary"]').click()
-                }
-            }
             if(e.target.closest('#send_mail_to')){
                 if(e.code === 'ArrowDown'){
-                    for(child of mailContactList.children){
+                    for(child of getRef('mail_contact_list').children){
                         if(!child.classList.contains('hide-completely')){
                             child.focus()
                             break
                         }
                     }
                 }
-                if(e.code === 'Enter' && mailContactList.firstElementChild){
-                    for(child of mailContactList.children){
+                if(e.code === 'Enter' && getRef('mail_contact_list').firstElementChild){
+                    for(child of getRef('mail_contact_list').children){
                         if(!child.classList.contains('hide-completely')){
                             child.click()
                             break
@@ -890,15 +1216,15 @@
             }
             if(e.target.closest('#search_contacts')){
                 if(e.code === 'ArrowDown'){
-                    for(child of contactsContainer.children){
+                    for(child of getRef('contacts_container').children){
                         if(!child.classList.contains('hide-completely')){
                             child.focus()
                             break
                         }
                     }
                 }
-                if(e.code === 'Enter' && contactsContainer.firstElementChild){
-                    for(child of contactsContainer.children){
+                if(e.code === 'Enter' && getRef('contacts_container').firstElementChild){
+                    for(child of getRef('contacts_container').children){
                         if(!child.classList.contains('hide-completely')){
                             child.click()
                             break
@@ -911,21 +1237,21 @@
                     if(document.activeElement.nextElementSibling)
                         document.activeElement.nextElementSibling.focus()
                     else
-                        mailContactList.firstElementChild.focus()
+                        getRef('mail_contact_list').firstElementChild.focus()
                 }
                 if(e.code === 'ArrowUp' || e.code === 'ArrowLeft' ){
                     if(document.activeElement.previousElementSibling)
                         document.activeElement.previousElementSibling.focus()
                     else
-                        mailContactList.lastElementChild.focus()
+                        getRef('mail_contact_list').lastElementChild.focus()
                 }
             }
         })
 
-        sendMailTo.addEventListener('input', function() {
-            mailContactList.classList.remove('hide-completely')
+        getRef('send_mail_to').addEventListener('input', function() {
+            getRef('mail_contact_list').classList.remove('hide-completely')
             if(this.value.trim !== ''){
-                for(child of mailContactList.children) {
+                for(child of getRef('mail_contact_list').children) {
                     if(child.getAttribute('name').toUpperCase().indexOf(this.value.toUpperCase()) > -1){
                         child.classList.remove('hide-completely')
                     }
@@ -936,9 +1262,9 @@
             }
         })
 
-        searchContacts.addEventListener('input', function() {
+        getRef('search_contacts').addEventListener('input', function() {
             if(this.value.trim !== ''){
-                for(child of contactsContainer.children) {
+                for(child of getRef('contacts_container').children) {
                     if(child.getAttribute('name').toUpperCase().indexOf(this.value.toUpperCase()) > -1){
                         child.classList.remove('hide-completely')
                     }
@@ -949,19 +1275,17 @@
             }
         })
 
-        mailContactList.addEventListener('click', e => {
+        getRef('mail_contact_list').addEventListener('click', e => {
             if(e.target.closest('.contact')){
-                sendMailTo.value = e.target.closest('.contact').getAttribute('flo-id')
-                mailContactList.classList.add('hide-completely')
-                sendMailTo.focusIn()
+                getRef('send_mail_to').value = e.target.closest('.contact').getAttribute('flo-id')
+                getRef('mail_contact_list').classList.add('hide-completely')
             }
         })
         
-        mailContactList.addEventListener('keyup', e => {
+        getRef('mail_contact_list').addEventListener('keyup', e => {
             if(e.target.closest('.contact') && e.code === 'Enter' || e.code === 'Space'){
-                sendMailTo.value = document.activeElement.getAttribute('flo-id')
-                mailContactList.classList.add('hide-completely')
-                sendMailTo.focusIn()
+                getRef('send_mail_to').value = document.activeElement.getAttribute('flo-id')
+                getRef('mail_contact_list').classList.add('hide-completely')
             }
         })
         
@@ -980,14 +1304,13 @@
 				activePage.page = targetPage;
             }
             if(e.target.closest('#send_mail_to') || e.target.closest('#mail_contact_list')){
-                mailContactList.classList.remove('hide-completely')
+                getRef('mail_contact_list').classList.remove('hide-completely')
             }
             else{
-                mailContactList.classList.add('hide-completely')
+                getRef('mail_contact_list').classList.add('hide-completely')
             }
 			if(e.target.closest('#new_mail_button')){
-                composeMailPopup.show()
-                sendMailTo.focusIn()
+                showPopup('compose_mail_popup')
             }
             if(e.target.closest('#chat')){
                 let floID = document.getElementById("receiver_floID").textContent;
@@ -1016,48 +1339,21 @@
             })
         }
 
-        let themeSwitcher = document.getElementById('theme_switcher'),
-            enterIsSend = document.getElementById('enter_is_send'),
+        let isEnterSendToggle = document.getElementById('is_enter_send_toggle'),
             isEnterSend = true
 
-        if (localStorage.theme === "dark") {
-            nightlight()
-            themeSwitcher.checked = true;
-        } else {
-            daylight()
-            themeSwitcher.checked = false;
-        }
-        
-        function daylight() {
-            document.body.setAttribute("data-theme", "light");
-        }
-        
-        function nightlight() {
-            document.body.setAttribute("data-theme", "dark");
-        }
-        themeSwitcher.addEventListener('change', function(e){
-            if(this.checked){
-                nightlight();
-                localStorage.setItem("theme", "dark");
-            }
-            else{
-                daylight();
-                localStorage.setItem("theme", "light");
-            }
-        })
-
-        if(localStorage.isEnterSend === null)
+        if(localStorage.getItem('isEnterSend') === null)
             localStorage.setItem('isEnterSend', 'true')
 
         if (localStorage.isEnterSend === 'true') {
             isEnterSend = true
-            enterIsSend.checked = true;
+            isEnterSendToggle.checked = true;
         } else {
             isEnterSend = false
-            enterIsSend.checked = false;
+            isEnterSendToggle.checked = false;
         }
         
-        enterIsSend.addEventListener('change', function(){
+        isEnterSendToggle.addEventListener('change', function(){
             if(this.checked){
                 isEnterSend = true
                 localStorage.setItem("isEnterSend", 'true');
@@ -1070,12 +1366,12 @@
 
         function updateHeight(){
             if(window.innerWidth < 640){
-                chatSection.style.height = window.innerHeight + 'px'
-                signInLanding.style.height = window.innerHeight + 'px'
+                getRef('chat').style.height = window.innerHeight + 'px'
+                getRef('sign_in_page').style.height = window.innerHeight + 'px'
             }
             else{
-                chatSection.style.height = '100vh'
-                signInLanding.style.height = '100vh'
+                getRef('chat').style.height = '100vh'
+                getRef('sign_in_page').style.height = '100vh'
             }
         }
         window.addEventListener('resize', e => {
@@ -1084,23 +1380,23 @@
 
 		function goto(page){
 			if(page === 'chats'){
-				chatSection.classList.add('hide-on-mobile')
-				allContactsSection.classList.remove('hide-on-mobile')
-				activeChatPage = allContactsSection
+				getRef('chat').classList.add('hide-on-mobile')
+				getRef('contacts').classList.remove('hide-on-mobile')
+				activeChatPage = getRef('contacts')
 			}
 			if(page === 'mails'){
-				mailSection.classList.add('hide-on-mobile')
-				allmailsSection.classList.remove('hide-on-mobile')
-				activeMailPage = allmailsSection
+				getRef('mail').classList.add('hide-on-mobile')
+				getRef('mails').classList.remove('hide-on-mobile')
+				activeMailPage = getRef('mails')
 			}
-			mainNavbar.classList.remove('hide-on-mobile')
+			getRef('main_navbar').classList.remove('hide-on-mobile')
 		}
 
         document.getElementById("mails").addEventListener('click', function (e) {
 			if (e.target.closest(".mail-card") && e.target.closest(".mail-card") !== activeMail){
                 refresh()
-                mailPageButton.setAttribute('data-notifications', '0')
-                mailSection.classList.remove('hide-completely')
+                getRef('mail_page_button').setAttribute('data-notifications', '0')
+                getRef('mail').classList.remove('hide-completely')
                 e.target.closest(".mail-card").classList.remove('unread')
                 viewMail(e.target.closest(".mail-card").getAttribute("name"));
                 if(activeMail)
@@ -1108,10 +1404,10 @@
                 e.target.closest(".mail-card").classList.add('active')
                 activeMail = e.target.closest(".mail-card")
 				if(activeMailPage.id === 'mails'){
-                    mailSection.classList.remove('hide-on-mobile')
-					allmailsSection.classList.add('hide-on-mobile')
-                    activeMailPage = mailSection
-                    mainNavbar.classList.add('hide-on-mobile')
+                    getRef('mail').classList.remove('hide-on-mobile')
+					getRef('mails').classList.add('hide-on-mobile')
+                    activeMailPage = getRef('mail')
+                    getRef('main_navbar').classList.add('hide-on-mobile')
 				}
 			}
         })
@@ -1120,26 +1416,26 @@
             viewMail(this.dataset["value"], false);
         })
 
-        document.getElementById('send_message_button').addEventListener('clicked', sendMessage)
+        getRef('send_message_button').addEventListener('click', sendMessage)
 
-        typeMessage.addEventListener('input', e => {
-            if(typeMessage.value.trim() !== '')
-                document.getElementById('send_message_button').disabled = false
+        getRef('type_message').addEventListener('input', e => {
+            if(getRef('type_message').value.trim() !== '')
+                getRef('send_message_button').classList.add('active')
             else   
-                document.getElementById('send_message_button').disabled = true
+                getRef('send_message_button').classList.remove('active')
         })
-        typeMessage.addEventListener('keydown', e => {
-            if(e.code === "Enter" && typeMessage.value.trim() !== '' && isEnterSend){
+        getRef('type_message').addEventListener('keydown', e => {
+            if(e.code === "Enter" && getRef('type_message').value.trim() !== '' && isEnterSend){
                 e.preventDefault()
                 sendMessage()
             }
         })
 
-        contactsContainer.addEventListener('click', function (e) {
+        getRef('contacts_container').addEventListener('click', function (e) {
 			if (!e.target.closest("sm-menu") && e.target.closest(".contact")){
                 refresh()
-                chatPageButton.setAttribute('data-notifications', '0')
-                chatSection.classList.remove('hide-completely')
+                getRef('chat_page_button').setAttribute('data-notifications', '0')
+                getRef('chat').classList.remove('hide-completely')
                 e.target.closest(".contact").classList.remove('unread')
                 viewConversation(e.target.closest(".contact"))
                 if(activeChat)
@@ -1147,49 +1443,47 @@
                 e.target.closest(".contact").classList.add('active')
                 activeChat = e.target.closest(".contact")
 				if(activeChatPage.id === 'contacts'){
-                    chatSection.classList.remove('hide-on-mobile')
-					allContactsSection.classList.add('hide-on-mobile')
-                    activeChatPage = chatSection
-					mainNavbar.classList.add('hide-on-mobile')
+                    getRef('chat').classList.remove('hide-on-mobile')
+					getRef('contacts').classList.add('hide-on-mobile')
+                    activeChatPage = getRef('chat')
+					getRef('main_navbar').classList.add('hide-on-mobile')
 				}
 			}
             let floID;
             if (e.target.closest(".send-mail-option")){
-				composeMailPopup.show()
+				showPopup('compose_mail_popup')
 				floID = e.target.closest(".contact").getAttribute("flo-id");
-				let tmp = sendMailTo.value.trim();
+				let tmp = getRef('send_mail_to').value.trim();
 				if (!tmp.includes(floID)) {
 					if (tmp == '')
 						tmp = floID;
 					else
 						tmp += `, ${floID}`;
 				}
-				sendMailTo.value = tmp;
+				getRef('send_mail_to').value = tmp;
 				return false;
 			}
         });
 
-        document.getElementById("sign_out").addEventListener('click', function (e) {
-            getConfirmation('Sign Out?',
-                'Are you sure you want to Sign out?', "Sign Out",
-                "Stay Signed In").then(
-                result => {
+        document.getElementById("sign_out").addEventListener('click', async function (e) {
+            if(await confirmation('Sign Out?',
+                'Are you sure you want to Sign out?', "Stay Signed In", "Sign Out")){
                     floDapps.clearCredentials().then(result => {
                         notify("Successfully Signed out", 'success')
                         setTimeout(onLoadStartUp, 2000)
                     }).catch(error => notify("Signout Unsuccessful", "error", error))
-                }).catch(error => {})
+                }
         });
 
-        document.getElementById("remove_account").addEventListener('click', function (e) {
-            getConfirmation('Remove Account?',
+        document.getElementById("remove_account").addEventListener('click', async function (e) {
+            if(await confirmation('Remove Account?',
                 '**Remember to store your PRIVATE-KEY**\n*Private-Key will be needed to signIn again*\nAre you sure you want to remove account?',
-                "Remove").then(result => {
+                'Cancel', "Remove")){
                 floDapps.clearCredentials().then(result => {
                     notify("Removed Account")
                     setTimeout(onLoadStartUp, 2000)
                 }).catch(error => notify("Remove Unsuccessful", "error", error))
-            }).catch(error => {})
+            }
         });
 
         document.getElementById("secure_key").addEventListener('click', async function (e) {
@@ -1214,29 +1508,23 @@
             }
         });
 
-        document.getElementById("clear_data").addEventListener('click', function (e) {
-            getConfirmation('Clear Data?',
-                `Are you sure you want to clear stored data?`, "Clear").then(
-                result => {
+        document.getElementById("clear_data").addEventListener('click', async function (e) {
+            if(await confirmation('Clear Data?',
+                `Are you sure you want to clear stored data?`, "Clear")){
                     messenger.clearUserData().then(result => {
                         notify("Successfully Cleared local data", 'success')
                         setTimeout(onLoadStartUp, 2000)
                     }).catch(error => notify(error, "error"))
-                }).catch(error => {})
+                }
         });
-
-        document.getElementById('show_contact_popup_button').addEventListener("click", function (e) {
-            addContactPopup.show()
-            addContactFloID.focusIn()
-		})
 		
         document.getElementById('add_contact_button').addEventListener("clicked", addContact)
 
         document.getElementById('show_reply_popup').addEventListener("click", () => {
-            replyMailPopup.show()
+            showPopup('reply_mail_popup')
         })
         
-        replyMailButton.addEventListener("clicked", replyMail)
+        getRef('reply_mail_button').addEventListener("clicked", replyMail)
 
         let refreshing = false
 
@@ -1247,12 +1535,12 @@
             messenger.requestDirectInbox().then(data => {
                 renderMessages(data.messages)
                 renderMailList(data.mails)
-                if(Object.keys(data.messages).length && activePage.button !== chatPageButton){
-                    chatPageButton.setAttribute('data-notifications', Object.keys(data.messages).length)
+                if(Object.keys(data.messages).length && activePage.button !== getRef('chat_page_button')){
+                    getRef('chat_page_button').setAttribute('data-notifications', Object.keys(data.messages).length)
                     notify(`${Object.keys(data.messages).length} new message(s)`)
                 }
-                if(Object.keys(data.mails).length && activePage.button !== mailPageButton){
-                    mailPageButton.setAttribute('data-notifications', Object.keys(data.mails).length)
+                if(Object.keys(data.mails).length && activePage.button !== getRef('mail_page_button')){
+                    getRef('mail_page_button').setAttribute('data-notifications', Object.keys(data.mails).length)
                     notify(`${Object.keys(data.mails).length} new mail(s)`)
                 }
                 setTimeout(() => {
@@ -1293,55 +1581,42 @@
             })
         })
 
-        document.getElementById("restore_data").addEventListener("change", function (e) {
+        document.getElementById("restore_data").addEventListener("change", async function (e) {
             let file = this.files[0]
             notify(`Retrieving backup data! Please wait.`);
             if (!file) {
                notify(`No files selected!`);
                 return;
             }
-            messenger.parseBackup(file).then(data => {
-                debugger;
-                getConfirmation('Restore Data?',
+            messenger.parseBackup(file).then(async data => {
+                if(await confirmation('Restore Data?',
                     `Found: ${Object.keys(data.contacts).length} Contacts,\n ${Object.keys(data.messages).length} Messages, ${Object.keys(data.mails).length} Mails.`,
-                    "Restore"
-                ).then(result => {
+                    'Cancel', "Restore"
+                )){
                     notify(`Restoring data! Please wait.`);
                     messenger.restoreData(data).then(result => {
-                        notify("Data restore completed successful! Initiating reload, Please wait")
+                        notify("Data restore completed successful! Initiating reload, Please wait", 'success')
                         setTimeout(onLoadStartUp, 2000)
                     }).catch(error => {
                         notify("Failed to restore data! Try again later", "error", error);
                     });
-                }).catch(error => {
-                    notify("Restore data Cancelled!", "warn");
-                });
+                }
             }).catch(error => {
                 notify("Retrive data Unsuccessful!", "error", error);
             })
         })
 
-        let refreshAgain = function() {
-            if(refreshCount > 30)
-                refreshTimeout *= 2;
-            refreshCount++;
-            refresh()
-            setTimeout(refreshAgain, refreshTimeout);
-        }
-
         function sendMessage() {
             let receiver = document.getElementById("receiver_floID").textContent;
             let container;
-            let message = typeMessage.value;
-			typeMessage.value = ''
+            let message = getRef('type_message').value;
+			getRef('type_message').value = ''
 			if(message.trim() === '') return
+            let time = Date.now()
+            render.messageBubble(receiver, message, time, 'sent', true)
+            getRef('chat_container').scrollTo({left: 0, top: getRef('chat_container').scrollHeight, behavior: 'smooth'})
             messenger.sendMessage(message, receiver).then(data => {
-                renderMessages(data, false)
-                //render.messageBubble(data.floID, data.message, data.time, data.category)
-                //chatContainer.scrollTo({left: 0, top: chatContainer.scrollHeight, behavior: 'smooth'})
-                //refreshCount = 0;
-                //refreshTimeout = 10000;
-                //setTimeout(refreshAgain, refreshTimeout)
+                document.getElementById(`${receiver}_${time}`).classList.remove('unconfirmed')
             }).catch(error => notify(error, "error"));
         }
 
@@ -1352,26 +1627,6 @@
         function clearElement(element) {
             element.innerHTML = '';
             return element;
-        }
-
-        function getConfirmation(title, message, trueBtn = "Ok", falseBtn = "Cancel") {
-            let confirmation = document.getElementById("confirmation");
-            confirmation.querySelector('.title').textContent = title;
-            confirmation.querySelector('.message').textContent = message;
-            confirmation.show()
-            let options = confirmation.getElementsByTagName("sm-button");
-            options[0].textContent = trueBtn;
-            options[1].textContent = falseBtn;
-            return new Promise((resolve, reject) => {
-                options[0].onclick = () => {
-                    confirmation.hide()
-                    resolve(true)
-                }
-                options[1].onclick = () => {
-                    confirmation.hide()
-                    reject(true)
-                }
-            })
         }
 
         async function getPromptInput(title, message, showText = true, trueBtn = "Ok", falseBtn = "Cancel") {
@@ -1400,25 +1655,17 @@
                 }
             })
 		}
-		
-		const notifications = document.getElementById('notifications')
-
-		function notify(message, mode = "normal", log = "", pinned) {
-            if (mode === "error")
-                console.error(message, log)
-            else if (mode === "warn")
-                console.warn(message, log)
-            else
-                console.log(mode.toUpperCase(), message, log)
-			notifications.push(message, mode, pinned)
-        }
 
         function addContact() {
-            let floID = addContactFloID.value.trim();
-            let name = addContactName.value.trim();
+            let floID = getRef('add_contact_floID').value.trim();
+            let name = getRef('add_contact_name').value.trim();
+            if(floID === myFloID){
+                notify( `you can't add your own FLO ID as contact`, 'error')
+                return
+            }
             messenger.storeContact(floID, name).then(result => {
                 getConversationElement(floID, name)
-                addContactPopup.hide()
+                hidePopup()
                 notify(`Added Contact: ${floID}`)
             }).catch(error => notify(error, "error"));
         }
@@ -1447,21 +1694,20 @@
                 element = document.createElement("div");
 				element.setAttribute("id", floID)
 				element.classList.add('flex', 'direction-column', 'hide-completely')
-                chatContainer.append(element)
+                getRef('chat_container').append(element)
                 render.contactCard(floID, name)
 			}
             return element;
         }
 
-        function renderMessages(data, markUnread = true) {
-            let floID
+        function renderMessages(data, markUnread = true, unconfirmed = false) {
             for (let m in data) {
-                floID = data[m].floID
-                render.messageBubble(data[m].floID, data[m].message, data[m].time, data[m].category)
+                let {floID, message, time, category} = data[m]
+                render.messageBubble(floID, message, time, category, unconfirmed)
                 if (markUnread)
-                    allContactsSection.querySelector(`[flo-id='${floID}']`).classList.add("unread");
+                    getRef('contacts').querySelector(`[flo-id='${floID}']`).classList.add("unread");
             }
-            chatContainer.scrollTo(0, chatContainer.scrollHeight)
+            getRef('chat_container').scrollTo(0, getRef('chat_container').scrollHeight)
         }
 
         const   receiverInitial = document.getElementById("receiver_initial"),
@@ -1487,7 +1733,7 @@
                 noEncryption.classList.add("hide-completely");
             else
                 noEncryption.classList.remove("hide-completely");
-            chatContainer.scrollTo(0, chatContainer.scrollHeight)   
+            getRef('chat_container').scrollTo(0, getRef('chat_container').scrollHeight)   
             messenger.removeMark(floID, "unread");
         }
 
@@ -1501,9 +1747,9 @@
                 else if(to.includes(myFloID))
                     inboxMailFrag.prepend(render.mailCard(from, ref, subject, time, content, markUnread))
             }
-            inboxMailContainer.prepend(inboxMailFrag)
-            sentMailContainer.prepend(sentMailFrag)
-            if(inboxMailContainer.children.length || sentMailContainer.children.length){
+            getRef('inbox_mail_container').prepend(inboxMailFrag)
+            getRef('sent_mail_container').prepend(sentMailFrag)
+            if(getRef('inbox_mail_container').children.length || getRef('sent_mail_container').children.length){
                 document.getElementById('no_mails').classList.add('hide-completely')
                 document.getElementById('all_mail_container').classList.remove('hide-completely')
             }
@@ -1528,9 +1774,9 @@
                 prevMail.style.display = prev ? 'block' : 'none';
                 //set values for reply mail form if new view
                 if (newView) {
-                    replyMailPopup.dataset["to"] = (from === myFloID ? to.join(',') : from)
-                    replyMailPopup.dataset["prev"] = mailRef;
-                    subjectOfReplyMail.value = subject.startsWith("Re: ") ? subject : `Re: ${subject}`;
+                    getRef('reply_mail_popup').dataset["to"] = (from === myFloID ? to.join(',') : from)
+                    getRef('reply_mail_popup').dataset["prev"] = mailRef;
+                    getRef('subject_of_reply_mail').value = subject.startsWith("Re: ") ? subject : `Re: ${subject}`;
                     document.getElementById("show_reply_popup").classList.remove("hide-completely");
                 }
                 messenger.removeMark(mailRef, "unread");
@@ -1540,7 +1786,7 @@
 		document.getElementById('send_mail_button').addEventListener('clicked', sendMail)
 
         function sendMail() {
-            let to = sendMailTo.value.split(",");
+            let to = getRef('send_mail_to').value.split(",");
             let subject = document.getElementById('subject_of_mail').value;
             let content = document.getElementById('mail_content').value
             let recipients = [];
@@ -1555,7 +1801,7 @@
                 messenger.sendMail(subject, content, recipients).then(result => {
                     notify(`Mail(s) sent!`)
                     renderMailList(result)
-                    composeMailPopup.hide()
+                    hidePopup()
                 }).catch(error => notify("Failed to send mail!", "error", error))
             } catch (error) {
                 notify(error, "error")
@@ -1563,16 +1809,16 @@
         }
 
         function replyMail() {
-            let recipient = replyMailPopup.dataset.to;
+            let recipient = getRef('reply_mail_popup').dataset.to;
             if(recipient.includes(','))
                 recipient = recipient.split(',')
-            let subject = subjectOfReplyMail.value;
-            let content = replyMailContent.value;
-            let prev = replyMailPopup.dataset.prev;
+            let subject = getRef('subject_of_reply_mail').value;
+            let content = getRef('reply_mail_content').value;
+            let prev = getRef('reply_mail_popup').dataset.prev;
             messenger.sendMail(subject, content, recipient, prev).then(result => {
                 notify(`Mail replied!`);
                 renderMailList(result)
-                replyMailPopup.hide()
+                hidePopup()
             }).catch(error => notify("Failed to reply mail!", "error", error))
         }
     </script>
