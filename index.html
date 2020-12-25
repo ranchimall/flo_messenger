@@ -22,15 +22,16 @@
             <sm-button variant="no-outline" class="submit-btn">OK</button>
         </div>
     </sm-popup>
-    <sm-popup id="prompt">
-        <h4 id="prompt_message"></h4>
-        <sm-input id="prompt_field"></sm-input>
+    <sm-popup id="prompt_popup">
+        <h4 id="prompt_title"></h4>
+        <p id="prompt_message"></p>
+        <sm-input id="prompt_input"></sm-input>
         <div class="flex align-center">
             <sm-button variant="no-outline" class="cancel-btn">Cancel</sm-button>
             <sm-button variant="no-outline" class="submit-btn">OK</button>
         </div>
     </sm-popup>
-    <sm-notifications id="show_message"></sm-notifications>
+    <sm-notifications id="notification_drawer"></sm-notifications>
 	<div id="sign_in_page" class="page hide-completely">
 		<header class="logo-section">
 			<svg class="main-logo" viewBox="0 0 27.25 32">
@@ -65,53 +66,7 @@
 				<p class="light-text">New here? login as guest and get your FLO private key.</p>
 			</div>
 			<div id="sign_in_illustration" class="right">				
-				<svg viewBox="0 0 512 512">
-					<defs>
-						<style>
-							.a {
-								fill: #fff;
-							}
-				
-							.b {
-								fill: #ccc;
-							}
-				
-							.c {
-								fill: none;
-							}
-				
-							.c,
-							.d,
-							.e {
-								stroke: #000;
-								stroke-miterlimit: 10;
-								stroke-width: 20;
-							}
-				
-							.d {
-								fill: #ed1c24;
-							}
-				
-							.e {
-								fill: #d30d41;
-							}
-						</style>
-					</defs>
-					<title>mascot</title>
-					<path class="a"
-						d="M506,367.94v51.19a52,52,0,0,1-52,52H130.4a52,52,0,0,1-52-52V183.69L9.58,40.88,454,43.24a52,52,0,0,1,52,52.05V225.38" />
-					<path class="b"
-						d="M506,98.69V431.58c.57,56.06-149.95,44-149.95,44a52,52,0,0,0,52-52V44.86L454,46.65A52,52,0,0,1,506,98.69Z" />
-					<line class="c" x1="506" y1="273.75" x2="506" y2="327.21" />
-					<path class="c"
-						d="M506,367.94v51.19a52,52,0,0,1-52,52H130.4a52,52,0,0,1-52-52V183.69L9.58,40.88,454,43.24a52,52,0,0,1,52,52.05V225.38" />
-					<path class="d" d="M361.83,340a69.63,69.63,0,1,1-139.26,0C222.57,301.5,361.83,301.5,361.83,340Z" />
-					<path class="c" d="M152,242.43a34.32,34.32,0,0,1,64.68.2" />
-					<path class="c" d="M367.79,242.43a34.32,34.32,0,0,1,64.68.2" />
-					<path class="e" d="M325,314.13c21,4.22,36.85,12.82,36.85,25.8a69.7,69.7,0,0,1-41.09,63.58" />
-				</svg>
-				<div class="circle"></div>
-				<div class="circle"></div>
+				<img src="assets/message-background.svg" alt="">
 			</div>
 			<sm-popup id="sign_in_popup">
                 <svg id="lock" viewBox="0 0 184 280" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -199,7 +154,7 @@
         <h4>Getting everything ready, Hang on.</h4>
     </div>
 	<sm-popup id="add_contact_popup">
-		<header class="flex align-center" slot="header">
+		<header class="popup-header" slot="header">
 			<svg class="icon" viewBox="0 0 64 64" onclick="this.closest('sm-popup').hide()">
 				<title>Close</title>
 				<line x1="64" y1="0" x2="0" y2="64" />
@@ -212,7 +167,7 @@
 		<sm-input id="add_contact_name" placeholder="Name" animate required></sm-input>
 	</sm-popup>
 	<sm-popup id="compose_mail_popup">
-		<header class="flex align-center" slot="header">
+		<header class="popup-header" slot="header">
 			<svg class="icon" viewBox="0 0 64 64" onclick="this.closest('sm-popup').hide()">
 				<title>Close</title>
 				<line x1="64" y1="0" x2="0" y2="64" />
@@ -229,7 +184,7 @@
 		<textarea id="mail_content" placeholder="Type a mail" name="" id="" rows="10" required></textarea>
 	</sm-popup>
 	<sm-popup id="reply_mail_popup">
-		<header class="flex align-center" slot="header">
+		<header class="popup-header" slot="header">
 			<svg class="icon" viewBox="0 0 64 64" onclick="this.closest('sm-popup').hide()">
 				<title>Close</title>
 				<line x1="64" y1="0" x2="0" y2="64" />
@@ -291,7 +246,6 @@
 			<time class="time"></time>
 		</div>
 	</template>
-
 	<main id="main" class="grid hide-completely">
 		<nav id="main_navbar" class="flex">
 			<div class="logo-section hide-on-mobile">			
@@ -317,7 +271,7 @@
                 </svg>
 				<h5 class="label">Mail</h5>
 			</div>
-			<div class="navbar-item flex align-center"  data-target="settings_page">
+			<div class="navbar-item flex align-center" data-target="settings_page">
 				<svg class="icon" viewBox="0 0 64 64">
 					<path
 						d="M41,62.92a1.7,1.7,0,0,1-1.45-.83L37,57.7a2.63,2.63,0,0,0-2.27-1.34h-.26a23.91,23.91,0,0,1-5,0h-.26A2.63,2.63,0,0,0,27,57.7l-2.54,4.39a1.67,1.67,0,0,1-1.44.83,1.72,1.72,0,0,1-.83-.22L10.33,55.86a1.67,1.67,0,0,1-.61-2.27l2.54-4.41a2.61,2.61,0,0,0-.12-2.85A23.77,23.77,0,0,1,9.65,42,2.65,2.65,0,0,0,7.24,40.5H2.17A1.67,1.67,0,0,1,.5,38.83V25.17A1.67,1.67,0,0,1,2.17,23.5H7.24A2.64,2.64,0,0,0,9.65,22a25,25,0,0,1,2.49-4.31,2.63,2.63,0,0,0,.12-2.85l-2.54-4.4a1.67,1.67,0,0,1,.61-2.27L22.17,1.3A1.72,1.72,0,0,1,23,1.08a1.67,1.67,0,0,1,1.44.83L27,6.3a2.63,2.63,0,0,0,2.27,1.34h.26a23.91,23.91,0,0,1,5,0h.26A2.63,2.63,0,0,0,37,6.3l2.53-4.39A1.7,1.7,0,0,1,41,1.08a1.72,1.72,0,0,1,.83.22L53.67,8.14a1.67,1.67,0,0,1,.61,2.27l-2.54,4.41a2.61,2.61,0,0,0,.12,2.85A24.46,24.46,0,0,1,54.35,22a2.65,2.65,0,0,0,2.41,1.52h5.07a1.67,1.67,0,0,1,1.67,1.67V38.83a1.67,1.67,0,0,1-1.67,1.67H56.76A2.63,2.63,0,0,0,54.35,42a24.63,24.63,0,0,1-2.49,4.31,2.63,2.63,0,0,0-.12,2.85l2.54,4.4a1.68,1.68,0,0,1-.61,2.27L41.83,62.7A1.72,1.72,0,0,1,41,62.92Z" />
@@ -334,23 +288,16 @@
 				<header class="grid">
                     <div class="grid align-center">
                         <h4>Direct Messages</h4>
-                        <svg xmlns="http://www.w3.org/2000/svg" id="new_message_button" class="icon" viewBox="0 0 64 64">
+                        <svg xmlns="http://www.w3.org/2000/svg" id="new_message_button" class="icon" onclick="toggleContacts()" viewBox="0 0 64 64">
                             <title>Send new message</title>
                             <path d="M55.76,20.13,59,23.34l3.5-3.48a3.26,3.26,0,0,0,.05-4.63l0-.05-.59-.56a3.3,3.3,0,0,0-4.67,0l-21.1,21a2.34,2.34,0,0,0-.63,1.19l-.9,4.63a.8.8,0,0,0,.66.91.57.57,0,0,0,.26,0l4.65-.88a2.36,2.36,0,0,0,1.22-.61l15.7-15.63"/>
                             <path d="M48.05,49.79a6,6,0,0,1-6,6H6.47a6,6,0,0,1-6-6V14.21a6,6,0,0,1,6-6H42"/>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" id="show_contact_popup_button" onclick="showPopup('add_contact_popup')" class="icon" viewBox="0 0 64 64">
-                            <title>Add contact</title>
-                            <path d="M21.7,5.73c6.88,0,11.78,4.64,11.78,12.44S29.58,32.6,22,32.6,10.59,26,10.59,18.25,15.48,5.81,22.36,5.81"/>
-                            <path d="M16.56,33C14.49,36.91,7.85,38.9,3,41.06,1,41.89-.69,52.67,1.63,52.67A40.31,40.31,0,0,0,22.53,58,36.52,36.52,0,0,0,42.6,52.67c2.32,0,.66-10.7-1.33-11.61C36.38,38.9,29.75,36.91,27.67,33"/>
-                            <line x1="54.32" y1="12.32" x2="54.32" y2="31.68"/>
-                            <line x1="64" y1="22" x2="44.64" y2="22"/>
                         </svg>
                         <sm-menu align-options="right">
                             <sm-menu-option>Create a group</sm-menu-option>
                         </sm-menu>
                     </div>
-                    <sm-input id="search_contacts" type="search" placeholder="Search Contacts">
+                    <sm-input id="search_chats" type="search" placeholder="Search Contacts">
                         <svg slot="icon" class="icon" viewBox="0 0 64 64">
                             <title>Search</title>
                             <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
@@ -370,6 +317,33 @@
                     <h4>Add a contact for getting started</h4>
                     <p class="light-text">Tap/click on added contact to start a conversation</p>
                 </div>
+                <div id="all_contacts">
+                    <header class="grid">
+                        <div class="flex align-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon back" onclick="toggleContacts()" viewBox="0 0 64 64">
+                                <title>back-arrow</title>
+                                <line x1="1" y1="32" x2="64" y2="32"/>
+                                <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
+                            </svg>
+                            <h4>Contacts</h4>
+                            <svg xmlns="http://www.w3.org/2000/svg" id="show_contact_popup_button" onclick="showPopup('add_contact_popup')" class="icon justify-right" viewBox="0 0 64 64">
+                                <title>Add contact</title>
+                                <path d="M21.7,5.73c6.88,0,11.78,4.64,11.78,12.44S29.58,32.6,22,32.6,10.59,26,10.59,18.25,15.48,5.81,22.36,5.81"/>
+                                <path d="M16.56,33C14.49,36.91,7.85,38.9,3,41.06,1,41.89-.69,52.67,1.63,52.67A40.31,40.31,0,0,0,22.53,58,36.52,36.52,0,0,0,42.6,52.67c2.32,0,.66-10.7-1.33-11.61C36.38,38.9,29.75,36.91,27.67,33"/>
+                                <line x1="54.32" y1="12.32" x2="54.32" y2="31.68"/>
+                                <line x1="64" y1="22" x2="44.64" y2="22"/>
+                            </svg>
+                        </div>
+                        <sm-input id="search_contacts" type="search" placeholder="Search Contacts">
+                            <svg slot="icon" class="icon" viewBox="0 0 64 64">
+                                <title>Search</title>
+                                <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
+                                <line x1="63.65" y1="63.66" x2="43.36" y2="43.37"/>
+                            </svg>
+                        </sm-input>
+                    </header>
+                    <div id="contacts_container" class="flex"></div>
+                </div>
 			</div>
 			<div id="chat" class="grid hide-on-mobile hide-completely">
 				<header class="flex align-center">
@@ -386,11 +360,14 @@
                 <h5 id="warn_no_encryption">Messages are not encrypted until receiver replies</h5>
 				<section id="chat_container" class="flex">
 				</section>
-				<footer class="flex">
-                    <sm-textarea id="type_message" placeholder="Type a message" class="rest"></sm-textarea>
-                    <svg xmlns="http://www.w3.org/2000/svg" id="send_message_button" class="icon" viewBox="0 0 64 64">
-                        <path d="M63.34,31,3.07,4.71A2.19,2.19,0,0,0,.18,7.58L8.94,28.29,42.18,32,8.94,35.71.18,56.42a2.19,2.19,0,0,0,2.89,2.87L63.34,33A1.09,1.09,0,0,0,63.34,31Z"/>
-                    </svg>
+				<footer class="grid">
+                    <div class="flex">
+                        <sm-textarea id="type_message" placeholder="Type a message" class="rest"></sm-textarea>
+                        <svg xmlns="http://www.w3.org/2000/svg" id="send_message_button" class="icon" viewBox="0 0 64 64">
+                            <path d="M63.34,31,3.07,4.71A2.19,2.19,0,0,0,.18,7.58L8.94,28.29,42.18,32,8.94,35.71.18,56.42a2.19,2.19,0,0,0,2.89,2.87L63.34,33A1.09,1.09,0,0,0,63.34,31Z"/>
+                        </svg>
+                    </div>
+                    <div id="emoji_container"></div>
 				</footer>
 			</div>
 		</section>
@@ -494,7 +471,7 @@
             </section>
 		</section>
     </main>
-    <script src="components.js"></script>
+    <script src="scripts/components.js"></script>
     <script id="standard_UI_functions">
         //Checks for internet connection status
         if (!navigator.onLine)
@@ -503,8 +480,8 @@
             notify('There seems to be a problem connecting to the internet.', 'error', true, true)
         })
         window.addEventListener('online', () => {
-            notifications.clearAll()
-            notify('We are back online.', '', '', true)
+            getRef('notification_drawer').clearAll()
+            notify('We are back online.', 'success')
         })
 
         const   themeSwitcher = document.getElementById('theme_switcher'),
@@ -650,7 +627,6 @@
             })
         }
 
-        let notifications = document.getElementById('show_message');
         //Function for displaying toast notifications. pass in error for mode param if you want to show an error.
         function notify(message, mode, pinned, sound) {
 
@@ -658,10 +634,10 @@
                 console.error(message)
             else
                 console.log(message)
-            notifications.push(message, mode, pinned)
+            getRef('notification_drawer').push(message, mode, pinned)
             if (navigator.onLine && sound) {
-                notificationSound.currentTime = 0;
-                notificationSound.play();
+                getRef('notification_sound').currentTime = 0;
+                getRef('notification_sound').play();
             }
         }
 
@@ -672,8 +648,7 @@
                 getRef('confirm_title').textContent = title;
                 getRef('confirm_message').textContent = message;
                 let cancelButton = getRef('confirmation_popup').children[2].children[0],
-                    submitButton = getRef('confirmation_popup').children[2].children[1]
-                console.log(cancelButton, submitButton)    
+                    submitButton = getRef('confirmation_popup').children[2].children[1]  
                 submitButton.textContent = confirmText
                 cancelButton.textContent = cancelText 
                 submitButton.onclick = () => {
@@ -688,31 +663,31 @@
         }
 
         // displays a popup for asking user input. Use this instead of JS prompt
-        let askPrompt = function (message, defaultVal) {
-            return new Promise(resolve => {
-                let popup = document.getElementById('prompt'),
-                    input = popup.querySelector('sm-input');
-                if (defaultVal)
-                    input.value = defaultVal;
-                showPopup('prompt')
-                input.focus()
-                input.addEventListener('keyup', e => {
-                    if (e.key === 'Enter') {
-                        resolve(input.value);
-                        popup.hide()
-                    }
-                })
-                popup.querySelector('#prompt_message').textContent = message;
-                popup.querySelector('.submit-btn').onclick = () => {
-                    popup.hide()
-                    resolve(input.value);
+        async function getPromptInput(title, message, showText = true, trueBtn = "Ok", falseBtn = "Cancel") {
+            showPopup('prompt_popup')
+            getRef('prompt_title').textContent = title;
+            let input = getRef('prompt_input');
+            input.setAttribute("placeholder", message)
+            let buttons = getRef('prompt_popup').querySelectorAll("sm-button");
+            if (showText)
+                input.setAttribute("type", "text")
+            else
+                input.setAttribute("type", "password")
+            input.focusIn()
+            buttons[0].textContent = falseBtn;
+            buttons[1].textContent = trueBtn;
+            return new Promise((resolve, reject) => {
+                buttons[0].onclick = () => {
+                    hidePopup()
+                    return;
                 }
-                popup.querySelector('.cancel-btn').onclick = () => {
-                    popup.hide()
-                    resolve(null);
+                buttons[1].onclick = () => {
+                    let value = input.value;
+                    hidePopup()
+                    resolve(value)
                 }
             })
-        }
+		}
 
         const currentYear = new Date().getFullYear()
         function formatedTime(time, relative) {
@@ -1214,7 +1189,7 @@
                     }
                 }
             }
-            if(e.target.closest('#search_contacts')){
+            if(e.target.closest('#search_chats')){
                 if(e.code === 'ArrowDown'){
                     for(child of getRef('contacts_container').children){
                         if(!child.classList.contains('hide-completely')){
@@ -1262,7 +1237,7 @@
             }
         })
 
-        getRef('search_contacts').addEventListener('input', function() {
+        getRef('search_chats').addEventListener('input', function() {
             if(this.value.trim !== ''){
                 for(child of getRef('contacts_container').children) {
                     if(child.getAttribute('name').toUpperCase().indexOf(this.value.toUpperCase()) > -1){
@@ -1363,6 +1338,11 @@
                 localStorage.setItem("isEnterSend", 'false');
             }
         })
+
+        // Function to show all contacts side drawer
+        function toggleContacts(){
+            getRef('all_contacts').classList.toggle('no-transformations')
+        }
 
         function updateHeight(){
             if(window.innerWidth < 640){
@@ -1628,33 +1608,6 @@
             element.innerHTML = '';
             return element;
         }
-
-        async function getPromptInput(title, message, showText = true, trueBtn = "Ok", falseBtn = "Cancel") {
-            let prompt = document.getElementById("prompt");
-            prompt.show()
-            prompt.querySelector('.title').textContent = title;
-            let input = prompt.querySelector("sm-input");
-            input.setAttribute("placeholder", message)
-            let buttons = prompt.querySelectorAll("sm-button");
-            if (showText)
-                input.setAttribute("type", "text")
-            else
-                input.setAttribute("type", "password")
-            input.focus()
-            buttons[0].textContent = trueBtn;
-            buttons[1].textContent = falseBtn;
-            return new Promise((resolve, reject) => {
-                buttons[0].onclick = () => {
-                    let value = input.value;
-                    prompt.hide()
-                    resolve(value)
-                }
-                buttons[1].onclick = () => {
-                    prompt.hide()
-                    reject(true)
-                }
-            })
-		}
 
         function addContact() {
             let floID = getRef('add_contact_floID').value.trim();

@@ -24,10 +24,8 @@ body {
   --foreground-color: 255, 255, 255;
   --background-color: #efefef;
   --error-color: red;
-  --hue: 210;
-  --saturation: 98%;
-  --lightness: 41%;
   color: rgba(var(--text-color), 1);
+  background: rgba(var(--foreground-color), 1);
 }
 
 body[data-theme=dark] {
@@ -36,10 +34,6 @@ body[data-theme=dark] {
   --text-color: 218, 218, 218;
   --text-color-light: 170, 170, 170;
   --foreground-color: 20, 20, 20;
-  --lightness: 60%;
-}
-body[data-theme=dark] .page {
-  background: rgba(var(--foreground-color), 0.9);
 }
 body[data-theme=dark] #contacts, body[data-theme=dark] #mails {
   background: rgba(var(--foreground-color), 0.5);
@@ -84,7 +78,7 @@ h1, h2, h3, h4, h5 {
 }
 
 textarea {
-  background: rgba(var(--text-color), 0.1);
+  background: rgba(var(--text-color), 0.06);
   border: none;
   border-radius: 0.3rem;
   width: 100%;
@@ -222,6 +216,34 @@ span.ripple {
   -webkit-tap-highlight-color: transparent;
 }
 
+sm-popup sm-input + sm-input {
+  margin-top: 1rem;
+}
+
+.popup-header {
+  padding: 0.5rem 1.5rem 0 1.5rem;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.popup-header .icon {
+  padding: 0.7rem;
+  height: 2.4rem;
+  width: 2.4rem;
+  stroke-width: 8;
+  transform: translateX(-0.5rem);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.popup-header .back {
+  transform: none;
+}
+.popup-header button,
+.popup-header sm-button {
+  width: auto;
+  margin-left: auto;
+}
+
 #confirmation_popup,
 #prompt {
   flex-direction: column;
@@ -245,7 +267,6 @@ span.ripple {
   align-items: flex-start;
   width: 100%;
   height: 100%;
-  background: rgba(var(--foreground-color), 0.7);
 }
 
 .card {
@@ -260,10 +281,6 @@ sm-button {
 }
 sm-button .icon {
   margin-right: 0.4rem;
-}
-
-sm-input {
-  margin-bottom: 1rem;
 }
 
 sm-button[variant=primary] .icon {
@@ -320,15 +337,11 @@ sm-button[variant=primary] .icon {
   padding: 1.5rem;
   display: flex;
 }
-#sign_in sm-popup::part(heading) {
-  font-size: 2rem;
-  font-weight: 600;
-}
 #sign_in .title-font {
   font-kerning: normal;
-  line-height: 1;
-  text-transform: uppercase;
-  font-weight: 900;
+  line-height: 1.2;
+  text-transform: capitalize;
+  font-weight: 700;
   font-size: 2.5rem;
 }
 #sign_in .left {
@@ -364,43 +377,14 @@ sm-button[variant=primary] .icon {
   background: rgba(var(--foreground-color), 1);
   overflow: hidden;
 }
-#sign_in_page header {
+
+.logo-section {
   padding: 1.5rem;
 }
 
 #sign_in_illustration {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
-}
-#sign_in_illustration svg {
-  height: 12rem;
-  width: 12rem;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  overflow: visible;
-  z-index: 2;
-}
-#sign_in_illustration .circle {
-  position: absolute;
-  border-radius: 50%;
-}
-#sign_in_illustration .circle:nth-of-type(1) {
-  right: -10vh;
-  background: var(--secondary-color);
-  width: 20vh;
-  height: 20vh;
-  top: -10vh;
-  z-index: 1;
-}
-#sign_in_illustration .circle:nth-of-type(2) {
-  right: 20vh;
-  bottom: -30vh;
-  background: var(--accent-color);
-  width: 60vh;
-  height: 60vh;
 }
 
 #lock {
@@ -712,24 +696,6 @@ sm-button[variant=primary] .icon {
   stroke: var(--accent-color);
 }
 
-#compose_mail_popup header, #add_contact_popup header, #reply_mail_popup header {
-  width: 100%;
-  padding: 0 1.5rem;
-  align-self: flex-start;
-}
-#compose_mail_popup header .icon, #add_contact_popup header .icon, #reply_mail_popup header .icon {
-  stroke-width: 8;
-  margin-right: 1rem;
-  height: 0.8rem;
-  cursor: pointer;
-}
-#compose_mail_popup header sm-button, #add_contact_popup header sm-button, #reply_mail_popup header sm-button {
-  margin: 0 0 0 auto;
-}
-#compose_mail_popup header sm-button::part(button), #add_contact_popup header sm-button::part(button), #reply_mail_popup header sm-button::part(button) {
-  padding: 0.5rem 1rem;
-}
-
 #auto_complete_contact {
   position: relative;
   justify-content: flex-start;
@@ -755,10 +721,12 @@ sm-button[variant=primary] .icon {
   display: none;
 }
 
+#contacts {
+  position: relative;
+}
 #contacts header {
   position: relative;
-  gap: 1rem;
-  padding-bottom: 0;
+  gap: 0.5rem;
 }
 #contacts header sm-input {
   margin: 0;
@@ -772,11 +740,32 @@ sm-button[variant=primary] .icon {
 #contacts header sm-input::part(input) {
   padding: 0.4rem 1rem;
 }
+#contacts #all_contacts {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+  background-color: rgba(var(--foreground-color), 1);
+  transition: transform 0.3s;
+  transform: translateX(-100%);
+}
+#contacts #all_contacts .back {
+  padding: 0.7rem;
+  height: 2.4rem;
+  width: 2.4rem;
+  margin-left: -0.6rem;
+  cursor: pointer;
+}
 
 #contacts, #mails {
   position: relative;
   grid-template-rows: max-content 1fr;
   height: calc(100vh - 3.5rem);
+  backdrop-filter: blur(0.4rem);
 }
 #contacts header, #mails header {
   padding: 1rem 1.5rem;
@@ -837,12 +826,13 @@ sm-button[variant=primary] .icon {
 #chat header sm-menu {
   margin-left: 1rem;
 }
-#chat footer {
+#chat footer .flex {
   align-items: flex-end;
   padding: 0.5rem 1rem;
 }
 #chat footer sm-textarea::part(textarea) {
   background: rgba(var(--text-color), 0.1);
+  padding-right: 3rem;
 }
 #chat #send_message_button {
   position: absolute;
@@ -1004,7 +994,7 @@ sm-tab-header {
 }
 
 #chat, #mail {
-  background: rgba(var(--foreground-color), 0.7);
+  background: rgba(var(--foreground-color), 1);
 }
 
 #mail {
@@ -1017,6 +1007,10 @@ sm-tab-header {
 }
 #mail .flex sm-button:first-of-type {
   margin-right: 0.5rem;
+}
+
+#compose_mail_popup sm-input {
+  margin-bottom: 1rem;
 }
 
 #settings_page {
@@ -1104,13 +1098,13 @@ sm-tab-header {
 
   .logo-section {
     padding: 2rem 3rem;
-    margin-bottom: 2rem;
+    margin: 0;
   }
 
   #sign_in {
     align-items: center;
     gap: 4vw;
-    grid-template-columns: 1.5fr 1fr;
+    grid-template-columns: 1.2fr 1fr;
     padding: 0 4vw;
   }
   #sign_in .left sm-button:last-of-type {
@@ -1118,16 +1112,6 @@ sm-tab-header {
   }
   #sign_in .left h4 {
     color: var(--accent-color);
-  }
-  #sign_in .circle:nth-of-type(1) {
-    right: -40vh;
-    width: 80vh;
-    height: 80vh;
-  }
-  #sign_in .circle:nth-of-type(2) {
-    right: -70vh;
-    width: 140vh;
-    height: 140vh;
   }
 
   #sign_in_popup .icon {
@@ -1179,10 +1163,6 @@ sm-tab-header {
   }
   #main_navbar .label {
     display: none;
-  }
-
-  #compose_mail_popup header, #add_contact_popup header, #reply_mail_popup header {
-    padding: 1.5rem 1.5rem 0 1.5rem;
   }
 
   #add_contact_popup::part(popup) {
@@ -1248,7 +1228,7 @@ sm-tab-header {
     padding: 0 12vw;
   }
   #sign_in .title-font {
-    font-size: 4rem;
+    font-size: 3rem;
   }
 
   #main_navbar {
