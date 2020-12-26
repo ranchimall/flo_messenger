@@ -996,7 +996,8 @@
                         messenger.loadDataFromIDB().then(data => {
                             console.log(data)
                             floGlobals.appendix = data.appendix;
-                            floGlobals.groups = data.groupInfo
+                            floGlobals.groups = data.groups;
+                            floGlobals.chats = data.chats
                             renderContactList(floGlobals.contacts)
                             renderMailContactList(floGlobals.contacts)
                             renderMessages(data.messages, false)
@@ -11128,13 +11129,51 @@ Bitcoin.Util = {
                 return Crypto.AES.decrypt(value, key)
             },
 
+            addMark(key, mark) {
+                return new Promise((resolve, reject) => {
+                    compactIDB.readData("marked", key).then(result => {
+                        if (!result)
+                            result = [mark];
+                        else if (!result.includes(mark))
+                            result.push(mark);
+                        else
+                            return resolve("Mark already exist");
+                        compactIDB.writeData("marked", result, key)
+                            .then(result => resolve(result))
+                            .catch(error => reject(error))
+                    }).catch(error => reject(error))
+                })
+            },
+
+            removeMark(key, mark) {
+                return new Promise((resolve, reject) => {
+                    compactIDB.readData("marked", key).then(result => {
+                        if (!result || !result.includes(mark))
+                            return resolve("Mark doesnot exist")
+                        else {
+                            result.splice(result.indexOf(mark),
+                                1); //remove the mark from the list of marks
+                            compactIDB.writeData("marked", result, key)
+                                .then(result => resolve("Mark removed"))
+                                .catch(error => reject(error))
+                        }
+                    }).catch(error => reject(error))
+                })
+            },
+
             UIcallback: {
                 group: (d, e) => console.log(d, e),
                 direct: (d, e) => console.log(d, e)
             },
 
             groupConn(groupID) {
-                let callbackFn = function (dataSet, error) {
+                let utilFn = {
+                    encrypt: this.encrypt,
+                    decrypt: this.decrypt,
+                    UIcallback: this.UIcallback["group"],
+                    addMark: this.addMark
+                }
+                let callbackFn = function(dataSet, error) {
                     if (error)
                         return console.error(error)
                     console.info(dataSet)
@@ -11159,11 +11198,11 @@ Bitcoin.Util = {
                                 if (ex.length)
                                     k = floGlobals.expiredKeys[groupID][ex.shift()]
                             }
-                            dataSet[vc].message = messenger.util.decrypt(dataSet[vc].message, k)
+                            dataSet[vc].message = utilFn.decrypt(dataSet[vc].message, k)
                             //store the pubKey if not stored already
                             floDapps.storePubKey(dataSet[vc].senderID, dataSet[vc].pubKey)
                             if (dataSet[vc].type === "GROUP_MSG")
-                                data.message = messenger.util.encrypt(dataSet[vc].message);
+                                data.message = utilFn.encrypt(dataSet[vc].message);
                             else if (data.sender === floGlobals.groups[groupID].admin) {
                                 let groupInfo = floGlobals.groups[groupID]
                                 data.admin = true;
@@ -11188,13 +11227,13 @@ Bitcoin.Util = {
                                 }
                                 infoChange = true;
                             }
-                            compactIDB.addData("groupMsg", {
+                            compactIDB.addData("messages", {
                                 ...data
-                            }, vc)
+                            }, `${groupID}|${vc}`)
                             if (data.message)
-                                data.message = messenger.util.decrypt(data.message);
+                                data.message = utilFn.decrypt(data.message);
                             newInbox.messages[vc] = data;
-                            messenger.addMark(data.groupID, "unread")
+                            utilFn.addMark(data.groupID, "unread")
                             if (!floGlobals.appendix[`lastReceived_${groupID}`] ||
                                 floGlobals.appendix[`lastReceived_${groupID}`] < vc)
                                 floGlobals.appendix[`lastReceived_${groupID}`] = vc;
@@ -11204,9 +11243,14 @@ Bitcoin.Util = {
                     }
                     compactIDB.writeData("appendix", floGlobals.appendix[`lastReceived_${groupID}`],
                         `lastReceived_${groupID}`);
-                    if (infoChange)
-                        compactIDB.writeData("groupInfo", floGlobals.groups[groupID], groupID)
-                    messenger.util.UIcallback["group"](newInbox)
+                    if (infoChange) {
+                        let newInfo = {
+                            ...floGlobals.groups[groupID]
+                        }
+                        newInfo.eKey = this.encrypt(newInfo.eKey)
+                        compactIDB.writeData("groups", newInfo, groupID)
+                    }
+                    utilFn.UIcallback(newInbox)
                 }
                 return floCloudAPI.requestApplicationData(null, {
                     receiverID: groupID,
@@ -11229,9 +11273,9 @@ Bitcoin.Util = {
                     messages: {},
                     mails: {},
                     marked: {},
-                    groupInfo: {},
-                    groupMsg: {},
-                    groupKey: {},
+                    chats: {},
+                    groups: {},
+                    gkeys: {},
                     appendix: {},
                 }
                 compactIDB.initDB(`${floGlobals.application}_${myFloID}`, obj).then(result => {
@@ -11252,9 +11296,11 @@ Bitcoin.Util = {
                         category: "sent",
                         message: this.util.encrypt(message)
                     }
+                    floGlobals.chats[receiver] = parseInt(vc)
+                    compactIDB.writeData("chats", parseInt(vc), receiver)
                     compactIDB.addData("messages", {
                         ...data
-                    }, vc)
+                    }, `${receiver}|${vc}`)
                     data.message = message;
                     resolve({
                         [vc]: data
@@ -11300,7 +11346,14 @@ Bitcoin.Util = {
 
         requestDirectInbox() {
             return new Promise((resolve, reject) => {
-                let callbackFn = function (dataSet, error) {
+                let utilFn = {
+                    encrypt: this.util.encrypt,
+                    decrypt: this.util.decrypt,
+                    UIcallback: this.util.UIcallback["direct"],
+                    groupConn: this.util.groupConn,
+                    addMark: this.util.addMark
+                }
+                let callbackFn = function(dataSet, error) {
                     if (error)
                         return console.error(error)
                     let newInbox = {
@@ -11314,24 +11367,24 @@ Bitcoin.Util = {
                         try {
                             //store the pubKey if not stored already
                             floDapps.storePubKey(dataSet[vc].senderID, dataSet[vc].pubKey)
-                            if (dataSet[vc].message instanceof Object && "secret" in dataSet[vc]
-                                .message)
-                                dataSet[vc].message = floCrypto.decryptData(dataSet[vc].message,
-                                    myPrivKey)
+                            if (dataSet[vc].message instanceof Object && "secret" in dataSet[vc].message)
+                                dataSet[vc].message = floCrypto.decryptData(dataSet[vc].message, myPrivKey)
                             if (dataSet[vc].type === "MESSAGE") {
                                 //process as message
                                 let dm = {
                                     time: dataSet[vc].time,
                                     floID: dataSet[vc].senderID,
                                     category: "received",
-                                    message: messenger.util.encrypt(dataSet[vc].message)
+                                    message: utilFn.encrypt(dataSet[vc].message)
                                 }
                                 compactIDB.addData("messages", {
                                     ...dm
-                                }, vc)
+                                }, `${dm.floID}|${vc}`)
+                                floGlobals.chats[dm.floID] = parseInt(vc)
+                                compactIDB.writeData("chats", parseInt(vc), dm.floID)
                                 dm.message = dataSet[vc].message;
                                 newInbox.messages[vc] = dm;
-                                messenger.addMark(dm.floID, "unread")
+                                utilFn.addMark(dm.floID, "unread")
                             } else if (dataSet[vc].type === "MAIL") {
                                 //process as mail
                                 let data = JSON.parse(dataSet[vc].message);
@@ -11340,7 +11393,7 @@ Bitcoin.Util = {
                                     from: dataSet[vc].senderID,
                                     to: [myFloID],
                                     subject: data.subject,
-                                    content: messenger.util.encrypt(data.content),
+                                    content: utilFn.encrypt(data.content),
                                     ref: data.ref,
                                     prev: data.prev
                                 }
@@ -11349,7 +11402,7 @@ Bitcoin.Util = {
                                 }, mail.ref);
                                 mail.content = data.content;
                                 newInbox.mails[mail.ref] = mail;
-                                messenger.addMark(mail.ref, "unread")
+                                utilFn.addMark(mail.ref, "unread")
                             } else if (dataSet[vc].type === "CREATE_GROUP") {
                                 //process create group
                                 let groupInfo = JSON.parse(dataSet[vc].message);
@@ -11357,9 +11410,14 @@ Bitcoin.Util = {
                                 if (groupInfo.admin === dataSet[vc].senderID &&
                                     floCrypto.verifySign(h, groupInfo.hash, groupInfo.pubKey) &&
                                     floCrypto.getFloID(groupInfo.pubKey) === groupInfo.groupID) {
+                                    let eKey = groupInfo.eKey
+                                    groupInfo.eKey = utilFn.encrypt(eKey)
+                                    compactIDB.writeData("groups", {
+                                        ...groupInfo
+                                    }, groupInfo.groupID)
+                                    groupInfo.eKey = eKey
                                     floGlobals.groups[groupInfo.groupID] = groupInfo
-                                    compactIDB.writeData("groupInfo", groupInfo, groupInfo.groupID)
-                                    messenger.util.groupConn(groupInfo.groupID)
+                                    utilFn.groupConn(groupInfo.groupID)
                                     newInbox.newgroups.push(groupInfo.groupID)
                                 }
                             } else if (dataSet[vc].type === "REVOKE_KEY") {
@@ -11369,8 +11427,12 @@ Bitcoin.Util = {
                                     if (typeof floGlobals.expiredKeys[r.groupID] !== "object")
                                         floGlobals.expiredKeys[r.groupID] = {}
                                     floGlobals.expiredKeys[r.groupID][vc] = groupInfo.eKey
-                                    groupInfo.eKey = r.newKey;
-                                    compactIDB.writeData("groupInfo", groupInfo, groupInfo.groupID)
+                                    let eKey = r.newKey
+                                    groupInfo.eKey = utilFn.encrypt(eKey);
+                                    compactIDB.writeData("groups", {
+                                        ...groupInfo
+                                    }, groupInfo.groupID)
+                                    groupInfo.eKey = eKey
                                     newInbox.keyrevoke.push(groupInfo.groupID)
                                 }
                             }
@@ -11382,7 +11444,7 @@ Bitcoin.Util = {
                         }
                     }
                     compactIDB.writeData("appendix", floGlobals.appendix.lastReceived, "lastReceived");
-                    messenger.util.UIcallback["direct"](newInbox)
+                    utilFn.UIcallback(newInbox)
                 }
 
                 var options = {
@@ -11405,36 +11467,23 @@ Bitcoin.Util = {
             });
         },
 
-        addMark(key, mark) {
-            return new Promise((resolve, reject) => {
-                compactIDB.readData("marked", key).then(result => {
-                    if (!result)
-                        result = [mark];
-                    else if (!result.includes(mark))
-                        result.push(mark);
-                    else
-                        return resolve("Mark already exist");
-                    compactIDB.writeData("marked", result, key)
-                        .then(result => resolve(result))
-                        .catch(error => reject(error))
-                }).catch(error => reject(error))
-            })
-        },
-
-        removeMark(key, mark) {
-            return new Promise((resolve, reject) => {
-                compactIDB.readData("marked", key).then(result => {
-                    if (!result || !result.includes(mark))
-                        return resolve("Mark doesnot exist")
-                    else {
-                        result.splice(result.indexOf(mark),
-                            1); //remove the mark from the list of marks
-                        compactIDB.writeData("marked", result, key)
-                            .then(result => resolve("Mark removed"))
-                            .catch(error => reject(error))
-                    }
-                }).catch(error => reject(error))
-            })
+        getChatOrder(type = ["direct", "group", "mixed"]) {
+            if (typeof type === "string")
+                type = type.split('|')
+            let result = {}
+            if (type.includes("direct"))
+                result.direct = Object.keys(floGlobals.chats).map(a => [floGlobals.chats[a], a])
+                .sort((a, b) => b[0] - a[0]).map(a => a[1])
+            if (type.includes("group"))
+                result.group = Object.keys(floGlobals.groups).map(a => [parseInt(floGlobals.appendix[`lastReceived_${a}`]), a])
+                .sort((a, b) => b[0] - a[0]).map(a => a[1])
+            if (type.includes("mixed"))
+                result.mixed = Object.keys(floGlobals.chats).map(a => [floGlobals.chats[a], a])
+                .concat(Object.keys(floGlobals.groups).map(a => [parseInt(floGlobals.appendix[`lastReceived_${a}`]), a]))
+                .sort((a, b) => b[0] - a[0]).map(a => a[1])
+            if (type.length === 1)
+                result = result[type[0]]
+            return result
         },
 
         storeContact(floID, name) {
@@ -11444,11 +11493,9 @@ Bitcoin.Util = {
         loadDataFromIDB(dataList = 'default') {
             return new Promise((resolve, reject) => {
                 if (dataList === 'default')
-                    dataList = ["messages", "mails", "marked", "groupMsg", "groupInfo", "appendix"]
+                    dataList = ["mails", "marked", "groups", "chats", "appendix"]
                 else if (dataList === 'all')
-                    dataList = ["messages", "mails", "marked", "groupMsg", "groupInfo", "groupKey",
-                        "appendix"
-                    ]
+                    dataList = ["messages", "mails", "marked", "chats", "groups", "gkeys", "appendix"]
                 let promises = []
                 for (var i = 0; i < dataList.length; i++)
                     promises[i] = compactIDB.readAllData(dataList[i])
@@ -11463,26 +11510,23 @@ Bitcoin.Util = {
                             data.appendix.AESKey = AESKey;
                             if (dataList.includes("messages"))
                                 for (let m in data.messages)
-                                    data.messages[m].message = this.util.decrypt(data.messages[m]
-                                        .message, AESKey)
+                                    if (data.messages[m].message)
+                                        data.messages[m].message = this.util.decrypt(data.messages[m].message, AESKey)
                             if (dataList.includes("mails"))
                                 for (let m in data.mails)
-                                    data.mails[m].content = this.util.decrypt(data.mails[m].content,
-                                        AESKey)
-                            if (dataList.includes("groupKey"))
-                                for (let k in data.groupKeys)
-                                    data.groupKeys[k] = this.util.decrypt(data.groupKeys[k], AESKey)
-                            if (dataList.includes("groupMsg"))
-                                for (let m in data.groupMsg)
-                                    if (datdata.groupMsg[m].message)
-                                        data.groupMsg[m].message = this.util.decrypt(data.groupMsg[
-                                            m].message, AESKey)
+                                    data.mails[m].content = this.util.decrypt(data.mails[m].content, AESKey)
+                            if (dataList.includes("groups"))
+                                for (let g in data.groups)
+                                    data.groups[g].eKey = this.util.decrypt(data.groups[g].eKey, AESKey)
+                            if (dataList.includes("gkeys"))
+                                for (let k in data.gkeys)
+                                    data.gkeys[k] = this.util.decrypt(data.gkeys[k], AESKey)
                             resolve(data)
                         } catch (error) {
                             reject("Corrupted AES Key");
                         }
                     } else {
-                        if (Object.keys(data.messages).length || Object.keys(data.mails).length)
+                        if (Object.keys(data.mails).length)
                             return reject("AES Key not Found")
                         let AESKey = floCrypto.randString(32);
                         let encryptedKey = floCrypto.encryptData(AESKey, myPubKey);
@@ -11491,6 +11535,37 @@ Bitcoin.Util = {
                             resolve(data);
                         }).catch(error => reject("Unable to Generate AES Key"))
                     }
+                }).catch(error => reject(error))
+            })
+        },
+
+        addMark(key, mark) {
+            return this.util.addMark(key, mark)
+        },
+
+        removeMark(key, mark) {
+            return this.util.removeMark(key, mark)
+        },
+
+        addChat(chatID) {
+            return new Promise((resolve, reject) => {
+                compactIDB.addData("chats", 0, chatID)
+                    .then(result => resolve("Added chat"))
+                    .catch(error => reject(error))
+            })
+        },
+
+        getChat(chatID) {
+            return new Promise((resolve, reject) => {
+                let options = {
+                    lowerKey: `${chatID}|`,
+                    upperKey: `${chatID}||`
+                }
+                compactIDB.searchData("messages", options).then(result => {
+                    for (let i in result)
+                        if (result[i].message)
+                            result[i].message = this.util.decrypt(result[i].message)
+                    resolve(result)
                 }).catch(error => reject(error))
             })
         },
@@ -11553,18 +11628,26 @@ Bitcoin.Util = {
                     var parseData = data => new Promise((res, rej) => res(data))
                 parseData(arg).then(data => {
                     for (let m in data.messages)
-                        data.messages[m].message = this.util.encrypt(data.messages[m].message)
+                        if (data.messages[m].message)
+                            data.messages[m].message = this.util.encrypt(data.messages[m].message)
                     for (let m in data.mail)
                         data.mails[m].content = this.util.encrypt(data.mails[m].content)
-                    for (let k in data.groupKeys)
-                        data.groupKeys[k] = this.util.encrypt(data.groupKeys[k])
-                    for (let m in data.groupMsg)
-                        if (datdata.groupMsg[m].message)
-                            data.groupMsg[m].message = this.util.encrypt(data.groupMsg[m].message)
+                    for (let k in data.gkeys)
+                        data.gkeys[k] = this.util.encrypt(data.gkeys[k])
+                    for (let g in data.groups)
+                        data.groups[g].eKey = this.util.encrypt(data.groups[g].eKey)
+                    for (let c in data.chats)
+                        if (data.chats[c] <= floGlobals.chats[c])
+                            delete data.chats[c]
                     for (let l in data.appendix)
-                        if (l.startsWith('lastReceived') && data.appendix[l] < floGlobals.appendix[
-                                l])
-                            data.appendix[l] = floGlobals.appendix[l]
+                        if (l.startsWith('lastReceived') && data.appendix[l] <= floGlobals.appendix[l])
+                            delete data.appendix[l]
+                    for (let c in data.contacts)
+                        if (c in floGlobals.contacts)
+                            delete data.contact[c]
+                    for (let p in data.pubKeys)
+                        if (p in floGlobals.pubKeys)
+                            delete data.pubKeys[p]
                     let promises = [];
                     for (let obs in data) {
                         let writeFn;
@@ -11615,15 +11698,16 @@ Bitcoin.Util = {
                     name: groupname,
                     description: description,
                     created: Date.now(),
-                    members: [myFloID],
-                    eKey: floCrypto.randString(16, false)
+                    members: [myFloID]
                 }
                 let h = ["groupID", "created", "admin"].map(x => groupInfo[x]).join('|')
-                console.log(h)
                 groupInfo.hash = floCrypto.signData(h, id.privKey)
-                p1 = compactIDB.addData("groupInfo", groupInfo, id.floID)
-                p2 = compactIDB.addData("groupKey", this.util.encrypt(id.privKey), id.floID)
+                let eKey = floCrypto.randString(16, false)
+                groupInfo.eKey = this.util.encrypt(eKey)
+                p1 = compactIDB.addData("groups", groupInfo, id.floID)
+                p2 = compactIDB.addData("gkeys", this.util.encrypt(id.privKey), id.floID)
                 Promise.all([p1, p2]).then(r => {
+                    groupInfo.eKey = eKey
                     floGlobals.groups[id.floID] = groupInfo;
                     this.util.groupConn(id.floID)
                     resolve(groupInfo)
