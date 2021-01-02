@@ -5,6 +5,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FLO Messenger</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.min.css">
 </head>
@@ -888,125 +889,125 @@
             }
         }
     </script>
-        <script id="floGlobals">
-            /* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
-            const floGlobals = {
-        
-                //Required for all
-                blockchain: "FLO",
-        
-                //Required for blockchain API operators
-                apiURL: {
-                    FLO: ['https://explorer.mediciland.com/', 'https://livenet.flocha.in/',
-                        'https://flosight.duckdns.org/', 'http://livenet-explorer.floexperiments.com/'
-                    ],
-                    FLO_TEST: ['https://testnet-flosight.duckdns.org/', 'https://testnet.flocha.in/']
-                },
-        
-                //Required for Supernode operations
-                SNStorageID: "FNaN9McoBAEFUjkRmNQRYLmBF8SpS7Tgfk",
-                supernodes: {}, //each supnernode must be stored as floID : {uri:<uri>,pubKey:<publicKey>}
-        
-                //for app
-                application: "messenger",
-                adminID: "FMRsefPydWznGWneLqi4ABeQAJeFvtS3aQ",
-                pubKeys: {},
-                contacts: {},
-                appendix: {}
-            }
-        </script>
-        <script id="onLoadStartUp">
-            function onLoadStartUp() {
-                privKeyNotSecured = true;
+    <script id="floGlobals">
+        /* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
+        const floGlobals = {
     
-                //display loading screen
-                getRef('loading_page').classList.remove("hide-completely")
-                //clear Rendered Elements
-                let elementsToReset = ['inbox_mail_container', 'sent_mail_container', 'contacts_container', 'chat_container',
-                    'receiver_floID', 'receiver_name', 'mail_contact_list'
-                ]
-                //, "backup_info"
-                elementsToReset.forEach(e => clearElement(document.getElementById(e)))
+            //Required for all
+            blockchain: "FLO",
     
-                floDapps.setCustomPrivKeyInput((type) => {
-                    return new Promise((resolve, reject) => {
-                        mainPage.classList.add('hide-completely')
-                        getRef('loading_page').classList.add('hide-completely')
-                        getRef('sign_in_page').classList.remove('hide-completely')
-                        getRef('sign_in_button').addEventListener('clicked', () => {
-                            let key = getRef('private_key_input_field').value;
-                            hidePopup()
-                            console.log(key)
-                            getRef('sign_in_page').classList.add('hide-completely')
-                            getRef('loading_page').classList.remove('hide-completely')
-                            resolve(key)
-                        })
-                        getRef('guest_login_button').onclick = () => {
-                            getRef('sign_in_page').classList.add('hide-completely')
-                            getRef('loading_page').classList.remove('hide-completely')
-                            reject(null)
+            //Required for blockchain API operators
+            apiURL: {
+                FLO: ['https://explorer.mediciland.com/', 'https://livenet.flocha.in/',
+                    'https://flosight.duckdns.org/', 'http://livenet-explorer.floexperiments.com/'
+                ],
+                FLO_TEST: ['https://testnet-flosight.duckdns.org/', 'https://testnet.flocha.in/']
+            },
+    
+            //Required for Supernode operations
+            SNStorageID: "FNaN9McoBAEFUjkRmNQRYLmBF8SpS7Tgfk",
+            supernodes: {}, //each supnernode must be stored as floID : {uri:<uri>,pubKey:<publicKey>}
+    
+            //for app
+            application: "messenger",
+            adminID: "FMRsefPydWznGWneLqi4ABeQAJeFvtS3aQ",
+            pubKeys: {},
+            contacts: {},
+            appendix: {}
+        }
+    </script>
+    <script id="onLoadStartUp">
+        function onLoadStartUp() {
+            privKeyNotSecured = true;
+
+            //display loading screen
+            getRef('loading_page').classList.remove("hide-completely")
+            //clear Rendered Elements
+            let elementsToReset = ['inbox_mail_container', 'sent_mail_container', 'contacts_container', 'chat_container',
+                'receiver_floID', 'receiver_name', 'mail_contact_list'
+            ]
+            //, "backup_info"
+            elementsToReset.forEach(e => clearElement(document.getElementById(e)))
+
+            floDapps.setCustomPrivKeyInput((type) => {
+                return new Promise((resolve, reject) => {
+                    mainPage.classList.add('hide-completely')
+                    getRef('loading_page').classList.add('hide-completely')
+                    getRef('sign_in_page').classList.remove('hide-completely')
+                    getRef('sign_in_button').addEventListener('clicked', () => {
+                        let key = getRef('private_key_input_field').value;
+                        hidePopup()
+                        console.log(key)
+                        getRef('sign_in_page').classList.add('hide-completely')
+                        getRef('loading_page').classList.remove('hide-completely')
+                        resolve(key)
+                    })
+                    getRef('guest_login_button').onclick = () => {
+                        getRef('sign_in_page').classList.add('hide-completely')
+                        getRef('loading_page').classList.remove('hide-completely')
+                        reject(null)
+                    }
+                    if (type === "PRIVATE_KEY") {
+                        getRef('private_key_input_field').setAttribute("placeholder", "Private Key")
+                        document.getElementById("type_of_key").textContent = 'FLO private key'
+                        document.getElementById("remove_account").classList.add("hide-completely");
+                    } else if (type === "PIN/Password") {
+                        getRef('private_key_input_field').setAttribute("placeholder", "PIN/Password")
+                        showPopup('sign_in_popup')
+                        document.getElementById("remove_account").classList.remove("hide-completely");
+                        document.getElementById("type_of_key").textContent = 'PIN/Password'
+                        privKeyNotSecured = false;
+                    }
+                })
+            })
+
+            //invoke the startup functions
+            floDapps.launchStartUp().then(result => {
+                console.log(result)
+                document.getElementById("greet_tag").textContent = myFloID
+                //load messages from IDB and render them
+                console.log(`Loading Data! Please Wait...`)
+                messenger.initUserDB().then(result => {
+                    console.log(result)
+                    messenger.loadDataFromIDB().then(data => {
+                        console.log(data)
+                        floGlobals.appendix = data.appendix;
+                        floGlobals.groups = data.groups;
+                        floGlobals.chats = data.chats
+                        renderContactList(floGlobals.contacts)
+                        renderMailContactList(floGlobals.contacts)
+                        renderMessages(data.messages, false)
+                        renderMailList(data.mails, false)
+                        renderMarked(data.marked)
+                        messenger.setUIcallbacks(renderDirectUI, renderGroupUI)
+                        messenger.requestDirectInbox()
+                            .then(r => console.log("DirectConn:", r))
+                            .catch(e => console.error("Request error:", e))
+                        messenger.requestGroupInbox()
+                            .then(r => console.log(r))
+                        console.log(`Load Successful!`)
+                        //hide loading screen
+                        getRef('loading_page').classList.add("hide-completely")
+                        mainPage.classList.remove('hide-completely')
+                        getRef('chat').classList.add('hide-completely')
+                        getRef('mail').classList.add('hide-completely')
+                        document.getElementById('chat_page_button').click()
+                        if (privKeyNotSecured) {
+                            notify("Private key is not secured with password. Remember to secure the private key in settings",
+                                "warn", '')
+                            document.getElementById("secure_key").textContent = 'Set password'
+                        } else {
+                            document.getElementById("secure_key").textContent = 'Change password'
                         }
-                        if (type === "PRIVATE_KEY") {
-                            getRef('private_key_input_field').setAttribute("placeholder", "Private Key")
-                            document.getElementById("type_of_key").textContent = 'FLO private key'
-                            document.getElementById("remove_account").classList.add("hide-completely");
-                        } else if (type === "PIN/Password") {
-                            getRef('private_key_input_field').setAttribute("placeholder", "PIN/Password")
-                            showPopup('sign_in_popup')
-                            document.getElementById("remove_account").classList.remove("hide-completely");
-                            document.getElementById("type_of_key").textContent = 'PIN/Password'
-                            privKeyNotSecured = false;
-                        }
+                    }).catch(error => {
+                        //console.error(`Failed to load data`)
+                        notify(error, "error")
                     })
                 })
-    
-                //invoke the startup functions
-                floDapps.launchStartUp().then(result => {
-                    console.log(result)
-                    document.getElementById("greet_tag").textContent = myFloID
-                    //load messages from IDB and render them
-                    console.log(`Loading Data! Please Wait...`)
-                    messenger.initUserDB().then(result => {
-                        console.log(result)
-                        messenger.loadDataFromIDB().then(data => {
-                            console.log(data)
-                            floGlobals.appendix = data.appendix;
-                            floGlobals.groups = data.groups;
-                            floGlobals.chats = data.chats
-                            renderContactList(floGlobals.contacts)
-                            renderMailContactList(floGlobals.contacts)
-                            renderMessages(data.messages, false)
-                            renderMailList(data.mails, false)
-                            renderMarked(data.marked)
-                            messenger.setUIcallbacks(renderDirectUI, renderGroupUI)
-                            messenger.requestDirectInbox()
-                                .then(r => console.log("DirectConn:", r))
-                                .catch(e => console.error("Request error:", e))
-                            messenger.requestGroupInbox()
-                                .then(r => console.log(r))
-                            console.log(`Load Successful!`)
-                            //hide loading screen
-                            getRef('loading_page').classList.add("hide-completely")
-                            mainPage.classList.remove('hide-completely')
-                            getRef('chat').classList.add('hide-completely')
-                            getRef('mail').classList.add('hide-completely')
-                            document.getElementById('chat_page_button').click()
-                            if (privKeyNotSecured) {
-                                notify("Private key is not secured with password. Remember to secure the private key in settings",
-                                    "warn", '')
-                                document.getElementById("secure_key").textContent = 'Set password'
-                            } else {
-                                document.getElementById("secure_key").textContent = 'Change password'
-                            }
-                        }).catch(error => {
-                            //console.error(`Failed to load data`)
-                            notify(error, "error")
-                        })
-                    })
-    
-                }).catch(error => notify(error, "error"))
-            }
-        </script>
+
+            }).catch(error => notify(error, "error"))
+        }
+    </script>
 	<script>
 		let isSignInOpen = false,
 			activePage = {

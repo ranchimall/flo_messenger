@@ -9,7 +9,7 @@
 
 :root {
   scroll-behavior: smooth;
-  font-size: clamp(16px, 1.2vmax, 36px);
+  font-size: clamp(16px, 1vmax, 18px);
 }
 
 html, body {
@@ -338,9 +338,8 @@ sm-button[variant=primary] .icon {
   display: flex;
 }
 #sign_in .title-font {
-  font-kerning: normal;
-  line-height: 1.2;
   text-transform: capitalize;
+  line-height: 1.2;
   font-weight: 700;
   font-size: 2.5rem;
 }
@@ -833,6 +832,7 @@ sm-button[variant=primary] .icon {
 #chat footer sm-textarea::part(textarea) {
   background: rgba(var(--text-color), 0.1);
   padding-right: 3rem;
+  border-radius: 2rem;
 }
 #chat #send_message_button {
   position: absolute;
@@ -1098,7 +1098,7 @@ sm-tab-header {
 
   .logo-section {
     padding: 2rem 3rem;
-    margin: 0;
+    margin: 0.5rem 0 1rem 0;
   }
 
   #sign_in {
