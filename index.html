@@ -99,7 +99,7 @@
                 <p class="light-text">
                     Please enter your <span id="type_of_key">FLO private key</span> to continue.
                 </p>
-                <sm-input id="private_key_input_field" type="password" placeholder="private key"></sm-input>
+                <sm-input id="private_key_input_field" type="password" placeholder="private key" privateKey></sm-input>
                 <sm-button id="sign_in_button" width="cover" variant="primary" disabled>continue</sm-button>
                 <sm-button id="remove_account" variant="outlined">Remove Account</sm-button>
 			</sm-popup>
@@ -164,7 +164,7 @@
 			<h4>Add contact</h4>
 			<sm-button id="add_contact_button" variant="primary" disabled>Add</sm-button>
 		</header>
-		<sm-input id="add_contact_floID" floId placeholder="FLO address" animate required></sm-input>
+		<sm-input id="add_contact_floID" class="outlined" floId placeholder="FLO address" animate required></sm-input>
 		<sm-input id="add_contact_name" placeholder="Name" animate required></sm-input>
 	</sm-popup>
 	<sm-popup id="compose_mail_popup">
@@ -289,11 +289,6 @@
 				<header class="grid">
                     <div class="grid align-center">
                         <h4>Direct Messages</h4>
-                        <svg xmlns="http://www.w3.org/2000/svg" id="new_message_button" class="icon" onclick="toggleContacts()" viewBox="0 0 64 64">
-                            <title>Send new message</title>
-                            <path d="M55.76,20.13,59,23.34l3.5-3.48a3.26,3.26,0,0,0,.05-4.63l0-.05-.59-.56a3.3,3.3,0,0,0-4.67,0l-21.1,21a2.34,2.34,0,0,0-.63,1.19l-.9,4.63a.8.8,0,0,0,.66.91.57.57,0,0,0,.26,0l4.65-.88a2.36,2.36,0,0,0,1.22-.61l15.7-15.63"/>
-                            <path d="M48.05,49.79a6,6,0,0,1-6,6H6.47a6,6,0,0,1-6-6V14.21a6,6,0,0,1,6-6H42"/>
-                        </svg>
                         <sm-menu align-options="right">
                             <sm-menu-option>Create a group</sm-menu-option>
                         </sm-menu>
@@ -306,6 +301,14 @@
                         </svg>
                     </sm-input>
                 </header>
+                <sm-button variant="primary" id="new_message_button" onclick="toggleContacts()" class="fab round">
+                    <svg xmlns="http://www.w3.org/2000/svg"class="icon" viewBox="0 0 64 64">
+                        <title>Send new message</title>
+                        <path d="M55.76,20.13,59,23.34l3.5-3.48a3.26,3.26,0,0,0,.05-4.63l0-.05-.59-.56a3.3,3.3,0,0,0-4.67,0l-21.1,21a2.34,2.34,0,0,0-.63,1.19l-.9,4.63a.8.8,0,0,0,.66.91.57.57,0,0,0,.26,0l4.65-.88a2.36,2.36,0,0,0,1.22-.61l15.7-15.63"/>
+                        <path d="M48.05,49.79a6,6,0,0,1-6,6H6.47a6,6,0,0,1-6-6V14.21a6,6,0,0,1,6-6H42"/>
+                    </svg>
+                    New chat
+                </sm-button>
                 <div id="contacts_container" class="flex"></div>
                 <div id="new_conversation" class="flex direction-column empty-state">
                     <svg class="icon new-conversation align-center" viewBox="0 0 512 512">
@@ -380,7 +383,7 @@
                         <sm-tab>Sent</sm-tab>
                     </sm-tab-header>
 				</header>
-                <sm-button variant="primary" id="new_mail_button" class="fab">
+                <sm-button variant="primary" id="new_mail_button" class="fab round">
                     <svg class="icon" viewBox="0 0 64 64">
                         <path
                             d="M46.73,14.81l7,7,7.65-7.6A7.15,7.15,0,0,0,61.39,4L60.11,2.77a7.23,7.23,0,0,0-10.19,0L3.87,48.57a5,5,0,0,0-1.39,2.6L.53,61.27a1.74,1.74,0,0,0,2,2l10.15-1.94A5.06,5.06,0,0,0,15.34,60L49.6,25.9" />
@@ -411,65 +414,91 @@
 			</div>
 		</section>
 		<section id="settings_page" class="page hide-completely">
-			<header>
-				<h3>User</h3>
-				<p>Manage settings and personal information.</p>
-            </header>
-            <section>
-                <div class="card">
-                    <h4>My FLO ID</h4>
-                    <div class="flex align-center">
-                        <p id="greet_tag" class="text-overflow"></p>
-                        <sm-button class="small justify-right" onclick="copyToClipboard('#greet_tag', 'FLO ID Copied')">copy</sm-button>
-                    </div>
-                    
-                    <h4>My private key</h4>
-                    <sm-input id="view_private_key" title="Click to Copy" placeholder="View Private Key. Click to copy" readonly/></sm-input>
-                    
-                    <h4>Set Password</h4>
-                    <p>
-                        This will require entering password everytime you refresh the window or directly close this tab.<br>
-                        <strong>This password will only be stored on this device locally, so this password won't work on other devices.</strong>
-                    </p>
-                    <sm-button id="secure_key">Set Password</sm-button>
-                    
-                    <h4>Clear data</h4>
-                    <p><strong></strong>This can't be undone.</strong> Make sure you have stored the PRIVATE KEY and backed up the data.</p>
-                    <sm-button id="clear_data">Clear Data</sm-button>
-                    
-                    <h4>Sign out</h4>
-                    <p>*Remember to store your <strong>PRIVATE KEY </strong> before signing out.</p>
-                    <sm-button id="sign_out">Sign Out</sm-button>
+            <aside id="settings_sidebar">
+                <div class="sidebar-item interact active" data-target="profile_panel">Account</div>
+                <div class="sidebar-item interact" data-target="personalise_panel">personalise</div>
+                <div class="sidebar-item interact" data-target="backup_panel">backup & restore</div>
+                <div class="sidebar-item interact" data-target="about_panel">About</div>
+            </aside>
+            <div id="settings_panel" class=" hide-on-mobile">
+                <header id="settings_header" class="flex align-center hide-on-desktop">
+                    <svg id="back_settings" onclick='hidePanel()' xmlns="http://www.w3.org/2000/svg" class="icon back" viewBox="0 0 64 64">
+                        <title>Go back</title>
+                        <line x1="1" y1="32" x2="64" y2="32"/>
+                        <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
+                    </svg>
+                    <h4 id="settings_title"></h4>
+                </header>
+                <div id="profile_panel" class="panel">
+                    <section>
+                        <h4>My FLO ID</h4>
+                        <div class="copy-row">
+                            <p id="greet_tag" class="copy"></p>
+                            <svg class="icon" onclick="copyToClipboard('#greet_tag', 'FLO ID Copied')" viewBox="0 0 64 64">
+                                <title>Copy</title>
+                                <rect x="16" y="16" width="48" height="48" rx="6" />
+                                <path d="M.5,47.52V6.5a6,6,0,0,1,6-6h41" />
+                            </svg>
+                        </div>
+                    </section>
+                    <section>
+                        <h4>Set Password</h4>
+                        <p>
+                            This will require entering password everytime you refresh the window or directly close this tab.<br>
+                            <strong>This password will only be stored on this device locally, so this password won't work on other devices.</strong>
+                        </p>
+                        <sm-button id="secure_key">Set Password</sm-button>
+                    </section>
+                    <section>
+                        <h4>Clear data</h4>
+                        <p><strong></strong>This can't be undone.</strong> Make sure you have stored the PRIVATE KEY and backed up the data.</p>
+                        <sm-button id="clear_data">Clear Data</sm-button>
+                    </section>
+                    <section>
+                        <h4>Sign out</h4>
+                        <p>*Remember to store your <strong>PRIVATE KEY </strong> before signing out.</p>
+                        <sm-button id="sign_out">Sign Out</sm-button>
+                    </section>
                 </div>
-                <div class="card">
-                    <h4>Backup data</h4>
-                    <p>Create a backup of contacts, conversations and mails. Which can later be used to restore these in case of data is cleared. </p>
-                    <sm-button id="backup_data" >Backup Data</sm-button>
-                    <span id="backup_info"></span>
-                    
-                    <h4>Restore backup</h4>
-                    <p>Select backup file with extension '.json'. Which was downloaded when backup was performed.</p>
-                    <label class="select-file">
-                        <sm-button >Select File</sm-button>
-                        <input type="file" id="restore_data" accept=".json" />
-                    </label>
-
-                    <h4>Theme</h4>
-                    <div class="flex">
-                        <p>Toggle dark theme</p>
-                        <sm-switch id="theme_switcher" class="justify-right"></sm-switch>
-                    </div>
-
-                    <h4>Enter key is send</h4>
-                    <div class="flex">
+                <div id="personalise_panel" class="panel hide-completely">
+                    <section class="setting-toggle">
+                        <h4>Dark mode</h4>
+                        <p>Toggle dark mode on/off.</p>
+                        <sm-switch id="theme_switcher"></sm-switch>
+                    </section>
+                    <section class="setting-toggle">
+                        <h4>Haptic feedback</h4>
+                        <p>Turn haptic feedbak (vibrations) on/off.</p>
+                        <sm-switch id="haptic_feedback_switcher"></sm-switch>
+                    </section>
+                    <section class="setting-toggle">
+                        <h4>Enter key is send</h4>
                         <p>If this toggle is ON then pressing 'Enter' key will send messages</p>
                         <sm-switch id="is_enter_send_toggle" class="justify-right"></sm-switch>
-                    </div>
-
+                    </section>
+                </div>
+                <div id="backup_panel" class="panel hide-completely">
+                    <section>
+                        <h4>Backup data</h4>
+                        <p>Create a backup of contacts, conversations and mails. Which can later be used to restore these in case of data is cleared. </p>
+                        <sm-button id="backup_data" >Backup Data</sm-button>
+                        <span id="backup_info"></span>
+                    </section>
+                    <section>
+                        <h4>Restore backup</h4>
+                        <p>Select backup file with extension '.json'. Which was downloaded when backup was performed.</p>
+                        <label class="select-file">
+                            <sm-button >Select File</sm-button>
+                            <input type="file" id="restore_data" accept=".json" />
+                        </label>
+                    </section>
+                </div>
+                <div id="about_panel" class="panel hide-completely">
                     <h4>Version</h4>
                     <p>0.0.35</p>
+                    <p>Created by RanchiMall, a blockchain incorporated entity</p>
                 </div>
-            </section>
+            </div>
 		</section>
     </main>
     <script src="scripts/components.js"></script>
@@ -1110,7 +1139,7 @@
                 let randomColor = randomHsl(90, 40)
                 cardContainer.setAttribute("text-color", randomColor.primary)
                 cardContainer.setAttribute("background-color", randomColor.light)
-                initial.setAttribute(`style`, `color: ${randomColor.primary};`)
+                initial.setAttribute(`style`, `background-color: ${randomColor.light}; color: ${randomColor.primary};`)
                 let duplicateCard = card.cloneNode(true);
                 getRef('contacts_container').append(card);
                 getRef('mail_contact_list').append(duplicateCard);
@@ -1252,21 +1281,20 @@
             }
         })
 
-        getRef('mail_contact_list').addEventListener('click', e => {
-            if(e.target.closest('.contact')){
+        document.addEventListener('click', e => {
+            if(e.target.closest('.sidebar-item')){
+                let target = e.target.closest('.sidebar-item')
+                if(target.dataset.target)
+                    showPanel(target, target.dataset.target)
+            }
+            else if(e.target.closest('.contact')){
                 getRef('send_mail_to').value = e.target.closest('.contact').getAttribute('flo-id')
                 getRef('mail_contact_list').classList.add('hide-completely')
             }
-        })
-        
-        getRef('mail_contact_list').addEventListener('keyup', e => {
-            if(e.target.closest('.contact') && e.code === 'Enter' || e.code === 'Space'){
+            else if(e.target.closest('.contact') && e.code === 'Enter' || e.code === 'Space'){
                 getRef('send_mail_to').value = document.activeElement.getAttribute('flo-id')
                 getRef('mail_contact_list').classList.add('hide-completely')
             }
-        })
-        
-		document.addEventListener('click', e => {
             if(e.target.closest('.navbar-item') && activePage.button !== e.target.closest('.navbar-item')){
                 refresh()
                 let targetButton = e.target.closest('.navbar-item'),
@@ -1407,9 +1435,19 @@
                 getRef('send_message_button').classList.remove('active')
         })
         getRef('type_message').addEventListener('keydown', e => {
-            if(e.code === "Enter" && getRef('type_message').value.trim() !== '' && isEnterSend){
+            if(getRef('type_message').value.trim() === '' && e.code === "Enter"){
                 e.preventDefault()
-                sendMessage()
+                return
+            }
+            else{
+                if(e.code === "Enter" && (e.code === "ShiftLeft" || e.code === "ShiftRight")){
+                    e.preventDefault()
+                    getRef('type_message').value += '\r\n';
+                }
+                else if(e.code === "Enter" && isEnterSend){
+                    e.preventDefault()
+                    sendMessage()
+                }
             }
         })
 
@@ -1492,7 +1530,7 @@
 
         document.getElementById("clear_data").addEventListener('click', async function (e) {
             if(await confirmation('Clear Data?',
-                `Are you sure you want to clear stored data?`, "Clear")){
+                `Are you sure you want to clear stored data?`, 'No', "Clear")){
                     messenger.clearUserData().then(result => {
                         notify("Successfully Cleared local data", 'success')
                         setTimeout(onLoadStartUp, 2000)
@@ -1530,18 +1568,6 @@
                 }, 5000);
             }).catch(error => notify(error, "error"))
         }
-
-        document.getElementById("view_private_key").addEventListener("mouseover", function (e) {
-            this.value = myPrivKey;
-        })
-
-        document.getElementById("view_private_key").addEventListener("mouseout", function (e) {
-            this.value = "";
-        });
-
-        document.getElementById("view_private_key").addEventListener("click", function (e) {
-            copyToClipboard(this, "Private Key copied to clipboard")
-        });
 
         document.getElementById("backup_data").addEventListener("click", function (e) {
             let backupInfoText = document.getElementById("backup_info")
@@ -1681,7 +1707,7 @@
             let currentChat = document.getElementById(floID)
             currentChat.classList.remove('hide-completely');
             receiverInitial.textContent = floGlobals.contacts[floID] ? floGlobals.contacts[floID].charAt(0) : name.charAt(0) || ' ';
-            receiverInitial.setAttribute('style', `color: ${textColor};`)
+            receiverInitial.setAttribute('style', `color: ${textColor}; background-color: ${backgroundColor};`)
             receiverName.textContent = floGlobals.contacts[floID] || name || ' ';
             receiverFloID.textContent = floID;
             if (floGlobals.pubKeys[floID])
@@ -1776,6 +1802,104 @@
                 hidePopup()
             }).catch(error => notify("Failed to reply mail!", "error", error))
         }
+
+        const   allPanels = document.querySelectorAll('.panel'),
+                allSidebarItems = document.querySelectorAll('.sidebar-item')
+
+        
+        const flyOutLeft = [
+            {
+                transform: 'translateX(0)',
+                opacity: 1
+            },
+            {
+                transform: 'translateX(-1rem)',
+                opacity: 0
+            },
+        ]
+
+        const flyInLeft = [
+            {
+                transform: 'translateX(1rem)',
+                opacity: 0
+            },
+            {
+                transform: 'translateX(0)',
+                opacity: 1
+            },
+        ]
+
+        const flyOutRight = [
+            {
+                transform: 'translateX(0)',
+                opacity: 1
+            },
+            {
+                transform: 'translateX(1rem)',
+                opacity: 0
+            },
+        ]
+
+        const flyInRight = [
+            {
+                transform: 'translateX(-1rem)',
+                opacity: 0
+            },
+            {
+                transform: 'translateX(0)',
+                opacity: 1
+            },
+        ]
+
+        const animOptions = {
+            duration: 150,
+            easing: 'ease',
+            fill: 'forwards'
+        }
+
+        const windowSizeObserver = new ResizeObserver(entries => {
+            if(entries[0].borderBoxSize[0].inlineSize > 640){
+                getRef('settings_sidebar').classList.remove('hide-on-mobile')
+                getRef('settings_panel').classList.remove('hide-on-mobile')
+                getRef('settings_sidebar').animate(flyInRight, animOptions)
+                getRef('settings_panel').animate(flyInRight, animOptions)
+            }
+            else{
+                getRef('settings_sidebar').animate(flyInRight, animOptions)
+                getRef('settings_panel').animate(flyOutRight, animOptions)
+                getRef('settings_sidebar').classList.remove('hide-on-mobile')
+                getRef('settings_panel').classList.add('hide-on-mobile')
+            }
+        })
+
+        windowSizeObserver.observe(document.body)
+
+        function showPanel(item, panel){
+            if(window.innerWidth < 720){
+                getRef('settings_sidebar').animate(flyOutLeft, animOptions).onfinish = () => {
+                    getRef('settings_title').textContent = item.textContent
+                    getRef('settings_sidebar').classList.add('hide-on-mobile')
+                    getRef('settings_panel').classList.remove('hide-on-mobile')
+                    getRef('settings_panel').animate(flyInLeft, animOptions)
+                }
+            }
+            else{
+                allSidebarItems.forEach(panel => panel.classList.remove('active'))
+                item.classList.add('active')
+            }
+            allPanels.forEach(panel => panel.classList.add('hide-completely'))
+            getRef(panel).classList.remove('hide-completely')
+        }
+        
+        function hidePanel(){
+            getRef('settings_panel').animate(flyOutRight, animOptions).onfinish = () => {
+                getRef('settings_title').textContent = ''
+                getRef('settings_panel').classList.add('hide-on-mobile')
+                getRef('settings_sidebar').classList.remove('hide-on-mobile')
+                getRef('settings_sidebar').animate(flyInRight, animOptions)
+            }
+        }
+
     </script>
 
 <script id="init_lib" version="1.0.1">

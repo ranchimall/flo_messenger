@@ -75,12 +75,12 @@ span.ripple {
     background: rgba(var(--text-color), 0.2);
 }
 :host(:not([disabled])) .button:focus-visible{
-    -webkit-box-shadow: 0 0 0 0.1rem var(--accent-color) inset;
-            box-shadow: 0 0 0 0.1rem var(--accent-color) inset;
+    -webkit-box-shadow: 0 0 0 0.1rem var(--accent-color);
+            box-shadow: 0 0 0 0.1rem var(--accent-color);
 }
 :host([variant='outlined']) .button:focus-visible{
-    -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
-            box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0 0 0.1rem var(--accent-color);
+            box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0 0 0.1rem var(--accent-color);
 }
 @media (hover: hover){
     :host(:not([disabled])) .button:hover{
@@ -152,9 +152,9 @@ customElements.define('sm-button',
             this.addEventListener('click', (e) => {
                 this.dispatch()
             })
-            this.addEventListener('keyup', (e) => {
+            this.addEventListener('keydown', (e) => {
                 if (e.code === "Enter" || e.code === "Space")
-                    this.dispatch()
+                    this.click()
             })
         }
     })
@@ -339,6 +339,8 @@ input{
         transform: translate(0.1rem, -1.5rem) scale(0.8);
     opacity: 1;
     background: rgba(var(--foreground-color), 1);
+}
+.animate-label:focus-within:not(.readonly) .label{
     color: var(--accent-color)
 }
 .feedback-text{
