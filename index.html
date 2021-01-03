@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FLO Messenger</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.min.css">
 </head>
 
@@ -33,8 +33,8 @@
         </div>
     </sm-popup>
     <sm-notifications id="notification_drawer"></sm-notifications>
-	<div id="sign_in_page" class="page hide-completely">
-		<header class="logo-section">
+	<div id="landing_page" class="page hide-completely">
+		<header class="logo-section align-center">
 			<svg class="main-logo" viewBox="0 0 27.25 32">
 				<title>RanchiMall</title>
 				<path
@@ -44,7 +44,7 @@
 				RanchiMall
 			</h4>
 		</header>
-		<div id="sign_in">
+		<div id="landing">
 			<div class="left">
 				<h4>
 					FLO Messenger
@@ -53,58 +53,73 @@
 				<h1 class="title-font">
 					Messages or Emails?<br>
 					Why Not Both!
-				</h1>
-				<div class="flex align-center">					
-					<sm-button variant="primary" id="open_sign_in_button">
-						login
-						<svg class="icon" viewBox="0 0 64 64">
-							<title>chevron_right</title>
-							<polyline points="15.99 0.35 47.65 32 15.99 63.65" />
-						</svg>
-					</sm-button>
-					<sm-button id="guest_login_button" variant="outlined">Guest login</sm-button>
-				</div>
+                </h1>				
+                <sm-button variant="primary" onclick="showPopup('sign_in_popup')">Sign In / Sign Up</sm-button>
 				<p class="light-text">New here? login as guest and get your FLO private key.</p>
 			</div>
-			<div id="sign_in_illustration" class="right">				
+			<div id="landing_illustration" class="right">				
 				<img src="assets/message-background.svg" alt="">
 			</div>
-			<sm-popup id="sign_in_popup">
-                <svg id="lock" viewBox="0 0 184 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g filter="url(#filter0_d)">
-                    <path d="M61.7756 195.257L70.5122 180.085C73.1971 175.397 78.1833 172.541 83.5958 172.541H101.112C106.524 172.541 111.51 175.439 114.195 180.085L122.932 195.257C125.617 199.945 125.617 205.698 122.932 210.386L114.195 225.558C111.51 230.246 106.524 233.101 101.112 233.101H83.5958C78.1833 233.101 73.1971 230.203 70.5122 225.558L61.7756 210.386C59.0907 205.698 59.0907 199.945 61.7756 195.257ZM81.9337 221.424L83.2548 223.683C84.235 225.345 86.025 226.367 87.9428 226.367H96.8072C98.725 226.367 100.515 225.345 101.495 223.683L102.816 221.424C104.905 217.801 102.305 213.326 98.1284 213.326H86.6216C82.4451 213.284 79.8454 217.801 81.9337 221.424Z" fill="#FBB03B"/>
-                    <path d="M61.7756 210.386L70.5122 225.558C73.1971 230.246 78.1833 233.101 83.5958 233.101H92.375V226.41H87.9428C86.025 226.41 84.235 225.387 83.2548 223.725L81.9337 221.466C79.8454 217.844 82.4451 213.369 86.6216 213.369H92.375V172.627H83.5958C78.1833 172.627 73.1971 175.525 70.5122 180.17L61.7756 195.342C59.0907 199.945 59.0907 205.698 61.7756 210.386Z" fill="#D8701A"/>
-                    <path d="M92.8438 29.1333C84.0646 29.1333 76.0951 32.7132 70.2991 38.4665C64.5457 44.2199 60.9659 52.1894 60.9659 61.0112V102.947L74.3478 97.5771V61.0112C74.3478 50.8256 82.6156 42.5578 92.8012 42.5578C97.9153 42.5578 102.518 44.6035 105.842 47.9703C109.166 51.2944 111.255 55.9398 111.255 61.0112V71.964C111.851 72.0066 112.405 72.0918 113.002 72.177L118.329 72.8589L124.679 73.6687V60.9686C124.679 43.4102 110.445 29.1333 92.8438 29.1333Z" fill="#4D4D4D"/>
-                    <path d="M92.8438 14.899C80.6978 14.899 69.7024 19.8427 61.733 27.7696C53.7635 35.739 48.8625 46.7344 48.8625 58.8804V102.904L67.3585 84.4083V58.8804C67.3585 44.774 78.78 33.3525 92.8864 33.3525C99.9183 33.3525 106.311 36.2078 110.914 40.8105C115.516 45.4132 118.372 51.8059 118.372 58.8378V72.8589L124.722 73.6687L132.904 74.7341L136.868 75.2455V58.8804C136.868 34.5884 117.136 14.899 92.8438 14.899Z" fill="#808080"/>
-                    <path d="M136.868 58.923V75.2881L132.904 74.7767L124.722 73.7113L118.372 72.9016V58.9656C118.372 51.9337 115.516 45.5411 110.914 40.9384C106.311 36.3357 99.9183 33.4803 92.8864 33.4803V14.899C117.136 14.899 136.868 34.5884 136.868 58.923Z" fill="#CCCCCC"/>
-                    <path d="M154 91.0567V178.934C154 181.15 152.381 182.983 150.164 183.281L132.862 185.54V84.4509L150.164 86.667C152.381 86.9654 154 88.8405 154 91.0567Z" fill="#D8701A"/>
-                    <path d="M113.045 81.8939C106.183 80.9989 99.2791 80.5727 92.375 80.5727C85.471 80.5727 78.5669 80.9989 71.7055 81.8939L52.1866 84.4083V185.54L71.7055 188.054C78.5669 188.949 85.471 189.375 92.375 189.375C99.2791 189.375 106.183 188.949 113.045 188.054L132.904 185.497V84.4509L113.045 81.8939Z" fill="#F7931E"/>
-                    <path d="M52.2293 84.4083V185.54L34.5856 183.238C32.4121 182.94 30.75 181.108 30.75 178.891V91.0566C30.75 88.8405 32.3695 87.008 34.5856 86.7096L52.2293 84.4083Z" fill="#FBB03B"/>
-                    <path d="M99.3217 211.92H85.4283C80.3995 211.92 77.2458 217.375 79.7602 221.722L81.337 224.492C82.4877 226.495 84.6612 227.774 87.0052 227.774H97.7448C100.089 227.774 102.22 226.538 103.413 224.492L104.99 221.722C107.504 217.375 104.351 211.92 99.3217 211.92ZM101.836 220.017L100.643 222.063C99.7478 223.597 98.1284 224.492 96.381 224.492H88.3263C86.579 224.492 84.9595 223.555 84.0646 222.063L82.8713 220.017C80.9961 216.736 83.3401 212.687 87.133 212.687H97.5743C101.367 212.687 103.711 216.778 101.836 220.017Z" fill="#A03C1D"/>
-                    </g>
-                    <defs>
-                    <filter id="filter0_d" x="0.75" y="0.899048" width="183.25" height="278.202" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                    <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
-                    <feOffset dy="16"/>
-                    <feGaussianBlur stdDeviation="15"/>
-                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
-                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
-                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
-                    </filter>
-                    </defs>
-                </svg>
-                <h4 class="accent-color">Sign In</h4>
-                <h2>Welcome Back!</h2>
-                <p class="light-text">
-                    Please enter your <span id="type_of_key">FLO private key</span> to continue.
-                </p>
-                <sm-input id="private_key_input_field" type="password" placeholder="private key" privateKey></sm-input>
-                <sm-button id="sign_in_button" width="cover" variant="primary" disabled>continue</sm-button>
-                <sm-button id="remove_account" variant="outlined">Remove Account</sm-button>
-			</sm-popup>
 		</div>
     </div>
+    <sm-popup id="sign_in_popup">  
+        <div id="sign_in" class="grid">
+            <div class="left">
+                <header class="popup-header" slot="header">
+                    <svg class="icon" onclick="this.closest('sm-popup').hide()" viewBox="0 0 64 64">
+                        <title>close</title>
+                        <line x1="64" y1="0" x2="0" y2="64" />
+                        <line x1="64" y1="64" x2="0" y2="0" />
+                    </svg>
+                </header>
+            </div>
+            <div class="sign-in-box flex direction-column">
+                <sm-tab-header target="user_entry">
+                    <sm-tab>Sign In</sm-tab>
+                    <sm-tab>Sign Up</sm-tab>
+                </sm-tab-header>
+                <sm-tab-panels id="user_entry">
+                    <sm-panel>
+                        <h3>Welcome back</h3>
+                        <p>Just enter your <span id="type_of_key">FLO private key</span> to continue.</p>
+                        <form action="" onsubmit="return false">
+                            <sm-input id="private_key_input_field" type="password" placeholder="FLO private key" privateKey></sm-input>
+                            <sm-button id="sign_in_button" width="cover" variant="primary" disabled>continue</sm-button>
+                            <sm-button id="remove_account" variant="outlined">Remove Account</sm-button>
+                        </form>
+                    </sm-panel>
+                    <sm-panel>
+                        <h3>Get started</h3>
+                        <p>Create your FLO public and private key pair. <Strong>Don't forget to store them
+                                securely!</Strong></p>
+                        <sm-button id="generate_flo_id" onclick="generateId()" variant="primary">Get FLO credentials
+                        </sm-button>
+                        <section id="credentials_section" class="hide-completely">
+                            <h5>FLO ID (User ID)</h5>
+                            <div class="copy-row">
+                                <h4 id="generated_id" class="copy"></h4>
+                                <svg class="icon" onclick="copyToClipboard(this.parentNode)" viewBox="0 0 64 64">
+                                    <title>Copy</title>
+                                    <rect x="16" y="16" width="48" height="48" rx="6" />
+                                    <path d="M.5,47.52V6.5a6,6,0,0,1,6-6h41" />
+                                </svg>
+                            </div>
+                            <h5>Private key (Password)</h5>
+                            <div class="copy-row">
+                                <h4 id="generated_key" class="copy"></h4>
+                                <svg class="icon" onclick="copyToClipboard(this.parentNode)" viewBox="0 0 64 64">
+                                    <title>Copy</title>
+                                    <rect x="16" y="16" width="48" height="48" rx="6" />
+                                    <path d="M.5,47.52V6.5a6,6,0,0,1,6-6h41" />
+                                </svg>
+                            </div>
+                            <sm-button id="sign_in_with" variant="primary">Sign in with this private key</sm-button>
+                        </section>
+                    </sm-panel>
+                </sm-tab-panels>
+            </div>
+        </div>
+    </sm-popup>
     <div id="loading_page" class="page hide-completely">
         <svg viewBox="0 0 512 512">
             <defs>
@@ -249,30 +264,26 @@
 	</template>
 	<main id="main" class="grid hide-completely">
 		<nav id="main_navbar" class="flex">
-			<div class="logo-section hide-on-mobile">			
+			<div class="logo-section hide-on-mobile" title="RanchiMall FLO Messenger">			
 				<svg class="main-logo" viewBox="0 0 27.25 32">
 					<title>RanchiMall</title>
 					<path
 						d="M27.14,30.86c-.74-2.48-3-4.36-8.25-6.94a20,20,0,0,1-4.2-2.49,6,6,0,0,1-1.25-1.67,4,4,0,0,1,0-2.26c.37-1.08.79-1.57,3.89-4.55a11.66,11.66,0,0,0,3.34-4.67,6.54,6.54,0,0,0,.05-2.82C20,3.6,18.58,2,16.16.49c-.89-.56-1.29-.64-1.3-.24a3,3,0,0,1-.3.72l-.3.55L13.42.94C13,.62,12.4.26,12.19.15c-.4-.2-.73-.18-.72.05a9.39,9.39,0,0,1-.61,1.33s-.14,0-.27-.13C8.76.09,8-.27,8,.23A11.73,11.73,0,0,1,6.76,2.6C4.81,5.87,2.83,7.49.77,7.49c-.89,0-.88,0-.61,1,.22.85.33.92,1.09.69A5.29,5.29,0,0,0,3,8.33c.23-.17.45-.29.49-.26a2,2,0,0,1,.22.63A1.31,1.31,0,0,0,4,9.34a5.62,5.62,0,0,0,2.27-.87L7,8l.13.55c.19.74.32.82,1,.65a7.06,7.06,0,0,0,3.46-2.47l.6-.71-.06.64c-.17,1.63-1.3,3.42-3.39,5.42L6.73,14c-3.21,3.06-3,5.59.6,8a46.77,46.77,0,0,0,4.6,2.41c.28.13,1,.52,1.59.87,3.31,2,4.95,3.92,4.95,5.93a2.49,2.49,0,0,0,.07.77h0c.09.09,0,.1.9-.14a2.61,2.61,0,0,0,.83-.32,3.69,3.69,0,0,0-.55-1.83A11.14,11.14,0,0,0,17,26.81a35.7,35.7,0,0,0-5.1-2.91C9.37,22.64,8.38,22,7.52,21.17a3.53,3.53,0,0,1-1.18-2.48c0-1.38.71-2.58,2.5-4.23,2.84-2.6,3.92-3.91,4.67-5.65a3.64,3.64,0,0,0,.42-2A3.37,3.37,0,0,0,13.61,5l-.32-.74.29-.48c.17-.27.37-.63.46-.8l.15-.3.44.64a5.92,5.92,0,0,1,1,2.81,5.86,5.86,0,0,1-.42,1.94c0,.12-.12.3-.15.4a9.49,9.49,0,0,1-.67,1.1,28,28,0,0,1-4,4.29C8.62,15.49,8.05,16.44,8,17.78a3.28,3.28,0,0,0,1.11,2.76c.95,1,2.07,1.74,5.25,3.32,3.64,1.82,5.22,2.9,6.41,4.38A4.78,4.78,0,0,1,21.94,31a3.21,3.21,0,0,0,.14.92,1.06,1.06,0,0,0,.43-.05l.83-.22.46-.12-.06-.46c-.21-1.53-1.62-3.25-3.94-4.8a37.57,37.57,0,0,0-5.22-2.82A13.36,13.36,0,0,1,11,21.19a3.36,3.36,0,0,1-.8-4.19c.41-.85.83-1.31,3.77-4.15,2.39-2.31,3.43-4.13,3.43-6a5.85,5.85,0,0,0-2.08-4.29c-.23-.21-.44-.43-.65-.65A2.5,2.5,0,0,1,15.27.69a10.6,10.6,0,0,1,2.91,2.78A4.16,4.16,0,0,1,19,6.16a4.91,4.91,0,0,1-.87,3c-.71,1.22-1.26,1.82-4.27,4.67a9.47,9.47,0,0,0-2.07,2.6,2.76,2.76,0,0,0-.33,1.54,2.76,2.76,0,0,0,.29,1.47c.57,1.21,2.23,2.55,4.65,3.73a32.41,32.41,0,0,1,5.82,3.24c2.16,1.6,3.2,3.16,3.2,4.8a1.94,1.94,0,0,0,.09.76,4.54,4.54,0,0,0,1.66-.4C27.29,31.42,27.29,31.37,27.14,30.86ZM6.1,7h0a3.77,3.77,0,0,1-1.46.45L4,7.51l.68-.83a25.09,25.09,0,0,0,3-4.82A12,12,0,0,1,8.28.76c.11-.12.77.32,1.53,1l.63.58-.57.84A10.34,10.34,0,0,1,6.1,7Zm5.71-1.78A9.77,9.77,0,0,1,9.24,7.18h0a5.25,5.25,0,0,1-1.17.28l-.58,0,.65-.78a21.29,21.29,0,0,0,2.1-3.12c.22-.41.42-.76.44-.79s.5.43.9,1.24L12,5ZM13.41,3a2.84,2.84,0,0,1-.45.64,11,11,0,0,1-.9-.91l-.84-.9.19-.45c.34-.79.39-.8,1-.31A9.4,9.4,0,0,1,13.8,2.33q-.18.34-.39.69Z" />
 				</svg>
-                <h5 class="label">RanchiMall</h5>
-                <h4 class="label">FLO Messenger</h4>
 			</div>
-			<div class="navbar-item flex badge align-center active" data-notifications="0" id="chat_page_button" data-target="chat_page">
+			<div class="navbar-item flex badge align-center active" data-notifications="0" id="chat_page_button" data-target="chat_page" title="Chat">
 				<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 64 64">
                     <path d="M21.31,51a6.62,6.62,0,0,0,6.62,6.62H52.1A6.62,6.62,0,0,0,58.72,51V27.74l4.41-7.55H51"/>
                     <path d="M5.33,37.51V14L.87,6.4H36.44a6.69,6.69,0,0,1,6.68,6.69V37.51a6.69,6.69,0,0,1-6.68,6.69H12A6.69,6.69,0,0,1,5.33,37.51Z"/>
                  </svg>
-				<h5 class="label">Chat</h5>
 			</div>
-			<div class="navbar-item flex badge align-center" id="mail_page_button" data-notifications="0" data-target="mail_page">
+			<div class="navbar-item flex badge align-center" id="mail_page_button" data-notifications="0" data-target="mail_page" title="Mail">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 64 64">
                     <rect x="0.5" y="5.72" width="63" height="52.56" rx="5"/>
                     <polyline points="12.25 21.36 32.03 32.03 51.75 21.42"/>
                 </svg>
-				<h5 class="label">Mail</h5>
 			</div>
-			<div class="navbar-item flex align-center" data-target="settings_page">
+			<div class="navbar-item flex align-center" data-target="settings_page" title="Settings">
 				<svg class="icon" viewBox="0 0 64 64">
 					<path
 						d="M41,62.92a1.7,1.7,0,0,1-1.45-.83L37,57.7a2.63,2.63,0,0,0-2.27-1.34h-.26a23.91,23.91,0,0,1-5,0h-.26A2.63,2.63,0,0,0,27,57.7l-2.54,4.39a1.67,1.67,0,0,1-1.44.83,1.72,1.72,0,0,1-.83-.22L10.33,55.86a1.67,1.67,0,0,1-.61-2.27l2.54-4.41a2.61,2.61,0,0,0-.12-2.85A23.77,23.77,0,0,1,9.65,42,2.65,2.65,0,0,0,7.24,40.5H2.17A1.67,1.67,0,0,1,.5,38.83V25.17A1.67,1.67,0,0,1,2.17,23.5H7.24A2.64,2.64,0,0,0,9.65,22a25,25,0,0,1,2.49-4.31,2.63,2.63,0,0,0,.12-2.85l-2.54-4.4a1.67,1.67,0,0,1,.61-2.27L22.17,1.3A1.72,1.72,0,0,1,23,1.08a1.67,1.67,0,0,1,1.44.83L27,6.3a2.63,2.63,0,0,0,2.27,1.34h.26a23.91,23.91,0,0,1,5,0h.26A2.63,2.63,0,0,0,37,6.3l2.53-4.39A1.7,1.7,0,0,1,41,1.08a1.72,1.72,0,0,1,.83.22L53.67,8.14a1.67,1.67,0,0,1,.61,2.27l-2.54,4.41a2.61,2.61,0,0,0,.12,2.85A24.46,24.46,0,0,1,54.35,22a2.65,2.65,0,0,0,2.41,1.52h5.07a1.67,1.67,0,0,1,1.67,1.67V38.83a1.67,1.67,0,0,1-1.67,1.67H56.76A2.63,2.63,0,0,0,54.35,42a24.63,24.63,0,0,1-2.49,4.31,2.63,2.63,0,0,0-.12,2.85l2.54,4.4a1.68,1.68,0,0,1-.61,2.27L41.83,62.7A1.72,1.72,0,0,1,41,62.92Z" />
@@ -281,7 +292,6 @@
 					<circle cx="32" cy="32" r="11.5" />
 					<path d="M32,21A11,11,0,1,1,21,32,11,11,0,0,1,32,21m0-1A12,12,0,1,0,44,32,12,12,0,0,0,32,20Z" />
 				</svg>
-				<h5 class="label">Settings</h5>
 			</div>
 		</nav>
 		<section id="chat_page" class="grid page">
@@ -293,7 +303,7 @@
                             <sm-menu-option>Create a group</sm-menu-option>
                         </sm-menu>
                     </div>
-                    <sm-input id="search_chats" type="search" placeholder="Search Contacts">
+                    <sm-input id="search_chats" type="search" placeholder="Search Chats">
                         <svg slot="icon" class="icon" viewBox="0 0 64 64">
                             <title>Search</title>
                             <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
@@ -468,7 +478,7 @@
                     </section>
                     <section class="setting-toggle">
                         <h4>Haptic feedback</h4>
-                        <p>Turn haptic feedbak (vibrations) on/off.</p>
+                        <p>Turn haptic feedback (vibrations) on/off.</p>
                         <sm-switch id="haptic_feedback_switcher"></sm-switch>
                     </section>
                     <section class="setting-toggle">
@@ -503,6 +513,15 @@
     </main>
     <script src="scripts/components.js"></script>
     <script id="standard_UI_functions">
+
+        const domRefs = {}
+
+        function getRef(elementId){
+            if(!domRefs.elementId)
+                domRefs[elementId] = document.getElementById(elementId)
+            return domRefs[elementId]
+        }
+
         //Checks for internet connection status
         if (!navigator.onLine)
             notify('There seems to be a problem connecting to the internet.', 'error', '', true)
@@ -514,8 +533,8 @@
             notify('We are back online.', 'success')
         })
 
-        const   themeSwitcher = document.getElementById('theme_switcher'),
-                hapticFeedbackSwitcher = document.getElementById('haptic_feedback_switcher')
+        const   themeSwitcher = getRef('theme_switcher'),
+                hapticFeedbackSwitcher = getRef('haptic_feedback_switcher')
 
         if (localStorage.theme === "dark") {
             nightlight()
@@ -565,14 +584,6 @@
                     localStorage.setItem("haptic", "off");
                 }
             })
-        }
-
-        const domRefs = {}
-
-        function getRef(elementId){
-            if(!domRefs.elementId)
-                domRefs[elementId] = document.getElementById(elementId)
-            return domRefs[elementId]
         }
 
         // function required for popups or modals to appear
@@ -653,7 +664,7 @@
 
         function clearElements(array = []) {
             array.forEach(item => {
-                document.getElementById(item).innerHTML = ``
+                getRef(item).innerHTML = ``
             })
         }
 
@@ -857,35 +868,44 @@
                 }
             }
         })
-        /*const   credentialsSection = document.getElementById('credentials_section'),
-                generateFloId = document.getElementById('generate_flo_id'),
-                generatedId = document.getElementById('generated_id'),
-                generatedKey = document.getElementById('generated_key'),
-                signInBtn = document.getElementById('sign_in_btn'),
-                signInWithBtn = document.getElementById('sign_in_with'),
-                privateKeyInput = document.getElementById('get_priv_key_field')
 
         function generateId() {
-            generateFloId.classList.add('hide-completely')
-            credentialsSection.classList.remove('hide-completely')
+            getRef('generate_flo_id').classList.add('hide-completely')
+            getRef('credentials_section').classList.remove('hide-completely')
             let { floID, privKey } = floCrypto.generateNewID()
-            generatedId.textContent = floID
-            generatedKey.textContent = privKey
-            privateKeyInput.value = privKey
+            getRef('generated_id').textContent = floID
+            getRef('generated_key').textContent = privKey
+            getRef('private_key_input_field').value = privKey
         }
 
-        const   signInButton = document.getElementById('sign_in_button'),
-                signOutButton = document.getElementById('sign_out_button')
-        
-        const signIn = () => {
+        const signIn = (type) => {
             return new Promise((resolve, reject) => {
-                signInBtn.onclick = () => {
-                    resolve(privateKeyInput.value)
+                mainPage.classList.add('hide-completely')
+                getRef('loading_page').classList.add('hide-completely')
+                getRef('landing_page').classList.remove('hide-completely')
+                getRef('sign_in_button').addEventListener('clicked', () => {
+                    let key = getRef('private_key_input_field').value;
                     hidePopup()
-                }
-                signInWithBtn.onclick = () => {
-                    resolve(privateKeyInput.value)
+                    getRef('landing_page').classList.add('hide-completely')
+                    getRef('loading_page').classList.remove('hide-completely')
+                    resolve(key)
+                })
+                getRef('sign_in_with').addEventListener('clicked', () => {
                     hidePopup()
+                    getRef('landing_page').classList.add('hide-completely')
+                    getRef('loading_page').classList.remove('hide-completely')
+                    resolve(getRef('generated_key').textContent)
+                })
+                if (type === "PRIVATE_KEY") {
+                    getRef('private_key_input_field').setAttribute("placeholder", "Private Key")
+                    getRef("type_of_key").textContent = 'FLO private key'
+                    getRef("remove_account").classList.add("hide-completely");
+                } else if (type === "PIN/Password") {
+                    getRef('private_key_input_field').setAttribute("placeholder", "PIN/Password")
+                    showPopup('sign_in_popup')
+                    getRef("remove_account").classList.remove("hide-completely");
+                    getRef("type_of_key").textContent = 'PIN/Password'
+                    privKeyNotSecured = false;
                 }
             })
         }
@@ -896,11 +916,9 @@
                 setTimeout(() => {
                     onLoadStartUp()
                     notifications.clearAll()
-                    signInButton.classList.remove('hide-completely')
-                    signOutButton.classList.add('hide-completely')
-                }, 500);
+                }, 1000);
             }
-        }*/
+        }
        async function loadPage(){
             if(location.hash === ''){
                 if(history.length === 2)
@@ -956,44 +974,14 @@
                 'receiver_floID', 'receiver_name', 'mail_contact_list'
             ]
             //, "backup_info"
-            elementsToReset.forEach(e => clearElement(document.getElementById(e)))
+            elementsToReset.forEach(e => clearElement(getRef(e)))
 
-            floDapps.setCustomPrivKeyInput((type) => {
-                return new Promise((resolve, reject) => {
-                    mainPage.classList.add('hide-completely')
-                    getRef('loading_page').classList.add('hide-completely')
-                    getRef('sign_in_page').classList.remove('hide-completely')
-                    getRef('sign_in_button').addEventListener('clicked', () => {
-                        let key = getRef('private_key_input_field').value;
-                        hidePopup()
-                        console.log(key)
-                        getRef('sign_in_page').classList.add('hide-completely')
-                        getRef('loading_page').classList.remove('hide-completely')
-                        resolve(key)
-                    })
-                    getRef('guest_login_button').onclick = () => {
-                        getRef('sign_in_page').classList.add('hide-completely')
-                        getRef('loading_page').classList.remove('hide-completely')
-                        reject(null)
-                    }
-                    if (type === "PRIVATE_KEY") {
-                        getRef('private_key_input_field').setAttribute("placeholder", "Private Key")
-                        document.getElementById("type_of_key").textContent = 'FLO private key'
-                        document.getElementById("remove_account").classList.add("hide-completely");
-                    } else if (type === "PIN/Password") {
-                        getRef('private_key_input_field').setAttribute("placeholder", "PIN/Password")
-                        showPopup('sign_in_popup')
-                        document.getElementById("remove_account").classList.remove("hide-completely");
-                        document.getElementById("type_of_key").textContent = 'PIN/Password'
-                        privKeyNotSecured = false;
-                    }
-                })
-            })
+            floDapps.setCustomPrivKeyInput(signIn)
 
             //invoke the startup functions
             floDapps.launchStartUp().then(result => {
                 console.log(result)
-                document.getElementById("greet_tag").textContent = myFloID
+                getRef("greet_tag").textContent = myFloID
                 //load messages from IDB and render them
                 console.log(`Loading Data! Please Wait...`)
                 messenger.initUserDB().then(result => {
@@ -1020,13 +1008,13 @@
                         mainPage.classList.remove('hide-completely')
                         getRef('chat').classList.add('hide-completely')
                         getRef('mail').classList.add('hide-completely')
-                        document.getElementById('chat_page_button').click()
+                        getRef('chat_page_button').click()
                         if (privKeyNotSecured) {
                             notify("Private key is not secured with password. Remember to secure the private key in settings",
                                 "warn", '')
-                            document.getElementById("secure_key").textContent = 'Set password'
+                            getRef("secure_key").textContent = 'Set password'
                         } else {
-                            document.getElementById("secure_key").textContent = 'Change password'
+                            getRef("secure_key").textContent = 'Change password'
                         }
                     }).catch(error => {
                         //console.error(`Failed to load data`)
@@ -1038,13 +1026,12 @@
         }
     </script>
 	<script>
-		let isSignInOpen = false,
-			activePage = {
-                page: document.getElementById('chat_page'),
-                button: document.getElementById('chat_page_button')
+		let activePage = {
+                page: getRef('chat_page'),
+                button: getRef('chat_page_button')
             },
-            activeChatPage = document.getElementById('contacts'),
-            activeMailPage = document.getElementById('mails'),
+            activeChatPage = getRef('contacts'),
+            activeMailPage = getRef('mails'),
             activeChat,
             activeMail
 
@@ -1137,9 +1124,9 @@
                 let initial = card.querySelector('.initial')
                 initial.textContent = name ? name.charAt(0) : 'U'
                 let randomColor = randomHsl(90, 40)
-                cardContainer.setAttribute("text-color", randomColor.primary)
-                cardContainer.setAttribute("background-color", randomColor.light)
-                initial.setAttribute(`style`, `background-color: ${randomColor.light}; color: ${randomColor.primary};`)
+                //cardContainer.setAttribute("text-color", randomColor.primary)
+                cardContainer.setAttribute("background-color", randomColor.primary)
+                initial.setAttribute(`style`, `background-color: ${randomColor.primary};`)
                 let duplicateCard = card.cloneNode(true);
                 getRef('contacts_container').append(card);
                 getRef('mail_contact_list').append(duplicateCard);
@@ -1195,11 +1182,6 @@
         function renderGroupUI(data){
             console.log(data)
         }
-
-		getRef('open_sign_in_button').addEventListener('clicked', () => {
-			isSignInOpen = true;
-            showPopup('sign_in_popup')
-		})
         
 		document.addEventListener('keyup', e => {
             if(e.target.closest('#send_mail_to')){
@@ -1298,7 +1280,7 @@
             if(e.target.closest('.navbar-item') && activePage.button !== e.target.closest('.navbar-item')){
                 refresh()
                 let targetButton = e.target.closest('.navbar-item'),
-                targetPage = document.getElementById(targetButton.dataset.target)
+                targetPage = getRef(targetButton.dataset.target)
 				targetButton.classList.add('active')
 				targetPage.classList.remove('hide-completely')
 				if(activePage.page){
@@ -1318,7 +1300,7 @@
                 showPopup('compose_mail_popup')
             }
             if(e.target.closest('#chat')){
-                let floID = document.getElementById("receiver_floID").textContent;
+                let floID = getRef("receiver_floID").textContent;
                 messenger.removeMark(floID, "unread");
             }
         })
@@ -1344,7 +1326,7 @@
             })
         }
 
-        let isEnterSendToggle = document.getElementById('is_enter_send_toggle'),
+        let isEnterSendToggle = getRef('is_enter_send_toggle'),
             isEnterSend = true
 
         if(localStorage.getItem('isEnterSend') === null)
@@ -1377,11 +1359,11 @@
         function updateHeight(){
             if(window.innerWidth < 640){
                 getRef('chat').style.height = window.innerHeight + 'px'
-                getRef('sign_in_page').style.height = window.innerHeight + 'px'
+                getRef('landing_page').style.height = window.innerHeight + 'px'
             }
             else{
                 getRef('chat').style.height = '100vh'
-                getRef('sign_in_page').style.height = '100vh'
+                getRef('landing_page').style.height = '100vh'
             }
         }
         window.addEventListener('resize', e => {
@@ -1402,7 +1384,7 @@
 			getRef('main_navbar').classList.remove('hide-on-mobile')
 		}
 
-        document.getElementById("mails").addEventListener('click', function (e) {
+        getRef("mails").addEventListener('click', function (e) {
 			if (e.target.closest(".mail-card") && e.target.closest(".mail-card") !== activeMail){
                 refresh()
                 getRef('mail_page_button').setAttribute('data-notifications', '0')
@@ -1422,7 +1404,7 @@
 			}
         })
 
-        document.getElementById("prev_mail").addEventListener('click', function (e) {
+        getRef("prev_mail").addEventListener('click', function (e) {
             viewMail(this.dataset["value"], false);
         })
 
@@ -1485,28 +1467,22 @@
 			}
         });
 
-        document.getElementById("sign_out").addEventListener('click', async function (e) {
+        getRef("sign_out").addEventListener('click', async function (e) {
             if(await confirmation('Sign Out?',
                 'Are you sure you want to Sign out?', "Stay Signed In", "Sign Out")){
-                    floDapps.clearCredentials().then(result => {
-                        notify("Successfully Signed out", 'success')
-                        setTimeout(onLoadStartUp, 2000)
-                    }).catch(error => notify("Signout Unsuccessful", "error", error))
+                    signOut()
                 }
         });
 
-        document.getElementById("remove_account").addEventListener('click', async function (e) {
+        getRef("remove_account").addEventListener('click', async function (e) {
             if(await confirmation('Remove Account?',
                 '**Remember to store your PRIVATE-KEY**\n*Private-Key will be needed to signIn again*\nAre you sure you want to remove account?',
                 'Cancel', "Remove")){
-                floDapps.clearCredentials().then(result => {
-                    notify("Removed Account")
-                    setTimeout(onLoadStartUp, 2000)
-                }).catch(error => notify("Remove Unsuccessful", "error", error))
+                    signOut()
             }
         });
 
-        document.getElementById("secure_key").addEventListener('click', async function (e) {
+        getRef("secure_key").addEventListener('click', async function (e) {
             try{
                 if(privKeyNotSecured){
                     let value = await getPromptInput("Set password", 'Enter Password', false);
@@ -1528,7 +1504,7 @@
             }
         });
 
-        document.getElementById("clear_data").addEventListener('click', async function (e) {
+        getRef("clear_data").addEventListener('click', async function (e) {
             if(await confirmation('Clear Data?',
                 `Are you sure you want to clear stored data?`, 'No', "Clear")){
                     messenger.clearUserData().then(result => {
@@ -1538,9 +1514,9 @@
                 }
         });
 		
-        document.getElementById('add_contact_button').addEventListener("clicked", addContact)
+        getRef('add_contact_button').addEventListener("clicked", addContact)
 
-        document.getElementById('show_reply_popup').addEventListener("click", () => {
+        getRef('show_reply_popup').addEventListener("click", () => {
             showPopup('reply_mail_popup')
         })
         
@@ -1569,8 +1545,8 @@
             }).catch(error => notify(error, "error"))
         }
 
-        document.getElementById("backup_data").addEventListener("click", function (e) {
-            let backupInfoText = document.getElementById("backup_info")
+        getRef("backup_data").addEventListener("click", function (e) {
+            let backupInfoText = getRef("backup_info")
             backupInfoText.classList.remove("error")
             backupInfoText.textContent = `Generating the backup file! Please wait...`;
             messenger.backupData().then(blob => {
@@ -1589,7 +1565,7 @@
             })
         })
 
-        document.getElementById("restore_data").addEventListener("change", async function (e) {
+        getRef("restore_data").addEventListener("change", async function (e) {
             let file = this.files[0]
             notify(`Retrieving backup data! Please wait.`);
             if (!file) {
@@ -1615,7 +1591,7 @@
         })
 
         function sendMessage() {
-            let receiver = document.getElementById("receiver_floID").textContent;
+            let receiver = getRef("receiver_floID").textContent;
             let container;
             let message = getRef('type_message').value;
 			getRef('type_message').value = ''
@@ -1624,7 +1600,7 @@
             render.messageBubble(receiver, message, time, 'sent', true)
             getRef('chat_container').scrollTo({left: 0, top: getRef('chat_container').scrollHeight, behavior: 'smooth'})
             messenger.sendMessage(message, receiver).then(data => {
-                document.getElementById(`${receiver}_${time}`).classList.remove('unconfirmed')
+                getRef(`${receiver}_${time}`).classList.remove('unconfirmed')
             }).catch(error => notify(error, "error"));
         }
 
@@ -1670,7 +1646,7 @@
         }
 
         function getConversationElement(floID, name = "Unknown") {
-            let element = document.getElementById(floID)
+            let element = getRef(floID)
             if (!element) {
                 element = document.createElement("div");
 				element.setAttribute("id", floID)
@@ -1691,29 +1667,25 @@
             getRef('chat_container').scrollTo(0, getRef('chat_container').scrollHeight)
         }
 
-        const   receiverInitial = document.getElementById("receiver_initial"),
-                receiverName = document.getElementById("receiver_name"),
-                receiverFloID = document.getElementById("receiver_floID"),
-                noEncryption = document.getElementById("warn_no_encryption")
         function viewConversation(contact) {
             let floID = contact.getAttribute("flo-id"),
                 name = contact.getAttribute('name'),
                 textColor = contact.getAttribute('text-color'),
                 backgroundColor = contact.getAttribute('background-color')
-            let currentConversation = document.getElementById("receiver_floID").textContent;
+            let currentConversation = getRef("receiver_floID").textContent;
             console.log(floID, floGlobals.contacts[floID])
             if (currentConversation != "")
-                document.getElementById(currentConversation).classList.add('hide-completely')
-            let currentChat = document.getElementById(floID)
+                getRef(currentConversation).classList.add('hide-completely')
+            let currentChat = getRef(floID)
             currentChat.classList.remove('hide-completely');
-            receiverInitial.textContent = floGlobals.contacts[floID] ? floGlobals.contacts[floID].charAt(0) : name.charAt(0) || ' ';
-            receiverInitial.setAttribute('style', `color: ${textColor}; background-color: ${backgroundColor};`)
-            receiverName.textContent = floGlobals.contacts[floID] || name || ' ';
-            receiverFloID.textContent = floID;
+            getRef("receiver_initial").textContent = floGlobals.contacts[floID] ? floGlobals.contacts[floID].charAt(0) : name.charAt(0) || ' ';
+            getRef("receiver_initial").setAttribute('style', `color: ${textColor}; background-color: ${backgroundColor};`)
+            getRef("receiver_name").textContent = floGlobals.contacts[floID] || name || ' ';
+            getRef("receiver_floID").textContent = floID;
             if (floGlobals.pubKeys[floID])
-                noEncryption.classList.add("hide-completely");
+                getRef("warn_no_encryption").classList.add("hide-completely");
             else
-                noEncryption.classList.remove("hide-completely");
+                getRef("warn_no_encryption").classList.remove("hide-completely");
             getRef('chat_container').scrollTo(0, getRef('chat_container').scrollHeight)   
             messenger.removeMark(floID, "unread");
         }
@@ -1731,26 +1703,26 @@
             getRef('inbox_mail_container').prepend(inboxMailFrag)
             getRef('sent_mail_container').prepend(sentMailFrag)
             if(getRef('inbox_mail_container').children.length || getRef('sent_mail_container').children.length){
-                document.getElementById('no_mails').classList.add('hide-completely')
-                document.getElementById('all_mail_container').classList.remove('hide-completely')
+                getRef('no_mails').classList.add('hide-completely')
+                getRef('all_mail_container').classList.remove('hide-completely')
             }
             else{
-                document.getElementById('all_mail_container').classList.add('hide-completely')
-                document.getElementById('no_mails').classList.remove('hide-completely')
+                getRef('all_mail_container').classList.add('hide-completely')
+                getRef('no_mails').classList.remove('hide-completely')
             }
         }
 
         function viewMail(mailRef, newView = true) {
             //clear the container and display popup (if needed)
             if (newView)
-                clearElement(document.getElementById("mail_container"))
+                clearElement(getRef("mail_container"))
 
             messenger.getMail(mailRef).then(result => {
                 let { from, to, prev, ref, subject, time, content } = result
                 //append the contents to mail container
-                document.getElementById("mail_container").append(render.mail(from, to, subject, time, content));
+                getRef("mail_container").append(render.mail(from, to, subject, time, content));
                 //add prop for previous mail (if available)
-                let prevMail = document.getElementById("prev_mail");
+                let prevMail = getRef("prev_mail");
                 prevMail.dataset["value"] = prev;
                 prevMail.style.display = prev ? 'block' : 'none';
                 //set values for reply mail form if new view
@@ -1758,18 +1730,18 @@
                     getRef('reply_mail_popup').dataset["to"] = (from === myFloID ? to.join(',') : from)
                     getRef('reply_mail_popup').dataset["prev"] = mailRef;
                     getRef('subject_of_reply_mail').value = subject.startsWith("Re: ") ? subject : `Re: ${subject}`;
-                    document.getElementById("show_reply_popup").classList.remove("hide-completely");
+                    getRef("show_reply_popup").classList.remove("hide-completely");
                 }
                 messenger.removeMark(mailRef, "unread");
             }).catch(error => notify("Unable to read mail", "error", error))
 		}
 		
-		document.getElementById('send_mail_button').addEventListener('clicked', sendMail)
+		getRef('send_mail_button').addEventListener('clicked', sendMail)
 
         function sendMail() {
             let to = getRef('send_mail_to').value.split(",");
-            let subject = document.getElementById('subject_of_mail').value;
-            let content = document.getElementById('mail_content').value
+            let subject = getRef('subject_of_mail').value;
+            let content = getRef('mail_content').value
             let recipients = [];
             try {
                 to.forEach(id => {
@@ -1853,34 +1825,35 @@
 
         const animOptions = {
             duration: 150,
-            easing: 'ease',
-            fill: 'forwards'
+            easing: 'ease'
         }
 
         const windowSizeObserver = new ResizeObserver(entries => {
             if(entries[0].borderBoxSize[0].inlineSize > 640){
-                getRef('settings_sidebar').classList.remove('hide-on-mobile')
-                getRef('settings_panel').classList.remove('hide-on-mobile')
-                getRef('settings_sidebar').animate(flyInRight, animOptions)
-                getRef('settings_panel').animate(flyInRight, animOptions)
-            }
-            else{
-                getRef('settings_sidebar').animate(flyInRight, animOptions)
-                getRef('settings_panel').animate(flyOutRight, animOptions)
-                getRef('settings_sidebar').classList.remove('hide-on-mobile')
-                getRef('settings_panel').classList.add('hide-on-mobile')
+                getRef('settings_sidebar').style = ''
+                getRef('settings_panel').style = ''
             }
         })
 
         windowSizeObserver.observe(document.body)
 
+        function animateTo(element, animation, options){
+            const anime = element.animate(animation, {...options})
+            anime.onfinish = () => {
+                anime.commitStyles()
+                anime.cancel()
+            }
+            return anime
+        }
+
         function showPanel(item, panel){
+            getRef('settings_title').textContent = item.textContent
             if(window.innerWidth < 720){
-                getRef('settings_sidebar').animate(flyOutLeft, animOptions).onfinish = () => {
-                    getRef('settings_title').textContent = item.textContent
+                animateTo(getRef('settings_sidebar'), flyOutLeft, animOptions).onfinish = () => {
+                    animateTo(getRef('settings_panel'), flyInLeft, animOptions)
+                    getRef('settings_sidebar').style = ''
                     getRef('settings_sidebar').classList.add('hide-on-mobile')
                     getRef('settings_panel').classList.remove('hide-on-mobile')
-                    getRef('settings_panel').animate(flyInLeft, animOptions)
                 }
             }
             else{
@@ -1892,11 +1865,12 @@
         }
         
         function hidePanel(){
-            getRef('settings_panel').animate(flyOutRight, animOptions).onfinish = () => {
+            animateTo(getRef('settings_panel'), flyOutRight, animOptions).onfinish = () => {
                 getRef('settings_title').textContent = ''
+                getRef('settings_panel').style = ''
+                animateTo(getRef('settings_sidebar'), flyInRight, animOptions)
                 getRef('settings_panel').classList.add('hide-on-mobile')
                 getRef('settings_sidebar').classList.remove('hide-on-mobile')
-                getRef('settings_sidebar').animate(flyInRight, animOptions)
             }
         }
 

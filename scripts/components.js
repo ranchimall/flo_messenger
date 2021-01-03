@@ -1036,7 +1036,7 @@ smSwitch.innerHTML = `
         -o-transition: transform 0.3s;
         transition: transform 0.3s;
         transition: transform 0.3s, -webkit-transform 0.3s;
-        border: solid 0.3rem rgba(var(--foreground-color), 1);
+        border: solid 0.3rem white;
     }
     
     input:checked ~ .button {
