@@ -14,7 +14,7 @@ html, body{
     height: 100%;
 }
 body{
-    --accent-color: #3042e7;
+    --accent-color: #0779e4;
     --secondary-color: #ffac2e;
     --text-color: 17, 17, 17;
     --text-color-light: 100, 100, 100;
@@ -25,14 +25,10 @@ body{
     background: rgba(var(--foreground-color), 1);
 }
 body[data-theme='dark']{
-    --accent-color: #5365ff;
     --secondary-color: #FDB956;
     --text-color: 218, 218, 218;
     --text-color-light: 170, 170, 170;
     --foreground-color: 20, 20, 20;
-    #contacts, #mails{
-        background: rgba(var(--foreground-color), 0.5);
-    }
     .initial{
         box-shadow: 0 0.1rem 0.1rem #00000016, 0 0.1rem 0.3rem #00000040;
     }
@@ -273,13 +269,6 @@ sm-button[variant="primary"]{
         stroke-width: 6;
         stroke: white;
     }
-}
-
-.back-button{
-    height: 2.4rem;
-    width: 2.4rem;
-    padding: 0.7rem;
-    transform: translateX(-0.6rem);
 }
 .logo-section{
     display: flex;
@@ -577,7 +566,8 @@ sm-button[variant="primary"]{
     flex-direction: column;
     padding: 1rem 1.5rem;
     .sender{
-        color: rgba(var(--text-color), 0.7);
+        color: rgba(var(--text-color), 0.9);
+        font-weight: 500;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -589,7 +579,7 @@ sm-button[variant="primary"]{
     }
     .subject{
         font-size: 1em;
-        margin-top: 0.3rem;
+        margin-top: 0.5rem;
         font-weight: 500;
     }
     .description{
@@ -598,6 +588,7 @@ sm-button[variant="primary"]{
         -webkit-box-orient: vertical;  
         overflow: hidden;
         font-size: 0.9em;
+        margin-top: 0.2rem;
         color: rgba(var(--text-color), 0.8);
     }
 }
@@ -666,7 +657,7 @@ sm-button[variant="primary"]{
     padding: 0;
     flex-wrap: wrap;
     width: 100%;
-    background: rgba(var(--foreground-color), 0.9);
+    background: rgba(var(--foreground-color), 1);
     box-shadow: 0 -0.2rem 1rem #00000016;
     height: 3.5rem;
     align-items: center;
@@ -684,6 +675,9 @@ sm-button[variant="primary"]{
         .icon{
             height: 1.2rem;
             width: 1.2rem;
+        }
+        .label{
+            margin-top: 0.4rem;
         }
         &.badge::after{
             right: 0;
@@ -755,7 +749,10 @@ sm-button[variant="primary"]{
             }
         }
         sm-input::part(input){
-            padding: 0.4rem 1rem;
+            padding: 0.5rem 1rem;
+        }
+        .flex{
+            padding-bottom: 1rem;
         }
     } 
     #all_contacts{
@@ -770,26 +767,16 @@ sm-button[variant="primary"]{
         background-color:rgba(var(--foreground-color), 1);
         transition: transform 0.3s;
         transform: translateX(-100%);
-        .back{
-            padding: 0.7rem;
-            height: 2.4rem;
-            width: 2.4rem;
-            margin-left: -0.6rem;
-            cursor: pointer;
-        }
     }
 }
 #contacts, #mails{
     position: relative;
     grid-template-rows: max-content 1fr;
     height: calc(100vh - 3.5rem);
-    backdrop-filter: blur(0.4rem);
     header{
         padding: 1rem 1.5rem;
         h4{
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.06em;
+            text-transform: capitalize;
         }
         .grid{
             grid-template-columns: 1fr auto;
@@ -819,12 +806,13 @@ sm-button[variant="primary"]{
 }
 #chat{
     height: 100vh;
-    grid-template-rows: max-content 1fr max-content;
     header{
         padding: 0.5rem 1rem;
         box-shadow: 0 0.2rem 0.4rem #00000016;
         .back-button{
-            margin-right: -1rem;
+            padding: 0.1rem;
+            stroke-width: 8;
+            margin-right: 0.5rem;
         }
         .initial{
             margin-right: 1rem;
@@ -910,7 +898,7 @@ sm-button[variant="primary"]{
         .message-body{
             background: var(--accent-color);
             color: #f0f0f0;
-            border-radius: 0.4em 0 0.4em 0.4em;
+            border-radius: 1.5em 0 1.5em 1.5em;
         }
         .time{
             grid-column: 1;
@@ -930,7 +918,7 @@ sm-button[variant="primary"]{
         }
         .message-body{
             background: rgba(var(--text-color), 0.1);
-            border-radius: 0 0.4em 0.4em 0.4em;
+            border-radius: 0 1.5em 1.5em 1.5em;
         }
     }
     .sent + .sent,
@@ -943,15 +931,15 @@ sm-button[variant="primary"]{
     }
     .sent + .sent .message-body,
     .received + .received .message-body{
-        border-radius: 0.4em;
+        border-radius: 1.5em;
     }
     .unconfirmed{
         opacity: 0.7;
     }
 }
 #chat_container{
+    flex: 1;
     padding: 0 1rem;
-    margin-bottom: 1rem;
 }
 #new_conversation, #no_mails{
     height: 100%;
@@ -976,6 +964,7 @@ sm-button[variant="primary"]{
     stroke: rgba(var(--text-color), 0.4);
 }
 #contacts_container,
+#dm_container,
 #chat_container,
 #inbox_mail_container,
 #sent_mail_container,
@@ -985,10 +974,10 @@ sm-button[variant="primary"]{
     height: 100%;
     overflow-y: auto;
 }
-#contacts_container:empty{
+#dm_container:empty{
     display: none;
 }
-#contacts_container:not(:empty) ~ .empty-state{
+#dm_container:not(:empty) ~ .empty-state{
     display: none;
 }
 sm-tab-panels{
@@ -1038,7 +1027,7 @@ sm-tab-header{
     height: 2.4rem;
     width: 2.4rem;
     background-color: rgba(var(--foreground-color), 1);
-    transform: translateX(-0.7rem);
+    margin-left: -0.5rem;
     cursor: pointer;
     stroke-width: 8;
     opacity: 0.8;
@@ -1073,7 +1062,6 @@ sm-tab-header{
         max-width: 50ch;
         display: grid;
         gap: .3rem;
-        justify-items: flex-start;
         &:not(:last-of-type){
             margin-bottom: 1.5rem;
         }
@@ -1088,6 +1076,9 @@ sm-tab-header{
                 grid-column: 1;
             }
         }
+    }
+    #sign_out::part(button){
+        color: var(--error-color);
     }
 }
 @media screen and (max-width: 640px){
@@ -1180,8 +1171,6 @@ sm-tab-header{
         padding: 0.5rem;
         box-shadow: none;
         height: auto;
-        background: #111;
-        color: #f0f0f0;
         .navbar-item{
             height: auto;
             justify-content: flex-start;
@@ -1189,31 +1178,24 @@ sm-tab-header{
             flex: none;
             padding: 1rem 0.5rem;
             border-radius: 0.4rem;
-            color: #f0f0f0;
             .icon{
                 height: 1.2rem;
                 width: 2.4rem;
             }
-            .label{
-                color: #f0f0f0;
-            }
-            .icon{
-                stroke: #f0f0f0;
+            &:last-of-type{
+                margin-top: auto;
             }
         }
         .logo-section{
             margin: 1rem 0 1.5rem 0;
             padding: 0 1rem;
-            .main-logo{
-                fill: #f0f0f0;
-            }
-            .label{
-                color: #f0f0f0;
-            }
         }
         .active{
             background: var(--accent-color);
             border-radius: 0.4rem;
+            .icon{
+                stroke: white;
+            }
         }
         .label{
             display: none;
@@ -1238,17 +1220,12 @@ sm-tab-header{
             }
         }
     }
-    .contact,
-    .mail-card{
-        margin: 0.25rem 0.5rem;
-        border-radius: 0.5rem;
-    }
     #chat_page, #mail_page{
         grid-template-columns: 20rem 1fr;
     }
-    #contacts, #mails{
+    #contacts, #mails, #settings_sidebar{
         height: 100vh;
-        border-right: 1px solid rgba(var(--text-color), 0.2);
+        background-color: #9da6ff10;
     }
     #settings_page{
         display: grid;
@@ -1256,10 +1233,6 @@ sm-tab-header{
         grid-template-columns: 14rem 1fr;
         sm-button{
             width: max-content;
-        }
-        #settings_sidebar{
-            height: 100%;
-            border-right: 1px solid rgba(var(--text-color), 0.2);
         }
         #settings_panel{
             padding: 1.5rem;

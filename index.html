@@ -55,7 +55,7 @@
 					Why Not Both!
                 </h1>				
                 <sm-button variant="primary" onclick="showPopup('sign_in_popup')">Sign In / Sign Up</sm-button>
-				<p class="light-text">New here? login as guest and get your FLO private key.</p>
+				<p class="light-text">New here? Sign up and get your FLO private key.</p>
 			</div>
 			<div id="landing_illustration" class="right">				
 				<img src="assets/message-background.svg" alt="">
@@ -180,7 +180,7 @@
 			<sm-button id="add_contact_button" variant="primary" disabled>Add</sm-button>
 		</header>
 		<sm-input id="add_contact_floID" class="outlined" floId placeholder="FLO address" animate required></sm-input>
-		<sm-input id="add_contact_name" placeholder="Name" animate required></sm-input>
+		<sm-input id="add_contact_name" class="outlined" placeholder="Name" animate required></sm-input>
 	</sm-popup>
 	<sm-popup id="compose_mail_popup">
 		<header class="popup-header" slot="header">
@@ -276,22 +276,25 @@
                     <path d="M21.31,51a6.62,6.62,0,0,0,6.62,6.62H52.1A6.62,6.62,0,0,0,58.72,51V27.74l4.41-7.55H51"/>
                     <path d="M5.33,37.51V14L.87,6.4H36.44a6.69,6.69,0,0,1,6.68,6.69V37.51a6.69,6.69,0,0,1-6.68,6.69H12A6.69,6.69,0,0,1,5.33,37.51Z"/>
                  </svg>
-			</div>
-			<div class="navbar-item flex badge align-center" id="mail_page_button" data-notifications="0" data-target="mail_page" title="Mail">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 64 64">
-                    <rect x="0.5" y="5.72" width="63" height="52.56" rx="5"/>
-                    <polyline points="12.25 21.36 32.03 32.03 51.75 21.42"/>
-                </svg>
-			</div>
-			<div class="navbar-item flex align-center" data-target="settings_page" title="Settings">
-				<svg class="icon" viewBox="0 0 64 64">
-					<path
+                 <h5 class="label">Chat</h5>
+                </div>
+                <div class="navbar-item flex badge align-center" id="mail_page_button" data-notifications="0" data-target="mail_page" title="Mail">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 64 64">
+                        <rect x="0.5" y="5.72" width="63" height="52.56" rx="5"/>
+                        <polyline points="12.25 21.36 32.03 32.03 51.75 21.42"/>
+                    </svg>
+                    <h5 class="label">Mail</h5>
+                </div>
+                <div class="navbar-item flex align-center" data-target="settings_page" title="Settings">
+                    <svg class="icon" viewBox="0 0 64 64">
+                        <path
 						d="M41,62.92a1.7,1.7,0,0,1-1.45-.83L37,57.7a2.63,2.63,0,0,0-2.27-1.34h-.26a23.91,23.91,0,0,1-5,0h-.26A2.63,2.63,0,0,0,27,57.7l-2.54,4.39a1.67,1.67,0,0,1-1.44.83,1.72,1.72,0,0,1-.83-.22L10.33,55.86a1.67,1.67,0,0,1-.61-2.27l2.54-4.41a2.61,2.61,0,0,0-.12-2.85A23.77,23.77,0,0,1,9.65,42,2.65,2.65,0,0,0,7.24,40.5H2.17A1.67,1.67,0,0,1,.5,38.83V25.17A1.67,1.67,0,0,1,2.17,23.5H7.24A2.64,2.64,0,0,0,9.65,22a25,25,0,0,1,2.49-4.31,2.63,2.63,0,0,0,.12-2.85l-2.54-4.4a1.67,1.67,0,0,1,.61-2.27L22.17,1.3A1.72,1.72,0,0,1,23,1.08a1.67,1.67,0,0,1,1.44.83L27,6.3a2.63,2.63,0,0,0,2.27,1.34h.26a23.91,23.91,0,0,1,5,0h.26A2.63,2.63,0,0,0,37,6.3l2.53-4.39A1.7,1.7,0,0,1,41,1.08a1.72,1.72,0,0,1,.83.22L53.67,8.14a1.67,1.67,0,0,1,.61,2.27l-2.54,4.41a2.61,2.61,0,0,0,.12,2.85A24.46,24.46,0,0,1,54.35,22a2.65,2.65,0,0,0,2.41,1.52h5.07a1.67,1.67,0,0,1,1.67,1.67V38.83a1.67,1.67,0,0,1-1.67,1.67H56.76A2.63,2.63,0,0,0,54.35,42a24.63,24.63,0,0,1-2.49,4.31,2.63,2.63,0,0,0-.12,2.85l2.54,4.4a1.68,1.68,0,0,1-.61,2.27L41.83,62.7A1.72,1.72,0,0,1,41,62.92Z" />
-					<path
+                        <path
 						d="M23,1.58h0a1.16,1.16,0,0,1,1,.58l2.54,4.39a3.14,3.14,0,0,0,2.7,1.59l.31,0C30.37,8,31.19,8,32,8s1.63,0,2.44.12l.31,0a3.14,3.14,0,0,0,2.7-1.59L40,2.16a1.16,1.16,0,0,1,1-.58,1.1,1.1,0,0,1,.58.16L53.42,8.57a1.16,1.16,0,0,1,.42,1.59L51.3,14.57a3.15,3.15,0,0,0,.15,3.4,23.69,23.69,0,0,1,2.45,4.21A3.12,3.12,0,0,0,56.76,24h5.07A1.17,1.17,0,0,1,63,25.17V38.83A1.17,1.17,0,0,1,61.83,40H56.76a3.11,3.11,0,0,0-2.86,1.82,24.33,24.33,0,0,1-2.44,4.23,3.11,3.11,0,0,0-.15,3.39l2.53,4.4a1.13,1.13,0,0,1,.12.88,1.17,1.17,0,0,1-.54.71L41.58,62.26a1.08,1.08,0,0,1-.58.16,1.16,1.16,0,0,1-1-.58l-2.54-4.39a3.14,3.14,0,0,0-2.7-1.59l-.31,0C33.63,56,32.81,56,32,56s-1.63,0-2.44-.12l-.31,0a3.14,3.14,0,0,0-2.7,1.59L24,61.84a1.16,1.16,0,0,1-1,.58,1.1,1.1,0,0,1-.58-.16L10.58,55.43a1.16,1.16,0,0,1-.42-1.59l2.54-4.41a3.15,3.15,0,0,0-.15-3.4,23.69,23.69,0,0,1-2.45-4.21A3.12,3.12,0,0,0,7.24,40H2.17A1.17,1.17,0,0,1,1,38.83V25.17A1.17,1.17,0,0,1,2.17,24H7.24a3.11,3.11,0,0,0,2.86-1.82A24.33,24.33,0,0,1,12.54,18a3.11,3.11,0,0,0,.15-3.39l-2.53-4.4a1.16,1.16,0,0,1,.42-1.59L22.42,1.74A1.08,1.08,0,0,1,23,1.58m0-1a2.11,2.11,0,0,0-1.08.29L10.08,7.7a2.17,2.17,0,0,0-.79,3l2.54,4.4a2.15,2.15,0,0,1-.1,2.31,24.92,24.92,0,0,0-2.54,4.4A2.13,2.13,0,0,1,7.24,23H2.17A2.17,2.17,0,0,0,0,25.17V38.83A2.17,2.17,0,0,0,2.17,41H7.24a2.13,2.13,0,0,1,1.95,1.23,25.25,25.25,0,0,0,2.55,4.39,2.13,2.13,0,0,1,.09,2.31L9.29,53.34a2.17,2.17,0,0,0,.79,3l11.84,6.83a2.11,2.11,0,0,0,1.08.29,2.17,2.17,0,0,0,1.88-1.08L27.41,58a2.14,2.14,0,0,1,1.84-1.09h.21a24.88,24.88,0,0,0,5.08,0h.21A2.14,2.14,0,0,1,36.59,58l2.53,4.39A2.17,2.17,0,0,0,41,63.42a2.11,2.11,0,0,0,1.08-.29L53.92,56.3a2.17,2.17,0,0,0,.79-3l-2.54-4.4a2.15,2.15,0,0,1,.1-2.31,24.92,24.92,0,0,0,2.54-4.4A2.13,2.13,0,0,1,56.76,41h5.07A2.17,2.17,0,0,0,64,38.83V25.17A2.17,2.17,0,0,0,61.83,23H56.76a2.13,2.13,0,0,1-1.95-1.23,25.25,25.25,0,0,0-2.55-4.39,2.13,2.13,0,0,1-.09-2.31l2.54-4.41a2.17,2.17,0,0,0-.79-3L42.08.87A2.11,2.11,0,0,0,41,.58a2.17,2.17,0,0,0-1.88,1.08L36.59,6.05a2.14,2.14,0,0,1-1.84,1.09h-.21a24.88,24.88,0,0,0-5.08,0h-.21a2.14,2.14,0,0,1-1.84-1.09L24.88,1.66A2.17,2.17,0,0,0,23,.58Z" />
-					<circle cx="32" cy="32" r="11.5" />
-					<path d="M32,21A11,11,0,1,1,21,32,11,11,0,0,1,32,21m0-1A12,12,0,1,0,44,32,12,12,0,0,0,32,20Z" />
-				</svg>
+                        <circle cx="32" cy="32" r="11.5" />
+                        <path d="M32,21A11,11,0,1,1,21,32,11,11,0,0,1,32,21m0-1A12,12,0,1,0,44,32,12,12,0,0,0,32,20Z" />
+                    </svg>
+                    <h5 class="label">Settings</h5>
 			</div>
 		</nav>
 		<section id="chat_page" class="grid page">
@@ -303,7 +306,7 @@
                             <sm-menu-option>Create a group</sm-menu-option>
                         </sm-menu>
                     </div>
-                    <sm-input id="search_chats" type="search" placeholder="Search Chats">
+                    <sm-input id="search_chats" type="search" placeholder="Search">
                         <svg slot="icon" class="icon" viewBox="0 0 64 64">
                             <title>Search</title>
                             <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
@@ -319,7 +322,7 @@
                     </svg>
                     New chat
                 </sm-button>
-                <div id="contacts_container" class="flex"></div>
+                <div id="dm_container" class="flex"></div>
                 <div id="new_conversation" class="flex direction-column empty-state">
                     <svg class="icon new-conversation align-center" viewBox="0 0 512 512">
                         <title>new conversation</title>
@@ -359,7 +362,7 @@
                     <div id="contacts_container" class="flex"></div>
                 </div>
 			</div>
-			<div id="chat" class="grid hide-on-mobile hide-completely">
+			<div id="chat" class="flex direction-column hide-on-mobile hide-completely">
 				<header class="flex align-center">
 					<svg class="icon hide-on-desktop back-button" onclick="goto('chats')" viewBox="0 0 64 64">
 						<title>Go to main page</title>
@@ -372,7 +375,7 @@
                     </div>
 				</header>
                 <h5 id="warn_no_encryption">Messages are not encrypted until receiver replies</h5>
-				<section id="chat_container" class="flex">
+				<section id="chat_container" class="flex direction-column">
 				</section>
 				<footer class="grid">
                     <div class="flex">
@@ -467,7 +470,7 @@
                     <section>
                         <h4>Sign out</h4>
                         <p>*Remember to store your <strong>PRIVATE KEY </strong> before signing out.</p>
-                        <sm-button id="sign_out">Sign Out</sm-button>
+                        <sm-button id="sign_out" variant="outlined">Sign Out</sm-button>
                     </section>
                 </div>
                 <div id="personalise_panel" class="panel hide-completely">
@@ -504,9 +507,11 @@
                     </section>
                 </div>
                 <div id="about_panel" class="panel hide-completely">
-                    <h4>Version</h4>
-                    <p>0.0.35</p>
-                    <p>Created by RanchiMall, a blockchain incorporated entity</p>
+                    <section>
+                        <h4>Version</h4>
+                        <p>0.0.35</p>
+                        <p>Created by RanchiMall, a blockchain incorporated entity</p>
+                    </section>
                 </div>
             </div>
 		</section>
@@ -911,7 +916,7 @@
         }
 
         async function signOut() {
-            if (await confirmation('Do you want to sign out?', 'Stay', 'Sign Out')) {
+            if (await confirmation('Sign Out', 'Are you sure you want to Sign out?', "Stay Signed In", "Sign Out")) {
                 await floDapps.clearCredentials()
                 setTimeout(() => {
                     onLoadStartUp()
@@ -992,8 +997,7 @@
                         floGlobals.groups = data.groups;
                         floGlobals.chats = data.chats
                         renderContactList(floGlobals.contacts)
-                        renderMailContactList(floGlobals.contacts)
-                        renderMessages(data.messages, false)
+                        renderChatList()
                         renderMailList(data.mails, false)
                         renderMarked(data.marked)
                         messenger.setUIcallbacks(renderDirectUI, renderGroupUI)
@@ -1114,9 +1118,9 @@
                 card.querySelector('.mail-content').textContent = content
                 return card
             },
-            contactCard(floID, name){
+            contactCard(floID, name, type){
                 let card = getRef('contact_template').content.cloneNode(true),
-                        cardContainer = card.querySelector('.contact')
+                        cardContainer = card.firstElementChild
                 cardContainer.setAttribute("name", name || 'Unknown')
                 cardContainer.setAttribute("flo-id", floID)
                 card.querySelector('.name').textContent = name || 'Unknown'
@@ -1126,10 +1130,17 @@
                 let randomColor = randomHsl(90, 40)
                 //cardContainer.setAttribute("text-color", randomColor.primary)
                 cardContainer.setAttribute("background-color", randomColor.primary)
-                initial.setAttribute(`style`, `background-color: ${randomColor.primary};`)
-                let duplicateCard = card.cloneNode(true);
-                getRef('contacts_container').append(card);
-                getRef('mail_contact_list').append(duplicateCard);
+                initial.setAttribute(`style`, `background-color: ${randomColor.primary};`)     
+                if(type === 'contact'){
+                    cardContainer.classList.add('contact')
+                    let duplicateCard = card.cloneNode(true);
+                    getRef('contacts_container').append(card);
+                    getRef('mail_contact_list').append(duplicateCard);
+                }
+                else{
+                    cardContainer.classList.add('chat')
+                    getRef('dm_container').append(card);
+                }
             },
             messageBubble(floID, message, timestamp, category, unconfirmed = false){
                 let card = getRef('message_template').content.cloneNode(true),
@@ -1156,10 +1167,10 @@
                     let dateCard = document.createElement('h5')
                     dateCard.classList.add('date-card')
                     dateCard.textContent = new Date().getFullYear() !== year ? `${time.slice(4, 10)} ${year}` : time.slice(4, 10)
-                    getConversationElement(floID).appendChild(dateCard)
+                    getRef('chat_container').appendChild(dateCard)
                     currentDate = `${time.slice(4, 10)} ${year}`
                 }
-                getConversationElement(floID).appendChild(card)
+                getRef('chat_container').appendChild(card)
 			},
         }
         
@@ -1168,6 +1179,7 @@
         function renderDirectUI(data) {
             console.log(data)
             renderMessages(data.messages);
+            renderChatList()
             renderMailList(data.mails)
             if(Object.keys(data.messages).length && activePage.button !== getRef('chat_page_button')){
                     getRef('chat_page_button').setAttribute('data-notifications', Object.keys(data.messages).length)
@@ -1278,7 +1290,6 @@
                 getRef('mail_contact_list').classList.add('hide-completely')
             }
             if(e.target.closest('.navbar-item') && activePage.button !== e.target.closest('.navbar-item')){
-                refresh()
                 let targetButton = e.target.closest('.navbar-item'),
                 targetPage = getRef(targetButton.dataset.target)
 				targetButton.classList.add('active')
@@ -1303,6 +1314,24 @@
                 let floID = getRef("receiver_floID").textContent;
                 messenger.removeMark(floID, "unread");
             }
+
+            //detect click on chat cards
+            if (!e.target.closest("sm-menu") && e.target.closest(".contact")){
+                getRef('chat_page_button').setAttribute('data-notifications', '0')
+                getRef('chat').classList.remove('hide-completely')
+                e.target.closest(".contact").classList.remove('unread')
+                viewConversation(e.target.closest(".contact"))
+                if(activeChat)
+                    activeChat.classList.remove('active')
+                e.target.closest(".contact").classList.add('active')
+                activeChat = e.target.closest(".contact")
+				if(activeChatPage.id === 'contacts'){
+                    getRef('chat').classList.remove('hide-on-mobile')
+					getRef('contacts').classList.add('hide-on-mobile')
+                    activeChatPage = getRef('chat')
+					getRef('main_navbar').classList.add('hide-on-mobile')
+				}
+			}
         })
 
         function copyToClipboard(target, message, parent){
@@ -1356,7 +1385,7 @@
             getRef('all_contacts').classList.toggle('no-transformations')
         }
 
-        function updateHeight(){
+        /*function updateHeight(){
             if(window.innerWidth < 640){
                 getRef('chat').style.height = window.innerHeight + 'px'
                 getRef('landing_page').style.height = window.innerHeight + 'px'
@@ -1368,7 +1397,7 @@
         }
         window.addEventListener('resize', e => {
             requestAnimationFrame(updateHeight)
-        })
+        })*/
 
 		function goto(page){
 			if(page === 'chats'){
@@ -1386,7 +1415,6 @@
 
         getRef("mails").addEventListener('click', function (e) {
 			if (e.target.closest(".mail-card") && e.target.closest(".mail-card") !== activeMail){
-                refresh()
                 getRef('mail_page_button').setAttribute('data-notifications', '0')
                 getRef('mail').classList.remove('hide-completely')
                 e.target.closest(".mail-card").classList.remove('unread')
@@ -1434,23 +1462,6 @@
         })
 
         getRef('contacts_container').addEventListener('click', function (e) {
-			if (!e.target.closest("sm-menu") && e.target.closest(".contact")){
-                refresh()
-                getRef('chat_page_button').setAttribute('data-notifications', '0')
-                getRef('chat').classList.remove('hide-completely')
-                e.target.closest(".contact").classList.remove('unread')
-                viewConversation(e.target.closest(".contact"))
-                if(activeChat)
-                    activeChat.classList.remove('active')
-                e.target.closest(".contact").classList.add('active')
-                activeChat = e.target.closest(".contact")
-				if(activeChatPage.id === 'contacts'){
-                    getRef('chat').classList.remove('hide-on-mobile')
-					getRef('contacts').classList.add('hide-on-mobile')
-                    activeChatPage = getRef('chat')
-					getRef('main_navbar').classList.add('hide-on-mobile')
-				}
-			}
             let floID;
             if (e.target.closest(".send-mail-option")){
 				showPopup('compose_mail_popup')
@@ -1467,20 +1478,9 @@
 			}
         });
 
-        getRef("sign_out").addEventListener('click', async function (e) {
-            if(await confirmation('Sign Out?',
-                'Are you sure you want to Sign out?', "Stay Signed In", "Sign Out")){
-                    signOut()
-                }
-        });
+        getRef("sign_out").addEventListener('click', signOut);
 
-        getRef("remove_account").addEventListener('click', async function (e) {
-            if(await confirmation('Remove Account?',
-                '**Remember to store your PRIVATE-KEY**\n*Private-Key will be needed to signIn again*\nAre you sure you want to remove account?',
-                'Cancel', "Remove")){
-                    signOut()
-            }
-        });
+        getRef("remove_account").addEventListener('click', signOut);
 
         getRef("secure_key").addEventListener('click', async function (e) {
             try{
@@ -1521,29 +1521,6 @@
         })
         
         getRef('reply_mail_button').addEventListener("clicked", replyMail)
-
-        let refreshing = false
-
-        function refresh(){
-            return
-            if(refreshing) return;
-            refreshing = true
-            messenger.requestDirectInbox().then(data => {
-                renderMessages(data.messages)
-                renderMailList(data.mails)
-                if(Object.keys(data.messages).length && activePage.button !== getRef('chat_page_button')){
-                    getRef('chat_page_button').setAttribute('data-notifications', Object.keys(data.messages).length)
-                    notify(`${Object.keys(data.messages).length} new message(s)`)
-                }
-                if(Object.keys(data.mails).length && activePage.button !== getRef('mail_page_button')){
-                    getRef('mail_page_button').setAttribute('data-notifications', Object.keys(data.mails).length)
-                    notify(`${Object.keys(data.mails).length} new mail(s)`)
-                }
-                setTimeout(() => {
-                    refreshing = false
-                }, 5000);
-            }).catch(error => notify(error, "error"))
-        }
 
         getRef("backup_data").addEventListener("click", function (e) {
             let backupInfoText = getRef("backup_info")
@@ -1599,6 +1576,7 @@
             let time = Date.now()
             render.messageBubble(receiver, message, time, 'sent', true)
             getRef('chat_container').scrollTo({left: 0, top: getRef('chat_container').scrollHeight, behavior: 'smooth'})
+            console.log(activeChat)
             messenger.sendMessage(message, receiver).then(data => {
                 getRef(`${receiver}_${time}`).classList.remove('unconfirmed')
             }).catch(error => notify(error, "error"));
@@ -1621,7 +1599,7 @@
                 return
             }
             messenger.storeContact(floID, name).then(result => {
-                getConversationElement(floID, name)
+                render.contactCard(floID, name)
                 hidePopup()
                 notify(`Added Contact: ${floID}`)
             }).catch(error => notify(error, "error"));
@@ -1629,12 +1607,14 @@
 
         function renderContactList(contactList = {}) {
             for (floID in contactList)
-                getConversationElement(floID, contactList[floID])
+                render.contactCard(floID, contactList[floID], 'contact')
         }
 
-        function renderMailContactList(contactList = {}) {
-            for (floID in contactList)
-                getConversationElement(floID, contactList[floID])
+        function renderChatList() {
+            getRef('dm_container').innerHTML = ''
+            for (floID of messenger.getChatOrder().direct)
+                render.contactCard(floID, floGlobals.contacts[floID], 'chat')
+            console.log()
         }
 
         function renderMarked(data) {
@@ -1644,19 +1624,6 @@
                     data[d].forEach(mark => element.classList.add(mark))
             }
         }
-
-        function getConversationElement(floID, name = "Unknown") {
-            let element = getRef(floID)
-            if (!element) {
-                element = document.createElement("div");
-				element.setAttribute("id", floID)
-				element.classList.add('flex', 'direction-column', 'hide-completely')
-                getRef('chat_container').append(element)
-                render.contactCard(floID, name)
-			}
-            return element;
-        }
-
         function renderMessages(data, markUnread = true, unconfirmed = false) {
             for (let m in data) {
                 let {floID, message, time, category} = data[m]
@@ -1667,25 +1634,22 @@
             getRef('chat_container').scrollTo(0, getRef('chat_container').scrollHeight)
         }
 
-        function viewConversation(contact) {
+        async function viewConversation(contact) {
+            getRef('chat_container').innerHTML = ''
             let floID = contact.getAttribute("flo-id"),
                 name = contact.getAttribute('name'),
                 textColor = contact.getAttribute('text-color'),
                 backgroundColor = contact.getAttribute('background-color')
             let currentConversation = getRef("receiver_floID").textContent;
-            console.log(floID, floGlobals.contacts[floID])
-            if (currentConversation != "")
-                getRef(currentConversation).classList.add('hide-completely')
-            let currentChat = getRef(floID)
-            currentChat.classList.remove('hide-completely');
             getRef("receiver_initial").textContent = floGlobals.contacts[floID] ? floGlobals.contacts[floID].charAt(0) : name.charAt(0) || ' ';
             getRef("receiver_initial").setAttribute('style', `color: ${textColor}; background-color: ${backgroundColor};`)
             getRef("receiver_name").textContent = floGlobals.contacts[floID] || name || ' ';
             getRef("receiver_floID").textContent = floID;
             if (floGlobals.pubKeys[floID])
-                getRef("warn_no_encryption").classList.add("hide-completely");
+            getRef("warn_no_encryption").classList.add("hide-completely");
             else
-                getRef("warn_no_encryption").classList.remove("hide-completely");
+            getRef("warn_no_encryption").classList.remove("hide-completely");
+            renderMessages(await messenger.getChat(floID), false)
             getRef('chat_container').scrollTo(0, getRef('chat_container').scrollHeight)   
             messenger.removeMark(floID, "unread");
         }

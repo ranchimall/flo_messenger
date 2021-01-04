@@ -15,9 +15,9 @@ smButton.innerHTML = `
 }
 :host([disabled]) .button{
     cursor: not-allowed;
-    opacity: 1;
+    opacity: 0.6;
     background: rgba(var(--text-color), 0.3) !important;
-    color: rgba(var(--foreground-color), 1);
+    color: rgba(var(--foreground-color), 0.6);
 }
 :host([variant='primary']) .button{
     background: var(--accent-color);
