@@ -1179,7 +1179,6 @@
         function renderDirectUI(data) {
             console.log(data)
             renderMessages(data.messages);
-            renderChatList()
             renderMailList(data.mails)
             if(Object.keys(data.messages).length && activePage.button !== getRef('chat_page_button')){
                     getRef('chat_page_button').setAttribute('data-notifications', Object.keys(data.messages).length)
@@ -1576,7 +1575,10 @@
             let time = Date.now()
             render.messageBubble(receiver, message, time, 'sent', true)
             getRef('chat_container').scrollTo({left: 0, top: getRef('chat_container').scrollHeight, behavior: 'smooth'})
-            console.log(activeChat)
+            const cloneContact = activeChat.cloneNode(true)
+            activeChat.remove()
+            activeChat = cloneContact
+            getRef('dm_container').prepend(cloneContact)
             messenger.sendMessage(message, receiver).then(data => {
                 getRef(`${receiver}_${time}`).classList.remove('unconfirmed')
             }).catch(error => notify(error, "error"));
@@ -1614,7 +1616,6 @@
             getRef('dm_container').innerHTML = ''
             for (floID of messenger.getChatOrder().direct)
                 render.contactCard(floID, floGlobals.contacts[floID], 'chat')
-            console.log()
         }
 
         function renderMarked(data) {
@@ -1628,8 +1629,13 @@
             for (let m in data) {
                 let {floID, message, time, category} = data[m]
                 render.messageBubble(floID, message, time, category, unconfirmed)
-                if (markUnread)
-                    getRef('contacts').querySelector(`[flo-id='${floID}']`).classList.add("unread");
+                if (markUnread){
+                    const contact = getRef('contacts').querySelector(`.chat[flo-id='${floID}']`)
+                    contact.classList.add("unread");
+                    const cloneContact = contact.cloneNode(true)
+                    contact.remove()
+                    getRef('dm_container').prepend(cloneContact)
+                }
             }
             getRef('chat_container').scrollTo(0, getRef('chat_container').scrollHeight)
         }
@@ -1646,9 +1652,9 @@
             getRef("receiver_name").textContent = floGlobals.contacts[floID] || name || ' ';
             getRef("receiver_floID").textContent = floID;
             if (floGlobals.pubKeys[floID])
-            getRef("warn_no_encryption").classList.add("hide-completely");
+                getRef("warn_no_encryption").classList.add("hide-completely");
             else
-            getRef("warn_no_encryption").classList.remove("hide-completely");
+                getRef("warn_no_encryption").classList.remove("hide-completely");
             renderMessages(await messenger.getChat(floID), false)
             getRef('chat_container').scrollTo(0, getRef('chat_container').scrollHeight)   
             messenger.removeMark(floID, "unread");

@@ -544,6 +544,18 @@ sm-button[variant=primary] .icon {
   text-transform: uppercase;
 }
 
+.chat {
+  animation: slide-up 0.3s forwards;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(1rem);
+  }
+  to {
+    transform: none;
+  }
+}
 .contact {
   position: relative;
   display: grid;
