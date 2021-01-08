@@ -662,8 +662,11 @@ customElements.define('sm-textarea',
         }
         set value(val) {
             this.shadowRoot.querySelector('textarea').value = val;
-            this.fireEvent()
             this.checkInput()
+            this.fireEvent()
+        }
+        focusIn() {
+            this.shadowRoot.querySelector('textarea').focus()
         }
         fireEvent() {
             let event = new Event('input', {
@@ -2996,21 +2999,12 @@ customElements.define('sm-menu', class extends HTMLElement {
         slot.addEventListener('slotchange', e => {
             this.availableOptions = slot.assignedElements()
             this.containerDimensions = this.optionList.getBoundingClientRect()
-            this.menuDimensions = menu.getBoundingClientRect()
         });
         window.addEventListener('mousedown', e => {
             if (!this.contains(e.target) && e.button !== 2) {
                 this.collapse()
             }
         })
-        if (this.hasAttribute('set-context') && this.getAttribute('set-context') === 'true') {
-            this.parentNode.setAttribute('oncontextmenu', 'return false')
-            this.parentNode.addEventListener('mouseup', e => {
-                if (e.button === 2) {
-                    this.expand()
-                }
-            })
-        }
     }
 })
 

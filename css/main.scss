@@ -23,6 +23,10 @@ body{
     --error-color: red;
     color: rgba(var(--text-color), 1);
     background: rgba(var(--foreground-color), 1);
+    #scroll_to_bottom{
+        background: rgba(var(--foreground-color), 1);
+        box-shadow: 0 0.3rem 0.4rem rgba(0, 0, 0, 0.2);
+    }
 }
 body[data-theme='dark']{
     --secondary-color: #FDB956;
@@ -30,10 +34,15 @@ body[data-theme='dark']{
     --text-color-light: 170, 170, 170;
     --foreground-color: 20, 20, 20;
     .initial{
+        color: rgba(var(--text-color), 1) !important;
         box-shadow: 0 0.1rem 0.1rem #00000016, 0 0.1rem 0.3rem #00000040;
     }
     .message{
         color: rgba(var(--text-color), 1);
+    }
+    #scroll_to_bottom{
+        background: linear-gradient(rgba(var(--text-color), 0.1), rgba(var(--text-color), 0.1)), rgba(var(--foreground-color), 1);
+        box-shadow: 0 0.4rem 0.4rem rgba(0, 0, 0, 0.3);
     }
 }
 p{
@@ -141,9 +150,8 @@ textarea{
     }
 }
 a:any-link{
-    text-decoration: none;
+    word-wrap: break-word;
     color: var(--accent-color);
-    text-transform: capitalize;
     font-weight: 500;
 }
 .solid-background{
@@ -304,13 +312,12 @@ sm-button[variant="primary"]{
     width: 100%;
     padding: 0 1.5rem;  
     height: 100%;
-    align-items: flex-end;
+    align-items: center;
     .logo-section{
         padding: 1.5rem;
         display: flex;
     }
     .title-font{
-        text-transform: capitalize;
         line-height: 1.2;
         font-weight: 700;
         font-size: 2.5rem;
@@ -322,6 +329,7 @@ sm-button[variant="primary"]{
         z-index: 1;
         h4{
             color: rgba(var(--foreground-color), 1);
+            font-weight: 500;
         }
         sm-button{
             margin: 1.5rem 0 2rem 0;
@@ -349,11 +357,6 @@ sm-button[variant="primary"]{
 #sign_in_popup{
     &::part(popup-body){
         padding: 0;
-    }
-    #sign_in{
-        .left{
-            background-size: 60%;
-        }
     }
 }
 .sign-in-box{
@@ -487,6 +490,7 @@ sm-button[variant="primary"]{
     }
 }
 .initial{
+    position: relative;
     justify-content: center;
     font-size: 1.2rem;
     width: 2.4rem;
@@ -496,17 +500,6 @@ sm-button[variant="primary"]{
     border-radius: 2rem;
     text-transform: uppercase;
 }
-.chat{
-    animation: slide-up 0.3s forwards;
-}
-@keyframes slide-up{
-    from{
-        transform: translateY(1rem);
-    }
-    to{
-        transform: none;
-    }
-}
 .contact{
     position: relative;
     display: grid;
@@ -514,7 +507,7 @@ sm-button[variant="primary"]{
     grid-template-columns: auto 1fr auto;
     grid-template-areas: 'dp . menu'
                          'dp . menu';
-    padding: 0.8rem 1rem;
+    padding: 0.8rem 1.5rem;
     align-items: center;
     &:focus{
         background: rgba(var(--text-color), 0.06);
@@ -525,7 +518,7 @@ sm-button[variant="primary"]{
     }
     .name{
         font-size: 1rem;
-        font-weight: 500;
+        font-weight: 400;
         text-transform: capitalize;
     }
     .address{
@@ -553,22 +546,20 @@ sm-button[variant="primary"]{
     align-self: center;
 }
 .mail-card.unread::before,
-.contact.unread::before{
+.contact.unread .initial::before{
     content: '';
     position: absolute;
-    width: 0.2rem;
-    height: 100%;
+    padding: 0.3rem;
+    border-radius: 1rem;
     top: 0;
     left: 0;
-    background: #00C853;
+    background: var(--accent-color);
 }
 .mail-card.unread,
 .contact.unread{
-    overflow: hidden;
-    h4{
+    h4, h5 ,p{
         font-weight: 700;
     }
-    font-weight: 600;
 }
 .mail-card{
     position: relative;
@@ -780,6 +771,7 @@ sm-button[variant="primary"]{
     }
 }
 #contacts, #mails{
+    overflow-y: hidden;
     position: relative;
     grid-template-rows: max-content 1fr;
     height: calc(100vh - 3.5rem);
@@ -826,17 +818,44 @@ sm-button[variant="primary"]{
         }
         .initial{
             margin-right: 1rem;
+            width: 1.6em;
+            height: 1.6em;
         }
         h4{
             font-weight: 500;
-            opacity: 0.8;
-        }
-        h5{ 
-            opacity: 0.7;
-            font-weight: 400;
+            font-size: 0.9rem;
         }
     }
+    #scroll_to_bottom{
+        position: fixed;
+        right: 0;
+        bottom: 4rem;
+        width: 2.6rem;
+        height: 2.6rem;
+        padding: 0.9rem;
+        border-radius: 4rem;
+        z-index: 1;
+        margin: 1.5rem;
+        stroke-width: 8;
+        cursor: pointer;
+        transform: scale(0);
+        transition: transform 0.3s;
+    }
     footer{
+        #toggle_emoji{
+            align-self: center;
+            padding: 0.6rem;
+            width: 2.6rem;
+            height: 2.6rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            path{
+                fill: rgba(var(--text-color), 0.5);
+            }
+            &.active path{
+                fill: var(--accent-color);
+            }
+        }
         .flex{
             align-items: flex-end;
             padding: 1rem;
@@ -844,6 +863,7 @@ sm-button[variant="primary"]{
         sm-textarea::part(textarea){
             background: rgba(var(--text-color), 0.1);
             padding-right: 3rem;
+            border-radius: 2rem;
         }
     }
     #send_message_button{
@@ -882,14 +902,23 @@ sm-button[variant="primary"]{
         .message-body{
             overflow-wrap: break-word;
             word-wrap: break-word;
+            word-break: break-all;
+            word-break: break-word;
+            -moz-hyphens: auto;
+            -webkit-hyphens: auto;
+            hyphens: auto;
             white-space: pre-wrap;
             box-shadow: 0 1px 0.1rem #00000020;
             padding: 0.6em 1em;
+            line-height: 1.5;
+            a{
+                color: inherit;
+            }
         }
         .time{
+            white-space: nowrap;
             font-size: 0.8em;
             opacity: 0.8;   
-            margin-top: 0.3rem;
         }
     }
     .sent{
@@ -945,11 +974,53 @@ sm-button[variant="primary"]{
     }
     .unconfirmed{
         opacity: 0.7;
+        transform-origin: left;
+        animation: slide-up 0.3s forwards;
+    }
+}
+@keyframes slide-up{
+    from{
+        transform: translate(-2rem, 2rem) scale(0.8);
+    }
+    to{
+        transform: none;
     }
 }
 #chat_container{
     flex: 1;
     padding: 0 1rem;
+}
+#emoji_picker{
+    display: grid;
+    background: rgba(var(--text-color), 0.06);
+    border-radius: 1rem;
+    margin: 0 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
+    box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    overflow-y: auto;
+    flex-wrap: wrap;
+    max-height: min(16rem, 30vh);
+}
+.emoji{
+    font-size: 1.6rem;
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: 0.6rem;
+    user-select: none;
+}
+.big-emoji{
+    &::after{
+        display: none;
+    }
+    .message-body{
+        background: none !important;
+        padding: 0 !important;
+        font-size: 2.6rem;
+    }
+}
+.emoji:hover{
+    background: rgba(var(--text-color), 0.1);
 }
 #new_conversation, #no_mails{
     height: 100%;
@@ -990,11 +1061,11 @@ sm-button[variant="primary"]{
 #dm_container:not(:empty) ~ .empty-state{
     display: none;
 }
+#dm_container{
+    transition: 0.3s;
+}
 sm-tab-panels{
     overflow: hidden auto;
-}
-sm-tab-header{
-    --accent-color: rgba(var(--text-color), 0.7);
 }
 
 #inbox_mail_container,
@@ -1103,13 +1174,7 @@ sm-tab-header{
         height: 100%;
     }
     #sing_in{
-        grid-template-rows: 16rem 1fr;
         max-height: 90vh;
-        background: url(sign-in-back.svg) no-repeat center 6rem;
-        background-size: 50%;
-        .left{
-            border-radius: 0.5rem 0.5rem 0 0;
-        }
     }
     #landing_illustration{
         grid-area: illustration;
@@ -1141,7 +1206,7 @@ sm-tab-header{
     }
     
     ::-webkit-scrollbar-thumb{
-        background: rgba(var(--text-color), 0.2);
+        background: rgba(var(--text-color), 0.3);
         &:hover{
             background: rgba(var(--text-color), 0.5);
         }
@@ -1173,6 +1238,11 @@ sm-tab-header{
             h4{
                 color: var(--accent-color);
             }
+        }
+    }
+    #sign_in_popup{
+        .popup-header{
+            padding-top: 1.5rem;
         }
     }
     #main_navbar{
@@ -1226,7 +1296,7 @@ sm-tab-header{
     #chat{
         .message{
             .message-body{
-                max-width: 50ch ;
+                max-width: 65ch ;
             }
         }
     }
@@ -1280,7 +1350,7 @@ sm-tab-header{
             padding: 0.5rem 1.5rem;
         }
         #chat_container{
-            padding: 1rem 1.5rem;
+            padding: 1rem 5rem;
         }
     }
 }

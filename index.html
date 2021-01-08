@@ -48,14 +48,12 @@
 			<div class="left">
 				<h4>
 					FLO Messenger
-					<div class="line"></div>
 				</h4>
 				<h1 class="title-font">
-					Messages or Emails?<br>
-					Why Not Both!
+                    Truely Secure,
+                    Private and Reliable. 
                 </h1>				
-                <sm-button variant="primary" onclick="showPopup('sign_in_popup')">Sign In / Sign Up</sm-button>
-				<p class="light-text">New here? Sign up and get your FLO private key.</p>
+                <sm-button variant="primary" onclick="showPopup('sign_in_popup')">Sign In / Up</sm-button>
 			</div>
 			<div id="landing_illustration" class="right">				
 				<img src="assets/message-background.svg" alt="">
@@ -63,16 +61,14 @@
 		</div>
     </div>
     <sm-popup id="sign_in_popup">  
+        <header class="popup-header" slot="header">
+            <svg class="icon" onclick="this.closest('sm-popup').hide()" viewBox="0 0 64 64">
+                <title>close</title>
+                <line x1="64" y1="0" x2="0" y2="64" />
+                <line x1="64" y1="64" x2="0" y2="0" />
+            </svg>
+        </header>
         <div id="sign_in" class="grid">
-            <div class="left">
-                <header class="popup-header" slot="header">
-                    <svg class="icon" onclick="this.closest('sm-popup').hide()" viewBox="0 0 64 64">
-                        <title>close</title>
-                        <line x1="64" y1="0" x2="0" y2="64" />
-                        <line x1="64" y1="64" x2="0" y2="0" />
-                    </svg>
-                </header>
-            </div>
             <div class="sign-in-box flex direction-column">
                 <sm-tab-header target="user_entry">
                     <sm-tab>Sign In</sm-tab>
@@ -359,6 +355,11 @@
                             </svg>
                         </sm-input>
                     </header>
+                    <div id="selected_contacts">
+                        <h4>Selected group members</h4>
+                        <div id="selected_contacts_container">
+                        </div>
+                    </div>
                     <div id="contacts_container" class="flex"></div>
                 </div>
 			</div>
@@ -368,23 +369,25 @@
 						<title>Go to main page</title>
 						<polyline points="48.01 0.35 16.35 32 48.01 63.65"/>
                     </svg>
-                    <div id="receiver_initial" onclick="goto('chats')" class="initial flex align-center"></div>
-					<div class="flex rest direction-column">
-						<h4 id="receiver_name"></h4>
-						<h5 id="receiver_floID" class="text-overflow"></h5>
-                    </div>
+                    <div id="receiver_initial" class="initial flex align-center"></div>
+                    <h4 id="receiver_name"></h4>
 				</header>
                 <h5 id="warn_no_encryption">Messages are not encrypted until receiver replies</h5>
 				<section id="chat_container" class="flex direction-column">
-				</section>
+                </section>
+                <svg id="scroll_to_bottom" onclick="scrollToBottom()" class="icon" viewBox="0 0 64 64">
+                    <title></title>
+                    <polyline points="63.65 15.99 32 47.66 0.35 15.99"/>
+                </svg>
 				<footer class="grid">
+                    <div id="emoji_picker" class="hide-completely"></div>
                     <div class="flex">
+                        <svg id="toggle_emoji" onclick="toggleEmoji(this)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M32,0A32,32,0,1,0,64,32,32,32,0,0,0,32,0ZM43.84,17.51a4.92,4.92,0,1,1-4.92,4.92A4.92,4.92,0,0,1,43.84,17.51Zm-23.62-.06a5,5,0,1,1-5,5A5,5,0,0,1,20.22,17.45ZM32,54.42A19.68,19.68,0,0,1,12.31,34.73H51.69A19.68,19.68,0,0,1,32,54.42Z"/></svg>
                         <sm-textarea id="type_message" placeholder="Type a message" class="rest"></sm-textarea>
                         <svg xmlns="http://www.w3.org/2000/svg" id="send_message_button" class="icon" viewBox="0 0 64 64">
                             <path d="M63.34,31,3.07,4.71A2.19,2.19,0,0,0,.18,7.58L8.94,28.29,42.18,32,8.94,35.71.18,56.42a2.19,2.19,0,0,0,2.89,2.87L63.34,33A1.09,1.09,0,0,0,63.34,31Z"/>
                         </svg>
                     </div>
-                    <div id="emoji_container"></div>
 				</footer>
 			</div>
 		</section>
@@ -920,7 +923,7 @@
                 await floDapps.clearCredentials()
                 setTimeout(() => {
                     onLoadStartUp()
-                    notifications.clearAll()
+                    getRef('notification_drawer').clearAll()
                 }, 1000);
             }
         }
@@ -976,7 +979,7 @@
             getRef('loading_page').classList.remove("hide-completely")
             //clear Rendered Elements
             let elementsToReset = ['inbox_mail_container', 'sent_mail_container', 'contacts_container', 'chat_container',
-                'receiver_floID', 'receiver_name', 'mail_contact_list'
+                 'receiver_name', 'mail_contact_list'
             ]
             //, "backup_info"
             elementsToReset.forEach(e => clearElement(getRef(e)))
@@ -1037,7 +1040,8 @@
             activeChatPage = getRef('contacts'),
             activeMailPage = getRef('mails'),
             activeChat,
-            activeMail
+            activeMail,
+            frag = document.createDocumentFragment()
 
 		const	mainPage = document.querySelector('main')
 
@@ -1127,10 +1131,10 @@
                 card.querySelector('.address').textContent = floID
                 let initial = card.querySelector('.initial')
                 initial.textContent = name ? name.charAt(0) : 'U'
-                let randomColor = randomHsl(90, 40)
-                //cardContainer.setAttribute("text-color", randomColor.primary)
-                cardContainer.setAttribute("background-color", randomColor.primary)
-                initial.setAttribute(`style`, `background-color: ${randomColor.primary};`)     
+                let randomColor = randomHsl(70, 30)
+                cardContainer.setAttribute("text-color", randomColor.primary)
+                cardContainer.setAttribute("background-color", randomColor.light)
+                initial.setAttribute(`style`, `background-color: ${randomColor.light}; color: ${randomColor.primary};`)     
                 if(type === 'contact'){
                     cardContainer.classList.add('contact')
                     let duplicateCard = card.cloneNode(true);
@@ -1157,7 +1161,13 @@
                     cardContainer.classList.add('unconfirmed')
 
                 cardContainer.classList.add(category)
-                cardContainer.children[0].textContent = message
+                if(isValidUrl(message))
+                    cardContainer.children[0].innerHTML = `<a href="${message}" target="_blank">${message}</a>`
+                else{
+                    if(message.length === 2 && isEmoji(message))
+                        cardContainer.classList.add('big-emoji')
+                    cardContainer.children[0].textContent = message
+                }
                 cardContainer.children[1].textContent = finalHours
                 if(currentFloID !== floID){
                     currentDate = null
@@ -1167,14 +1177,33 @@
                     let dateCard = document.createElement('h5')
                     dateCard.classList.add('date-card')
                     dateCard.textContent = new Date().getFullYear() !== year ? `${time.slice(4, 10)} ${year}` : time.slice(4, 10)
-                    getRef('chat_container').appendChild(dateCard)
                     currentDate = `${time.slice(4, 10)} ${year}`
+                    let frag = document.createDocumentFragment()
+                    frag.append(dateCard, card)
+                    return frag
                 }
-                getRef('chat_container').appendChild(card)
+                else
+                    return card;
 			},
         }
-        
         let currentDate, currentFloID
+
+        const isValidUrl = (url) => {
+            try {
+                new URL(url);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        };
+
+        const isEmoji = (txt) => {
+            if(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/.test(txt)) 
+                return true
+            else 
+                return false
+        }
+        
 
         function renderDirectUI(data) {
             console.log(data)
@@ -1193,6 +1222,13 @@
         function renderGroupUI(data){
             console.log(data)
         }
+
+        window.addEventListener('focus', e => {
+            console.log('focused')
+        })
+        window.addEventListener('blur', e => {
+            console.log('blured')
+        })
         
 		document.addEventListener('keyup', e => {
             if(e.target.closest('#send_mail_to')){
@@ -1244,6 +1280,16 @@
                     else
                         getRef('mail_contact_list').lastElementChild.focus()
                 }
+            }
+        })
+
+        let prevScroll
+        getRef('chat_container').addEventListener('scroll', function() {
+            if((this.scrollHeight > this.clientHeight) && (prevScroll - this.scrollTop >= 100)){
+               getRef('scroll_to_bottom').classList.add('no-transformations')
+            }
+            else{
+                getRef('scroll_to_bottom').classList.remove('no-transformations')
             }
         })
 
@@ -1310,28 +1356,47 @@
                 showPopup('compose_mail_popup')
             }
             if(e.target.closest('#chat')){
-                let floID = getRef("receiver_floID").textContent;
-                messenger.removeMark(floID, "unread");
+                messenger.removeMark(currentReceiver, "unread");
             }
 
             //detect click on chat cards
             if (!e.target.closest("sm-menu") && e.target.closest(".contact")){
+                const contact = e.target.closest(".contact")
+                if(activeChat === contact && window.innerWidth > 640) return
                 getRef('chat_page_button').setAttribute('data-notifications', '0')
                 getRef('chat').classList.remove('hide-completely')
-                e.target.closest(".contact").classList.remove('unread')
-                viewConversation(e.target.closest(".contact"))
+                contact.classList.remove('unread')
+                viewConversation(contact)
                 if(activeChat)
                     activeChat.classList.remove('active')
-                e.target.closest(".contact").classList.add('active')
-                activeChat = e.target.closest(".contact")
+                contact.classList.add('active')
+                activeChat = contact
 				if(activeChatPage.id === 'contacts'){
                     getRef('chat').classList.remove('hide-on-mobile')
 					getRef('contacts').classList.add('hide-on-mobile')
                     activeChatPage = getRef('chat')
 					getRef('main_navbar').classList.add('hide-on-mobile')
 				}
-			}
+            }
+            
+            //Detect emoji clicks
+            if(e.target.closest('.emoji')){
+                getRef('type_message').value += e.target.closest('.emoji').textContent
+                getRef('type_message').focusIn()
+            }
         })
+
+        const emojis = ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾"];
+        let renderedEmojis = ''
+        emojis.forEach(emoji => {
+            renderedEmojis += `<span class="emoji">${emoji}</span>`
+        })
+        getRef('emoji_picker').innerHTML = renderedEmojis
+
+        function toggleEmoji(button){
+            button.classList.toggle('active')
+            getRef('emoji_picker').classList.toggle('hide-completely')
+        }
 
         function copyToClipboard(target, message, parent){
             let copyText, copyTarget = target;
@@ -1384,7 +1449,7 @@
             getRef('all_contacts').classList.toggle('no-transformations')
         }
 
-        /*function updateHeight(){
+        function updateHeight(){
             if(window.innerWidth < 640){
                 getRef('chat').style.height = window.innerHeight + 'px'
                 getRef('landing_page').style.height = window.innerHeight + 'px'
@@ -1394,9 +1459,6 @@
                 getRef('landing_page').style.height = '100vh'
             }
         }
-        window.addEventListener('resize', e => {
-            requestAnimationFrame(updateHeight)
-        })*/
 
 		function goto(page){
 			if(page === 'chats'){
@@ -1460,7 +1522,7 @@
             }
         })
 
-        getRef('contacts_container').addEventListener('click', function (e) {
+        getRef('dm_container').addEventListener('click', function (e) {
             let floID;
             if (e.target.closest(".send-mail-option")){
 				showPopup('compose_mail_popup')
@@ -1567,18 +1629,30 @@
         })
 
         function sendMessage() {
-            let receiver = getRef("receiver_floID").textContent;
+            let receiver = currentReceiver
             let container;
             let message = getRef('type_message').value;
 			getRef('type_message').value = ''
 			if(message.trim() === '') return
             let time = Date.now()
-            render.messageBubble(receiver, message, time, 'sent', true)
-            getRef('chat_container').scrollTo({left: 0, top: getRef('chat_container').scrollHeight, behavior: 'smooth'})
-            const cloneContact = activeChat.cloneNode(true)
-            activeChat.remove()
-            activeChat = cloneContact
-            getRef('dm_container').prepend(cloneContact)
+            getRef('chat_container').append(render.messageBubble(receiver, message, time, 'sent', true))
+            scrollToBottom(true)
+            if(activeChat !== getRef('dm_container').children[0]){
+                const contact = getRef('dm_container').querySelector(`.chat[flo-id="${activeChat.getAttribute('flo-id')}"]`)
+                const cloneContact = contact.cloneNode(true)
+                contact.remove()
+                activeChat = cloneContact
+                getRef('dm_container').prepend(cloneContact)
+                animateTo(getRef('dm_container').children[0], [
+                        {transform: 'translateY(1rem)'},
+                        {transform: 'none'},
+                    ],
+                    {
+                        easing: 'ease',
+                        duration: 300
+                    }
+                )
+            }
             messenger.sendMessage(message, receiver).then(data => {
                 getRef(`${receiver}_${time}`).classList.remove('unconfirmed')
             }).catch(error => notify(error, "error"));
@@ -1625,38 +1699,54 @@
                     data[d].forEach(mark => element.classList.add(mark))
             }
         }
+
+        function scrollToBottom(smooth = false){
+            getRef('chat_container').scrollTo({top: getRef('chat_container').scrollHeight, behaviour: smooth ? 'smooth': ''})
+        }
+
         function renderMessages(data, markUnread = true, unconfirmed = false) {
             for (let m in data) {
                 let {floID, message, time, category} = data[m]
-                render.messageBubble(floID, message, time, category, unconfirmed)
-                if (markUnread){
-                    const contact = getRef('contacts').querySelector(`.chat[flo-id='${floID}']`)
-                    contact.classList.add("unread");
-                    const cloneContact = contact.cloneNode(true)
-                    contact.remove()
-                    getRef('dm_container').prepend(cloneContact)
+                frag.append(render.messageBubble(floID, message, time, category, unconfirmed))
+                if (markUnread && activeChat !== getRef('dm_container').children[0]){
+                        const contact = getRef('dm_container').querySelector(`.chat[flo-id='${floID}']`)
+                        contact.classList.add("unread");
+                        const cloneContact = contact.cloneNode(true)
+                        contact.remove()
+                        getRef('dm_container').prepend(cloneContact)
+                        animateTo(getRef('dm_container').children[0], [
+                            {transform: 'translateY(1rem)'},
+                            {transform: 'none'},
+                        ],
+                        {
+                            easing: 'ease',
+                            duration: 300
+                        }
+                        )
+                    }
                 }
-            }
-            getRef('chat_container').scrollTo(0, getRef('chat_container').scrollHeight)
+            getRef('chat_container').append(frag)
+            scrollToBottom()
         }
-
+        
+        let currentReceiver
         async function viewConversation(contact) {
             getRef('chat_container').innerHTML = ''
             let floID = contact.getAttribute("flo-id"),
                 name = contact.getAttribute('name'),
                 textColor = contact.getAttribute('text-color'),
                 backgroundColor = contact.getAttribute('background-color')
-            let currentConversation = getRef("receiver_floID").textContent;
+            currentReceiver = floID
             getRef("receiver_initial").textContent = floGlobals.contacts[floID] ? floGlobals.contacts[floID].charAt(0) : name.charAt(0) || ' ';
             getRef("receiver_initial").setAttribute('style', `color: ${textColor}; background-color: ${backgroundColor};`)
             getRef("receiver_name").textContent = floGlobals.contacts[floID] || name || ' ';
-            getRef("receiver_floID").textContent = floID;
             if (floGlobals.pubKeys[floID])
                 getRef("warn_no_encryption").classList.add("hide-completely");
             else
                 getRef("warn_no_encryption").classList.remove("hide-completely");
             renderMessages(await messenger.getChat(floID), false)
-            getRef('chat_container').scrollTo(0, getRef('chat_container').scrollHeight)   
+            scrollToBottom() 
+            prevScroll = getRef('chat_container').scrollTop
             messenger.removeMark(floID, "unread");
         }
 
@@ -1799,6 +1889,7 @@
         }
 
         const windowSizeObserver = new ResizeObserver(entries => {
+            updateHeight()
             if(entries[0].borderBoxSize[0].inlineSize > 640){
                 getRef('settings_sidebar').style = ''
                 getRef('settings_panel').style = ''
@@ -8747,7 +8838,6 @@ Bitcoin.Util = {
     }
 })();
 </script>
-
 <script id="floCrypto" version="2.0.0">
     /* FLO Crypto Operators*/
     const floCrypto = {
