@@ -51,7 +51,7 @@
 					FLO Messenger
 				</h4>
 				<h1 class="title-font">
-                    Truely Secure,
+                    Truly Secure,
                     Private and Reliable. 
                 </h1>				
                 <sm-button variant="primary" onclick="showPopup('sign_in_popup')">Sign In / Up</sm-button>
@@ -749,7 +749,7 @@
 		}
 
         const currentYear = new Date().getFullYear()
-        function formatedTime(time, relative) {
+        function getFormatedTime(time, relative) {
             try {
                 if (String(time).indexOf('_'))
                     time = String(time).split('_')[0]
@@ -1140,7 +1140,7 @@
                 card.querySelector('.name').textContent = name || 'Unknown'
                 const lastMessage = Object.values(await messenger.getChat(floID)).pop()
                 card.querySelector('.last-message').textContent = lastMessage.message
-                card.querySelector('.time').textContent = formatedTime(lastMessage.time, true)
+                card.querySelector('.time').textContent = getFormatedTime(lastMessage.time, true)
                 let initial = card.querySelector('.initial')
                 initial.textContent = name ? name.charAt(0) : 'U'
                 let color = randomColor()
@@ -1676,7 +1676,7 @@
             messenger.sendMessage(message, receiver).then(data => {
                 getRef(`${receiver}_${time}`).classList.remove('unconfirmed')
                 activeChat.chatCard.querySelector('.last-message').textContent = message
-                activeChat.chatCard.querySelector('.time').textContent = formatedTime(Date.now(), true)
+                activeChat.chatCard.querySelector('.time').textContent = getFormatedTime(Date.now(), true)
             }).catch(error => notify(error, "error"));
         }
 
@@ -1735,7 +1735,7 @@
                 if(activeChat['receiver'] && activeChat['receiver'] === floID)
                     frag.append(render.messageBubble(floID, message, time, category))
                 const contact = getRef('dm_container').querySelector(`.chat[flo-id='${floID}']`)
-                if (markUnread){
+                if (markUnread && contact){
                     contact.classList.add("unread");
                     if(activeChat['chatCard'] !== getRef('dm_container').children[0] || contact !== getRef('dm_container').children[0]){
                         const cloneContact = contact.cloneNode(true)
@@ -1755,7 +1755,7 @@
                 if(updateChatCard){
                     const chatCard = getRef('dm_container').querySelector(`[flo-id="${floID}"]`)
                     chatCard.querySelector('.last-message').textContent = message
-                    chatCard.querySelector('.time').textContent = formatedTime(time, true)
+                    chatCard.querySelector('.time').textContent = getFormatedTime(time, true)
                 }
             } 
             getRef('chat_container').append(frag)
