@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FLO Messenger</title>
-    <link rel="shortcut icon" href="assets/messenger-favicon.png" type="image/png">
+    <link rel="shortcut icon" href="assets/messenger-favicon_1.png" type="image/png">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.min.css">
@@ -242,14 +242,13 @@
     </template>
 
 	<template id="contact_template">
-		<div class="contact" tabindex="0">
+		<div class="contact interact" tabindex="0">
 			<div class="initial flex align-center"></div>
 			<h4 class="name"></h4>
             <h5 class="last-message"></h5>
             <h5 class="time"></h5>
             <!--<sm-menu align-options="right">
                 <sm-menu-option class="send-mail-option">Send mail</sm-menu-option>
-                <sm-menu-option onclick="copyToClipboard('.copy', 'FLO ID copied', this.closest('.contact'))">Copy FLO ID</sm-menu-option>
             </sm-menu>-->
 		</div>
 	</template>
@@ -300,7 +299,7 @@
 			<div id="contacts" class="grid">
 				<header class="grid">
                     <div class="grid align-center">
-                        <h4>Direct Messages</h4>
+                        <h4>Chats</h4>
                         <sm-menu align-options="right">
                             <sm-menu-option onclick="initGroupCreation()">Create a group</sm-menu-option>
                         </sm-menu>
@@ -661,7 +660,7 @@
         })
 
         function setAttributes(el, attrs) {
-            for (var key in attrs) {
+            for (key in attrs) {
                 el.setAttribute(key, attrs[key]);
             }
         }
@@ -752,15 +751,19 @@
         function getFormatedTime(time, relative) {
             try {
                 if (String(time).indexOf('_'))
-                    time = String(time).split('_')[0]
-                let timeFrag = new Date(parseInt(time)).toString().split(' '),
+                time = String(time).split('_')[0]
+                const intTime = parseInt(time)
+                if(String(intTime).length < 13)
+                    time *= 1000
+                let timeFrag = new Date(intTime).toString().split(' '),
                     day = timeFrag[0],
                     month = timeFrag[1],
                     date = timeFrag[2],
                     year = timeFrag[3],
-                    minutes = new Date(parseInt(time)).getMinutes(),
-                    hours = new Date(parseInt(time)).getHours(),
+                    minutes = new Date(intTime).getMinutes(),
+                    hours = new Date(intTime).getHours(),
                     currentTime = new Date().toString().split(' ')
+
                 minutes = minutes < 10 ? `0${minutes}` : minutes
                 let finalHours = ``;
                 if (hours > 12)
@@ -773,12 +776,23 @@
                 finalHours = hours >= 12 ? `${finalHours} PM` : `${finalHours} AM`
                 if (relative) {
                     if (year == currentYear) {
-                        if (currentTime[1] === month && date === currentTime[2])
-                            return `Today at ${finalHours}`;
+                        if (currentTime[1] === month){
+                            const dateDiff = (parseInt(currentTime[2]) - parseInt(date))
+                            if(dateDiff === 0)
+                                return `${finalHours}`;
+                            else if(dateDiff === 1)
+                                return `yesterday`;
+                            else if(dateDiff > 1 && dateDiff < 8)
+                                return currentTime[0];
+                            else
+                                return ` ${date} ${month}`;
+                        }
                         else
                             return ` ${date} ${month}`;
 
                     }
+                    else
+                        return `${month} ${year}`;
                 }
                 else
                     return `${month} ${date} ${year}`;
@@ -1058,18 +1072,9 @@
 		// render elements 
 		const render = {
 			mailCard(floID, ref, subject, timestamp, content, markUnread){
+                console.log(timestamp)
                 let card = getRef('mail_card_template').content.cloneNode(true),
-                    cardContainer = card.querySelector('.mail-card'),
-                    time = new Date(timestamp).toString(),
-                    minutes = String(new Date(timestamp).getMinutes()),
-                    hours = new Date(timestamp).getHours(),
-                    dateTime
-                minutes = minutes.length === 1 ? `0${minutes}` : minutes  
-                let finalHours = hours - 12 > 0 ? `${hours - 12}:${minutes} pm` : `${hours}:${minutes} am`
-                if(new Date().getDate() === new Date(timestamp).getDate())
-                    dateTime = finalHours
-                else
-                    dateTime = time.slice(4, 10)
+                    cardContainer = card.firstElementChild
                 let mailSummery = content.split(' ')
                 mailSummery.splice(16)
                 mailSummery = mailSummery.join(' ')
@@ -1089,26 +1094,16 @@
                     contact = floGlobals.contacts[floID] || floID
                 if(markUnread)
                     cardContainer.classList.add('unread')
-                card.querySelector('.sender').textContent = contact
-                card.querySelector('.subject').textContent = subject
-                card.querySelector('.date').textContent = dateTime
-                card.querySelector('.description').textContent = mailSummery
+                cardContainer.querySelector('.sender').textContent = contact
+                cardContainer.querySelector('.subject').textContent = subject
+                cardContainer.querySelector('.date').textContent = getFormatedTime(timestamp, true)
+                cardContainer.querySelector('.description').textContent = mailSummery
                 return card
             },
             
             mail(from, to, subject, timestamp, content){
                 let card = getRef('mail_template').content.cloneNode(true),
-                    cardContainer = card.querySelector('.mail'),
-                    time = new Date(timestamp).toString(),
-                    minutes = String(new Date(timestamp).getMinutes()),
-                    hours = new Date(timestamp).getHours(),
-                    dateTime
-                minutes = minutes.length === 1 ? `0${minutes}` : minutes  
-                let finalHours = hours - 12 > 0 ? `${hours - 12}:${minutes} pm` : `${hours}:${minutes} am`
-                if(new Date().getDate() === new Date(timestamp).getDate())
-                    dateTime = finalHours
-                else
-                    dateTime = time.slice(4, 10)
+                    cardContainer = card.querySelector('.mail')
                 let senderName, floID
                 if(from === myFloID){
                     let count = 0, list = [];
@@ -1128,7 +1123,7 @@
                 card.querySelector('.sender-name').textContent = senderName
                 card.querySelector('.flo-id').textContent = floID
                 card.querySelector('.mail-subject').textContent = subject
-                card.querySelector('.date').textContent = dateTime;
+                card.querySelector('.date').textContent = getFormatedTime(timestamp);
                 card.querySelector('.mail-content').textContent = content
                 return card
             },
@@ -1137,10 +1132,13 @@
                         cardContainer = card.firstElementChild
                 cardContainer.setAttribute("name", name || 'Unknown')
                 cardContainer.setAttribute("flo-id", floID)
-                card.querySelector('.name').textContent = name || 'Unknown'
-                const lastMessage = Object.values(await messenger.getChat(floID)).pop()
-                card.querySelector('.last-message').textContent = lastMessage.message
-                card.querySelector('.time').textContent = getFormatedTime(lastMessage.time, true)
+                cardContainer.querySelector('.name').textContent = name || 'Unknown'
+                messenger.getChat(floID).then(chat => {
+                    const lastMessage = Object.values(chat).pop()
+                    console.log(chat, lastMessage)
+                    cardContainer.querySelector('.last-message').textContent = lastMessage.message
+                    cardContainer.querySelector('.time').textContent = getFormatedTime(lastMessage.time, true)
+                })
                 let initial = card.querySelector('.initial')
                 initial.textContent = name ? name.charAt(0) : 'U'
                 let color = randomColor()
@@ -1173,8 +1171,13 @@
                     cardContainer.classList.add('unconfirmed')
 
                 cardContainer.classList.add(category)
-                if(isValidUrl(message))
-                    cardContainer.children[0].innerHTML = `<a href="${message}" target="_blank">${message}</a>`
+                if(isValidUrl(message)){
+                    const anchorTag = document.createElement('a')
+                    anchorTag.href = message
+                    anchorTag.target="_blank"
+                    anchorTag.textContent = message
+                    cardContainer.children[0].append(anchorTag)
+                }
                 else{
                     if(message.length === 2 && isEmoji(message))
                         cardContainer.classList.add('big-emoji')
@@ -1292,6 +1295,10 @@
                     else
                         getRef('mail_contact_list').lastElementChild.focus()
                 }
+                if(e.code === 'Enter' || e.code === 'Space'){
+                    getRef('send_mail_to').value = document.activeElement.getAttribute('flo-id')
+                    getRef('mail_contact_list').classList.add('hide-completely')
+                }
             }
         })
 
@@ -1338,12 +1345,8 @@
                 if(target.dataset.target)
                     showPanel(target, target.dataset.target)
             }
-            else if(e.target.closest('.contact')){
+            else if(e.target.closest('.contact') && e.target.closest('#mail_contact_list')){
                 getRef('send_mail_to').value = e.target.closest('.contact').getAttribute('flo-id')
-                getRef('mail_contact_list').classList.add('hide-completely')
-            }
-            else if(e.target.closest('.contact') && e.code === 'Enter' || e.code === 'Space'){
-                getRef('send_mail_to').value = document.activeElement.getAttribute('flo-id')
                 getRef('mail_contact_list').classList.add('hide-completely')
             }
             if(e.target.closest('.navbar-item') && activePage.button !== e.target.closest('.navbar-item')){
@@ -1379,31 +1382,44 @@
 				getRef('send_mail_to').value = floID;
 				return false;
 			}
-
-            //detect click on chat cards
-            if (!e.target.closest("sm-menu") && e.target.closest(".contact")){
-                const contact = e.target.closest(".contact")
-                if(activeChat['chatCard'] === contact && window.innerWidth > 640) return
-                getRef('chat_page_button').setAttribute('data-notifications', '0')
-                getRef('chat').classList.remove('hide-completely')
-                contact.classList.remove('unread')
-                viewConversation(contact)
-                if(activeChat['chatCard'])
-                    activeChat['chatCard'].classList.remove('active')
-                contact.classList.add('active')
-                activeChat['chatCard'] = contact
-				if(activeChatPage.id === 'contacts'){
-                    getRef('chat').classList.remove('hide-on-mobile')
-					getRef('contacts').classList.add('hide-on-mobile')
-                    activeChatPage = getRef('chat')
-					getRef('main_navbar').classList.add('hide-on-mobile')
-				}
-            }
             
             //Detect emoji clicks
             if(e.target.closest('.emoji')){
                 getRef('type_message').value += e.target.closest('.emoji').textContent
                 getRef('type_message').focusIn()
+            }
+        })
+
+        let clickedContact = {}
+        getRef('contacts').addEventListener('click', e => {
+            //detect click on chat cards
+            if (e.target.closest(".contact")){
+                const contact = e.target.closest(".contact")
+                clickedContact['card'] = contact
+                clickedContact['floID'] = contact.getAttribute("flo-id")
+                if(e.target.closest("sm-menu")){
+                    //show contact detail popup
+                }
+                else if(isCreatingGroup){
+                    // code for adding group members
+                }
+                else{
+                    if(activeChat['chatCard'] === contact && window.innerWidth > 640) return
+                    getRef('chat_page_button').setAttribute('data-notifications', '0')
+                    getRef('chat').classList.remove('hide-completely')
+                    contact.classList.remove('unread')
+                    viewConversation(contact)
+                    if(activeChat['chatCard'])
+                        activeChat['chatCard'].classList.remove('active')
+                    contact.classList.add('active')
+                    activeChat['chatCard'] = contact
+                    if(activeChatPage.id === 'contacts'){
+                        getRef('chat').classList.remove('hide-on-mobile')
+                        getRef('contacts').classList.add('hide-on-mobile')
+                        activeChatPage = getRef('chat')
+                        getRef('main_navbar').classList.add('hide-on-mobile')
+                    }
+                }
             }
         })
 
@@ -1447,21 +1463,19 @@
             })
         }
 
-        let isEnterSendToggle = getRef('is_enter_send_toggle'),
-            isEnterSend = true
-
+        let isEnterSend = true
         if(localStorage.getItem('isEnterSend') === null)
             localStorage.setItem('isEnterSend', 'true')
 
         if (localStorage.isEnterSend === 'true') {
             isEnterSend = true
-            isEnterSendToggle.checked = true;
+            getRef('is_enter_send_toggle').checked = true;
         } else {
             isEnterSend = false
-            isEnterSendToggle.checked = false;
+            getRef('is_enter_send_toggle').checked = false;
         }
         
-        isEnterSendToggle.addEventListener('change', function(){
+        getRef('is_enter_send_toggle').addEventListener('change', function(){
             if(this.checked){
                 isEnterSend = true
                 localStorage.setItem("isEnterSend", 'true');
@@ -1711,7 +1725,7 @@
         async function renderChatList() {
             getRef('dm_container').innerHTML = ''
             for (floID of messenger.getChatOrder().direct){
-                await render.contactCard(floID, floGlobals.contacts[floID], 'chat')
+                render.contactCard(floID, floGlobals.contacts[floID], 'chat')
             }
         }
 
@@ -1764,7 +1778,7 @@
         
         async function viewConversation(contact) {
             getRef('chat_container').innerHTML = ''
-            let floID = contact.getAttribute("flo-id"),
+            let floID = clickedContact['floID'],
                 name = contact.getAttribute('name'),
                 textColor = contact.getAttribute('text-color'),
                 backgroundColor = contact.getAttribute('background-color')

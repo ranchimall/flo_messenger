@@ -628,6 +628,7 @@ sm-button[variant=primary] .icon {
 }
 .mail-card .date {
   margin-left: auto;
+  font-weight: 500;
   white-space: nowrap;
 }
 .mail-card .subject {
@@ -1136,7 +1137,7 @@ sm-button[variant=primary] .icon {
 }
 
 #dm_container {
-  transition: 0.3s;
+  padding-bottom: 3.5rem;
 }
 
 sm-tab-panels {
@@ -1145,7 +1146,7 @@ sm-tab-panels {
 
 #inbox_mail_container,
 #sent_mail_container {
-  padding-bottom: 6rem;
+  padding-bottom: 3.5rem;
 }
 
 #chat, #mail {
@@ -1154,7 +1155,7 @@ sm-tab-panels {
 
 #mail {
   height: 100vh;
-  padding: 1.5rem;
+  padding: 0 1.5rem;
   align-items: flex-start;
 }
 #mail .flex {

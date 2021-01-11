@@ -573,6 +573,7 @@ sm-button[variant="primary"]{
     }
     .date{
         margin-left: auto;
+        font-weight: 500;
         white-space: nowrap;
     }
     .subject{
@@ -1071,7 +1072,7 @@ sm-button[variant="primary"]{
     display: none;
 }
 #dm_container{
-    transition: 0.3s;
+    padding-bottom: 3.5rem;
 }
 sm-tab-panels{
     overflow: hidden auto;
@@ -1080,14 +1081,14 @@ sm-tab-panels{
 #inbox_mail_container,
 #sent_mail_container
 {
-    padding-bottom: 6rem;
+    padding-bottom: 3.5rem;
 }
 #chat, #mail{
     background: rgba(var(--foreground-color), 1);
 }
 #mail{
     height: 100vh;
-    padding: 1.5rem;
+    padding: 0 1.5rem;
     align-items: flex-start;
     .flex{margin-top: 1rem;
         sm-button:first-of-type{
