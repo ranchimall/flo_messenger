@@ -107,7 +107,7 @@
                                 <svg class="icon" onclick="copyToClipboard(this.parentNode)" viewBox="0 0 64 64">
                                     <title>Copy</title>
                                     <rect x="16" y="16" width="48" height="48" rx="6" />
-                                    <path d="M.5,47.52V6.5a6,6,0,0,1,6-6h41" />
+                                    <path d="M.5,47.52V6.5a6,6,0,0,1,6-6h41"/>
                                 </svg>
                             </div>
                             <sm-button id="sign_in_with" variant="primary">Sign in with this private key</sm-button>
@@ -245,8 +245,6 @@
 		<div class="contact interact" tabindex="0">
 			<div class="initial flex align-center"></div>
 			<h4 class="name"></h4>
-            <h5 class="last-message"></h5>
-            <h5 class="time"></h5>
             <!--<sm-menu align-options="right">
                 <sm-menu-option class="send-mail-option">Send mail</sm-menu-option>
             </sm-menu>-->
@@ -1133,12 +1131,6 @@
                 cardContainer.setAttribute("name", name || 'Unknown')
                 cardContainer.setAttribute("flo-id", floID)
                 cardContainer.querySelector('.name').textContent = name || 'Unknown'
-                messenger.getChat(floID).then(chat => {
-                    const lastMessage = Object.values(chat).pop()
-                    console.log(chat, lastMessage)
-                    cardContainer.querySelector('.last-message').textContent = lastMessage.message
-                    cardContainer.querySelector('.time').textContent = getFormatedTime(lastMessage.time, true)
-                })
                 let initial = card.querySelector('.initial')
                 initial.textContent = name ? name.charAt(0) : 'U'
                 let color = randomColor()
@@ -1152,19 +1144,20 @@
                     getRef('mail_contact_list').append(duplicateCard);
                 }
                 else{
+                    
+                    messenger.getChat(floID).then(chat => {
+                        const lastMessage = Object.values(chat).pop()
+                        cardContainer.innerHTML += `
+                            <h5 class="last-message">${lastMessage.message}</h5>
+                            <h5 class="time">${getFormatedTime(lastMessage.time, true)}</h5>`
+                    })
                     cardContainer.classList.add('chat')
                     getRef('dm_container').append(card);
                 }
             },
             messageBubble(floID, message, timestamp, category, unconfirmed = false){
                 let card = getRef('message_template').content.cloneNode(true),
-                    cardContainer = card.querySelector('.message'),
-                    time = new Date(timestamp).toString(),
-                    minutes = String(new Date(timestamp).getMinutes()),
-                    hours = new Date(timestamp).getHours(),
-                    year = new Date(timestamp).getFullYear()
-                minutes = minutes.length === 1 ? `0${minutes}` : minutes
-                let finalHours = hours - 12 > 0 ? `${hours - 12}:${minutes} pm` : `${hours}:${minutes} am`
+                    cardContainer = card.querySelector('.message')
 
                 cardContainer.id = `${floID}_${timestamp}`
                 if(unconfirmed)
@@ -1179,29 +1172,42 @@
                     cardContainer.children[0].append(anchorTag)
                 }
                 else{
-                    if(message.length === 2 && isEmoji(message))
+                    let [messageBody, isOnlyEmoji] = isEmoji(message)
+                    if(isOnlyEmoji)
                         cardContainer.classList.add('big-emoji')
-                    cardContainer.children[0].textContent = message
+                    cardContainer.children[0].append(messageBody)
                 }
+
+                let time = new Date(timestamp).toString(),
+                    minutes = String(new Date(timestamp).getMinutes()),
+                    hours = new Date(timestamp).getHours(),
+                    year = new Date(timestamp).getFullYear()
+                minutes = minutes.length === 1 ? `0${minutes}` : minutes
+                let finalHours = hours - 12 > 0 ? `${hours - 12}:${minutes} pm` : `${hours}:${minutes} am`
+
                 cardContainer.children[1].textContent = finalHours
+
                 if(currentFloID !== floID){
                     currentDate = null
                     currentFloID = floID
+                    renderedDates.clear()
                 }
-                if(`${time.slice(4, 10)} ${year}` !== currentDate){
+
+                if(!renderedDates.has(`${time.slice(4, 10)} ${year}`) && `${time.slice(4, 10)} ${year}` !== currentDate){
                     let dateCard = document.createElement('h5')
                     dateCard.classList.add('date-card')
                     dateCard.textContent = new Date().getFullYear() !== year ? `${time.slice(4, 10)} ${year}` : time.slice(4, 10)
                     currentDate = `${time.slice(4, 10)} ${year}`
                     let frag = document.createDocumentFragment()
                     frag.append(dateCard, card)
+                    renderedDates.set(currentDate, currentDate)
                     return frag
                 }
                 else
                     return card;
 			},
         }
-        let currentDate, currentFloID
+        let currentDate, currentFloID, renderedDates = new Map()
 
         const isValidUrl = (url) => {
             try {
@@ -1213,21 +1219,34 @@
         };
 
         const isEmoji = (txt) => {
-            if(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/.test(txt)) 
-                return true
-            else 
-                return false
+            const rx = /([\uD800-\uDBFF][\uDC00-\uDFFF](?:[\u200D\uFE0F][\uD800-\uDBFF][\uDC00-\uDFFF]){2,}|\uD83D\uDC69(?:\u200D(?:(?:\uD83D\uDC69\u200D)?\uD83D\uDC67|(?:\uD83D\uDC69\u200D)?\uD83D\uDC66)|\uD83C[\uDFFB-\uDFFF])|\uD83D\uDC69\u200D(?:\uD83D\uDC69\u200D)?\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC69\u200D(?:\uD83D\uDC69\u200D)?\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67])|\uD83C\uDFF3\uFE0F\u200D\uD83C\uDF08|(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD37-\uDD39\uDD3D\uDD3E\uDDD6-\uDDDD])(?:\uD83C[\uDFFB-\uDFFF])\u200D[\u2640\u2642]\uFE0F|\uD83D\uDC69(?:\uD83C[\uDFFB-\uDFFF])\u200D(?:\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92])|(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC6F\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD37-\uDD39\uDD3C-\uDD3E\uDDD6-\uDDDF])\u200D[\u2640\u2642]\uFE0F|\uD83C\uDDFD\uD83C\uDDF0|\uD83C\uDDF6\uD83C\uDDE6|\uD83C\uDDF4\uD83C\uDDF2|\uD83C\uDDE9(?:\uD83C[\uDDEA\uDDEC\uDDEF\uDDF0\uDDF2\uDDF4\uDDFF])|\uD83C\uDDF7(?:\uD83C[\uDDEA\uDDF4\uDDF8\uDDFA\uDDFC])|\uD83C\uDDE8(?:\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDEE\uDDF0-\uDDF5\uDDF7\uDDFA-\uDDFF])|(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)(?:\uFE0F\u200D[\u2640\u2642]|(?:\uD83C[\uDFFB-\uDFFF])\u200D[\u2640\u2642])\uFE0F|(?:\uD83D\uDC41\uFE0F\u200D\uD83D\uDDE8|\uD83D\uDC69(?:\uD83C[\uDFFB-\uDFFF])\u200D[\u2695\u2696\u2708]|\uD83D\uDC69\u200D[\u2695\u2696\u2708]|\uD83D\uDC68(?:(?:\uD83C[\uDFFB-\uDFFF])\u200D[\u2695\u2696\u2708]|\u200D[\u2695\u2696\u2708]))\uFE0F|\uD83C\uDDF2(?:\uD83C[\uDDE6\uDDE8-\uDDED\uDDF0-\uDDFF])|\uD83D\uDC69\u200D(?:\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D(?:\uD83D[\uDC68\uDC69])|\uD83D[\uDC68\uDC69]))|\uD83C\uDDF1(?:\uD83C[\uDDE6-\uDDE8\uDDEE\uDDF0\uDDF7-\uDDFB\uDDFE])|\uD83C\uDDEF(?:\uD83C[\uDDEA\uDDF2\uDDF4\uDDF5])|\uD83C\uDDED(?:\uD83C[\uDDF0\uDDF2\uDDF3\uDDF7\uDDF9\uDDFA])|\uD83C\uDDEB(?:\uD83C[\uDDEE-\uDDF0\uDDF2\uDDF4\uDDF7])|[#\*0-9]\uFE0F\u20E3|\uD83C\uDDE7(?:\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEF\uDDF1-\uDDF4\uDDF6-\uDDF9\uDDFB\uDDFC\uDDFE\uDDFF])|\uD83C\uDDE6(?:\uD83C[\uDDE8-\uDDEC\uDDEE\uDDF1\uDDF2\uDDF4\uDDF6-\uDDFA\uDDFC\uDDFD\uDDFF])|\uD83C\uDDFF(?:\uD83C[\uDDE6\uDDF2\uDDFC])|\uD83C\uDDF5(?:\uD83C[\uDDE6\uDDEA-\uDDED\uDDF0-\uDDF3\uDDF7-\uDDF9\uDDFC\uDDFE])|\uD83C\uDDFB(?:\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDEE\uDDF3\uDDFA])|\uD83C\uDDF3(?:\uD83C[\uDDE6\uDDE8\uDDEA-\uDDEC\uDDEE\uDDF1\uDDF4\uDDF5\uDDF7\uDDFA\uDDFF])|\uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62(?:\uDB40\uDC77\uDB40\uDC6C\uDB40\uDC73|\uDB40\uDC73\uDB40\uDC63\uDB40\uDC74|\uDB40\uDC65\uDB40\uDC6E\uDB40\uDC67)\uDB40\uDC7F|\uD83D\uDC68(?:\u200D(?:\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83D\uDC68|(?:(?:\uD83D[\uDC68\uDC69])\u200D)?\uD83D\uDC66\u200D\uD83D\uDC66|(?:(?:\uD83D[\uDC68\uDC69])\u200D)?\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92])|(?:\uD83C[\uDFFB-\uDFFF])\u200D(?:\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]))|\uD83C\uDDF8(?:\uD83C[\uDDE6-\uDDEA\uDDEC-\uDDF4\uDDF7-\uDDF9\uDDFB\uDDFD-\uDDFF])|\uD83C\uDDF0(?:\uD83C[\uDDEA\uDDEC-\uDDEE\uDDF2\uDDF3\uDDF5\uDDF7\uDDFC\uDDFE\uDDFF])|\uD83C\uDDFE(?:\uD83C[\uDDEA\uDDF9])|\uD83C\uDDEE(?:\uD83C[\uDDE8-\uDDEA\uDDF1-\uDDF4\uDDF6-\uDDF9])|\uD83C\uDDF9(?:\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDED\uDDEF-\uDDF4\uDDF7\uDDF9\uDDFB\uDDFC\uDDFF])|\uD83C\uDDEC(?:\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEE\uDDF1-\uDDF3\uDDF5-\uDDFA\uDDFC\uDDFE])|\uD83C\uDDFA(?:\uD83C[\uDDE6\uDDEC\uDDF2\uDDF3\uDDF8\uDDFE\uDDFF])|\uD83C\uDDEA(?:\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDED\uDDF7-\uDDFA])|\uD83C\uDDFC(?:\uD83C[\uDDEB\uDDF8])|(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)(?:\uD83C[\uDFFB-\uDFFF])|(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD37-\uDD39\uDD3D\uDD3E\uDDD6-\uDDDD])(?:\uD83C[\uDFFB-\uDFFF])|(?:[\u261D\u270A-\u270D]|\uD83C[\uDF85\uDFC2\uDFC7]|\uD83D[\uDC42\uDC43\uDC46-\uDC50\uDC66\uDC67\uDC70\uDC72\uDC74-\uDC76\uDC78\uDC7C\uDC83\uDC85\uDCAA\uDD74\uDD7A\uDD90\uDD95\uDD96\uDE4C\uDE4F\uDEC0\uDECC]|\uD83E[\uDD18-\uDD1C\uDD1E\uDD1F\uDD30-\uDD36\uDDD1-\uDDD5])(?:\uD83C[\uDFFB-\uDFFF])|\uD83D\uDC68(?:\u200D(?:(?:(?:\uD83D[\uDC68\uDC69])\u200D)?\uD83D\uDC67|(?:(?:\uD83D[\uDC68\uDC69])\u200D)?\uD83D\uDC66)|\uD83C[\uDFFB-\uDFFF])|(?:[\u261D\u26F9\u270A-\u270D]|\uD83C[\uDF85\uDFC2-\uDFC4\uDFC7\uDFCA-\uDFCC]|\uD83D[\uDC42\uDC43\uDC46-\uDC50\uDC66-\uDC69\uDC6E\uDC70-\uDC78\uDC7C\uDC81-\uDC83\uDC85-\uDC87\uDCAA\uDD74\uDD75\uDD7A\uDD90\uDD95\uDD96\uDE45-\uDE47\uDE4B-\uDE4F\uDEA3\uDEB4-\uDEB6\uDEC0\uDECC]|\uD83E[\uDD18-\uDD1C\uDD1E\uDD1F\uDD26\uDD30-\uDD39\uDD3D\uDD3E\uDDD1-\uDDDD])(?:\uD83C[\uDFFB-\uDFFF])?|(?:[\u231A\u231B\u23E9-\u23EC\u23F0\u23F3\u25FD\u25FE\u2614\u2615\u2648-\u2653\u267F\u2693\u26A1\u26AA\u26AB\u26BD\u26BE\u26C4\u26C5\u26CE\u26D4\u26EA\u26F2\u26F3\u26F5\u26FA\u26FD\u2705\u270A\u270B\u2728\u274C\u274E\u2753-\u2755\u2757\u2795-\u2797\u27B0\u27BF\u2B1B\u2B1C\u2B50\u2B55]|\uD83C[\uDC04\uDCCF\uDD8E\uDD91-\uDD9A\uDDE6-\uDDFF\uDE01\uDE1A\uDE2F\uDE32-\uDE36\uDE38-\uDE3A\uDE50\uDE51\uDF00-\uDF20\uDF2D-\uDF35\uDF37-\uDF7C\uDF7E-\uDF93\uDFA0-\uDFCA\uDFCF-\uDFD3\uDFE0-\uDFF0\uDFF4\uDFF8-\uDFFF]|\uD83D[\uDC00-\uDC3E\uDC40\uDC42-\uDCFC\uDCFF-\uDD3D\uDD4B-\uDD4E\uDD50-\uDD67\uDD7A\uDD95\uDD96\uDDA4\uDDFB-\uDE4F\uDE80-\uDEC5\uDECC\uDED0-\uDED2\uDEEB\uDEEC\uDEF4-\uDEF8]|\uD83E[\uDD10-\uDD3A\uDD3C-\uDD3E\uDD40-\uDD45\uDD47-\uDD4C\uDD50-\uDD6B\uDD80-\uDD97\uDDC0\uDDD0-\uDDE6])|(?:[#\*0-9\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB-\u25FE\u2600-\u2604\u260E\u2611\u2614\u2615\u2618\u261D\u2620\u2622\u2623\u2626\u262A\u262E\u262F\u2638-\u263A\u2640\u2642\u2648-\u2653\u2660\u2663\u2665\u2666\u2668\u267B\u267F\u2692-\u2697\u2699\u269B\u269C\u26A0\u26A1\u26AA\u26AB\u26B0\u26B1\u26BD\u26BE\u26C4\u26C5\u26C8\u26CE\u26CF\u26D1\u26D3\u26D4\u26E9\u26EA\u26F0-\u26F5\u26F7-\u26FA\u26FD\u2702\u2705\u2708-\u270D\u270F\u2712\u2714\u2716\u271D\u2721\u2728\u2733\u2734\u2744\u2747\u274C\u274E\u2753-\u2755\u2757\u2763\u2764\u2795-\u2797\u27A1\u27B0\u27BF\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B50\u2B55\u3030\u303D\u3297\u3299]|\uD83C[\uDC04\uDCCF\uDD70\uDD71\uDD7E\uDD7F\uDD8E\uDD91-\uDD9A\uDDE6-\uDDFF\uDE01\uDE02\uDE1A\uDE2F\uDE32-\uDE3A\uDE50\uDE51\uDF00-\uDF21\uDF24-\uDF93\uDF96\uDF97\uDF99-\uDF9B\uDF9E-\uDFF0\uDFF3-\uDFF5\uDFF7-\uDFFF]|\uD83D[\uDC00-\uDCFD\uDCFF-\uDD3D\uDD49-\uDD4E\uDD50-\uDD67\uDD6F\uDD70\uDD73-\uDD7A\uDD87\uDD8A-\uDD8D\uDD90\uDD95\uDD96\uDDA4\uDDA5\uDDA8\uDDB1\uDDB2\uDDBC\uDDC2-\uDDC4\uDDD1-\uDDD3\uDDDC-\uDDDE\uDDE1\uDDE3\uDDE8\uDDEF\uDDF3\uDDFA-\uDE4F\uDE80-\uDEC5\uDECB-\uDED2\uDEE0-\uDEE5\uDEE9\uDEEB\uDEEC\uDEF0\uDEF3-\uDEF8]|\uD83E[\uDD10-\uDD3A\uDD3C-\uDD3E\uDD40-\uDD45\uDD47-\uDD4C\uDD50-\uDD6B\uDD80-\uDD97\uDDC0\uDDD0-\uDDE6])\uFE0F)/;
+            const res = txt.split(rx).filter(Boolean);
+            const messageBody = document.createDocumentFragment()
+            const length = res.length
+            let isOnlyEmoji = false
+            res.forEach(section => {
+                if(section.match(rx)){
+                    const span = document.createElement('span')
+                    if(length === 1)
+                        isOnlyEmoji = true
+                    else
+                        span.classList.add('text-emoji') 
+                    span.textContent = section
+                    messageBody.append(span)
+                }
+                else
+                    messageBody.append(section)
+            })
+            return [messageBody, isOnlyEmoji]
         }
         
 
         function renderDirectUI(data) {
-            console.log(data)
             renderMessages(data.messages, {updateChatCard: true});
             renderMailList(data.mails)
-            if(Object.keys(data.messages).length && activePage.button !== getRef('chat_page_button')){
-                    getRef('chat_page_button').setAttribute('data-notifications', Object.keys(data.messages).length)
-                    notify(`${Object.keys(data.messages).length} new message(s)`)
-                }
+            if(Object.keys(data.messages).length){
+                document.title = `New message(s)`
+            }
             if(Object.keys(data.mails).length && activePage.button !== getRef('mail_page_button')){
                 getRef('mail_page_button').setAttribute('data-notifications', Object.keys(data.mails).length)
                 notify(`${Object.keys(data.mails).length} new mail(s)`)
@@ -1239,7 +1258,10 @@
         }
 
         window.addEventListener('focus', e => {
-            console.log('focused')
+            if(activeChat.chatCard && activeChat.chatCard.classList.contains('active'))
+                setTimeout(() => {
+                    activeChat.chatCard.classList.remove('unread')
+                }, 2000)
         })
         window.addEventListener('blur', e => {
             console.log('blured')
@@ -1386,7 +1408,8 @@
             //Detect emoji clicks
             if(e.target.closest('.emoji')){
                 getRef('type_message').value += e.target.closest('.emoji').textContent
-                getRef('type_message').focusIn()
+                if(window.innerWidth > 640)
+                    getRef('type_message').focusIn()
             }
         })
 
@@ -1404,10 +1427,10 @@
                     // code for adding group members
                 }
                 else{
-                    if(activeChat['chatCard'] === contact && window.innerWidth > 640) return
-                    getRef('chat_page_button').setAttribute('data-notifications', '0')
-                    getRef('chat').classList.remove('hide-completely')
                     contact.classList.remove('unread')
+                    if(activeChat['chatCard'] === contact && window.innerWidth > 640) return
+                    document.title = `FLO Messenger`
+                    getRef('chat').classList.remove('hide-completely')
                     viewConversation(contact)
                     if(activeChat['chatCard'])
                         activeChat['chatCard'].classList.remove('active')
@@ -1423,18 +1446,67 @@
             }
         })
 
-        const emojis = ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗","😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", 
-                        "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", 
-                        "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐", "🥴",
-                        "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "😺", "😸", "😹", "😻", "😼", "😽", 
-                        "🙀", "😿", "😾",
-                        "👋", "🤚", "🖐", "✋", "🖖", "👌", "🤏", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉", "👆", "🖕", "👇", "☝️", "👍", "👎", "✊", "👊", "🤛", "🤜", "👏", "🙌", "👐", "🤲", "🤝", "🙏", 
-                        "✍️", "💅", "🤳", "💪", "🦾", "🦵", "🦿", "🦶", "👣", "👂", "🦻", "👃", "🧠", "🦷", "🦴", "👀", "👅", "👄", "💋", "🩸"
-                    ];
+        const emojis = [
+            "<", "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗","😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", 
+            "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", 
+            "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐", "🥴",
+            "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "😺", "😸", "😹", "😻", "😼", "😽", 
+            "🙀", "😿", "😾", ">",
+            
+            "<", "👋", "🤚", "🖐", "✋", "🖖", "👌", "🤏", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉", "👆", "🖕", "👇", "☝️", "👍", "👎", "✊", "👊", "🤛", "🤜", "👏", "🙌", "👐", "🤲", "🤝", "🙏", 
+            "✍️", "💅", "🤳", "💪", "🦾", "🦵", "🦿", "🦶", "👣", "👂", "🦻", "👃", "🧠", "🦷", "🦴", "👀", "👅", "👄", "💋", "🩸", ">",
+
+            "<",
+            "👶", "👧", "🧒", "👦", "👩", "🧑", "👨", "👩‍🦱", "🧑‍🦱", "👨‍🦱", "👩‍🦰", "🧑‍🦰", "👨‍🦰", "👱‍♀️", "👱", "👱‍♂️", "👩‍🦳", "🧑‍🦳", "👨‍🦳", "👩‍🦲", "🧑‍🦲", "👨‍🦲", "🧔", "👵", "🧓", "👴", "👲", "👳‍♀️", "👳", 
+            "👳‍♂️", "🧕", "👮‍♀️", "👮", "👮‍♂️", "👷‍♀️", "👷", "👷‍♂️", "💂‍♀️", "💂", "💂‍♂️", "🕵️‍♀️", "🕵️", "🕵️‍♂️", "👩‍⚕️", "🧑‍⚕️", "👨‍⚕️", "👩‍🌾", "🧑‍🌾", "👨‍🌾", "👩‍🍳", "🧑‍🍳", "👨‍🍳", "👩‍🎓", "🧑‍🎓", "👨‍🎓", "👩‍🎤", "🧑‍🎤", "👨‍🎤", 
+            "👩‍🏫", "🧑‍🏫", "👨‍🏫", "👩‍🏭", "🧑‍🏭", "👨‍🏭", "👩‍💻", "🧑‍💻", "👨‍💻", "👩‍💼", "🧑‍💼", "👨‍💼", "👩‍🔧", "🧑‍🔧", "👨‍🔧", "👩‍🔬", "🧑‍🔬", "👨‍🔬", "👩‍🎨", "🧑‍🎨", "👨‍🎨", "👩‍🚒", "🧑‍🚒", "👨‍🚒", "👩‍✈️", "🧑‍✈️", "👨‍✈️", 
+            "👩‍🚀", "🧑‍🚀", "👨‍🚀", "👩‍⚖️", "🧑‍⚖️", "👨‍⚖️", "👰‍♀️", "👰", "👰‍♂️", "🤵‍♀️", "🤵", "🤵‍♂️", "👸", "🤴", "🦸‍♀️", "🦸", "🦸‍♂️", "🦹‍♀️", "🦹", "🦹‍♂️", "🤶", "🧑‍🎄", "🎅", "🧙‍♀️", "🧙", "🧙‍♂️", "🧝‍♀️", "🧝", 
+            "🧝‍♂️", "🧛‍♀️", "🧛", "🧛‍♂️", "🧟‍♀️", "🧟", "🧟‍♂️", "🧞‍♀️", "🧞", "🧞‍♂️", "🧜‍♀️", "🧜", "🧜‍♂️", "🧚‍♀️", "🧚", "🧚‍♂️", "👼", "🤰", "🤱", "👩‍🍼", "🧑‍🍼", "👨‍🍼", "🙇‍♀️", "🙇", "🙇‍♂️", "💁‍♀️", "💁", "💁‍♂️", "🙅‍♀️", "🙅", 
+            "🙅‍♂️", "🙆‍♀️", "🙆", "🙆‍♂️", "🙋‍♀️", "🙋", "🙋‍♂️", "🧏‍♀️", "🧏", "🧏‍♂️", "🤦‍♀️", "🤦", "🤦‍♂️", "🤷‍♀️", "🤷", "🤷‍♂️", "🙎‍♀️", "🙎", "🙎‍♂️", "🙍‍♀️", "🙍", "🙍‍♂️", "💇‍♀️", "💇", "💇‍♂️", "💆‍♀️", "💆", "💆‍♂️", "🧖‍♀️", "🧖", "🧖‍♂️", 
+            "💅", "🤳", "💃", "🕺", "👯‍♀️", "👯", "👯‍♂️", "🕴", "👩‍🦽", "🧑‍🦽", "👨‍🦽", "👩‍🦼", "🧑‍🦼", "👨‍🦼", "🚶‍♀️", "🚶", "🚶‍♂️", "👩‍🦯", "🧑‍🦯", "👨‍🦯", "🧎‍♀️", "🧎", "🧎‍♂️", "🏃‍♀️", "🏃", "🏃‍♂️", "🧍‍♀️", "🧍", "🧍‍♂️", "👭", "🧑‍🤝‍🧑", "👬", 
+            "👫", "👩‍❤️‍👩", "💑", "👨‍❤️‍👨", "👩‍❤️‍👨", "👩‍❤️‍💋‍👩", "💏", "👨‍❤️‍💋‍👨", "👩‍❤️‍💋‍👨", "👪", "👨‍👩‍👦", "👨‍👩‍👧", "👨‍👩‍👧‍👦", "👨‍👩‍👦‍👦", "👨‍👩‍👧‍👧", "👨‍👨‍👦", "👨‍👨‍👧", "👨‍👨‍👧‍👦", "👨‍👨‍👦‍👦", "👨‍👨‍👧‍👧", "👩‍👩‍👦", "👩‍👩‍👧", "👩‍👩‍👧‍👦", "👩‍👩‍👦‍👦", "👩‍👩‍👧‍👧", "👨‍👦", "👨‍👦‍👦", "👨‍👧", "👨‍👧‍👦", 
+            "👨‍👧‍👧", "👩‍👦", "👩‍👦‍👦", "👩‍👧", "👩‍👧‍👦", "👩‍👧‍👧", "👤", "👥", ">",
+
+            "<",
+            "🧳", "🌂", "☂️", "🧵", "🧶", "👓", "🥽", "🥼", "🦺", "👔", "👕", "👖", "🧣", "🧤", "🧥", "🧦", "👗", "👘", "🥻", "🩱", "🩲", "🩳", "👙", "👚", "👛", "👜", "👝", "🎒", "👞", "👟", "🥾", "🥿", 
+            "👠", "👡", "🩰", "👢", "👑", "👒", "🎩", "🎓", "🧢", "💄", "💍", "💼", 
+            ">",
+
+            "<", "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮", "🐷", "🐽", "🐸", "🐵", "🙈", "🙉", "🙊", "🐒", "🐔", "🐧", "🐦", "🐤", "🐣", "🐥", "🦆", "🦅", "🦉", 
+            "🦇", "🐺", "🐗", "🐴", "🦄", "🐝", "🐛", "🦋", "🐌", "🐞", "🐜", "🦟", "🦗", "🕷", "🕸", "🦂", "🐢", "🐍", "🦎", "🦖", "🦕", "🐙", "🦑", "🦐", "🦞", "🦀", "🐡", "🐠", "🐟", 
+            "🐬", "🐳", "🐋", "🦈", "🐊", "🐅", "🐆", "🦓", "🦍", "🦧", "🐘", "🦛", "🦏", "🐪", "🐫", "🦒", "🦘", "🐃", "🐂", "🐄", "🐎", "🐖", "🐏", "🐑", "🦙", "🐐", "🦌", "🐕", "🐩", 
+            "🦮", "🐕‍🦺", "🐈", "🐈‍", "🐓", "🦃", "🦚", "🦜", "🦢", "🦩", "🐇", "🦝", "🦨", "🦡", "🦦", "🦥", "🐁", "🐀", "🦔", "🐾", "🐉", "🐲", "🌵", "🎄", "🌲", "🌳", "🌴", "🌱", "🌿", 
+            "☘️", "🍀", "🎍", "🎋", "🍃", "🍂", "🍁", "🍄", "🐚", "🌾", "💐", "🌷", "🌹", "🥀", "🌺", "🌸", "🌼", "🌻", "🌞", "🌝", "🌛", "🌜", "🌚", "🌕", "🌖", "🌗", "🌘", "🌑", "🌒", 
+            "🌓", "🌔", "🌙", "🌎", "🌍", "🌏", "🪐", "💫", "⭐️", "🌟", "✨", "⚡️", "☄️", "💥", "🔥", "🌈", "☀️", "⛅️", "☁️", "❄️", "☃️", "⛄️", "💨", "💧", "💦", "☔️", "☂️", "🌊", ">",
+            
+            "<", "🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🍈", "🍒", "🍑", "🥭", "🍍", "🥥", "🥝", "🍅", "🍆", "🥑", "🥦", "🥬", "🥒", "🌽", "🥕", "🧄", "🧅", "🥔", "🍠", "🥐", 
+            "🥯", "🍞", "🥖", "🥨", "🧀", "🥚", "🍳", "🧈", "🥞", "🧇", "🥓", "🥩", "🍗", "🍖", "🦴", "🌭", "🍔", "🍟", "🍕", "🥪", "🥙", "🧆", "🌮", "🌯", "🥗", "🥘", "🥫", "🍝", "🍜", 
+            "🍲", "🍛", "🍣", "🍱", "🥟", "🦪", "🍤", "🍙", "🍚", "🍘", "🍥", "🥠", "🥮", "🍢", "🍡", "🍧", "🍨", "🍦", "🥧", "🧁", "🍰", "🎂", "🍮", "🍭", "🍬", "🍫", "🍿", "🍩", "🍪", 
+            "🌰", "🥜", "🍯", "🥛", "🍼", "☕️", "🍵", "🧃", "🥤", "🍶", "🍺", "🍻", "🥂", "🍷", "🥃", "🍸", "🍹", "🧉", "🍾", "🧊", "🥄", "🍴", "🍽", "🥣", "🥡", "🥢", "🧂", ">",
+            
+            "<", "⚽️", "🏀", "🏈", "⚾️", "🥎", "🎾", "🏐", "🏉", "🥏", "🎱", "🪀", "🏓", "🏸", "🏒", "🏑", "🥍", "🏏", "🥅", "⛳️", "🪁", "🏹", "🎣", "🤿", "🥊", "🥋", "🎽", "🛹", "🛷", "🥌", 
+            "🎿", "🏂", "🪂", "🏋️‍♀️", "🏋️", "🏋️‍♂️", "🤼‍♀️", "🤼", "🤼‍♂️", "🤸‍♀️", "🤸", "🤸‍♂️", "⛹️‍♀️", "⛹️", "⛹️‍♂️", "🤺", "🤾‍♀️", "🤾", "🤾‍♂️", "🏌️‍♀️", "🏌️", "🏌️‍♂️", "🏇", "🧘‍♀️", "🧘", "🧘‍♂️", "🏄‍♀️", "🏄", "🏄‍♂️", "🏊‍♀️", 
+            "🏊", "🏊‍♂️", "🤽‍♀️", "🤽", "🤽‍♂️", "🚣‍♀️", "🚣", "🚣‍♂️", "🧗‍♀️", "🧗", "🧗‍♂️", "🚵‍♀️", "🚵", "🚵‍♂️", "🚴‍♀️", "🚴", "🚴‍♂️", "🏆", "🥇", "🥈", "🥉", "🏅", "🎫", "🎪", "🤹", "🤹‍♂️", "🤹‍♀️", "🎭", "🩰", "🎨", 
+            "🎬", "🎤", "🎧", "🎼", "🎹", "🥁", "🎷", "🎺", "🎸", "🪕", "🎻", "🎲", "🎯", "🎳", "🎮", "🎰", "🧩", ">"
+        ];
         let renderedEmojis = ''
-        emojis.forEach(emoji => {
-            renderedEmojis += `<span class="emoji">${emoji}</span>`
-        })
+        let emojiSectionCounter = 0
+        let emojiSections = ['Smileys', 'Gestures and Body Parts', 'People and Fantasy', 'Clothing and Accessories', 'Animals & Nature', 'Food & Drink', 'Activity and Sports']
+        renderedEmojis += `
+            <section>
+                <header class="section-header">Recent</header>
+            </section>`
+        for(emoji of emojis){
+            if(emoji === '<'){
+                renderedEmojis += `<section>
+                                    <header id="${emojiSections[emojiSectionCounter].toLowerCase().replace(/ /g, '_')}" class="section-header">${emojiSections[emojiSectionCounter]}</header>`
+                emojiSectionCounter++                   
+            }
+            else if(emoji === '>')
+                renderedEmojis += `</section>`
+            else
+                renderedEmojis += `<span class="emoji">${emoji}</span>`
+        }
         getRef('emoji_picker').innerHTML = renderedEmojis
 
         function toggleEmoji(button){
@@ -1741,10 +1813,30 @@
             getRef('chat_container').scrollTo({top: getRef('chat_container').scrollHeight, behaviour: smooth ? 'smooth': ''})
         }
 
+        let startIndex = 0,
+            endIndex = 0
         function renderMessages(data, options) {
-            let {markUnread = true, updateChatCard = false} = options
-            for (let m in data) {
-                let {floID, message, time, category} = data[m]
+            let {markUnread = true, updateChatCard = false, reRender = false, lazyLoad = false} = options
+            let messages
+            if(reRender){
+                activeChat['allMessages'] = Object.values(data)
+                startIndex = (activeChat['allMessages'].length - 10) > 0 ? activeChat['allMessages'].length - 10 : 0
+                endIndex = activeChat['allMessages'].length
+                messages = activeChat['allMessages']
+            }
+            else if(lazyLoad){
+                messages = activeChat['allMessages']
+                startIndex = startIndex > 10 ? startIndex -= 10 : 0
+                markUnread = false
+            }
+            else{
+                messages = Object.values(data)
+                startIndex = 0
+                endIndex = messages.length  
+            }
+
+            for (i = startIndex; i < endIndex; i++) {
+                let {floID, message, time, category} = messages[i]
                 //Stops message from rendering in wrong chat window
                 if(activeChat['receiver'] && activeChat['receiver'] === floID)
                     frag.append(render.messageBubble(floID, message, time, category))
@@ -1772,9 +1864,42 @@
                     chatCard.querySelector('.time').textContent = getFormatedTime(time, true)
                 }
             } 
-            getRef('chat_container').append(frag)
-            scrollToBottom()
+            endIndex = startIndex
+            if(!lazyLoad && !reRender){
+                endIndex = messages.length
+                getRef('chat_container').append(frag)
+            }
+            if(reRender || lazyLoad){
+                currentDate = null
+                getRef('chat_container').prepend(frag)
+                prevScroll = getRef('chat_container').scrollTop
+            }
+            if(reRender){
+                scrollToBottom()
+            }
         }
+
+        //checks for added elements in chat
+        const chatMutationObserver = new MutationObserver(
+            (mutations, observer) => {
+                for(const mutation of mutations) {
+                    if (mutation.type === 'childList' && mutation.addedNodes.length) {
+                        chatMessageObserver.observe(getRef('chat_container').firstElementChild)
+                    }
+                }
+            }            
+        )
+        chatMutationObserver.observe(getRef('chat_container'), { attributes: true, childList: true })
+
+        //Lazy loading for chat messages
+        const chatMessageObserver = new IntersectionObserver(
+            (entries, observer) => {
+                if(entries[0].isIntersecting){
+                    renderMessages('', {lazyLoad: true})
+                    observer.disconnect()
+                }
+            }
+        )
         
         async function viewConversation(contact) {
             getRef('chat_container').innerHTML = ''
@@ -1790,9 +1915,7 @@
                 getRef("warn_no_encryption").classList.add("hide-completely");
             else
                 getRef("warn_no_encryption").classList.remove("hide-completely");
-            renderMessages(await messenger.getChat(floID),{markUnread: false})
-            scrollToBottom() 
-            prevScroll = getRef('chat_container').scrollTop
+            renderMessages(await messenger.getChat(floID),{markUnread: false, reRender: true})
             messenger.removeMark(floID, "unread");
         }
 

@@ -498,11 +498,17 @@ sm-button[variant="primary"]{
     position: relative;
     display: grid;
     gap: 0 1rem;
-    grid-template-columns: auto 1fr auto;
-    grid-template-areas: 'dp . menu'
-                         'dp . menu';
     padding: 0.8rem 1.5rem;
     align-items: center;
+    &.chat{
+        grid-template-columns: auto 1fr auto;
+        grid-template-areas: 'dp . menu'
+        'dp . .';
+    }
+    &:not(.chat){
+        grid-template-columns: auto 1fr;
+        grid-template-areas: 'dp .';
+    }
     &:focus{
         background: rgba(var(--text-color), 0.06);
         outline: none;
@@ -516,6 +522,7 @@ sm-button[variant="primary"]{
         color: rgba(var(--text-color), 0.8);
     }
     .last-message{
+        grid-column: 2/4;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -546,7 +553,7 @@ sm-button[variant="primary"]{
 .contact.unread .initial::before{
     content: '';
     position: absolute;
-    padding: 0.3rem;
+    padding: 0.4rem;
     border-radius: 1rem;
     top: 0;
     left: 0;
@@ -911,6 +918,9 @@ sm-button[variant="primary"]{
         margin-bottom: 0.2rem;
         margin-top: 0.8rem;
         .message-body{
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
             overflow-wrap: break-word;
             word-wrap: break-word;
             word-break: break-all;
@@ -924,6 +934,11 @@ sm-button[variant="primary"]{
             line-height: 1.5;
             a{
                 color: inherit;
+            }
+            .text-emoji{
+                align-self: center;
+                font-size: 1.4em;
+                letter-spacing: 0ch;
             }
         }
         .time{
@@ -985,41 +1000,17 @@ sm-button[variant="primary"]{
     }
     .unconfirmed{
         opacity: 0.7;
-        transform-origin: left;
+        transform-origin: right;
         animation: slide-up 0.3s forwards;
     }
 }
 @keyframes slide-up{
     from{
-        transform: translate(-2rem, 2rem) scale(0.8);
+        transform: translateY(-2rem);
     }
     to{
         transform: none;
     }
-}
-#chat_container{
-    flex: 1;
-    padding: 0 1rem;
-}
-#emoji_picker{
-    display: grid;
-    background: rgba(var(--text-color), 0.06);
-    border-radius: 1rem;
-    margin: 0 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
-    box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.3);
-    padding: 1rem;
-    overflow-y: auto;
-    flex-wrap: wrap;
-    max-height: min(16rem, 30vh);
-}
-.emoji{
-    font-size: 1.6rem;
-    cursor: pointer;
-    padding: 0.4rem;
-    border-radius: 0.6rem;
-    user-select: none;
-    text-align: center;
 }
 .big-emoji{
     &::after{
@@ -1031,6 +1022,42 @@ sm-button[variant="primary"]{
         padding: 0 !important;
         font-size: 2.6rem;
     }
+}
+#chat_container{
+    flex: 1;
+    padding: 0 1rem;
+}
+#emoji_picker{
+    display: grid;
+    gap: 1rem;
+    background: rgba(var(--text-color), 0.06);
+    border-radius: 1rem;
+    margin: 0 1rem;
+    box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+    max-height: 30vh;
+    section{
+        display: flex;
+        flex-wrap: wrap;
+        padding: 1rem;
+    }
+    .section-header{
+        position: sticky;
+        top: 0;
+        background: linear-gradient(rgba(var(--text-color), 0.06), rgba(var(--text-color), 0.06)), rgba(var(--foreground-color), 1);
+        padding: 1rem 0;
+        width: 100%;
+        z-index: 1;
+    }
+}
+.emoji{
+    font-size: 1.6rem;
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: 0.6rem;
+    user-select: none;
+    text-align: center;
+    min-width: 3rem;
 }
 #new_conversation, #no_mails{
     height: 100%;
@@ -1194,6 +1221,10 @@ sm-tab-panels{
         transition: transform 0.3s;
         z-index: 4;
     }
+    #dm_container,
+    #contact_container{
+        gap: 0.5rem;
+    }
     #chat{
         header{
             padding: 1rem;
@@ -1264,7 +1295,7 @@ sm-tab-panels{
     #main_navbar{
         position: relative;
         width: auto;
-        background: rgba(var(--text-color), 0.06);
+        background: rgba(var(--text-color), 0.05);
         padding-bottom: 0.5rem;
         .navbar-item{
             margin: 0 0.5rem;
@@ -1288,6 +1319,9 @@ sm-tab-panels{
         width: 100vw;
         height: 100vh;
         grid-template-columns: auto 1fr;
+    }
+    #emoji_picker{
+        max-height: 18rem;
     }
     #chat{
         .message{

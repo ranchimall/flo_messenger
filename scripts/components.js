@@ -662,6 +662,7 @@ customElements.define('sm-textarea',
         }
         set value(val) {
             this.shadowRoot.querySelector('textarea').value = val;
+            this.textareaBox.dataset.value = val
             this.checkInput()
             this.fireEvent()
         }
@@ -2127,18 +2128,18 @@ customElements.define('sm-popup', class extends HTMLElement {
 
         this.popupHeader.addEventListener('touchstart', (e) => {
             this.handleTouchStart(e)
-        })
+        }, {passive: true})
         this.popupHeader.addEventListener('touchmove', (e) => {
             this.handleTouchMove(e)
-        })
+        }, {passive: true})
         this.popupHeader.addEventListener('touchend', (e) => {
             this.handleTouchEnd(e)
-        })
+        }, {passive: true})
     }
     disconnectedCallback() {
-        this.popupHeader.removeEventListener('touchstart', this.handleTouchStart)
-        this.popupHeader.removeEventListener('touchmove', this.handleTouchMove)
-        this.popupHeader.removeEventListener('touchend', this.handleTouchEnd)
+        this.popupHeader.removeEventListener('touchstart', this.handleTouchStart, {passive: true})
+        this.popupHeader.removeEventListener('touchmove', this.handleTouchMove, {passive: true})
+        this.popupHeader.removeEventListener('touchend', this.handleTouchEnd, {passive: true})
     }
 })
 
@@ -2694,9 +2695,9 @@ customElements.define('sm-notifications', class extends HTMLElement {
         } else {
             notification.setAttribute('style', `transform: translateY(0); opacity: 1`)
         }
-        notification.addEventListener('touchstart', this.handleTouchStart)
-        notification.addEventListener('touchmove', this.handleTouchMove)
-        notification.addEventListener('touchend', this.handleTouchEnd)
+        notification.addEventListener('touchstart', this.handleTouchStart, {passive: true})
+        notification.addEventListener('touchmove', this.handleTouchMove, {passive: true})
+        notification.addEventListener('touchend', this.handleTouchEnd, {passive: true})
     }
 
     removeNotification = (notification, toLeft) => {
@@ -2829,6 +2830,7 @@ smMenu.innerHTML = `
 .hide{
     opacity: 0;
     pointer-events: none;
+    user-select: none;
 }
 .select{
     position: relative;
@@ -2941,6 +2943,9 @@ customElements.define('sm-menu', class extends HTMLElement {
             this.optionList.classList.add('no-transformations')
             this.open = true
             this.icon.classList.add('focused')
+            this.availableOptions.forEach(option => {
+                option.setAttribute('tabindex', '0')
+            })
         }
     }
     collapse() {
@@ -2949,6 +2954,9 @@ customElements.define('sm-menu', class extends HTMLElement {
             this.icon.classList.remove('focused')
             this.optionList.classList.add('hide')
             this.optionList.classList.remove('no-transformations')
+            this.availableOptions.forEach(option => {
+                option.removeAttribute('tabindex')
+            })
         }
     }
     connectedCallback() {
@@ -3067,7 +3075,6 @@ customElements.define('sm-menu-option', class extends HTMLElement {
                 this.click()
             }
         })
-        this.setAttribute('tabindex', '0')
     }
 })
 

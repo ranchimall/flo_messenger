@@ -548,10 +548,16 @@ sm-button[variant=primary] .icon {
   position: relative;
   display: grid;
   gap: 0 1rem;
-  grid-template-columns: auto 1fr auto;
-  grid-template-areas: "dp . menu" "dp . menu";
   padding: 0.8rem 1.5rem;
   align-items: center;
+}
+.contact.chat {
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "dp . menu" "dp . .";
+}
+.contact:not(.chat) {
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "dp .";
 }
 .contact:focus {
   background: rgba(var(--text-color), 0.06);
@@ -566,6 +572,7 @@ sm-button[variant=primary] .icon {
   color: rgba(var(--text-color), 0.8);
 }
 .contact .last-message {
+  grid-column: 2/4;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -598,7 +605,7 @@ sm-button[variant=primary] .icon {
 .contact.unread .initial::before {
   content: "";
   position: absolute;
-  padding: 0.3rem;
+  padding: 0.4rem;
   border-radius: 1rem;
   top: 0;
   left: 0;
@@ -973,6 +980,9 @@ sm-button[variant=primary] .icon {
   margin-top: 0.8rem;
 }
 #chat .message .message-body {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-all;
@@ -987,6 +997,11 @@ sm-button[variant=primary] .icon {
 }
 #chat .message .message-body a {
   color: inherit;
+}
+#chat .message .message-body .text-emoji {
+  align-self: center;
+  font-size: 1.4em;
+  letter-spacing: 0ch;
 }
 #chat .message .time {
   white-space: nowrap;
@@ -1044,18 +1059,28 @@ sm-button[variant=primary] .icon {
 }
 #chat .unconfirmed {
   opacity: 0.7;
-  transform-origin: left;
+  transform-origin: right;
   animation: slide-up 0.3s forwards;
 }
 
 @keyframes slide-up {
   from {
-    transform: translate(-2rem, 2rem) scale(0.8);
+    transform: translateY(-2rem);
   }
   to {
     transform: none;
   }
 }
+.big-emoji::after {
+  display: none;
+}
+.big-emoji .message-body {
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  font-size: 2.6rem;
+}
+
 #chat_container {
   flex: 1;
   padding: 0 1rem;
@@ -1063,15 +1088,26 @@ sm-button[variant=primary] .icon {
 
 #emoji_picker {
   display: grid;
+  gap: 1rem;
   background: rgba(var(--text-color), 0.06);
   border-radius: 1rem;
   margin: 0 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
   box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.3);
-  padding: 1rem;
   overflow-y: auto;
+  max-height: 30vh;
+}
+#emoji_picker section {
+  display: flex;
   flex-wrap: wrap;
-  max-height: min(16rem, 30vh);
+  padding: 1rem;
+}
+#emoji_picker .section-header {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(rgba(var(--text-color), 0.06), rgba(var(--text-color), 0.06)), rgba(var(--foreground-color), 1);
+  padding: 1rem 0;
+  width: 100%;
+  z-index: 1;
 }
 
 .emoji {
@@ -1081,16 +1117,7 @@ sm-button[variant=primary] .icon {
   border-radius: 0.6rem;
   user-select: none;
   text-align: center;
-}
-
-.big-emoji::after {
-  display: none;
-}
-.big-emoji .message-body {
-  background: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  font-size: 2.6rem;
+  min-width: 3rem;
 }
 
 #new_conversation, #no_mails {
@@ -1269,6 +1296,11 @@ sm-tab-panels {
     z-index: 4;
   }
 
+  #dm_container,
+#contact_container {
+    gap: 0.5rem;
+  }
+
   #chat header {
     padding: 1rem;
   }
@@ -1340,7 +1372,7 @@ sm-tab-panels {
   #main_navbar {
     position: relative;
     width: auto;
-    background: rgba(var(--text-color), 0.06);
+    background: rgba(var(--text-color), 0.05);
     padding-bottom: 0.5rem;
   }
   #main_navbar .navbar-item {
@@ -1367,6 +1399,10 @@ sm-tab-panels {
     width: 100vw;
     height: 100vh;
     grid-template-columns: auto 1fr;
+  }
+
+  #emoji_picker {
+    max-height: 18rem;
   }
 
   #chat .message .message-body {
