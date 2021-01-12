@@ -1887,6 +1887,7 @@ smPopup.innerHTML = `
     display: -webkit-box;
     display: flex;
     width: 100%;
+    touch-action: none;
     -webkit-box-align: center;
         -ms-flex-align: center;
             align-items: center;
@@ -2051,7 +2052,6 @@ customElements.define('sm-popup', class extends HTMLElement {
     }
 
     handleTouchMove = (e) => {
-        e.preventDefault()
         if (this.touchStartY < e.changedTouches[0].clientY) {
             this.offset = e.changedTouches[0].clientY - this.touchStartY;
             this.touchEndAnimataion = window.requestAnimationFrame(() => this.movePopup())
@@ -2509,6 +2509,7 @@ smNotifications.innerHTML = `
         -webkit-hyphens: auto;
         hyphens: auto;
         max-width: 100%;
+        touch-action: none;
     }
     h4:first-letter,
     p:first-letter{
@@ -2612,7 +2613,6 @@ customElements.define('sm-notifications', class extends HTMLElement {
     }
 
     handleTouchMove = (e) => {
-        e.preventDefault()
         if (this.touchStartX < e.changedTouches[0].clientX) {
             this.offset = e.changedTouches[0].clientX - this.touchStartX;
             this.touchEndAnimataion = requestAnimationFrame(this.movePopup)

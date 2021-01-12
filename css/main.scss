@@ -8,13 +8,13 @@
 } 
 :root{
     scroll-behavior: smooth;
-    font-size: clamp(16px, 1.2vw, 48px);
+    font-size: clamp(16px, 1.2vmax, 48px);
 }
 html, body{
     height: 100%;
 }
 body{
-    --accent-color: #1976D2;
+    --accent-color:#d60739;
     --secondary-color: #ffac2e;
     --text-color: 17, 17, 17;
     --text-color-light: 100, 100, 100;
@@ -29,8 +29,9 @@ body{
     }
 }
 body[data-theme='dark']{
-    --secondary-color: #FDB956;
-    --text-color: 218, 218, 218;
+    --accent-color: rgb(214 7 57);
+    --secondary-color: #d60739;
+    --text-color: 240, 240, 240;
     --text-color-light: 170, 170, 170;
     --foreground-color: 20, 20, 20;
     .initial{
@@ -500,6 +501,7 @@ sm-button[variant="primary"]{
     gap: 0 1rem;
     padding: 0.8rem 1.5rem;
     align-items: center;
+    min-height: max-content;
     &.chat{
         grid-template-columns: auto 1fr auto;
         grid-template-areas: 'dp . menu'
@@ -666,7 +668,6 @@ sm-button[variant="primary"]{
     width: max(18rem, 80vw);
     height: 100vh;
     background: rgba(var(--foreground-color), 1);
-    // box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
     .logo-section{
         margin: 1rem 0 1.5rem 0;
         padding: 0 1rem;
@@ -681,6 +682,7 @@ sm-button[variant="primary"]{
         }
     }
     .label{
+        font-weight: 500;
         font-size: 0.9rem;
     }
     .navbar-item{
@@ -749,23 +751,6 @@ sm-button[variant="primary"]{
 }
 #contacts{
     position: relative;
-    header{
-        position: relative;
-        gap: 0.5rem;
-        sm-input{
-            margin: 0;
-            width: 100%;
-            .icon{
-                stroke: rgba(var(--text-color), 0.5);
-                height: 0.9rem;
-                width: 0.9rem;
-            }
-        }
-        sm-input::part(input){
-            border-radius: 3rem;
-            padding: 0.5rem 1rem;
-        }
-    } 
     #all_contacts{
         position: absolute;
         top: 0;
@@ -775,9 +760,12 @@ sm-button[variant="primary"]{
         height: 100%;
         width: 100%;
         z-index: 1;
-        background-color:rgba(var(--foreground-color), 1);
+        background: linear-gradient(rgba(157, 166, 255, 0.063), rgba(157, 166, 255, 0.063)), rgba(var(--foreground-color), 1);
         transition: transform 0.3s;
         transform: translateX(-100%);
+        .header{
+            padding-bottom: 1rem;
+        }
     }
 }
 #selected_contacts{
@@ -792,23 +780,52 @@ sm-button[variant="primary"]{
     }
 }
 #contacts, #mails{
-    overflow-y: hidden;
     position: relative;
     grid-template-rows: max-content 1fr;
+}
+#contacts, #mails, #settings_page{
     height: 100vh;
-    header{
-        padding: 1rem 1.5rem;
+    overflow-y: hidden;
+    .header{
+        background: rgba(var(--text-color), 0.06);
+        padding: 1rem 1.5rem 0 1.5rem;
+        border-bottom: solid 1px rgba(var(--text-color), 0.2);
+        position: relative;
+        gap: 0.5rem;
+        // margin-bottom: 1rem;
+        sm-tab::part(tab){
+            padding: 0.8rem 1rem;
+        }
+        sm-input{
+            margin: 0;
+            width: 100%;
+            .icon{
+                stroke: rgba(var(--text-color), 0.5);
+                height: 0.9rem;
+                width: 0.9rem;
+            }
+        }
+        sm-input::part(input){
+            border-radius: 3rem;
+            padding: 0.5rem 1rem;
+        }
         h4{
             text-transform: capitalize;
         }
-        .grid{
-            grid-template-columns: 1fr auto;
-            gap: 0.5rem;
+        .flex{
+            h4{
+                flex: 1;
+                margin: 0 1rem;
+            }
             .icon{
                 height: 2.2rem;
                 width: 2.2rem;
-                padding: 0.4rem;
+                padding: 0.6rem;
+                margin-left: -0.4rem;
                 cursor: pointer;
+            }
+            sm-menu{
+                margin-right: -0.7rem;
             }
         }
         sm-button{
@@ -1081,9 +1098,9 @@ sm-button[variant="primary"]{
     stroke-width: 16;
     stroke: rgba(var(--text-color), 0.4);
 }
-#contacts_container,
-#dm_container,
 #chat_container,
+#dm_container,
+#contacts_container,
 #inbox_mail_container,
 #sent_mail_container,
 #mail{
@@ -1091,6 +1108,13 @@ sm-button[variant="primary"]{
     flex-direction: column;
     height: 100%;
     overflow-y: auto;
+}
+#dm_container,
+#contacts_container,
+#inbox_mail_container,
+#sent_mail_container{
+    height: auto;
+    min-height: 100%;
 }
 #dm_container:empty{
     display: none;
@@ -1103,6 +1127,10 @@ sm-button[variant="primary"]{
 }
 sm-tab-panels{
     overflow: hidden auto;
+}
+sm-panel{
+    width: 100%;
+    overflow-y: auto;
 }
 
 #inbox_mail_container,
@@ -1144,7 +1172,6 @@ sm-tab-panels{
     padding: 0.7rem;
     height: 2.4rem;
     width: 2.4rem;
-    background-color: rgba(var(--foreground-color), 1);
     margin-left: -0.5rem;
     cursor: pointer;
     stroke-width: 8;
@@ -1155,8 +1182,9 @@ sm-tab-panels{
     }
 }
 #settings_page{
-    height: 100vh;
-    overflow: hidden auto;
+    #settings_sidebar header{
+        padding: 1rem 1.5rem;
+    }
     .flex sm-button{
         margin: 0;
         margin-left: 1rem;
@@ -1171,7 +1199,7 @@ sm-tab-panels{
         text-transform: capitalize;
     }
     #settings_sidebar{
-        padding: 1rem 0;
+        height: 100%;
     }
     #settings_panel{
         padding: 0 1.5rem;
@@ -1220,6 +1248,20 @@ sm-tab-panels{
         transform: translateX(-100%);
         transition: transform 0.3s;
         z-index: 4;
+        box-shadow: 0 0 1rem rgba(0, 0, 0, 0.3);
+        .logo-section{
+            padding: 1rem;
+        }
+        #navbar_backdrop{
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: -1;
+            transition: transform 0.3s;
+        }
     }
     #dm_container,
     #contact_container{
@@ -1239,10 +1281,11 @@ sm-tab-panels{
         }
     }
     #settings_page{
-        header{
+        #settings_panel header{
             position: sticky;
             top: 0;
-            padding: 1.5rem 0;
+            padding: 1rem 0;
+            margin-bottom: 0.5rem;
             background: rgba(var(--foreground-color), 1);
         }
     }
@@ -1297,6 +1340,14 @@ sm-tab-panels{
         width: auto;
         background: rgba(var(--text-color), 0.05);
         padding-bottom: 0.5rem;
+        .logo-section{
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0;
+            .main-logo{
+                margin: 0;
+            }
+        }
         .navbar-item{
             margin: 0 0.5rem;
             border-radius: 0.5rem;
@@ -1336,7 +1387,6 @@ sm-tab-panels{
         z-index: 1;
     }
     #contacts, #mails, #settings_sidebar{
-        height: 100vh;
         background-color: rgba(157, 166, 255, 0.063);
     }
     #settings_page{
@@ -1373,17 +1423,6 @@ sm-tab-panels{
         padding: 0 8vw;
         .title-font{
             font-size: 3rem;
-        }
-    }
-    #main_navbar{
-        width: 12rem;
-        .navbar-item{
-            .icon{
-                margin-right: 0.8rem;
-            }
-        }
-        .label{
-            display: block;
         }
     }
     #chat_page, #mail_page{

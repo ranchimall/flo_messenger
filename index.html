@@ -259,7 +259,8 @@
 	</template>
 	<main id="main" class="grid hide-completely">
 		<nav id="main_navbar" class="flex">
-			<div class="logo-section hide-on-mobile" title="RanchiMall FLO Messenger">			
+            <div id="navbar_backdrop" onclick="toggleDrawer()"></div>
+			<div class="logo-section" title="RanchiMall FLO Messenger">			
 				<svg class="main-logo" viewBox="0 0 27.25 32">
 					<title>RanchiMall</title>
 					<path
@@ -295,9 +296,14 @@
 		</nav>
 		<section id="chat_page" class="grid page">
 			<div id="contacts" class="grid">
-				<header class="grid">
-                    <div class="grid align-center">
-                        <h4>Chats</h4>
+				<header class="grid header">
+                    <div class="flex align-center">
+                        <svg class="icon" onclick="toggleDrawer()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                            <line y1="10.66" x2="64" y2="10.66"/>
+                            <line y1="32" x2="64" y2="32"/>
+                            <line y1="53.34" x2="64" y2="53.34"/>
+                        </svg>
+                        <h4>Chat</h4>
                         <sm-menu align-options="right">
                             <sm-menu-option onclick="initGroupCreation()">Create a group</sm-menu-option>
                         </sm-menu>
@@ -309,6 +315,10 @@
                             <line x1="63.65" y1="63.66" x2="43.36" y2="43.37"/>
                         </svg>
                     </sm-input>
+                    <sm-tab-header target="chat_panels">
+                        <sm-tab>Direct</sm-tab>
+                        <sm-tab>Groups</sm-tab>
+                    </sm-tab-header>
                 </header>
                 <sm-button variant="primary" id="new_message_button" onclick="showContacts()" class="fab round">
                     <svg xmlns="http://www.w3.org/2000/svg"class="icon" viewBox="0 0 64 64">
@@ -318,20 +328,25 @@
                     </svg>
                     New chat
                 </sm-button>
-                <div id="dm_container" class="flex"></div>
-                <div id="new_conversation" class="flex direction-column empty-state">
-                    <svg class="icon new-conversation align-center" viewBox="0 0 512 512">
-                        <title>new conversation</title>
-                        <path d="M304.11,403.5H101.42a51,51,0,0,1-51-51v-191L6.87,84.82H424.36a51,51,0,0,1,51,51v86.72"/>
-                        <ellipse cx="423.3" cy="342.48" rx="84.7"/>
-                        <line  x1="423.3" y1="306.34" x2="423.3" y2="379.64"/>
-                        <line x1="459.95" y1="342.99" x2="386.65" y2="342.99"/>
-                    </svg>                  
-                    <h4>Add a contact for getting started</h4>
-                    <p class="light-text">Tap/click on added contact to start a conversation</p>
-                </div>
+                <sm-tab-panels id="chat_panels">
+                    <sm-panel>
+                        <div id="dm_container" class="flex"></div>
+                        <div id="new_conversation" class="flex direction-column empty-state">
+                            <svg class="icon new-conversation align-center" viewBox="0 0 512 512">
+                                <title>new conversation</title>
+                                <path d="M304.11,403.5H101.42a51,51,0,0,1-51-51v-191L6.87,84.82H424.36a51,51,0,0,1,51,51v86.72"/>
+                                <ellipse cx="423.3" cy="342.48" rx="84.7"/>
+                                <line  x1="423.3" y1="306.34" x2="423.3" y2="379.64"/>
+                                <line x1="459.95" y1="342.99" x2="386.65" y2="342.99"/>
+                            </svg>                  
+                            <h4>Add a contact for getting started</h4>
+                            <p class="light-text">Tap/click on added contact to start a conversation</p>
+                        </div>
+                    </sm-panel>
+                    <sm-panel></sm-panel>
+                </sm-tab-panels>
                 <div id="all_contacts">
-                    <header class="grid">
+                    <header class="grid header">
                         <div class="flex align-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon back" onclick="showContacts(false)" viewBox="0 0 64 64">
                                 <title>back-arrow</title>
@@ -395,8 +410,16 @@
 		</section>
 		<section class="page grid hide-completely" id="mail_page">
 			<div id="mails" class="grid">
-				<header class="flex align-center">
-                    <sm-tab-header variant="tab" target="all_mail_container">
+				<header class="grid header">
+                    <div class="flex align-center">
+                        <svg class="icon" onclick="toggleDrawer()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                            <line y1="10.66" x2="64" y2="10.66"/>
+                            <line y1="32" x2="64" y2="32"/>
+                            <line y1="53.34" x2="64" y2="53.34"/>
+                        </svg>
+                        <h4>Mail</h4>
+                    </div>
+                    <sm-tab-header target="all_mail_container">
                         <sm-tab>Inbox</sm-tab>
                         <sm-tab>Sent</sm-tab>
                     </sm-tab-header>
@@ -433,6 +456,16 @@
 		</section>
 		<section id="settings_page" class="page hide-completely">
             <aside id="settings_sidebar">
+                <header class="grid header">
+                    <div class="flex align-center">
+                        <svg class="icon" onclick="toggleDrawer()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                            <line y1="10.66" x2="64" y2="10.66"/>
+                            <line y1="32" x2="64" y2="32"/>
+                            <line y1="53.34" x2="64" y2="53.34"/>
+                        </svg>
+                        <h4>Settings</h4>
+                    </div>
+				</header>
                 <div class="sidebar-item interact active" data-target="profile_panel">Account</div>
                 <div class="sidebar-item interact" data-target="personalise_panel">personalise</div>
                 <div class="sidebar-item interact" data-target="backup_panel">backup & restore</div>
@@ -1324,9 +1357,8 @@
             }
         })
 
-        let prevScroll
         getRef('chat_container').addEventListener('scroll', function() {
-            if((this.scrollHeight > this.clientHeight) && (prevScroll - this.scrollTop >= 100)){
+            if((this.scrollHeight > this.clientHeight) && (this.scrollHeight - this.clientHeight - this.scrollTop >= 100)){
                getRef('scroll_to_bottom').classList.add('no-transformations')
             }
             else{
@@ -1381,7 +1413,9 @@
 					activePage.button.classList.remove('active')
 				}
 				activePage.button = targetButton
-				activePage.page = targetPage;
+                activePage.page = targetPage;
+                if(getRef('main_navbar').classList.contains('no-transformations'))
+                    getRef('main_navbar').classList.remove('no-transformations')
             }
             if(e.target.closest('#send_mail_to') || e.target.closest('#mail_contact_list')){
                 getRef('mail_contact_list').classList.remove('hide-completely')
@@ -1820,13 +1854,13 @@
             let messages
             if(reRender){
                 activeChat['allMessages'] = Object.values(data)
-                startIndex = (activeChat['allMessages'].length - 10) > 0 ? activeChat['allMessages'].length - 10 : 0
+                startIndex = (activeChat['allMessages'].length - 20) > 0 ? activeChat['allMessages'].length - 20 : 0
                 endIndex = activeChat['allMessages'].length
                 messages = activeChat['allMessages']
             }
             else if(lazyLoad){
                 messages = activeChat['allMessages']
-                startIndex = startIndex > 10 ? startIndex -= 10 : 0
+                startIndex = startIndex > 20 ? startIndex -= 20 : 0
                 markUnread = false
             }
             else{
@@ -1872,7 +1906,6 @@
             if(reRender || lazyLoad){
                 currentDate = null
                 getRef('chat_container').prepend(frag)
-                prevScroll = getRef('chat_container').scrollTop
             }
             if(reRender){
                 scrollToBottom()
@@ -2109,6 +2142,10 @@
                 getRef('settings_panel').classList.add('hide-on-mobile')
                 getRef('settings_sidebar').classList.remove('hide-on-mobile')
             }
+        }
+
+        function toggleDrawer(){
+            getRef('main_navbar').classList.toggle('no-transformations')
         }
 
     </script>
