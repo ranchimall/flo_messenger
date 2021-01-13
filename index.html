@@ -95,7 +95,7 @@
                             <h5>FLO ID (User ID)</h5>
                             <div class="copy-row">
                                 <h4 id="generated_id" class="copy"></h4>
-                                <svg class="icon" onclick="copyToClipboard(this.parentNode)" viewBox="0 0 64 64">
+                                <svg class="icon" onclick="copyToClipboard(this, 'Copied FLO ID')" viewBox="0 0 64 64">
                                     <title>Copy</title>
                                     <rect x="16" y="16" width="48" height="48" rx="6" />
                                     <path d="M.5,47.52V6.5a6,6,0,0,1,6-6h41" />
@@ -104,7 +104,7 @@
                             <h5>Private key (Password)</h5>
                             <div class="copy-row">
                                 <h4 id="generated_key" class="copy"></h4>
-                                <svg class="icon" onclick="copyToClipboard(this.parentNode)" viewBox="0 0 64 64">
+                                <svg class="icon" onclick="copyToClipboard('this, Copied private key')" viewBox="0 0 64 64">
                                     <title>Copy</title>
                                     <rect x="16" y="16" width="48" height="48" rx="6" />
                                     <path d="M.5,47.52V6.5a6,6,0,0,1,6-6h41"/>
@@ -208,7 +208,44 @@
 		</header>
 		<sm-input id="subject_of_reply_mail" placeholder="Subject" animate></sm-input>
 		<textarea id="reply_mail_content" placeholder="Type a mail" id="" rows="10" required></textarea>
-	</sm-popup>
+    </sm-popup>
+    <!-- Contact popup -->
+    <sm-popup id="contact_details_popup">
+        <header class="popup-header" slot="header">
+            <svg class="icon" onclick="this.closest('sm-popup').hide()" viewBox="0 0 64 64">
+                <title>close</title>
+                <line x1="64" y1="0" x2="0" y2="64" />
+                <line x1="64" y1="64" x2="0" y2="0" />
+            </svg>
+        </header>
+        <div class="flex direction-column align-center">
+            <div id="contact_initial" class="initial flex align-center"></div>
+            <h4 id="contact_name" ondblclick="setNameEditable()"></h4>
+            <div class="flex space-between align-center">
+                <svg tooltip="Edit" id="edit_contact_name" class="icon" onclick="setNameEditable()" viewBox="0 0 64 64">
+                    <path
+                        d="M46.73,14.81l7,7,7.65-7.6A7.15,7.15,0,0,0,61.39,4L60.11,2.77a7.23,7.23,0,0,0-10.19,0L3.87,48.57a5,5,0,0,0-1.39,2.6L.53,61.27a1.74,1.74,0,0,0,2,2l10.15-1.94A5.06,5.06,0,0,0,15.34,60L49.6,25.9" />
+                </svg>
+                <!--<svg id="delete_person" onclick="deletePerson()" class="icon" viewBox="0 0 64 64" title="Remove">
+                    <title>remove</title>
+                    <line x1="4" y1="6.3" x2="60" y2="6.3" />
+                    <path d="M53.5,20.5v38.9c0,2.3-1.8,4.1-4.1,4.1h0H14.6c-2.3,0-4.1-1.8-4.1-4.1c0,0,0,0,0,0V20.5" />
+                    <path d="M22.7,6.6V3.8c0-1.8,1.5-3.3,3.3-3.3h11.4c1.8,0,3.3,1.5,3.3,3.3v2.8" />
+                </svg>-->
+            </div>
+        </div>
+        <h5>FLO ID</h5>
+        <div class="copy-row grid">
+            <h4 id="contact_flo_id" class="copy"></h4>
+            <svg class="icon" onclick="copyToClipboard(this, 'Copied FLO ID')" viewBox="0 0 64 64">
+                <title>Copy</title>
+                <rect x="16" y="16" width="48" height="48" rx="6" />
+                <path d="M.5,47.52V6.5a6,6,0,0,1,6-6h41" />
+            </svg>
+        </div>
+        <div class="flex">
+        </div>
+    </sm-popup>
 
 	<!-- Templates -->
 
@@ -256,10 +293,10 @@
 			<p class="message-body"></p>
 			<time class="time"></time>
 		</div>
-	</template>
+    </template>
+    <div id="navbar_backdrop" class="hide" onclick="toggleDrawer()"></div>
 	<main id="main" class="grid hide-completely">
 		<nav id="main_navbar" class="flex">
-            <div id="navbar_backdrop" onclick="toggleDrawer()"></div>
 			<div class="logo-section" title="RanchiMall FLO Messenger">			
 				<svg class="main-logo" viewBox="0 0 27.25 32">
 					<title>RanchiMall</title>
@@ -292,20 +329,21 @@
                         <path d="M32,21A11,11,0,1,1,21,32,11,11,0,0,1,32,21m0-1A12,12,0,1,0,44,32,12,12,0,0,0,32,20Z" />
                     </svg>
                     <h5 class="label">Settings</h5>
-			</div>
-		</nav>
+                </div>
+            </nav>
 		<section id="chat_page" class="grid page">
 			<div id="contacts" class="grid">
 				<header class="grid header">
                     <div class="flex align-center">
-                        <svg class="icon" onclick="toggleDrawer()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                        <svg class="hamburger-menu-button icon hide-on-desktop" onclick="toggleDrawer()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
                             <line y1="10.66" x2="64" y2="10.66"/>
                             <line y1="32" x2="64" y2="32"/>
                             <line y1="53.34" x2="64" y2="53.34"/>
                         </svg>
                         <h4>Chat</h4>
                         <sm-menu align-options="right">
-                            <sm-menu-option onclick="initGroupCreation()">Create a group</sm-menu-option>
+                            <sm-menu-option onclick="showPopup('add_contact_popup')">Add a contact</sm-menu-option>
+                            <sm-menu-option onclick="initGroupCreation()">Create new group</sm-menu-option>
                         </sm-menu>
                     </div>
                     <sm-input id="search_chats" type="search" placeholder="Search">
@@ -386,7 +424,7 @@
                         <line x1="1" y1="32" x2="64" y2="32"/>
                         <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
                     </svg>
-                    <div id="receiver_initial" class="initial flex align-center"></div>
+                    <div id="receiver_initial" onclick="showPopup('contact_details_popup')" class="initial flex align-center"></div>
                     <h4 id="receiver_name"></h4>
 				</header>
                 <h5 id="warn_no_encryption">Messages are not encrypted until receiver replies</h5>
@@ -412,7 +450,7 @@
 			<div id="mails" class="grid">
 				<header class="grid header">
                     <div class="flex align-center">
-                        <svg class="icon" onclick="toggleDrawer()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                        <svg class="hamburger-menu-button icon hide-on-desktop" onclick="toggleDrawer()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
                             <line y1="10.66" x2="64" y2="10.66"/>
                             <line y1="32" x2="64" y2="32"/>
                             <line y1="53.34" x2="64" y2="53.34"/>
@@ -458,7 +496,7 @@
             <aside id="settings_sidebar">
                 <header class="grid header">
                     <div class="flex align-center">
-                        <svg class="icon" onclick="toggleDrawer()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                        <svg class="hamburger-menu-button icon hide-on-desktop" onclick="toggleDrawer()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
                             <line y1="10.66" x2="64" y2="10.66"/>
                             <line y1="32" x2="64" y2="32"/>
                             <line y1="53.34" x2="64" y2="53.34"/>
@@ -485,7 +523,7 @@
                         <h4>My FLO ID</h4>
                         <div class="copy-row">
                             <p id="greet_tag" class="copy"></p>
-                            <svg class="icon" onclick="copyToClipboard('#greet_tag', 'FLO ID Copied')" viewBox="0 0 64 64">
+                            <svg class="icon" onclick="copyToClipboard(this, 'FLO ID Copied')" viewBox="0 0 64 64">
                                 <title>Copy</title>
                                 <rect x="16" y="16" width="48" height="48" rx="6" />
                                 <path d="M.5,47.52V6.5a6,6,0,0,1,6-6h41" />
@@ -514,7 +552,7 @@
                 <div id="personalise_panel" class="panel hide-completely">
                     <section class="setting-toggle">
                         <h4>Dark mode</h4>
-                        <p>Toggle dark mode on/off. Setting applies to this browser only</p>
+                        <p>Toggle dark mode on/off.<br><strong>*Setting applies to this browser only</strong></p>
                         <sm-switch id="theme_switcher"></sm-switch>
                     </section>
                     <section class="setting-toggle">
@@ -672,11 +710,25 @@
 
             if (window.innerWidth > 720 && firstInput)
                 firstInput.focusIn()
+
+            switch (e.detail.popup.id) {
+                case 'contact_details_popup':
+                    getRef('contact_initial').setAttribute('style', `background: ${clickedContact['card'].getAttribute('background-color')}`)
+                    getRef('contact_initial').textContent = clickedContact['name'].charAt(0)
+                    getRef('contact_name').textContent = clickedContact['name']
+                    getRef('contact_flo_id').textContent = clickedContact['floID']
+                break;
+            }
         })
 
         document.addEventListener('popupclosed', e => {
             popupStack = e.detail.popupStack
             let thisPopup = e.detail.popup
+            switch (e.detail.popup.id) {
+                case 'contact_details_popup':
+                    clickedContact['name'] = getRef('contact_name').textContent
+                break;
+            }
         })
 
         window.addEventListener('popstate', e => {
@@ -1357,7 +1409,10 @@
             }
         })
 
+        let prevScroll = {};
         getRef('chat_container').addEventListener('scroll', function() {
+            prevScroll['scrollTop'] = this.scrollTop
+            prevScroll['scrollheight'] = this.scrollHeight
             if((this.scrollHeight > this.clientHeight) && (this.scrollHeight - this.clientHeight - this.scrollTop >= 100)){
                getRef('scroll_to_bottom').classList.add('no-transformations')
             }
@@ -1414,8 +1469,10 @@
 				}
 				activePage.button = targetButton
                 activePage.page = targetPage;
-                if(getRef('main_navbar').classList.contains('no-transformations'))
+                if(getRef('main_navbar').classList.contains('no-transformations')){
                     getRef('main_navbar').classList.remove('no-transformations')
+                    getRef('navbar_backdrop').classList.add('hide')
+                }
             }
             if(e.target.closest('#send_mail_to') || e.target.closest('#mail_contact_list')){
                 getRef('mail_contact_list').classList.remove('hide-completely')
@@ -1454,8 +1511,9 @@
                 const contact = e.target.closest(".contact")
                 clickedContact['card'] = contact
                 clickedContact['floID'] = contact.getAttribute("flo-id")
-                if(e.target.closest("sm-menu")){
-                    //show contact detail popup
+                clickedContact['name'] = contact.getAttribute("name")
+                if(e.target.closest(".initial") || e.target.closest("sm-menu")){
+                    showPopup('contact_details_popup')
                 }
                 else if(isCreatingGroup){
                     // code for adding group members
@@ -1548,15 +1606,9 @@
             getRef('emoji_picker').classList.toggle('hide-completely')
         }
 
-        function copyToClipboard(target, message, parent){
-            let copyText, copyTarget = target;
-            if(typeof target === 'string'){                
-                if(parent)
-                    copyTarget = parent.querySelector(target)
-                else{
-                    copyTarget = document.querySelector(target)
-                }
-            }
+        function copyToClipboard(element, message, parent = '.copy-row'){
+            const parentElement = element.closest(parent)
+            const copyTarget = parentElement.querySelector('.copy')
             if(copyTarget.tagName === 'SM-INPUT' || copyTarget.tagName === 'INPUT' || copyTarget.tagName === 'TEXTAREA')
                 copyText = copyTarget.value
             else
@@ -1816,6 +1868,10 @@
                 notify( `you can't add your own FLO ID as contact`, 'error')
                 return
             }
+            if(floGlobals.contacts.hasOwnProperty(floID)){
+                notify( `Contact already saved`, 'error')
+                return
+            }
             messenger.storeContact(floID, name).then(result => {
                 render.contactCard(floID, name, 'contact')
                 hidePopup()
@@ -1905,6 +1961,8 @@
             }
             if(reRender || lazyLoad){
                 currentDate = null
+                prevScroll['scrollTop'] = getRef('chat_container').scrollTop
+                prevScroll['scrollHeight'] = getRef('chat_container').scrollHeight
                 getRef('chat_container').prepend(frag)
             }
             if(reRender){
@@ -1918,11 +1976,14 @@
                 for(const mutation of mutations) {
                     if (mutation.type === 'childList' && mutation.addedNodes.length) {
                         chatMessageObserver.observe(getRef('chat_container').firstElementChild)
+                        prevScroll['scrollTop'] += (getRef('chat_container').scrollHeight - prevScroll['scrollHeight'])
+                        prevScroll['scrollHeight'] = getRef('chat_container').scrollHeight
+                        getRef('chat_container').scrollTo({top: prevScroll['scrollTop']})
                     }
                 }
             }            
         )
-        chatMutationObserver.observe(getRef('chat_container'), { attributes: true, childList: true })
+        chatMutationObserver.observe(getRef('chat_container'), {childList: true })
 
         //Lazy loading for chat messages
         const chatMessageObserver = new IntersectionObserver(
@@ -2146,7 +2207,42 @@
 
         function toggleDrawer(){
             getRef('main_navbar').classList.toggle('no-transformations')
+            getRef('navbar_backdrop').classList.toggle('hide')
         }
+
+        function setNameEditable() {
+            if (!getRef('contact_name').isContentEditable) {
+                getRef('contact_name').contentEditable = 'true'
+                getRef('contact_name').focus()
+                document.execCommand('selectAll', false, null);
+                clickedContact['name'] = getRef('contact_name').textContent
+            }
+        }
+
+        async function changeContactName() {
+            clickedContact['name'] = getRef('contact_name').textContent.trim()
+            if (clickedContact['name'] === '')
+                clickedContact['name'] = 'Unknown'
+            messenger.storeContact(clickedContact['floID'], clickedContact['name']).then(result => {
+                getRef('contact_initial').textContent = clickedContact['name'].charAt(0)
+                document.querySelectorAll(`.contact[flo-id="${clickedContact['floID']}"]`).forEach(contact => {
+                    contact.children[0].textContent = clickedContact['name'].charAt(0) 
+                    contact.children[1].textContent = clickedContact['name'] 
+                })
+                notify('Renamed contact', 'success')
+            })
+            .catch(error => notify(error, "error"));
+        }
+
+        document.getElementById('contact_details_popup').addEventListener('click', e => {
+            if (!e.target.closest('#contact_name') && !e.target.closest('#edit_contact_name')) {
+                if (getRef('contact_name').isContentEditable)
+                    getRef('contact_name').contentEditable = 'false'
+                if (clickedContact['name'] !== getRef('contact_name').textContent)
+                    changeContactName()
+            }
+        })
+
 
     </script>
 
@@ -11602,6 +11698,7 @@ Bitcoin.Util = {
                     groups: {},
                     gkeys: {},
                     appendix: {},
+                    contactsInfo: {}
                 }
                 compactIDB.initDB(`${floGlobals.application}_${myFloID}`, obj).then(result => {
                     console.info(result)

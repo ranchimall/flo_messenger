@@ -96,6 +96,10 @@ textarea:focus {
   box-shadow: 0 0 0 0.1rem var(--accent-color);
 }
 
+strong {
+  font-weight: 500;
+}
+
 .flex {
   display: flex;
 }
@@ -167,11 +171,14 @@ textarea:focus {
 
 .fab {
   filter: drop-shadow(0 0.4rem 0.3rem rgba(0, 0, 0, 0.2));
-  margin-right: 1rem;
+  margin: 1.5rem;
   position: fixed;
   right: 0;
   bottom: 0;
   z-index: 1;
+}
+.fab::part(button) {
+  padding: 0.9rem 1.6rem;
 }
 .fab .icon {
   margin-left: 0 !important;
@@ -588,6 +595,46 @@ sm-button[variant=primary] .icon {
   align-self: flex-start;
 }
 
+#contact_details_popup > .flex:first-of-type {
+  margin: 1rem 0;
+}
+#contact_details_popup > .flex:first-of-type .flex .icon {
+  height: 2.6rem;
+  width: 2.6rem;
+  padding: 0.85rem;
+  cursor: pointer;
+  stroke-width: 8;
+}
+#contact_details_popup > .flex:first-of-type .flex .icon:hover {
+  background: rgba(var(--text-color), 0.06);
+}
+#contact_details_popup h5 {
+  font-weight: 500;
+  opacity: 0.8;
+}
+#contact_details_popup .copy-row {
+  margin-bottom: 1.5rem;
+}
+#contact_details_popup .copy-row h4 {
+  font-weight: 400;
+}
+#contact_details_popup #contact_initial {
+  height: 3.6rem;
+  width: 3.6rem;
+  font-size: 1.6rem;
+  border-radius: 4rem;
+  margin-bottom: 1rem;
+}
+#contact_details_popup #contact_name {
+  border-radius: 0.5rem;
+  max-width: 30ch;
+  padding: 0.6rem 1.2rem;
+}
+#contact_details_popup #contact_name:focus {
+  outline: none;
+  background: rgba(var(--text-color), 0.1);
+}
+
 #warn_no_encryption, .date-card {
   padding: 0.4rem 0.8rem;
   background: rgba(var(--text-color), 0.1);
@@ -723,8 +770,7 @@ sm-button[variant=primary] .icon {
   bottom: 0;
   top: 0;
   padding: 0;
-  width: max(18rem, 80vw);
-  height: 100vh;
+  width: max(16rem, 60vw);
   background: rgba(var(--foreground-color), 1);
 }
 #main_navbar .logo-section {
@@ -820,7 +866,8 @@ sm-button[variant=primary] .icon {
   height: 100%;
   width: 100%;
   z-index: 1;
-  background: linear-gradient(rgba(157, 166, 255, 0.063), rgba(157, 166, 255, 0.063)), rgba(var(--foreground-color), 1);
+  padding-bottom: 1.5rem;
+  background: rgba(var(--foreground-color), 1);
   transition: transform 0.3s;
   transform: translateX(-100%);
 }
@@ -875,9 +922,15 @@ sm-button[variant=primary] .icon {
 #contacts .header h4, #mails .header h4, #settings_page .header h4 {
   text-transform: capitalize;
 }
+#contacts .header .icon, #mails .header .icon, #settings_page .header .icon {
+  -webkit-tap-highlight-color: transparent;
+}
+#contacts .header .flex .hamburger-menu-button, #mails .header .flex .hamburger-menu-button, #settings_page .header .flex .hamburger-menu-button {
+  -webkit-tap-highlight-color: transparent;
+  margin-right: 1rem;
+}
 #contacts .header .flex h4, #mails .header .flex h4, #settings_page .header .flex h4 {
   flex: 1;
-  margin: 0 1rem;
 }
 #contacts .header .flex .icon, #mails .header .flex .icon, #settings_page .header .flex .icon {
   height: 2.2rem;
@@ -915,8 +968,10 @@ sm-button[variant=primary] .icon {
   padding: 0.1rem;
   stroke-width: 8;
   margin-right: 0.5rem;
+  stroke: rgba(var(--text-color), 0.8);
 }
 #chat header .initial {
+  cursor: pointer;
   margin-right: 1rem;
 }
 #chat header h4 {
@@ -965,6 +1020,8 @@ sm-button[variant=primary] .icon {
   position: absolute;
   right: 1.5rem;
   transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
   z-index: 1;
   align-self: center;
   height: 2.4rem;
@@ -977,8 +1034,10 @@ sm-button[variant=primary] .icon {
   transition: 0.3s;
 }
 #chat #send_message_button.active {
+  opacity: 1;
   fill: var(--accent-color);
   transform: none;
+  pointer-events: all;
 }
 #chat #type_message {
   margin: 0;
@@ -1188,7 +1247,7 @@ sm-button[variant=primary] .icon {
 }
 
 #dm_container {
-  padding-bottom: 3.5rem;
+  padding-bottom: 5rem;
 }
 
 sm-tab-panels {
@@ -1202,7 +1261,7 @@ sm-panel {
 
 #inbox_mail_container,
 #sent_mail_container {
-  padding-bottom: 3.5rem;
+  padding-bottom: 5rem;
 }
 
 #chat, #mail {
@@ -1326,15 +1385,16 @@ sm-panel {
   #main_navbar .logo-section {
     padding: 1rem;
   }
-  #main_navbar #navbar_backdrop {
+
+  #navbar_backdrop {
     position: fixed;
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.3);
-    z-index: -1;
-    transition: transform 0.3s;
+    z-index: 2;
+    transition: transform 0.3s, opacity 0.3s;
   }
 
   #dm_container,
@@ -1393,6 +1453,7 @@ sm-panel {
   }
 
   sm-popup::part(popup) {
+    width: 24rem;
     min-width: 24rem;
   }
 
@@ -1414,8 +1475,8 @@ sm-panel {
   #main_navbar {
     position: relative;
     width: auto;
-    background: rgba(var(--text-color), 0.05);
     padding-bottom: 0.5rem;
+    background: rgba(var(--text-color), 0.06);
   }
   #main_navbar .logo-section {
     display: flex;
@@ -1463,10 +1524,6 @@ sm-panel {
     grid-template-columns: 20rem 1fr;
     box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
     z-index: 1;
-  }
-
-  #contacts, #mails, #settings_sidebar {
-    background-color: rgba(157, 166, 255, 0.063);
   }
 
   #settings_page {

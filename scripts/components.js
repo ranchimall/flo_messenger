@@ -1851,6 +1851,7 @@ smPopup.innerHTML = `
     -o-transition: opacity 0.3s;
     transition: opacity 0.3s;
     z-index: 10;
+    touch-action: none;
 }
 :host(.stacked) .popup{
     -webkit-transform: scale(0.9) translateY(-2rem) !important;
