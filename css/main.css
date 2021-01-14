@@ -349,6 +349,10 @@ sm-button[variant=primary] .icon {
   fill: rgba(var(--text-color), 0.8);
   stroke: none;
 }
+.logo-section img {
+  width: 2rem;
+  margin-right: 0.5rem;
+}
 
 .select-file input[type=file] {
   display: none;
@@ -899,7 +903,6 @@ sm-button[variant=primary] .icon {
 #contacts .header, #mails .header, #settings_page .header {
   background: rgba(var(--text-color), 0.06);
   padding: 1rem 1.5rem 0 1.5rem;
-  border-bottom: solid 1px rgba(var(--text-color), 0.2);
   position: relative;
   gap: 0.5rem;
 }
@@ -1172,16 +1175,18 @@ sm-button[variant=primary] .icon {
   max-height: 30vh;
 }
 #emoji_picker section {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3.6rem, 1fr));
+  gap: 0.5rem;
+  padding: 0 1rem;
+  width: 100%;
 }
 #emoji_picker .section-header {
+  grid-column: 1/-1;
   position: sticky;
   top: 0;
   background: linear-gradient(rgba(var(--text-color), 0.06), rgba(var(--text-color), 0.06)), rgba(var(--foreground-color), 1);
   padding: 1rem 0;
-  width: 100%;
   z-index: 1;
 }
 
@@ -1192,7 +1197,6 @@ sm-button[variant=primary] .icon {
   border-radius: 0.6rem;
   user-select: none;
   text-align: center;
-  min-width: 3rem;
 }
 
 #new_conversation, #no_mails {
@@ -1414,6 +1418,9 @@ sm-panel {
     max-width: 90%;
   }
 
+  #settings_page {
+    overflow-x: hidden;
+  }
   #settings_page #settings_panel header {
     position: sticky;
     top: 0;

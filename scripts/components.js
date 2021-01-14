@@ -2047,26 +2047,31 @@ customElements.define('sm-popup', class extends HTMLElement {
     }
 
     handleTouchStart = (e) => {
-        this.touchStartY = e.changedTouches[0].clientY
+        this.isPressed = true
+        this.popupHeader.setPointerCapture(e.pointerId)
+        this.touchStartY = e.clientY
         this.popup.style.transition = 'transform 0.1s'
         this.touchStartTime = e.timeStamp
     }
 
     handleTouchMove = (e) => {
-        if (this.touchStartY < e.changedTouches[0].clientY) {
-            this.offset = e.changedTouches[0].clientY - this.touchStartY;
+        if(!this.isPressed) return
+        if (this.touchStartY < e.clientY) {
+            this.offset = e.clientY - this.touchStartY;
             this.touchEndAnimataion = window.requestAnimationFrame(() => this.movePopup())
         }
         /*else {
-            this.offset = this.touchStartY - e.changedTouches[0].clientY;
+            this.offset = this.touchStartY - e.clientY;
             this.popup.style.transform = `translateY(-${this.offset}px)`
         }*/
     }
-
+    
     handleTouchEnd = (e) => {
+        this.isPressed = false
+        this.popupHeader.releasePointerCapture(e.pointerId)
         this.touchEndTime = e.timeStamp
         cancelAnimationFrame(this.touchEndAnimataion)
-        this.touchEndY = e.changedTouches[0].clientY
+        this.touchEndY = e.clientY
         this.popup.style.transition = 'transform 0.3s'
         if (this.touchEndTime - this.touchStartTime > 200) {
             if (this.touchEndY - this.touchStartY > this.threshold) {
@@ -2107,6 +2112,7 @@ customElements.define('sm-popup', class extends HTMLElement {
         this.touchEndTime = 0
         this.touchEndAnimataion;
         this.threshold
+        this.isPressed = false
 
         if (this.hasAttribute('open'))
             this.show()
@@ -2127,20 +2133,14 @@ customElements.define('sm-popup', class extends HTMLElement {
             this.inputFields = this.querySelectorAll('sm-input', 'sm-checkbox', 'textarea', 'sm-textarea', 'radio')
         })
 
-        this.popupHeader.addEventListener('touchstart', (e) => {
-            this.handleTouchStart(e)
-        }, {passive: true})
-        this.popupHeader.addEventListener('touchmove', (e) => {
-            this.handleTouchMove(e)
-        }, {passive: true})
-        this.popupHeader.addEventListener('touchend', (e) => {
-            this.handleTouchEnd(e)
-        }, {passive: true})
+        this.popupHeader.addEventListener('pointerdown', (e) => {this.handleTouchStart(e)}, {passive: true})
+        this.popupHeader.addEventListener('pointermove', (e) => {this.handleTouchMove(e)}, {passive: true})
+        this.popupHeader.addEventListener('pointerup', (e) => {this.handleTouchEnd(e)}, {passive: true})
     }
     disconnectedCallback() {
-        this.popupHeader.removeEventListener('touchstart', this.handleTouchStart, {passive: true})
-        this.popupHeader.removeEventListener('touchmove', this.handleTouchMove, {passive: true})
-        this.popupHeader.removeEventListener('touchend', this.handleTouchEnd, {passive: true})
+        this.popupHeader.removeEventListener('pointerdown', this.handleTouchStart, {passive: true})
+        this.popupHeader.removeEventListener('pointermove', this.handleTouchMove, {passive: true})
+        this.popupHeader.removeEventListener('pointerup', this.handleTouchEnd, {passive: true})
     }
 })
 
@@ -2607,27 +2607,32 @@ customElements.define('sm-notifications', class extends HTMLElement {
     }
 
     handleTouchStart = (e) => {
+        this.isPressed = true
         this.notification = e.target.closest('.notification')
-        this.touchStartX = e.changedTouches[0].clientX
+        this.notification.setPointerCapture(e.pointerId)
+        this.touchStartX = e.clientX
         this.notification.style.transition = 'initial'
         this.touchStartTime = e.timeStamp
     }
 
     handleTouchMove = (e) => {
-        if (this.touchStartX < e.changedTouches[0].clientX) {
-            this.offset = e.changedTouches[0].clientX - this.touchStartX;
-            this.touchEndAnimataion = requestAnimationFrame(this.movePopup)
+        if (!this.isPressed) return;
+        if (this.touchStartX < e.clientX) {
+            this.offset = e.clientX - this.touchStartX;
+            this.touchEndAnimataion = requestAnimationFrame(this.moveNotification)
         } else {
-            this.offset = -(this.touchStartX - e.changedTouches[0].clientX);
-            this.touchEndAnimataion = requestAnimationFrame(this.movePopup)
+            this.offset = -(this.touchStartX - e.clientX);
+            this.touchEndAnimataion = requestAnimationFrame(this.moveNotification)
         }
     }
 
     handleTouchEnd = (e) => {
+        this.isPressed = false
+        this.notification.releasePointerCapture(e.pointerId)
         this.notification.style.transition = 'transform 0.3s, opacity 0.3s'
         this.touchEndTime = e.timeStamp
         cancelAnimationFrame(this.touchEndAnimataion)
-        this.touchEndX = e.changedTouches[0].clientX
+        this.touchEndX = e.clientX
         if (this.touchEndTime - this.touchStartTime > 200) {
             if (this.touchEndX - this.touchStartX > this.threshold) {
                 this.removeNotification(this.notification)
@@ -2645,7 +2650,7 @@ customElements.define('sm-notifications', class extends HTMLElement {
         }
     }
 
-    movePopup = () => {
+    moveNotification = () => {
         this.notification.style.transform = `translateX(${this.offset}px)`
     }
 
@@ -2683,22 +2688,22 @@ customElements.define('sm-notifications', class extends HTMLElement {
         this.notificationPanel.prepend(notification)
         if (window.innerWidth > 640) {
             notification.animate([{
-                    transform: `translateX(1rem)`,
-                    opacity: '0'
-                },
-                {
-                    transform: 'translateX(0)',
-                    opacity: '1'
-                }
+                transform: `translateX(1rem)`,
+                opacity: '0'
+            },
+            {
+                transform: 'translateX(0)',
+                opacity: '1'
+            }
             ], this.animationOptions).onfinish = () => {
                 notification.setAttribute('style', `transform: none;`);
             }
         } else {
             notification.setAttribute('style', `transform: translateY(0); opacity: 1`)
         }
-        notification.addEventListener('touchstart', this.handleTouchStart, {passive: true})
-        notification.addEventListener('touchmove', this.handleTouchMove, {passive: true})
-        notification.addEventListener('touchend', this.handleTouchEnd, {passive: true})
+        notification.addEventListener('pointerdown', e => { this.handleTouchStart(e) }, { passive: true })
+        notification.addEventListener('pointermove', e => { this.handleTouchMove(e) }, {passive: true})
+        notification.addEventListener('pointerup', e => { this.handleTouchEnd(e) }, {passive: true})
     }
 
     removeNotification = (notification, toLeft) => {
@@ -2745,7 +2750,6 @@ customElements.define('sm-notifications', class extends HTMLElement {
             fill: "forwards",
             easing: "ease"
         }
-        this.fontSize = Number(window.getComputedStyle(document.body).getPropertyValue('font-size').match(/\d+/)[0])
         this.notification
         this.offset
         this.touchStartX = 0
@@ -2754,6 +2758,7 @@ customElements.define('sm-notifications', class extends HTMLElement {
         this.touchEndTime = 0
         this.threshold = this.notificationPanel.getBoundingClientRect().width * 0.3
         this.touchEndAnimataion;
+        this.isPressed = false
 
         this.notificationPanel.addEventListener('click', e => {
             if (e.target.closest('.close'))(
@@ -2780,10 +2785,14 @@ customElements.define('sm-notifications', class extends HTMLElement {
             })
         })
         observer.observe(this.notificationPanel, {
-            attributes: true,
             childList: true,
             subtree: true
         })
+    }
+    disconnectedCallback() {
+        notification.removeEventListener('pointerdown', e => { this.handleTouchStart(e) }, { passive: true })
+        notification.removeEventListener('pointermove', e => { this.handleTouchMove(e) }, {passive: true})
+        notification.removeEventListener('pointerup', e => { this.handleTouchEnd(e) }, {passive: true})
     }
 })
 
