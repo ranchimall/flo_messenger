@@ -8,13 +8,13 @@
 } 
 :root{
     scroll-behavior: smooth;
-    font-size: clamp(16px, 1.2vmax, 48px);
+    font-size: clamp(1rem, 1.2vmax, 3rem);
 }
 html, body{
     height: 100%;
 }
 body{
-    --accent-color:#d60739;
+    --accent-color:#5b00d3;
     --secondary-color: #ffac2e;
     --text-color: 17, 17, 17;
     --text-color-light: 100, 100, 100;
@@ -29,7 +29,7 @@ body{
     }
 }
 body[data-theme='dark']{
-    --accent-color: rgb(214 7 57);
+    --accent-color:#923eff;
     --secondary-color: #d60739;
     --text-color: 240, 240, 240;
     --text-color-light: 170, 170, 170;
@@ -511,7 +511,7 @@ sm-button[variant="primary"]{
     gap: 0 1rem;
     padding: 0.8rem 1.5rem;
     align-items: center;
-    min-height: max-content;
+    flex-shrink: 0;
     &.chat{
         grid-template-columns: auto 1fr auto;
         grid-template-areas: 'dp . menu'
@@ -599,9 +599,6 @@ sm-button[variant="primary"]{
     color: rgba(var(--text-color), 0.8);
     margin: 1rem 0;
     justify-self: center;
-    align-self: flex-start;
-}
-.date-card{
     align-self: center;
 }
 .mail-card.unread::before,
@@ -616,6 +613,9 @@ sm-button[variant="primary"]{
 }
 .mail-card.unread,
 .contact.unread{
+    .time{
+        color: var(--accent-color);
+    }
     h4, h5 ,p{
         font-weight: 700;
     }
@@ -809,16 +809,17 @@ sm-button[variant="primary"]{
         bottom: 0;
         left: 0;
         right: 0;
-        height: 100%;
-        width: 100%;
         z-index: 1;
         padding-bottom: 1.5rem;
         background: rgba(var(--foreground-color), 1);
         transition: transform 0.3s;
-        transform: translateX(-100%);
+        transform: translateX(-110%);
         .header{
             padding-bottom: 1rem;
         }
+    }
+    #contacts_container{
+        height: calc(100vh - 7.3rem);
     }
 }
 #selected_contacts{
@@ -831,6 +832,11 @@ sm-button[variant="primary"]{
     sm-button{
         margin-bottom: 0;
     }
+}
+#selected_contacts_container{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
+    gap: 1rem;
 }
 #contacts, #mails{
     position: relative;
@@ -848,6 +854,17 @@ sm-button[variant="primary"]{
         sm-tab::part(tab){
             padding: 0.8rem 1rem;
         }
+        .expanding-search{
+            position: absolute;
+            width: 100%;
+            padding: 0.7rem 1.5rem;
+            background: linear-gradient(rgba(var(--text-color), 0.06), rgba(var(--text-color), 0.06)), rgba(var(--foreground-color), 1);
+            clip-path: circle(0% at calc(100% - 4rem) center);
+            transition: clip-path 0.3s;
+            &.expand{
+                clip-path: circle(100%);
+            }
+        }
         sm-input{
             margin: 0;
             width: 100%;
@@ -859,7 +876,7 @@ sm-button[variant="primary"]{
         }
         sm-input::part(input){
             border-radius: 3rem;
-            padding: 0.5rem 1rem;
+            padding: 0.3rem 0.8rem;
         }
         h4{
             text-transform: capitalize;
@@ -1173,13 +1190,6 @@ sm-button[variant="primary"]{
     flex-direction: column;
     height: 100%;
     overflow-y: auto;
-}
-#dm_container,
-#contacts_container,
-#inbox_mail_container,
-#sent_mail_container{
-    height: auto;
-    min-height: 100%;
 }
 #dm_container:empty{
     display: none;

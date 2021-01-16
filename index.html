@@ -342,21 +342,33 @@
                             <line y1="53.34" x2="64" y2="53.34"/>
                         </svg>
                         <h4>Chat</h4>
-                        <sm-menu align-options="right">
-                            <sm-menu-option onclick="showPopup('add_contact_popup')">Add a contact</sm-menu-option>
-                            <sm-menu-option onclick="initGroupCreation()">Create new group</sm-menu-option>
-                        </sm-menu>
-                    </div>
-                    <sm-input id="search_chats" type="search" placeholder="Search">
-                        <svg slot="icon" class="icon" viewBox="0 0 64 64">
+                        <svg class="icon" onclick="toggleSearch('chat_search_field')" viewBox="0 0 64 64">
                             <title>Search</title>
                             <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
                             <line x1="63.65" y1="63.66" x2="43.36" y2="43.37"/>
                         </svg>
-                    </sm-input>
+                        <sm-menu align-options="right">
+                            <sm-menu-option onclick="initGroupCreation()">Create new group</sm-menu-option>
+                        </sm-menu>
+                    </div>
+                    <div id="chat_search_field" class="expanding-search flex align-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon back" onclick="toggleSearch('chat_search_field')" viewBox="0 0 64 64">
+                            <title>back-arrow</title>
+                            <line x1="1" y1="32" x2="64" y2="32"/>
+                            <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
+                        </svg>
+                        <sm-input id="search_chats" type="search" placeholder="Search">
+                            <svg slot="icon" class="icon" viewBox="0 0 64 64">
+                                <title>Search</title>
+                                <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
+                                <line x1="63.65" y1="63.66" x2="43.36" y2="43.37"/>
+                            </svg>
+                        </sm-input>
+                    </div>
                     <sm-tab-header target="chat_panels">
                         <sm-tab>Direct</sm-tab>
                         <sm-tab>Groups</sm-tab>
+                        <sm-tab>Notes</sm-tab>
                     </sm-tab-header>
                 </header>
                 <sm-button variant="primary" id="new_message_button" onclick="showContacts()" class="fab round">
@@ -393,6 +405,11 @@
                                 <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
                             </svg>
                             <h4>Contacts</h4>
+                            <svg class="icon" onclick="toggleSearch('contacts_search_field')" viewBox="0 0 64 64">
+                                <title>Search</title>
+                                <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
+                                <line x1="63.65" y1="63.66" x2="43.36" y2="43.37"/>
+                            </svg>
                             <svg xmlns="http://www.w3.org/2000/svg" id="show_contact_popup_button" onclick="showPopup('add_contact_popup')" class="icon justify-right" viewBox="0 0 64 64">
                                 <title>Add contact</title>
                                 <path d="M21.7,5.73c6.88,0,11.78,4.64,11.78,12.44S29.58,32.6,22,32.6,10.59,26,10.59,18.25,15.48,5.81,22.36,5.81"/>
@@ -401,13 +418,20 @@
                                 <line x1="64" y1="22" x2="44.64" y2="22"/>
                             </svg>
                         </div>
-                        <sm-input id="search_contacts" type="search" placeholder="Search Contacts">
-                            <svg slot="icon" class="icon" viewBox="0 0 64 64">
-                                <title>Search</title>
-                                <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
-                                <line x1="63.65" y1="63.66" x2="43.36" y2="43.37"/>
+                        <div id="contacts_search_field" class="expanding-search flex align-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon back" onclick="toggleSearch('contacts_search_field')" viewBox="0 0 64 64">
+                                <title>back-arrow</title>
+                                <line x1="1" y1="32" x2="64" y2="32"/>
+                                <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
                             </svg>
-                        </sm-input>
+                            <sm-input id="search_contacts" type="search" placeholder="Search Contacts">
+                                <svg slot="icon" class="icon" viewBox="0 0 64 64">
+                                    <title>Search</title>
+                                    <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
+                                    <line x1="63.65" y1="63.66" x2="43.36" y2="43.37"/>
+                                </svg>
+                            </sm-input>
+                        </div>
                     </header>
                     <div id="selected_contacts" class="hide-completely">
                         <h4>Add group members</h4>
@@ -415,7 +439,7 @@
                         </div>
                         <sm-button>Create</sm-button>
                     </div>
-                    <div id="contacts_container" class="flex"></div>
+                    <div id="contacts_container"></div>
                 </div>
 			</div>
 			<div id="chat" class="flex direction-column hide-on-mobile hide-completely">
@@ -763,6 +787,14 @@
             return selectedColors[Math.floor(Math.random() * selectedColors.length)]
         }
 
+        const contactsInfo = {}
+        function contactColor(floID){
+            if(!contactsInfo[floID]){
+                contactsInfo[floID] = randomColor()
+            }
+            return contactsInfo[floID]
+        }
+
         function clearElements(array = []) {
             array.forEach(item => {
                 getRef(item).innerHTML = ``
@@ -865,7 +897,7 @@
                             if(dateDiff === 0)
                                 return `${finalHours}`;
                             else if(dateDiff === 1)
-                                return `yesterday`;
+                                return `Yesterday`;
                             else if(dateDiff > 1 && dateDiff < 8)
                                 return currentTime[0];
                             else
@@ -873,7 +905,6 @@
                         }
                         else
                             return ` ${date} ${month}`;
-
                     }
                     else
                         return `${month} ${year}`;
@@ -1086,7 +1117,7 @@
             //display loading screen
             getRef('loading_page').classList.remove("hide-completely")
             //clear Rendered Elements
-            let elementsToReset = ['inbox_mail_container', 'sent_mail_container', 'contacts_container', 'chat_container',
+            let elementsToReset = ['inbox_mail_container', 'sent_mail_container', 'contacts_container', 'dm_container', 'chat_container',
                  'receiver_name', 'mail_contact_list'
             ]
             //, "backup_info"
@@ -1211,15 +1242,15 @@
                 card.querySelector('.mail-content').textContent = content
                 return card
             },
-            async contactCard(floID, name, type){
+            async contactCard(floID, name, type, prepend = false){
                 let card = getRef('contact_template').content.cloneNode(true),
-                        cardContainer = card.firstElementChild
+                    cardContainer = card.firstElementChild
                 cardContainer.setAttribute("name", name || 'Unknown')
                 cardContainer.setAttribute("flo-id", floID)
                 cardContainer.querySelector('.name').textContent = name || 'Unknown'
                 let initial = card.querySelector('.initial')
                 initial.textContent = name ? name.charAt(0) : 'U'
-                let color = randomColor()
+                let color = contactColor(floID)
                 //cardContainer.setAttribute("text-color", randomColor.primary)
                 cardContainer.setAttribute("background-color", color)
                 initial.setAttribute(`style`, `background-color: ${color};`)     
@@ -1230,15 +1261,25 @@
                     getRef('mail_contact_list').append(duplicateCard);
                 }
                 else{
-                    
-                    messenger.getChat(floID).then(chat => {
-                        const lastMessage = Object.values(chat).pop()
+                    //render chat card for newly added contact
+                    cardContainer.classList.add('chat')
+                    if(prepend){
                         cardContainer.innerHTML += `
+                            <h5 class="last-message"></h5>
+                            <h5 class="time"></h5>`
+                        getRef('dm_container').prepend(card);
+                        getRef('dm_container').children[0].click()
+                    }
+                    else{
+                        messenger.getChat(floID).then(chat => {
+                            const lastMessage = Object.values(chat).pop()
+                            cardContainer.innerHTML += `
                             <h5 class="last-message">${lastMessage.message}</h5>
                             <h5 class="time">${getFormatedTime(lastMessage.time, true)}</h5>`
-                    })
-                    cardContainer.classList.add('chat')
-                    getRef('dm_container').append(card);
+                        })
+                        .catch(error => console.log(error))
+                        getRef('dm_container').append(card);
+                    }
                 }
             },
             messageBubble(floID, message, timestamp, category, unconfirmed = false){
@@ -1423,7 +1464,7 @@
                 chatScrollInfo['scrolledUp'] = false
                 getRef('scroll_to_bottom').classList.remove('no-transformations')
             }
-        })
+        }, {passive: true})
 
         getRef('send_mail_to').addEventListener('input', function() {
             getRef('mail_contact_list').classList.remove('hide-completely')
@@ -1512,8 +1553,11 @@
                     recentEmojis.push(clickedEmoji)
                 localStorage.recentEmojis = recentEmojis.join(' ')
                 renderRecentEmojis()
-                if(window.innerWidth > 640)
-                    getRef('type_message').focusIn()
+                if(window.innerWidth > 640){
+                    setTimeout(() => {
+                        getRef('type_message').focusIn()
+                    }, 0);
+                }
             }
         })
 
@@ -1635,6 +1679,8 @@
             button.classList.toggle('active')
             getRef('emoji_picker').classList.toggle('hide-completely')
             getRef('scroll_to_bottom').setAttribute('style', `top: calc(${getRef('chat_container').getBoundingClientRect().height}px - 1.5rem`)
+            if(!chatScrollInfo.scrolledUp)
+                scrollToBottom()
         }
 
         function copyToClipboard(element, message, parent = '.copy-row'){
@@ -1860,21 +1906,27 @@
             let time = Date.now()
             getRef('chat_container').append(render.messageBubble(receiver, message, time, 'sent', true))
             scrollToBottom(true)
-            if(activeChat['chatCard'] !== getRef('dm_container').children[0]){
-                const contact = getRef('dm_container').querySelector(`.chat[flo-id="${activeChat.receiver}"]`)
-                const cloneContact = contact.cloneNode(true)
-                contact.remove()
-                activeChat['chatCard'] = cloneContact
-                getRef('dm_container').prepend(cloneContact)
-                animateTo(getRef('dm_container').children[0], [
-                        {transform: 'translateY(1rem)'},
-                        {transform: 'none'},
-                    ],
-                    {
-                        easing: 'ease',
-                        duration: 300
-                    }
-                )
+            const contact = getRef('dm_container').querySelector(`.chat[flo-id="${receiver}"]`)
+            if(contact){
+                if(activeChat['chatCard'] !== getRef('dm_container').children[0]){
+                    const cloneContact = contact.cloneNode(true)
+                    contact.remove()
+                    activeChat['chatCard'] = cloneContact
+                    getRef('dm_container').prepend(cloneContact)
+                    animateTo(getRef('dm_container').children[0], [
+                            {transform: 'translateY(1rem)'},
+                            {transform: 'none'},
+                        ],
+                        {
+                            easing: 'ease',
+                            duration: 300
+                        }
+                    )
+                }
+            }
+            else{
+                messenger.addChat(receiver)
+                render.contactCard(receiver, floGlobals.contacts[receiver], 'chat', true)
             }
             messenger.sendMessage(message, receiver).then(data => {
                 getRef(`${receiver}_${time}`).classList.remove('unconfirmed')
@@ -1945,6 +1997,7 @@
                 startIndex = (activeChat['allMessages'].length - 20) > 0 ? activeChat['allMessages'].length - 20 : 0
                 endIndex = activeChat['allMessages'].length
                 messages = activeChat['allMessages']
+                renderedDates.clear()
             }
             else if(lazyLoad){
                 messages = activeChat['allMessages']
@@ -2280,6 +2333,11 @@
             }
         })
 
+        function toggleSearch(target){
+            getRef(target).classList.toggle('expand')
+            if(getRef(target).classList.contains('expand'))
+                getRef(target).children[1].focusIn()
+        }
 
     </script>
 
@@ -11734,8 +11792,7 @@ Bitcoin.Util = {
                     chats: {},
                     groups: {},
                     gkeys: {},
-                    appendix: {},
-                    contactsInfo: {}
+                    appendix: {}
                 }
                 compactIDB.initDB(`${floGlobals.application}_${myFloID}`, obj).then(result => {
                     console.info(result)
