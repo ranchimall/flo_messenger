@@ -34,7 +34,7 @@
         </div>
     </sm-popup>
     <sm-notifications id="notification_drawer"></sm-notifications>
-	<div id="landing_page" class="page hide-completely">
+	<div id="landing_page" class="grid page hide-completely">
 		<header class="logo-section align-center">
 			<svg class="main-logo" viewBox="0 0 27.25 32">
 				<title>RanchiMall</title>
@@ -51,10 +51,9 @@
 					FLO Messenger
 				</h4>
 				<h1 class="title-font">
-                    Truly Secure,
-                    Private and Reliable. 
+                    Truly Secure, Private and Reliable. 
                 </h1>				
-                <sm-button variant="primary" onclick="showPopup('sign_in_popup')">Sign In / Up</sm-button>
+                <sm-button variant="primary" onclick="showPopup('sign_in_popup')">Sign In / Create account</sm-button>
 			</div>
 			<div id="landing_illustration" class="right">				
 				<img src="assets/message-background.svg" alt="">
@@ -73,23 +72,22 @@
             <div class="sign-in-box flex direction-column">
                 <sm-tab-header target="user_entry">
                     <sm-tab>Sign In</sm-tab>
-                    <sm-tab>Sign Up</sm-tab>
+                    <sm-tab>Create account</sm-tab>
                 </sm-tab-header>
                 <sm-tab-panels id="user_entry">
                     <sm-panel>
                         <h3>Welcome back</h3>
-                        <p>Just enter your <span id="type_of_key">FLO private key</span> to continue.</p>
+                        <p>Enter your <span id="type_of_key">FLO private key</span> to continue.</p>
                         <form action="" onsubmit="return false">
-                            <sm-input id="private_key_input_field" type="password" placeholder="FLO private key" privateKey></sm-input>
+                            <sm-input id="private_key_input_field" class="outlined" type="password" placeholder="FLO private key" privateKey animate></sm-input>
                             <sm-button id="sign_in_button" width="cover" variant="primary" disabled>continue</sm-button>
                             <sm-button id="remove_account" variant="outlined">Remove Account</sm-button>
                         </form>
                     </sm-panel>
                     <sm-panel>
                         <h3>Get started</h3>
-                        <p>Create your FLO public and private key pair. <Strong>Don't forget to store them
-                                securely!</Strong></p>
-                        <sm-button id="generate_flo_id" onclick="generateId()" variant="primary">Get FLO credentials
+                        <strong>Don't forget to store them securely. <br> Once lost private key can't be recovered along with your data!</strong>
+                        <sm-button id="generate_flo_id" onclick="generateId()" variant="primary">Get your FLO credentials
                         </sm-button>
                         <section id="credentials_section" class="hide-completely">
                             <h5>FLO ID (User ID)</h5>
@@ -190,7 +188,7 @@
 			<sm-button id="send_mail_button" variant="primary" disabled>Send</sm-button>
         </header>
         <div id="auto_complete_contact" class="flex direction-column">
-            <sm-input id="send_mail_to" floId placeholder="To" animate required></sm-input>
+            <sm-input id="send_mail_to" placeholder="To" animate required></sm-input>
             <div id="mail_contact_list" class="hide-completely contact-list"></div>
         </div>
 		<sm-input id="subject_of_mail" placeholder="Subject" animate></sm-input>
@@ -279,7 +277,7 @@
     </template>
 
 	<template id="contact_template">
-		<div class="contact interact" tabindex="0">
+		<div class="contact interact">
 			<div class="initial flex align-center"></div>
 			<h4 class="name"></h4>
             <!--<sm-menu align-options="right">
@@ -395,8 +393,9 @@
                         </div>
                     </sm-panel>
                     <sm-panel></sm-panel>
+                    <sm-panel></sm-panel>
                 </sm-tab-panels>
-                <div id="all_contacts">
+                <div id="all_contacts" class="flex direction-column hide-completely">
                     <header class="grid header">
                         <div class="flex align-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon back" onclick="showContacts(false)" viewBox="0 0 64 64">
@@ -404,27 +403,7 @@
                                 <line x1="1" y1="32" x2="64" y2="32"/>
                                 <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
                             </svg>
-                            <h4>Contacts</h4>
-                            <svg class="icon" onclick="toggleSearch('contacts_search_field')" viewBox="0 0 64 64">
-                                <title>Search</title>
-                                <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
-                                <line x1="63.65" y1="63.66" x2="43.36" y2="43.37"/>
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" id="show_contact_popup_button" onclick="showPopup('add_contact_popup')" class="icon justify-right" viewBox="0 0 64 64">
-                                <title>Add contact</title>
-                                <path d="M21.7,5.73c6.88,0,11.78,4.64,11.78,12.44S29.58,32.6,22,32.6,10.59,26,10.59,18.25,15.48,5.81,22.36,5.81"/>
-                                <path d="M16.56,33C14.49,36.91,7.85,38.9,3,41.06,1,41.89-.69,52.67,1.63,52.67A40.31,40.31,0,0,0,22.53,58,36.52,36.52,0,0,0,42.6,52.67c2.32,0,.66-10.7-1.33-11.61C36.38,38.9,29.75,36.91,27.67,33"/>
-                                <line x1="54.32" y1="12.32" x2="54.32" y2="31.68"/>
-                                <line x1="64" y1="22" x2="44.64" y2="22"/>
-                            </svg>
-                        </div>
-                        <div id="contacts_search_field" class="expanding-search flex align-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon back" onclick="toggleSearch('contacts_search_field')" viewBox="0 0 64 64">
-                                <title>back-arrow</title>
-                                <line x1="1" y1="32" x2="64" y2="32"/>
-                                <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
-                            </svg>
-                            <sm-input id="search_contacts" type="search" placeholder="Search Contacts">
+                            <sm-input id="search_contacts" type="search" placeholder="Enter name or FLO ID">
                                 <svg slot="icon" class="icon" viewBox="0 0 64 64">
                                     <title>Search</title>
                                     <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
@@ -437,9 +416,27 @@
                         <h4>Add group members</h4>
                         <div id="selected_contacts_container">
                         </div>
-                        <sm-button>Create</sm-button>
                     </div>
-                    <div id="contacts_container"></div>
+                    <div class="scrolling-wrapper">
+                        <div id="create_group_option" class="option interact" onclick="initGroupCreation()">
+
+                            Create new group
+                        </div>
+                        <div id="contacts_container"></div>
+                        <sm-button id="show_contact_popup_button" variant="primary" class="fab round" onclick="showPopup('add_contact_popup')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 64 64">
+                                <title>Add contact</title>
+                                <path d="M21.7,5.73c6.88,0,11.78,4.64,11.78,12.44S29.58,32.6,22,32.6,10.59,26,10.59,18.25,15.48,5.81,22.36,5.81"/>
+                                <path d="M16.56,33C14.49,36.91,7.85,38.9,3,41.06,1,41.89-.69,52.67,1.63,52.67A40.31,40.31,0,0,0,22.53,58,36.52,36.52,0,0,0,42.6,52.67c2.32,0,.66-10.7-1.33-11.61C36.38,38.9,29.75,36.91,27.67,33"/>
+                                <line x1="54.32" y1="12.32" x2="54.32" y2="31.68"/>
+                                <line x1="64" y1="22" x2="44.64" y2="22"/>
+                            </svg>
+                            Add a contact
+                        </sm-button>
+                        <sm-button id="create_group_button" variant="primary" class="fab round hide-completely">
+                            Create
+                        </sm-button>
+                    </div>
                 </div>
 			</div>
 			<div id="chat" class="flex direction-column hide-on-mobile hide-completely">
@@ -571,7 +568,7 @@
                     <section>
                         <h4>Sign out</h4>
                         <p>*Remember to store your <strong>PRIVATE KEY </strong> before signing out.</p>
-                        <sm-button id="sign_out" variant="outlined">Sign Out</sm-button>
+                        <sm-button id="sign_out">Sign Out</sm-button>
                     </section>
                 </div>
                 <div id="personalise_panel" class="panel hide-completely">
@@ -609,9 +606,7 @@
                 </div>
                 <div id="about_panel" class="panel hide-completely">
                     <section>
-                        <h4>Version</h4>
-                        <p>0.0.35</p>
-                        <p>Created by RanchiMall, a blockchain incorporated entity</p>
+                        <p>Created by RanchiMall, a Blockchain incorporated entity</p>
                     </section>
                 </div>
             </div>
@@ -1156,8 +1151,6 @@
                         getRef('mail').classList.add('hide-completely')
                         getRef('chat_page_button').click()
                         if (privKeyNotSecured) {
-                            notify("Private key is not secured with password. Remember to secure the private key in settings",
-                                "warn", '')
                             getRef("secure_key").textContent = 'Set password'
                         } else {
                             getRef("secure_key").textContent = 'Change password'
@@ -1274,7 +1267,7 @@
                         messenger.getChat(floID).then(chat => {
                             const lastMessage = Object.values(chat).pop()
                             cardContainer.innerHTML += `
-                            <h5 class="last-message">${lastMessage.message}</h5>
+                            <p class="last-message">${lastMessage.message}</p>
                             <h5 class="time">${getFormatedTime(lastMessage.time, true)}</h5>`
                         })
                         .catch(error => console.log(error))
@@ -1722,24 +1715,37 @@
         })
 
         // Function to show all contacts side drawer
+        let contactsDrawerAnimation
         function showContacts(show = true){
-            if(show)
-                getRef('all_contacts').classList.add('no-transformations')
+            if(show){
+                getRef('all_contacts').classList.remove('hide-completely')
+                contactsDrawerAnimation = animateTo(getRef('all_contacts'), [
+                    {transform: 'translateY(2rem)'},
+                    {transform: 'none'},
+                ],{
+                    duration: 300,
+                    easing: 'ease'
+                })
+            }
             else{
-                getRef('all_contacts').classList.remove('no-transformations')
-                getRef('selected_contacts').classList.add('hide-completely')
                 isCreatingGroup = false
+                contactsDrawerAnimation.reverse()
+                contactsDrawerAnimation.onfinish = () => {
+                    getRef('all_contacts').classList.add('hide-completely')
+                    getRef('create_group_option').classList.remove('hide-completely')
+                    getRef('selected_contacts').classList.add('hide-completely')
+                    getRef('create_group_button').classList.add('hide-completely')
+                    getRef('show_contact_popup_button').classList.remove('hide-completely')
+                }
             }
         }
 
         function updateHeight(){
             if(window.innerWidth < 640){
                 getRef('chat').style.height = window.innerHeight + 'px'
-                getRef('landing_page').style.height = window.innerHeight + 'px'
             }
             else{
                 getRef('chat').style.height = '100vh'
-                getRef('landing_page').style.height = '100vh'
             }
         }
 
@@ -2129,7 +2135,10 @@
         function initGroupCreation(){
             isCreatingGroup = true
             showContacts()
+            getRef('create_group_option').classList.add('hide-completely')
             getRef('selected_contacts').classList.remove('hide-completely')
+            getRef('show_contact_popup_button').classList.add('hide-completely')
+            getRef('create_group_button').classList.remove('hide-completely')
         }
 
         function viewMail(mailRef, newView = true) {
@@ -2318,6 +2327,7 @@
                 document.querySelectorAll(`.contact[flo-id="${clickedContact['floID']}"]`).forEach(contact => {
                     contact.children[0].textContent = clickedContact['name'].charAt(0) 
                     contact.children[1].textContent = clickedContact['name'] 
+                    contact.setAttribute('name', clickedContact['name']) 
                 })
                 notify('Renamed contact', 'success')
             })

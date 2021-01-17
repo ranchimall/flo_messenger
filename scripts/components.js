@@ -325,7 +325,7 @@ input{
     color: var(--accent-color)
 }
 :host(.outlined) .input {
-    box-shadow: 0 0 0 1px rgba(var(--text-color), 0.3) inset;
+    box-shadow: 0 0 0 0.1rem rgba(var(--text-color), 0.4) inset;
     background: rgba(var(--foreground-color), 1);
 }
 :host(.outlined) .label {
@@ -1883,6 +1883,7 @@ smPopup.innerHTML = `
     -webkit-box-shadow: 0 -1rem 2rem #00000020;
             box-shadow: 0 -1rem 2rem #00000020;
     max-height: 90vh;
+    content-visibility: auto;
 }
 .container-header{
     display: -webkit-box;
@@ -1915,6 +1916,7 @@ smPopup.innerHTML = `
 .hide{
     opacity: 0;
     pointer-events: none;
+    visiblity: none;
 }
 @media screen and (min-width: 640px){
     .popup{
@@ -2030,7 +2032,7 @@ customElements.define('sm-popup', class extends HTMLElement {
                 this.inputFields.forEach(field => {
                     if (field.type === 'radio' || field.tagName === 'SM-CHECKBOX')
                         field.checked = false
-                    if (field.tagName === 'SM-INPUT' || field.tagName === 'TEXTAREA')
+                    if (field.tagName === 'SM-INPUT' || field.tagName === 'TEXTAREA'|| field.tagName === 'SM-TEXTAREA')
                         field.value = ''
                 })
             }, 300);
@@ -2053,7 +2055,6 @@ customElements.define('sm-popup', class extends HTMLElement {
     }
 
     handleTouchMove = (e) => {
-        e.preventDefault()
         if (this.touchStartY < e.changedTouches[0].clientY) {
             this.offset = e.changedTouches[0].clientY - this.touchStartY;
             this.touchEndAnimataion = window.requestAnimationFrame(() => this.movePopup())
@@ -2128,14 +2129,14 @@ customElements.define('sm-popup', class extends HTMLElement {
             this.inputFields = this.querySelectorAll('sm-input', 'sm-checkbox', 'textarea', 'sm-textarea', 'radio')
         })
 
-        this.popupHeader.addEventListener('touchstart', (e) => {this.handleTouchStart(e)})
-        this.popupHeader.addEventListener('touchmove', (e) => {this.handleTouchMove(e)})
-        this.popupHeader.addEventListener('touchend', (e) => {this.handleTouchEnd(e)})
+        this.popupHeader.addEventListener('touchstart', (e) => { this.handleTouchStart(e) }, {passive: true})
+        this.popupHeader.addEventListener('touchmove', (e) => {this.handleTouchMove(e)}, {passive: true})
+        this.popupHeader.addEventListener('touchend', (e) => {this.handleTouchEnd(e)}, {passive: true})
     }
     disconnectedCallback() {
-        this.popupHeader.removeEventListener('touchstart', this.handleTouchStart)
-        this.popupHeader.removeEventListener('touchmove', this.handleTouchMove)
-        this.popupHeader.removeEventListener('touchend', this.handleTouchEnd)
+        this.popupHeader.removeEventListener('touchstart', this.handleTouchStart, {passive: true})
+        this.popupHeader.removeEventListener('touchmove', this.handleTouchMove, {passive: true})
+        this.popupHeader.removeEventListener('touchend', this.handleTouchEnd, {passive: true})
     }
 })
 

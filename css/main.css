@@ -346,7 +346,7 @@ sm-button[variant=primary] .icon {
 .logo-section .main-logo {
   height: 1.4rem;
   margin-right: 0.4rem;
-  fill: rgba(var(--text-color), 0.8);
+  fill: rgba(var(--text-color), 1);
   stroke: none;
 }
 .logo-section img {
@@ -365,6 +365,7 @@ sm-button[variant=primary] .icon {
   padding: 0 1.5rem;
   height: 100%;
   align-items: center;
+  overflow-y: auto;
 }
 #landing .logo-section {
   padding: 1.5rem;
@@ -424,7 +425,7 @@ sm-button[variant=primary] .icon {
   background: rgba(var(--foreground-color), 1);
 }
 .sign-in-box sm-input {
-  text-align: left;
+  margin-top: 1.5rem;
 }
 .sign-in-box sm-panel {
   width: 100%;
@@ -461,6 +462,14 @@ sm-button[variant=primary] .icon {
   opacity: 0.8;
   font-weight: 500;
 }
+.sign-in-box strong {
+  display: flex;
+  background: #ffd92e;
+  padding: 0.4em 0.6em;
+  border-radius: 0.4em;
+  color: #111;
+  margin-top: 0.5rem;
+}
 .sign-in-box .copy-row h4 {
   max-width: 34ch;
 }
@@ -468,15 +477,19 @@ sm-button[variant=primary] .icon {
   margin-bottom: 1rem;
 }
 .sign-in-box button {
-  width: auto;
-  margin-top: 1rem;
+  margin-top: 2rem;
   padding: 0.6rem 1.6rem;
+}
+.sign-in-box sm-button {
+  width: 100%;
+}
+.sign-in-box sm-button::part(button) {
+  padding: 0.8rem 1.6rem;
 }
 .sign-in-box p {
   margin-bottom: 0.5rem;
   max-width: 35ch;
   margin-top: 0.5rem;
-  margin-bottom: 1.5rem;
 }
 .sign-in-box #credentials_section {
   border-top: 1px rgba(var(--text-color), 0.2) solid;
@@ -484,8 +497,9 @@ sm-button[variant=primary] .icon {
   padding-top: 1.5rem;
   animation: slide-down 0.3s forwards;
 }
-.sign-in-box #sign_in_with {
+.sign-in-box #sign_in_with, .sign-in-box sm-button {
   margin-top: 2rem;
+  margin-bottom: 0;
 }
 
 @keyframes slide-down {
@@ -572,15 +586,11 @@ sm-button[variant=primary] .icon {
   grid-template-columns: auto 1fr;
   grid-template-areas: "dp .";
 }
-.contact:focus {
-  background: rgba(var(--text-color), 0.06);
-  outline: none;
-}
 .contact .initial {
   grid-area: dp;
 }
 .contact .name {
-  font-size: 1rem;
+  font-size: 1em;
   font-weight: 500;
   color: rgba(var(--text-color), 0.8);
 }
@@ -589,7 +599,8 @@ sm-button[variant=primary] .icon {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-weight: 500;
+  font-weight: 400;
+  font-size: 0.9em;
   color: rgba(var(--text-color), 0.9);
 }
 .contact .time {
@@ -648,6 +659,11 @@ sm-button[variant=primary] .icon {
   margin: 1rem 0;
   justify-self: center;
   align-self: center;
+}
+
+#warn_no_encryption {
+  background: #fffd8d;
+  color: #111;
 }
 
 .mail-card.unread::before,
@@ -868,16 +884,28 @@ sm-button[variant=primary] .icon {
   left: 0;
   right: 0;
   z-index: 1;
-  padding-bottom: 1.5rem;
   background: rgba(var(--foreground-color), 1);
-  transition: transform 0.3s;
-  transform: translateX(-110%);
 }
 #contacts #all_contacts .header {
   padding-bottom: 1rem;
 }
+#contacts .option {
+  padding: 1rem 1.5rem;
+}
+#contacts .scrolling-wrapper {
+  height: 100%;
+  flex: 1;
+  overflow-y: auto;
+}
 #contacts #contacts_container {
-  height: calc(100vh - 7.3rem);
+  padding-bottom: 5rem;
+}
+#contacts #contacts_container::before {
+  display: flex;
+  content: "Contacts";
+  font-size: 0.9em;
+  color: rgba(var(--text-color), 0.9);
+  padding: 1rem 1.5rem;
 }
 
 #selected_contacts {
@@ -908,7 +936,6 @@ sm-button[variant=primary] .icon {
   overflow-y: hidden;
 }
 #contacts .header, #mails .header, #settings_page .header {
-  background: rgba(var(--text-color), 0.06);
   padding: 1rem 1.5rem 0 1.5rem;
   position: relative;
   gap: 0.5rem;
@@ -920,12 +947,28 @@ sm-button[variant=primary] .icon {
   position: absolute;
   width: 100%;
   padding: 0.7rem 1.5rem;
-  background: linear-gradient(rgba(var(--text-color), 0.06), rgba(var(--text-color), 0.06)), rgba(var(--foreground-color), 1);
-  clip-path: circle(0% at calc(100% - 4rem) center);
-  transition: clip-path 0.3s;
+  background: rgba(var(--foreground-color), 1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
 }
 #contacts .header .expanding-search.expand, #mails .header .expanding-search.expand, #settings_page .header .expanding-search.expand {
-  clip-path: circle(100%);
+  transform: none;
+  opacity: 1;
+  pointer-events: all;
+}
+#contacts .header .expanding-search.expand sm-input,
+#contacts .header .expanding-search.expand .back, #mails .header .expanding-search.expand sm-input,
+#mails .header .expanding-search.expand .back, #settings_page .header .expanding-search.expand sm-input,
+#settings_page .header .expanding-search.expand .back {
+  transform: none;
+}
+#contacts .header .expanding-search sm-input,
+#contacts .header .expanding-search .back, #mails .header .expanding-search sm-input,
+#mails .header .expanding-search .back, #settings_page .header .expanding-search sm-input,
+#settings_page .header .expanding-search .back {
+  transform: translateX(0.5rem);
+  transition: transform 0.3s;
 }
 #contacts .header sm-input, #mails .header sm-input, #settings_page .header sm-input {
   margin: 0;
@@ -964,7 +1007,7 @@ sm-button[variant=primary] .icon {
   margin-right: -0.7rem;
 }
 #contacts .header sm-button, #mails .header sm-button, #settings_page .header sm-button {
-  margin: 0 0 0 auto;
+  margin: 0;
 }
 #contacts .header sm-button .icon, #mails .header sm-button .icon, #settings_page .header sm-button .icon {
   height: 0.9rem;
@@ -1087,7 +1130,6 @@ sm-button[variant=primary] .icon {
   -webkit-hyphens: auto;
   hyphens: auto;
   white-space: pre-wrap;
-  box-shadow: 0 1px 0.1rem rgba(0, 0, 0, 0.16);
   padding: 0.6em 1em;
   line-height: 1.5;
 }
@@ -1172,7 +1214,6 @@ sm-button[variant=primary] .icon {
 }
 .big-emoji .message-body {
   background: none !important;
-  box-shadow: none !important;
   padding: 0 !important;
   font-size: 2.6rem;
 }
@@ -1242,7 +1283,6 @@ sm-button[variant=primary] .icon {
 
 #chat_container,
 #dm_container,
-#contacts_container,
 #inbox_mail_container,
 #sent_mail_container,
 #mail {
@@ -1379,7 +1419,17 @@ sm-panel {
 
   #landing {
     grid-template-areas: "illustration" ".";
-    height: 100%;
+    align-items: flex-start;
+  }
+  #landing .title-font {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 500;
+  }
+  #landing sm-button {
+    width: 100%;
+    display: flex;
+    width: 100% !important;
   }
 
   #sing_in {
@@ -1413,7 +1463,7 @@ sm-panel {
 
   #dm_container,
 #contact_container {
-    gap: 0.5rem;
+    gap: 0.2rem;
   }
 
   #chat header {
@@ -1475,7 +1525,6 @@ sm-panel {
   }
 
   #landing {
-    height: calc(100vh - 8rem);
     align-items: center;
     gap: 4vw;
     grid-template-columns: 1fr 1fr;
