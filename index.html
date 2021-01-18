@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/main.min.css">
 </head>
 
-<body data-theme="light" onload="onLoadStartUp()">
+<body data-theme="light" onload="onLoadStartUp()" class="hide-completely">
     <audio id="notification_sound">
         <source src="https://rmservices.duckdns.org/files/notification-sound.mp3" type="audio/mpeg">
         <source src="https://rmservices.duckdns.org/files/notification-sound.ogg" type="audio/ogg">
@@ -277,12 +277,9 @@
     </template>
 
 	<template id="contact_template">
-		<div class="contact interact">
+		<div class="contact">
 			<div class="initial flex align-center"></div>
 			<h4 class="name"></h4>
-            <!--<sm-menu align-options="right">
-                <sm-menu-option class="send-mail-option">Send mail</sm-menu-option>
-            </sm-menu>-->
 		</div>
 	</template>
 
@@ -339,7 +336,7 @@
                             <line y1="32" x2="64" y2="32"/>
                             <line y1="53.34" x2="64" y2="53.34"/>
                         </svg>
-                        <h4>Chat</h4>
+                        <h4>FLO Messenger</h4>
                         <svg class="icon" onclick="toggleSearch('chat_search_field')" viewBox="0 0 64 64">
                             <title>Search</title>
                             <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
@@ -363,11 +360,6 @@
                             </svg>
                         </sm-input>
                     </div>
-                    <sm-tab-header target="chat_panels">
-                        <sm-tab>Direct</sm-tab>
-                        <sm-tab>Groups</sm-tab>
-                        <sm-tab>Notes</sm-tab>
-                    </sm-tab-header>
                 </header>
                 <sm-button variant="primary" id="new_message_button" onclick="showContacts()" class="fab round">
                     <svg xmlns="http://www.w3.org/2000/svg"class="icon" viewBox="0 0 64 64">
@@ -377,24 +369,18 @@
                     </svg>
                     New chat
                 </sm-button>
-                <sm-tab-panels id="chat_panels">
-                    <sm-panel>
-                        <div id="dm_container" class="flex"></div>
-                        <div id="new_conversation" class="flex direction-column empty-state">
-                            <svg class="icon new-conversation align-center" viewBox="0 0 512 512">
-                                <title>new conversation</title>
-                                <path d="M304.11,403.5H101.42a51,51,0,0,1-51-51v-191L6.87,84.82H424.36a51,51,0,0,1,51,51v86.72"/>
-                                <ellipse cx="423.3" cy="342.48" rx="84.7"/>
-                                <line  x1="423.3" y1="306.34" x2="423.3" y2="379.64"/>
-                                <line x1="459.95" y1="342.99" x2="386.65" y2="342.99"/>
-                            </svg>                  
-                            <h4>Add a contact for getting started</h4>
-                            <p class="light-text">Tap/click on added contact to start a conversation</p>
-                        </div>
-                    </sm-panel>
-                    <sm-panel></sm-panel>
-                    <sm-panel></sm-panel>
-                </sm-tab-panels>
+                <div id="chat_container" class="flex"></div>
+                <div id="new_conversation" class="flex direction-column empty-state">
+                    <svg class="icon new-conversation align-center" viewBox="0 0 512 512">
+                        <title>new conversation</title>
+                        <path d="M304.11,403.5H101.42a51,51,0,0,1-51-51v-191L6.87,84.82H424.36a51,51,0,0,1,51,51v86.72"/>
+                        <ellipse cx="423.3" cy="342.48" rx="84.7"/>
+                        <line  x1="423.3" y1="306.34" x2="423.3" y2="379.64"/>
+                        <line x1="459.95" y1="342.99" x2="386.65" y2="342.99"/>
+                    </svg>                  
+                    <h4>Add a contact for getting started</h4>
+                    <p class="light-text">Tap/click on added contact to start a conversation</p>
+                </div>
                 <div id="all_contacts" class="flex direction-column hide-completely">
                     <header class="grid header">
                         <div class="flex align-center">
@@ -440,17 +426,19 @@
                 </div>
 			</div>
 			<div id="chat" class="flex direction-column hide-on-mobile hide-completely">
-				<header class="flex align-center">
+				<header class="grid align-center">
                     <svg class="icon hide-on-desktop back-button" onclick="goto('chats')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
                         <title>Go to chat page</title>
                         <line x1="1" y1="32" x2="64" y2="32"/>
                         <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
                     </svg>
-                    <div id="receiver_initial" onclick="showPopup('contact_details_popup')" class="initial flex align-center"></div>
-                    <h4 id="receiver_name"></h4>
+                    <div class="flex align-center interact" onclick="showPopup('contact_details_popup')">
+                        <div id="receiver_initial" class="initial flex align-center"></div>
+                        <h4 id="receiver_name"></h4>
+                    </div>
 				</header>
                 <h5 id="warn_no_encryption">Messages are not encrypted until receiver replies</h5>
-				<section id="chat_container" class="flex direction-column">
+				<section id="messages_container" class="flex direction-column">
                 </section>
                 <svg id="scroll_to_bottom" onclick="scrollToBottom()" class="icon" viewBox="0 0 64 64">
                     <title></title>
@@ -459,7 +447,7 @@
 				<footer class="grid">
                     <div id="emoji_picker" class="hide-completely"></div>
                     <div class="flex">
-                        <svg id="toggle_emoji" onclick="toggleEmoji(this)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M32,0A32,32,0,1,0,64,32,32,32,0,0,0,32,0ZM43.84,17.51a4.92,4.92,0,1,1-4.92,4.92A4.92,4.92,0,0,1,43.84,17.51Zm-23.62-.06a5,5,0,1,1-5,5A5,5,0,0,1,20.22,17.45ZM32,54.42A19.68,19.68,0,0,1,12.31,34.73H51.69A19.68,19.68,0,0,1,32,54.42Z"/></svg>
+                        <svg id="emoji_toggle" onclick="toggleEmoji()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M32,0A32,32,0,1,0,64,32,32,32,0,0,0,32,0ZM43.84,17.51a4.92,4.92,0,1,1-4.92,4.92A4.92,4.92,0,0,1,43.84,17.51Zm-23.62-.06a5,5,0,1,1-5,5A5,5,0,0,1,20.22,17.45ZM32,54.42A19.68,19.68,0,0,1,12.31,34.73H51.69A19.68,19.68,0,0,1,32,54.42Z"/></svg>
                         <sm-textarea id="type_message" placeholder="Type a message" class="rest"></sm-textarea>
                         <svg xmlns="http://www.w3.org/2000/svg" id="send_message_button" class="icon" viewBox="0 0 64 64">
                             <path d="M63.34,31,3.07,4.71A2.19,2.19,0,0,0,.18,7.58L8.94,28.29,42.18,32,8.94,35.71.18,56.42a2.19,2.19,0,0,0,2.89,2.87L63.34,33A1.09,1.09,0,0,0,63.34,31Z"/>
@@ -777,7 +765,7 @@
             return color;
         }
 
-        const selectedColors = ['#FF1744', '#F50057', '#8E24AA', '#5E35B1', '#3F51B5', '#3D5AFE', '#00B0FF', '#00BCD4', '#1DE9B6', '#66BB6A', '#8BC34A', '#FBC02D', '#FF6F00', '#FF9100', '#FF3D00']
+        const selectedColors = ['#FF1744', '#F50057', '#8E24AA', '#5E35B1', '#3F51B5', '#3D5AFE', '#00B0FF', '#00BCD4', '#16c79a', '#66BB6A', '#8BC34A', '#11698e', '#FF6F00', '#FF9100', '#FF3D00']
         function randomColor(){
             return selectedColors[Math.floor(Math.random() * selectedColors.length)]
         }
@@ -984,32 +972,32 @@
                 }
             })
 
-            function createRipple(event, target) {
-                const circle = document.createElement("span");
-                const diameter = Math.max(target.clientWidth, target.clientHeight);
-                const radius = diameter / 2;
-                circle.style.width = circle.style.height = `${diameter}px`;
-                circle.style.left = `${event.clientX - (target.getBoundingClientRect().left + radius)}px`;
-                circle.style.top = `${event.clientY - (target.getBoundingClientRect().top + radius)}px`;
-                circle.classList.add("ripple");
-                const rippleAnimation = circle.animate([
-
-                    {
-                        transform: 'scale(3)',
-                        opacity: 0
-                    }
-                ],
-                    {
-                        duration: 1000,
-                        fill: "forwards",
-                        easing: 'ease-out'
-                    })
-                target.append(circle);
-                rippleAnimation.onfinish = () => {
-                    circle.remove()
-                }
-            }
         })
+        function createRipple(event, target) {
+            const circle = document.createElement("span");
+            const diameter = Math.max(target.clientWidth, target.clientHeight);
+            const radius = diameter / 2;
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - (target.getBoundingClientRect().left + radius)}px`;
+            circle.style.top = `${event.clientY - (target.getBoundingClientRect().top + radius)}px`;
+            circle.classList.add("ripple");
+            const rippleAnimation = circle.animate([
+
+                {
+                    transform: 'scale(3)',
+                    opacity: 0
+                }
+            ],
+                {
+                    duration: 1000,
+                    fill: "forwards",
+                    easing: 'ease-out'
+                })
+            target.append(circle);
+            rippleAnimation.onfinish = () => {
+                circle.remove()
+            }
+        }
 
         function generateId() {
             getRef('generate_flo_id').classList.add('hide-completely')
@@ -1107,12 +1095,13 @@
     </script>
     <script id="onLoadStartUp">
         function onLoadStartUp() {
+            document.body.classList.remove('hide-completely')
             privKeyNotSecured = true;
 
             //display loading screen
             getRef('loading_page').classList.remove("hide-completely")
             //clear Rendered Elements
-            let elementsToReset = ['inbox_mail_container', 'sent_mail_container', 'contacts_container', 'dm_container', 'chat_container',
+            let elementsToReset = ['inbox_mail_container', 'sent_mail_container', 'contacts_container', 'chat_container', 'messages_container',
                  'receiver_name', 'mail_contact_list'
             ]
             //, "backup_info"
@@ -1133,6 +1122,7 @@
                         floGlobals.appendix = data.appendix;
                         floGlobals.groups = data.groups;
                         floGlobals.chats = data.chats
+                        floGlobals['marked'] = data.marked
                         renderContactList(floGlobals.contacts)
                         renderChatList()
                         renderMailList(data.mails, false)
@@ -1235,14 +1225,15 @@
                 card.querySelector('.mail-content').textContent = content
                 return card
             },
-            async contactCard(floID, name, type, prepend = false){
+            async contactCard(floID, name, type, options = {}){
+                let {prepend = false, markUnread = false} = options
                 let card = getRef('contact_template').content.cloneNode(true),
                     cardContainer = card.firstElementChild
                 cardContainer.setAttribute("name", name || 'Unknown')
                 cardContainer.setAttribute("flo-id", floID)
-                cardContainer.querySelector('.name').textContent = name || 'Unknown'
+                cardContainer.querySelector('.name').textContent = name || floID
                 let initial = card.querySelector('.initial')
-                initial.textContent = name ? name.charAt(0) : 'U'
+                initial.textContent = name ? name.charAt(0) : floID.charAt(0)
                 let color = contactColor(floID)
                 //cardContainer.setAttribute("text-color", randomColor.primary)
                 cardContainer.setAttribute("background-color", color)
@@ -1255,23 +1246,36 @@
                 }
                 else{
                     //render chat card for newly added contact
-                    cardContainer.classList.add('chat')
-                    if(prepend){
+                    if(type === 'chat')
+                        cardContainer.classList.add('chat')
+                    else    
+                        cardContainer.classList.add('group')
+                    if(markUnread)
+                        cardContainer.classList.add('unread')
+                    messenger.getChat(floID).then(chat => {
+                        let lastMessage = {message: '', time: 0}
+                        if(Object.values(chat).length){
+                            lastMessage = Object.values(chat).pop()
+                        }
+                        else if(type === 'group'){
+                            lastMessage.time = floGlobals.groups[floID].created
+                        }
                         cardContainer.innerHTML += `
-                            <h5 class="last-message"></h5>
-                            <h5 class="time"></h5>`
-                        getRef('dm_container').prepend(card);
-                        getRef('dm_container').children[0].click()
+                        <p class="last-message">${lastMessage.message}</p>
+                        <h5 class="time">${getFormatedTime(lastMessage.time, true)}</h5>
+                        <svg class="icon menu" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                            <circle cx="5.59" cy="32" r="5.59"/>
+                            <circle cx="58.41" cy="32" r="5.59"/>
+                            <circle cx="31.89" cy="32" r="5.59"/>
+                        </svg>`
+                    })
+                    .catch(error => console.error(error))
+                    if(prepend){
+                        getRef('chat_container').prepend(card);
+                        getRef('chat_container').children[0].click()
                     }
                     else{
-                        messenger.getChat(floID).then(chat => {
-                            const lastMessage = Object.values(chat).pop()
-                            cardContainer.innerHTML += `
-                            <p class="last-message">${lastMessage.message}</p>
-                            <h5 class="time">${getFormatedTime(lastMessage.time, true)}</h5>`
-                        })
-                        .catch(error => console.log(error))
-                        getRef('dm_container').append(card);
+                        getRef('chat_container').append(card);
                     }
                 }
             },
@@ -1409,7 +1413,7 @@
             }
             if(e.target.closest('#search_chats')){
                 if(e.code === 'ArrowDown'){
-                    for(child of getRef('dm_container').children){
+                    for(child of getRef('chat_container').children){
                         if(!child.classList.contains('hide-completely')){
                             child.focus()
                             break
@@ -1446,7 +1450,7 @@
         })
 
         const chatScrollInfo = {};
-        getRef('chat_container').addEventListener('scroll', function() {
+        getRef('messages_container').addEventListener('scroll', function() {
             chatScrollInfo['scrollTop'] = this.scrollTop
             chatScrollInfo['scrollheight'] = this.scrollHeight
             if((this.scrollHeight > this.clientHeight) && (this.scrollHeight - this.clientHeight - this.scrollTop >= 100)){
@@ -1475,7 +1479,7 @@
 
         getRef('search_chats').addEventListener('input', function() {
             if(this.value.trim !== ''){
-                for(child of getRef('dm_container').children) {
+                for(child of getRef('chat_container').children) {
                     if(child.getAttribute('name').toUpperCase().indexOf(this.value.toUpperCase()) > -1){
                         child.classList.remove('hide-completely')
                     }
@@ -1486,7 +1490,7 @@
             }
         })
 
-        document.addEventListener('pointerdown', e => {
+        document.addEventListener('click', e => {
             if(e.target.closest('.sidebar-item')){
                 let target = e.target.closest('.sidebar-item')
                 if(target.dataset.target)
@@ -1521,9 +1525,6 @@
 			if(e.target.closest('#new_mail_button')){
                 showPopup('compose_mail_popup')
             }
-            if(e.target.closest('#chat')){
-                messenger.removeMark(activeChat['receiver'], "unread");
-            }
 
             //Detect click on send mail option 
             if (e.target.closest(".send-mail-option")){
@@ -1552,6 +1553,15 @@
                     }, 0);
                 }
             }
+            // detect click outside emoji panel and emoji button
+            if(isEmojiPickerOpen && (!e.target.closest('#emoji_picker') && !e.target.closest('#emoji_toggle') && !e.target.closest('#type_message'))){
+                isEmojiPickerOpen = false
+                getRef('emoji_toggle').classList.remove('active')
+                getRef('emoji_picker').classList.add('hide-completely')
+                getRef('scroll_to_bottom').setAttribute('style', `top: calc(${getRef('messages_container').getBoundingClientRect().height}px - 1.5rem`)
+                if(!chatScrollInfo.scrolledUp)
+                    scrollToBottom()
+            }
         })
 
         let clickedContact = {}
@@ -1562,13 +1572,14 @@
                 clickedContact['card'] = contact
                 clickedContact['floID'] = contact.getAttribute("flo-id")
                 clickedContact['name'] = contact.getAttribute("name")
-                if(e.target.closest(".initial") || e.target.closest("sm-menu")){
+                if(e.target.closest(".initial") || e.target.closest(".icon")){
                     showPopup('contact_details_popup')
                 }
                 else if(isCreatingGroup){
                     // code for adding group members
                 }
                 else{
+                    createRipple(e, contact)
                     contact.classList.remove('unread')
                     if(activeChat['chatCard'] === contact && window.innerWidth > 640) return
                     document.title = `FLO Messenger`
@@ -1641,6 +1652,7 @@
         }
         let renderedEmojis = ''
         let emojiSectionCounter = 0
+        let isEmojiPickerOpen = false
         let emojiSections = ['Smileys', 'Gestures and Body Parts', 'People and Fantasy', 'Clothing and Accessories', 'Animals & Nature', 'Food & Drink', 'Activity and Sports']
         renderedEmojis += `
             <section id="recent_emoji_section">
@@ -1664,14 +1676,19 @@
                 emojis += `<span class="emoji">${emoji}</span>`
             })
             getRef('recent_emoji_section').innerHTML = ''
-            getRef('recent_emoji_section').innerHTML = emojis
+            if(recentEmojis.length)
+                getRef('recent_emoji_section').innerHTML = emojis
         }
         renderRecentEmojis()
 
         function toggleEmoji(button){
-            button.classList.toggle('active')
+            getRef('emoji_toggle').classList.toggle('active')
             getRef('emoji_picker').classList.toggle('hide-completely')
-            getRef('scroll_to_bottom').setAttribute('style', `top: calc(${getRef('chat_container').getBoundingClientRect().height}px - 1.5rem`)
+            getRef('scroll_to_bottom').setAttribute('style', `top: calc(${getRef('messages_container').getBoundingClientRect().height}px - 1.5rem`)
+            if(getRef('emoji_picker').classList.contains('hide-completely'))
+                isEmojiPickerOpen = false
+            else
+                isEmojiPickerOpen = true
             if(!chatScrollInfo.scrolledUp)
                 scrollToBottom()
         }
@@ -1721,7 +1738,7 @@
                 getRef('all_contacts').classList.remove('hide-completely')
                 contactsDrawerAnimation = animateTo(getRef('all_contacts'), [
                     {transform: 'translateY(2rem)'},
-                    {transform: 'none'},
+                    {transform: 'translateY(0)'},
                 ],{
                     duration: 300,
                     easing: 'ease'
@@ -1800,11 +1817,11 @@
                 return
             }
             else{
-                if(e.code === "Enter" && (e.code === "ShiftLeft" || e.code === "ShiftRight")){
+                if(e.code === "Enter" && e.shiftKey){
                     e.preventDefault()
                     getRef('type_message').value += '\r\n';
                 }
-                else if(e.code === "Enter" && isEnterSend){
+                else if(!e.shiftKey && e.code === "Enter" && isEnterSend){
                     e.preventDefault()
                     sendMessage()
                 }
@@ -1906,20 +1923,20 @@
                 getRef('type_message').focusIn()
             let receiver = activeChat['receiver']
             let container;
-            let message = getRef('type_message').value;
+            let message = getRef('type_message').value.trim();
 			getRef('type_message').value = ''
-            if(message.trim() === '') return
+            if(message === '') return
             let time = Date.now()
-            getRef('chat_container').append(render.messageBubble(receiver, message, time, 'sent', true))
+            getRef('messages_container').append(render.messageBubble(receiver, message, time, 'sent', true))
             scrollToBottom(true)
-            const contact = getRef('dm_container').querySelector(`.chat[flo-id="${receiver}"]`)
+            const contact = getRef('chat_container').querySelector(`.chat[flo-id="${receiver}"]`)
             if(contact){
-                if(activeChat['chatCard'] !== getRef('dm_container').children[0]){
+                if(activeChat['chatCard'] !== getRef('chat_container').children[0]){
                     const cloneContact = contact.cloneNode(true)
                     contact.remove()
                     activeChat['chatCard'] = cloneContact
-                    getRef('dm_container').prepend(cloneContact)
-                    animateTo(getRef('dm_container').children[0], [
+                    getRef('chat_container').prepend(cloneContact)
+                    animateTo(getRef('chat_container').children[0], [
                             {transform: 'translateY(1rem)'},
                             {transform: 'none'},
                         ],
@@ -1932,7 +1949,7 @@
             }
             else{
                 messenger.addChat(receiver)
-                render.contactCard(receiver, floGlobals.contacts[receiver], 'chat', true)
+                render.contactCard(receiver, floGlobals.contacts[receiver], 'chat', {prepend: true})
             }
             messenger.sendMessage(message, receiver).then(data => {
                 getRef(`${receiver}_${time}`).classList.remove('unconfirmed')
@@ -1974,11 +1991,17 @@
         }
 
         async function renderChatList() {
-            getRef('dm_container').innerHTML = ''
-            for (floID of messenger.getChatOrder().direct){
-                render.contactCard(floID, floGlobals.contacts[floID], 'chat')
+            getRef('chat_container').innerHTML = ''
+            for (floID of messenger.getChatOrder().mixed){
+                const markUnread = floGlobals.marked[floID]?.[0] === 'unread' ? true : false
+                let type
+                if(floGlobals.chats[floID])
+                    type = 'chat'
+                else if(floGlobals.groups[floID])
+                    type = 'group'
+                render.contactCard(floID, floGlobals.contacts[floID], type, {markUnread})
             }
-            chatMutationObserver.observe(getRef('chat_container'), {childList: true})
+            chatMutationObserver.observe(getRef('messages_container'), {childList: true})
         }
 
         function renderMarked(data) {
@@ -1990,7 +2013,7 @@
         }
 
         function scrollToBottom(smooth = false){
-            getRef('chat_container').scrollTo({top: getRef('chat_container').scrollHeight, behaviour: smooth ? 'smooth': ''})
+            getRef('messages_container').scrollTo({top: getRef('messages_container').scrollHeight, behaviour: smooth ? 'smooth': ''})
         }
 
         let startIndex = 0,
@@ -2021,14 +2044,14 @@
                 //Stops message from rendering in wrong chat window
                 if(activeChat['receiver'] && activeChat['receiver'] === floID)
                     frag.append(render.messageBubble(floID, message, time, category))
-                const contact = getRef('dm_container').querySelector(`.chat[flo-id='${floID}']`)
+                const contact = getRef('chat_container').querySelector(`.chat[flo-id='${floID}']`)
                 if (markUnread && contact){
                     contact.classList.add("unread");
-                    if(activeChat['chatCard'] !== getRef('dm_container').children[0] || contact !== getRef('dm_container').children[0]){
+                    if(contact !== getRef('chat_container').children[0]){
                         const cloneContact = contact.cloneNode(true)
                         contact.remove()
-                        getRef('dm_container').prepend(cloneContact)
-                        animateTo(getRef('dm_container').children[0], [
+                        getRef('chat_container').prepend(cloneContact)
+                        animateTo(getRef('chat_container').children[0], [
                                 {transform: 'translateY(1rem)'},
                                 {transform: 'none'},
                             ],
@@ -2040,7 +2063,7 @@
                     }
                 }
                 if(updateChatCard){
-                    const chatCard = getRef('dm_container').querySelector(`[flo-id="${floID}"]`)
+                    const chatCard = getRef('chat_container').querySelector(`[flo-id="${floID}"]`)
                     chatCard.querySelector('.last-message').textContent = message
                     chatCard.querySelector('.time').textContent = getFormatedTime(time, true)
                 }
@@ -2048,15 +2071,15 @@
             endIndex = startIndex
             if(!lazyLoad && !reRender){
                 endIndex = messages.length
-                getRef('chat_container').append(frag)
+                getRef('messages_container').append(frag)
                 if(!chatScrollInfo['scrolledUp'])
                     scrollToBottom()
             }
             if(reRender || lazyLoad){
                 currentDate = null
-                chatScrollInfo['scrollTop'] = getRef('chat_container').scrollTop
-                chatScrollInfo['scrollHeight'] = getRef('chat_container').scrollHeight
-                getRef('chat_container').prepend(frag)
+                chatScrollInfo['scrollTop'] = getRef('messages_container').scrollTop
+                chatScrollInfo['scrollHeight'] = getRef('messages_container').scrollHeight
+                getRef('messages_container').prepend(frag)
             }
             if(reRender){
                 scrollToBottom()
@@ -2068,10 +2091,10 @@
             (mutations, observer) => {
                 for(const mutation of mutations) {
                     if (mutation.type === 'childList' && mutation.addedNodes.length) {
-                        chatMessageObserver.observe(getRef('chat_container').firstElementChild)
-                        chatScrollInfo['scrollTop'] += (getRef('chat_container').scrollHeight - chatScrollInfo['scrollHeight'])
-                        chatScrollInfo['scrollHeight'] = getRef('chat_container').scrollHeight
-                        getRef('chat_container').scrollTo({top: chatScrollInfo['scrollTop']})
+                        chatMessageObserver.observe(getRef('messages_container').firstElementChild)
+                        chatScrollInfo['scrollTop'] += (getRef('messages_container').scrollHeight - chatScrollInfo['scrollHeight'])
+                        chatScrollInfo['scrollHeight'] = getRef('messages_container').scrollHeight
+                        getRef('messages_container').scrollTo({top: chatScrollInfo['scrollTop']})
                     }
                 }
             }            
@@ -2088,7 +2111,7 @@
         )
         
         async function viewConversation(contact) {
-            getRef('chat_container').innerHTML = ''
+            getRef('messages_container').innerHTML = ''
             let floID = clickedContact['floID'],
                 name = contact.getAttribute('name'),
                 textColor = contact.getAttribute('text-color'),
@@ -2096,7 +2119,7 @@
             activeChat['receiver'] = floID
             getRef("receiver_initial").textContent = floGlobals.contacts[floID] ? floGlobals.contacts[floID].charAt(0) : name.charAt(0) || ' ';
             getRef("receiver_initial").setAttribute('style', `color: ${textColor}; background-color: ${backgroundColor};`)
-            getRef("receiver_name").textContent = floGlobals.contacts[floID] || name || ' ';
+            getRef("receiver_name").textContent = floGlobals.contacts[floID] || floID || ' ';
             if (floGlobals.pubKeys[floID])
                 getRef("warn_no_encryption").classList.add("hide-completely");
             else
@@ -2268,11 +2291,11 @@
         windowSizeObserver.observe(document.body)
 
         function animateTo(element, animation, options){
-            const anime = element.animate(animation, {...options})
-            anime.onfinish = () => {
+            const anime = element.animate(animation, {...options, fill: 'both'})
+            anime.addEventListener('finish', () => {
                 anime.commitStyles()
                 anime.cancel()
-            }
+            })
             return anime
         }
 

@@ -577,14 +577,15 @@ sm-button[variant=primary] .icon {
   padding: 0.8rem 1.5rem;
   align-items: center;
   flex-shrink: 0;
-}
-.contact.chat {
-  grid-template-columns: auto 1fr auto;
-  grid-template-areas: "dp . menu" "dp . .";
+  overflow: hidden;
 }
 .contact:not(.chat) {
   grid-template-columns: auto 1fr;
   grid-template-areas: "dp .";
+}
+.contact.chat, .contact.group {
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "dp . time" "dp . menu";
 }
 .contact .initial {
   grid-area: dp;
@@ -593,9 +594,11 @@ sm-button[variant=primary] .icon {
   font-size: 1em;
   font-weight: 500;
   color: rgba(var(--text-color), 0.8);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 .contact .last-message {
-  grid-column: 2/4;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -603,11 +606,16 @@ sm-button[variant=primary] .icon {
   font-size: 0.9em;
   color: rgba(var(--text-color), 0.9);
 }
+.contact .menu {
+  grid-area: menu;
+  justify-self: flex-end;
+  padding: 0.2rem;
+  fill: rgba(var(--text-color), 1);
+}
 .contact .time {
   font-weight: 400;
   opacity: 0.8;
-  grid-area: menu;
-  align-self: flex-start;
+  grid-area: time;
 }
 
 #contact_details_popup > .flex:first-of-type {
@@ -644,6 +652,7 @@ sm-button[variant=primary] .icon {
   border-radius: 0.5rem;
   max-width: 30ch;
   padding: 0.6rem 1.2rem;
+  overflow-wrap: break-word;
 }
 #contact_details_popup #contact_name:focus {
   outline: none;
@@ -666,8 +675,7 @@ sm-button[variant=primary] .icon {
   color: #111;
 }
 
-.mail-card.unread::before,
-.contact.unread .initial::before {
+.mail-card.unread::before {
   content: "";
   position: absolute;
   padding: 0.4rem;
@@ -675,6 +683,23 @@ sm-button[variant=primary] .icon {
   top: 0;
   left: 0;
   background: var(--accent-color);
+}
+
+.contact .initial::after {
+  content: "";
+  position: absolute;
+  height: calc(100% + 0.8rem);
+  width: calc(100% + 0.8rem);
+  border: solid var(--accent-color) 0.2rem;
+  border-radius: 100%;
+  transform: scale(0.8);
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.contact.unread .initial::after {
+  transform: scale(1);
+  opacity: 1;
 }
 
 .mail-card.unread .time,
@@ -815,7 +840,7 @@ sm-button[variant=primary] .icon {
   justify-content: flex-start;
   flex-direction: row;
   flex: none;
-  padding: 1rem 1.2rem;
+  padding: 1rem;
 }
 #main_navbar .navbar-item .icon {
   height: 1.2rem;
@@ -887,7 +912,7 @@ sm-button[variant=primary] .icon {
   background: rgba(var(--foreground-color), 1);
 }
 #contacts #all_contacts .header {
-  padding-bottom: 1rem;
+  padding-top: 0.7rem;
 }
 #contacts .option {
   padding: 1rem 1.5rem;
@@ -936,9 +961,10 @@ sm-button[variant=primary] .icon {
   overflow-y: hidden;
 }
 #contacts .header, #mails .header, #settings_page .header {
-  padding: 1rem 1.5rem 0 1.5rem;
+  padding: 1rem 1.5rem 1rem 1.5rem;
   position: relative;
   gap: 0.5rem;
+  min-height: 4rem;
 }
 #contacts .header sm-tab::part(tab), #mails .header sm-tab::part(tab), #settings_page .header sm-tab::part(tab) {
   padding: 0.8rem 1rem;
@@ -948,27 +974,15 @@ sm-button[variant=primary] .icon {
   width: 100%;
   padding: 0.7rem 1.5rem;
   background: rgba(var(--foreground-color), 1);
+  transform: scale(0.9);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s;
+  transition: opacity 0.3s, transform 0.3s;
 }
 #contacts .header .expanding-search.expand, #mails .header .expanding-search.expand, #settings_page .header .expanding-search.expand {
   transform: none;
   opacity: 1;
   pointer-events: all;
-}
-#contacts .header .expanding-search.expand sm-input,
-#contacts .header .expanding-search.expand .back, #mails .header .expanding-search.expand sm-input,
-#mails .header .expanding-search.expand .back, #settings_page .header .expanding-search.expand sm-input,
-#settings_page .header .expanding-search.expand .back {
-  transform: none;
-}
-#contacts .header .expanding-search sm-input,
-#contacts .header .expanding-search .back, #mails .header .expanding-search sm-input,
-#mails .header .expanding-search .back, #settings_page .header .expanding-search sm-input,
-#settings_page .header .expanding-search .back {
-  transform: translateX(0.5rem);
-  transition: transform 0.3s;
 }
 #contacts .header sm-input, #mails .header sm-input, #settings_page .header sm-input {
   margin: 0;
@@ -981,10 +995,11 @@ sm-button[variant=primary] .icon {
 }
 #contacts .header sm-input::part(input), #mails .header sm-input::part(input), #settings_page .header sm-input::part(input) {
   border-radius: 3rem;
-  padding: 0.3rem 0.8rem;
+  padding: 0.2rem 0.8rem;
 }
 #contacts .header h4, #mails .header h4, #settings_page .header h4 {
   text-transform: capitalize;
+  font-weight: 500;
 }
 #contacts .header .icon, #mails .header .icon, #settings_page .header .icon {
   -webkit-tap-highlight-color: transparent;
@@ -1023,10 +1038,12 @@ sm-button[variant=primary] .icon {
 }
 
 #chat {
-  height: 100vh;
+  height: 100%;
 }
 #chat header {
-  padding: 0.5rem 1rem;
+  padding: 1rem;
+  min-height: 4rem;
+  grid-template-columns: auto 1fr auto;
 }
 #chat header .back-button {
   padding: 0.1rem;
@@ -1037,10 +1054,17 @@ sm-button[variant=primary] .icon {
 #chat header .initial {
   cursor: pointer;
   margin-right: 1rem;
+  height: 2.2rem;
+  width: 2.2rem;
 }
 #chat header h4 {
   font-weight: 500;
   font-size: 0.9rem;
+}
+#chat header #receiver_name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 #chat #scroll_to_bottom {
   position: fixed;
@@ -1057,7 +1081,7 @@ sm-button[variant=primary] .icon {
   transform: scale(0);
   transition: transform 0.3s;
 }
-#chat footer #toggle_emoji {
+#chat footer #emoji_toggle {
   align-self: center;
   padding: 0.6rem;
   width: 2.6rem;
@@ -1065,10 +1089,10 @@ sm-button[variant=primary] .icon {
   border-radius: 2rem;
   cursor: pointer;
 }
-#chat footer #toggle_emoji path {
+#chat footer #emoji_toggle path {
   fill: rgba(var(--text-color), 0.5);
 }
-#chat footer #toggle_emoji.active path {
+#chat footer #emoji_toggle.active path {
   fill: var(--accent-color);
 }
 #chat footer .flex {
@@ -1113,7 +1137,7 @@ sm-button[variant=primary] .icon {
   align-items: center;
   gap: 0.5rem;
   width: 100%;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   max-width: max-content;
   margin-bottom: 0.2rem;
   margin-top: 0.8rem;
@@ -1131,7 +1155,7 @@ sm-button[variant=primary] .icon {
   hyphens: auto;
   white-space: pre-wrap;
   padding: 0.6em 1em;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 #chat .message .message-body a {
   color: inherit;
@@ -1218,7 +1242,7 @@ sm-button[variant=primary] .icon {
   font-size: 2.6rem;
 }
 
-#chat_container {
+#messages_container {
   flex: 1;
   padding: 0 1rem;
 }
@@ -1281,8 +1305,8 @@ sm-button[variant=primary] .icon {
   stroke: rgba(var(--text-color), 0.4);
 }
 
+#messages_container,
 #chat_container,
-#dm_container,
 #inbox_mail_container,
 #sent_mail_container,
 #mail {
@@ -1292,16 +1316,16 @@ sm-button[variant=primary] .icon {
   overflow-y: auto;
 }
 
-#dm_container:empty {
+#chat_container:empty {
   display: none;
 }
 
-#dm_container:not(:empty) ~ .empty-state {
+#chat_container:not(:empty) ~ .empty-state {
   display: none;
 }
 
-#dm_container {
-  padding-bottom: 5rem;
+#chat_container {
+  padding-bottom: 6rem;
 }
 
 sm-tab-panels {
@@ -1461,18 +1485,11 @@ sm-panel {
     transition: transform 0.3s, opacity 0.3s;
   }
 
-  #dm_container,
+  #chat_container,
 #contact_container {
     gap: 0.2rem;
   }
 
-  #chat header {
-    padding: 1rem;
-  }
-  #chat header .initial {
-    width: 2rem;
-    height: 2rem;
-  }
   #chat .message {
     width: fit-content;
     max-width: 90%;
@@ -1554,7 +1571,7 @@ sm-panel {
   }
   #main_navbar .navbar-item {
     margin: 0 0.5rem;
-    border-radius: 0.5rem;
+    border-radius: 0.8rem;
   }
   #main_navbar .navbar-item .icon {
     margin-right: 0;
@@ -1637,9 +1654,9 @@ sm-panel {
   }
 
   #chat header {
-    padding: 0.5rem 1.5rem;
+    padding: 0.8rem 1.5rem;
   }
-  #chat #chat_container {
+  #chat #messages_container {
     padding: 1rem 5rem;
   }
 }
@@ -1649,17 +1666,21 @@ sm-panel {
     cursor: pointer;
   }
 
-  .contact sm-menu {
+  .contact .menu {
     opacity: 0;
     transition: opacity 0.3s;
   }
 
-  .contact:hover sm-menu,
-sm-menu:focus-within {
+  .contact:hover .menu {
     opacity: 1;
   }
 
   .emoji:hover {
     background: rgba(var(--text-color), 0.1);
+  }
+}
+@media (hover: none) {
+  .contact .menu {
+    display: none;
   }
 }
