@@ -53,6 +53,7 @@
 				<h1 class="title-font">
                     Truly Secure, Private and Reliable. 
                 </h1>				
+                <p>A messenger made with <strong>Blockchain</strong> and <strong>Open Source</strong> technologies. Take back control of your data that belongs to you and you alone.</p>
                 <sm-button variant="primary" onclick="showPopup('sign_in_popup')">Sign In / Create account</sm-button>
 			</div>
 			<div id="landing_illustration" class="right">				
@@ -343,7 +344,9 @@
                             <line x1="63.65" y1="63.66" x2="43.36" y2="43.37"/>
                         </svg>
                         <sm-menu align-options="right">
-                            <sm-menu-option onclick="initGroupCreation()">Create new group</sm-menu-option>
+                            <sm-menu-option onclick="initGroupCreation()">
+                                Create new group
+                            </sm-menu-option>
                         </sm-menu>
                     </div>
                     <div id="chat_search_field" class="expanding-search flex align-center">
@@ -405,7 +408,7 @@
                     </div>
                     <div class="scrolling-wrapper">
                         <div id="create_group_option" class="option interact" onclick="initGroupCreation()">
-
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M14.77,20.69c-1.72,0-4.95-2.46-5.59-3.74A22.74,22.74,0,0,1,7.76,9.27s-.28-6.36,7-6.36a6.69,6.69,0,0,1,7,6.36A23,23,0,0,1,20.36,17c-.65,1.28-3.88,3.74-5.59,3.74"/><path d="M34,24.52c-2.32,0-6.68-3.32-7.55-5.06A30.72,30.72,0,0,1,24.57,9.1S24.2.5,34,.5c9.09,0,9.46,8.6,9.46,8.6a30.72,30.72,0,0,1-1.92,10.36c-.86,1.74-5.23,5.06-7.54,5.06"/><path d="M51.11,31.69c-4.36-1.92-9-3.23-10.84-6.71A12.57,12.57,0,0,1,34,28.89,12.57,12.57,0,0,1,27.8,25C26,28.46,21.32,29.77,17,31.69,15.18,32.43,13.71,42,15.78,42"/><path d="M25,25c-2.38-1-4.55-2-5.57-3.93a9.38,9.38,0,0,1-4.62,2.89A9.32,9.32,0,0,1,10.15,21c-1.37,2.57-4.8,3.54-8,5-1.31.55-2.41,7.66-.87,7.66a25.71,25.71,0,0,0,11.38,3.46"/><line x1="52" y1="40" x2="52" y2="64"/><line x1="64" y1="52" x2="40" y2="52"/></svg>
                             Create new group
                         </div>
                         <div id="contacts_container"></div>
@@ -1233,9 +1236,16 @@
                 cardContainer.setAttribute("flo-id", floID)
                 cardContainer.querySelector('.name').textContent = name || floID
                 let initial = card.querySelector('.initial')
-                initial.textContent = name ? name.charAt(0) : floID.charAt(0)
                 let color = contactColor(floID)
                 //cardContainer.setAttribute("text-color", randomColor.primary)
+                if(type === 'group'){
+                    initial.innerHTML = `
+                    <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
+                    `
+                }
+                else{
+                    initial.textContent = name ? name.charAt(0) : floID.charAt(0)
+                }
                 cardContainer.setAttribute("background-color", color)
                 initial.setAttribute(`style`, `background-color: ${color};`)     
                 if(type === 'contact'){
@@ -1611,7 +1621,7 @@
 
             "<",
             "👶", "👧", "🧒", "👦", "👩", "🧑", "👨", "👩‍🦱", "👨‍🦱", "👩‍🦰",  "👨‍🦰", "👱‍♀️", "👱", "👱‍♂️", "👩‍🦳", "👨‍🦳", "👩‍🦲", "👨‍🦲", "🧔", "👵", "🧓", "👴", "👲", "👳‍♀️", "👳", 
-            "👳‍♂️", "🧕", "👮‍♀️", "👮", "👮‍♂️", "👷‍♀️", "👷", "👷‍♂️", "💂‍♀️", "💂", "💂‍♂️", "🕵️‍♀️", "🕵️", "🕵️‍♂️", "👩‍⚕️", "👨‍⚕️", "👩‍🌾", "👨‍🌾", "👩‍🍳", "👨‍🍳", "👩‍🎓", "👨‍🎓", "👩‍🎤", "👨‍🎤", 
+            "🧕", "👮‍♀️", "👮", "👷‍♀️", "👷", "👷‍♂️", "💂‍♀️", "💂", "🕵️‍♀️", "🕵️", "🕵️‍♂️", "👩‍⚕️", "👨‍⚕️", "👩‍🌾", "👨‍🌾", "👩‍🍳", "👨‍🍳", "👩‍🎓", "👨‍🎓", "👩‍🎤", "👨‍🎤", 
             "👩‍🏫", "👨‍🏫", "👩‍🏭", "👨‍🏭", "👩‍💻", "👨‍💻", "👩‍💼", "👨‍💼", "👩‍🔧", "👨‍🔧", "👩‍🔬", "👨‍🔬", "👩‍🎨",  "👨‍🎨", "👩‍🚒", "👨‍🚒", "👩‍✈️", "👨‍✈️", 
             "👩‍🚀", "👨‍🚀", "👩‍⚖️", "👨‍⚖️", "👰", "🤵", "👸", "🤴", "🦸‍♀️", "🦸", "🦸‍♂️", "🦹‍♀️", "🦹", "🦹‍♂️", "🤶", "🎅", "🧙‍♀️", "🧙", "🧙‍♂️", "🧝‍♀️", "🧝", 
             "🧝‍♂️", "🧛‍♀️", "🧛", "🧛‍♂️", "🧟‍♀️", "🧟", "🧟‍♂️", "🧞‍♀️", "🧞", "🧞‍♂️", "🧜‍♀️", "🧜", "🧜‍♂️", "🧚‍♀️", "🧚", "🧚‍♂️", "👼", "🤰", "🤱", "🙇‍♀️", "🙇", "🙇‍♂️", "💁‍♀️", "💁", "💁‍♂️", "🙅‍♀️", "🙅", 
@@ -1929,7 +1939,7 @@
             let time = Date.now()
             getRef('messages_container').append(render.messageBubble(receiver, message, time, 'sent', true))
             scrollToBottom(true)
-            const contact = getRef('chat_container').querySelector(`.chat[flo-id="${receiver}"]`)
+            const contact = getRef('chat_container').querySelector(`.chat[flo-id="${receiver}"], .group[flo-id="${receiver}"]`)
             if(contact){
                 if(activeChat['chatCard'] !== getRef('chat_container').children[0]){
                     const cloneContact = contact.cloneNode(true)
@@ -1951,11 +1961,19 @@
                 messenger.addChat(receiver)
                 render.contactCard(receiver, floGlobals.contacts[receiver], 'chat', {prepend: true})
             }
-            messenger.sendMessage(message, receiver).then(data => {
-                getRef(`${receiver}_${time}`).classList.remove('unconfirmed')
-                activeChat.chatCard.querySelector('.last-message').textContent = message
-                activeChat.chatCard.querySelector('.time').textContent = getFormatedTime(Date.now(), true)
-            }).catch(error => notify(error, "error"));
+            if(activeChat.isGroup)
+                messenger.sendGroupMessage(message, receiver).then(data => {
+                    console.log('sent group message')
+                    getRef('messages_container').querySelector(`#${receiver}_${time}`).classList.remove('unconfirmed')
+                    activeChat.chatCard.querySelector('.last-message').textContent = message
+                    activeChat.chatCard.querySelector('.time').textContent = getFormatedTime(Date.now(), true)
+                }).catch(error => notify(error, "error"));
+                else
+                messenger.sendMessage(message, receiver).then(data => {
+                    getRef('messages_container').querySelector(`#${receiver}_${time}`).classList.remove('unconfirmed')
+                    activeChat.chatCard.querySelector('.last-message').textContent = message
+                    activeChat.chatCard.querySelector('.time').textContent = getFormatedTime(Date.now(), true)
+                }).catch(error => notify(error, "error"));
         }
 
         function removeElement(element) {
@@ -2117,10 +2135,18 @@
                 textColor = contact.getAttribute('text-color'),
                 backgroundColor = contact.getAttribute('background-color')
             activeChat['receiver'] = floID
-            getRef("receiver_initial").textContent = floGlobals.contacts[floID] ? floGlobals.contacts[floID].charAt(0) : name.charAt(0) || ' ';
+            activeChat['isGroup'] = floGlobals.groups[floID] ? true : false
+            if(activeChat.isGroup){
+                getRef("receiver_initial").innerHTML = `
+                    <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
+                    `
+            }
+            else{
+                getRef("receiver_initial").textContent = floGlobals.contacts[floID] ? floGlobals.contacts[floID].charAt(0) : name.charAt(0) || ' ';
+            }
             getRef("receiver_initial").setAttribute('style', `color: ${textColor}; background-color: ${backgroundColor};`)
             getRef("receiver_name").textContent = floGlobals.contacts[floID] || floID || ' ';
-            if (floGlobals.pubKeys[floID])
+            if (floGlobals.pubKeys[floID] || activeChat.isGroup)
                 getRef("warn_no_encryption").classList.add("hide-completely");
             else
                 getRef("warn_no_encryption").classList.remove("hide-completely");
