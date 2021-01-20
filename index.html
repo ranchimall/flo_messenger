@@ -1093,7 +1093,8 @@
             adminID: "FMRsefPydWznGWneLqi4ABeQAJeFvtS3aQ",
             pubKeys: {},
             contacts: {},
-            appendix: {}
+            appendix: {},
+            expiredKeys: {}
         }
     </script>
     <script id="onLoadStartUp">
@@ -1379,6 +1380,7 @@
         function renderDirectUI(data) {
             renderMessages(data.messages, {updateChatCard: true});
             renderMailList(data.mails)
+            //let order = Object.keys(data.messages).map(a => a.split('_')).sort((a, b) => a[0] - b[0]).map(a => a[1])
             if(Object.keys(data.messages).length){
                 document.title = `New message(s)`
             }
@@ -10271,7 +10273,7 @@ Bitcoin.Util = {
         }
     }
 </script>
-<script id="floCloudAPI" version="2.0.2c">
+<script id="floCloudAPI" version="2.0.2e">
     /* FLO Cloud operations to send/request application data*/
     const floCloudAPI = {
 
@@ -10293,7 +10295,7 @@ Bitcoin.Util = {
                         return nodeIdNewInt8Array;
                     },
 
-                    addNode: function (floID, KB) {
+                    addNode: function(floID, KB) {
                         let decodedId = this.decodeID(floID);
                         const contact = {
                             id: decodedId,
@@ -10302,27 +10304,27 @@ Bitcoin.Util = {
                         KB.add(contact)
                     },
 
-                    removeNode: function (floID, KB) {
+                    removeNode: function(floID, KB) {
                         let decodedId = this.decodeID(floID);
                         KB.remove(decodedId)
                     },
 
-                    isPresent: function (floID, KB) {
+                    isPresent: function(floID, KB) {
                         let kArray = KB.toArray().map(k => k.floID);
                         return kArray.includes(floID)
                     },
 
-                    distanceOf: function (floID, KB) {
+                    distanceOf: function(floID, KB) {
                         let decodedId = this.decodeID(floID);
                         return KB.distance(KB.localNodeId, decodedId);
                     },
 
-                    closestOf: function (floID, n, KB) {
+                    closestOf: function(floID, n, KB) {
                         let decodedId = this.decodeID(floID);
                         return KB.closest(decodedId, n)
                     },
 
-                    constructKB: function (list, refID) {
+                    constructKB: function(list, refID) {
                         const KBoptions = {
                             localNodeId: this.decodeID(refID)
                         };
@@ -10333,7 +10335,7 @@ Bitcoin.Util = {
                     }
                 },
 
-                launch: function () {
+                launch: function() {
                     return new Promise((resolve, reject) => {
                         try {
                             let superNodeList = Object.keys(floGlobals.supernodes);
@@ -10351,7 +10353,7 @@ Bitcoin.Util = {
                     });
                 },
 
-                innerNodes: function (id1, id2) {
+                innerNodes: function(id1, id2) {
                     if (!this.SNCO.includes(id1) || !this.SNCO.includes(id2))
                         throw Error('Given nodes are not supernode');
                     let iNodes = []
@@ -10363,7 +10365,7 @@ Bitcoin.Util = {
                     return iNodes
                 },
 
-                outterNodes: function (id1, id2) {
+                outterNodes: function(id1, id2) {
                     if (!this.SNCO.includes(id1) || !this.SNCO.includes(id2))
                         throw Error('Given nodes are not supernode');
                     let oNodes = []
@@ -10375,7 +10377,7 @@ Bitcoin.Util = {
                     return oNodes
                 },
 
-                prevNode: function (id, N = 1) {
+                prevNode: function(id, N = 1) {
                     let n = N || this.SNCO.length;
                     if (!this.SNCO.includes(id))
                         throw Error('Given node is not supernode');
@@ -10390,7 +10392,7 @@ Bitcoin.Util = {
                     return (N == 1 ? pNodes[0] : pNodes)
                 },
 
-                nextNode: function (id, N = 1) {
+                nextNode: function(id, N = 1) {
                     let n = N || this.SNCO.length;
                     if (!this.SNCO.includes(id))
                         throw Error('Given node is not supernode');
@@ -10406,7 +10408,7 @@ Bitcoin.Util = {
                     return (N == 1 ? nNodes[0] : nNodes)
                 },
 
-                closestNode: function (id, N = 1) {
+                closestNode: function(id, N = 1) {
                     let decodedId = this.util.decodeID(id);
                     let n = N || this.SNCO.length;
                     let cNodes = this.SNKB.closest(decodedId, n)
@@ -10415,13 +10417,13 @@ Bitcoin.Util = {
                 }
             },
 
-            inactive: [],
+            inactive: new Set(),
             connect(snID) {
                 return new Promise((resolve, reject) => {
                     if (!(snID in floGlobals.supernodes))
                         return reject(`${snID} is not a supernode`)
                     let inactive = this.inactive
-                    if (inactive.includes(snID))
+                    if (inactive.has(snID))
                         return reject(`${snID} is not active`)
                     var wsConn = new WebSocket("wss://" + floGlobals.supernodes[snID].uri + "/ws");
                     wsConn.onmessage = (evt) => {
@@ -10429,12 +10431,12 @@ Bitcoin.Util = {
                             resolve(wsConn)
                         else if (evt.data == '$-') {
                             wsConn.close();
-                            inactive.push(snID)
+                            inactive.add(snID)
                             reject(`${snID} is not active`)
                         }
                     }
                     wsConn.onerror = evt => {
-                        inactive.push(snID)
+                        inactive.add(snID)
                         reject(`${snID} is unavailable`)
                     }
                 })
@@ -10442,7 +10444,7 @@ Bitcoin.Util = {
 
             connectActive(snID, reverse = false) {
                 return new Promise((resolve, reject) => {
-                    if (this.inactive.length === this.kBucket.SNCO.length)
+                    if (this.inactive.size === this.kBucket.SNCO.length)
                         return reject('Cloud offline')
                     if (!(snID in floGlobals.supernodes))
                         snID = this.kBucket.closestNode(snID);
@@ -10460,7 +10462,7 @@ Bitcoin.Util = {
                 })
             },
 
-            singleRequest: function (floID, data) {
+            singleRequest: function(floID, data) {
                 return new Promise((resolve, reject) => {
                     this.connectActive(floID).then(node => {
                         let randID = floCrypto.randString(5);
@@ -10481,7 +10483,7 @@ Bitcoin.Util = {
                 });
             },
 
-            liveRequest: function (floID, datareq, callback) {
+            liveRequest: function(floID, datareq, callback) {
                 let request = {
                     ...datareq.request
                 };
@@ -10525,21 +10527,21 @@ Bitcoin.Util = {
                 });
             },
 
-            encodeMessage: function (message) {
+            encodeMessage: function(message) {
                 return btoa(unescape(encodeURIComponent(JSON.stringify(message))))
             },
 
-            decodeMessage: function (message) {
+            decodeMessage: function(message) {
                 return JSON.parse(decodeURIComponent(escape(atob(message))))
             },
 
-            filterKey: function (type, options) {
+            filterKey: function(type, options) {
                 return type + (options.comment ? ':' + options.comment : '') +
                     '|' + (options.receiverID || floGlobals.adminID) +
                     '|' + (options.application || floGlobals.application);
             },
 
-            lastCommit: function (method, objName) {
+            lastCommit: function(method, objName) {
                 switch (method) {
                     case "GET":
                         return JSON.parse(this.lastCommit[objName]);
@@ -10548,7 +10550,7 @@ Bitcoin.Util = {
                 }
             },
 
-            updateObject: function (dataSet) {
+            updateObject: function(dataSet) {
                 try {
                     console.log(dataSet)
                     let updatedObjects = new Set()
@@ -10575,7 +10577,7 @@ Bitcoin.Util = {
                 }
             },
 
-            storeGeneral: function (fk, dataSet) {
+            storeGeneral: function(fk, dataSet) {
                 try {
                     console.log(dataSet)
                     if (typeof floGlobals.generalData[fk] !== "object")
@@ -10592,7 +10594,7 @@ Bitcoin.Util = {
         },
 
         //send Any message to supernode cloud storage
-        sendApplicationData: function (message, type, options = {}) {
+        sendApplicationData: function(message, type, options = {}) {
             return new Promise((resolve, reject) => {
                 var data = {
                     senderID: myFloID,
@@ -10618,7 +10620,7 @@ Bitcoin.Util = {
         },
 
         //request any data from supernode cloud
-        requestApplicationData: function (type, options = {}) {
+        requestApplicationData: function(type, options = {}) {
             return new Promise((resolve, reject) => {
                 var request = {
                     receiverID: options.receiverID || floGlobals.adminID,
@@ -10655,7 +10657,7 @@ Bitcoin.Util = {
         },
 
         //delete data from supernode cloud (received only)
-        deleteApplicationData: function (vectorClocks, options = {}) {
+        deleteApplicationData: function(vectorClocks, options = {}) {
             return new Promise((resolve, reject) => {
                 var delreq = {
                     requestorID: myFloID,
@@ -10681,7 +10683,7 @@ Bitcoin.Util = {
         },
 
         //edit comment of data in supernode cloud (mutable comments only)
-        editApplicationData: function (vectorClock, newComment, oldData, options = {}) {
+        editApplicationData: function(vectorClock, newComment, oldData, options = {}) {
             return new Promise((resolve, reject) => {
                 let p0
                 if (!oldData) {
@@ -10723,7 +10725,7 @@ Bitcoin.Util = {
         },
 
         //mark data in supernode cloud (subAdmin access only)
-        markApplicationData: function (mark, options = {}) {
+        markApplicationData: function(mark, options = {}) {
             return new Promise((resolve, reject) => {
                 if (!floGlobals.subAdmins.includes(myFloID))
                     return reject("Only subAdmins can mark data")
@@ -10758,7 +10760,7 @@ Bitcoin.Util = {
         },
 
         //send General Data
-        sendGeneralData: function (message, type, options = {}) {
+        sendGeneralData: function(message, type, options = {}) {
             return new Promise((resolve, reject) => {
                 if (options.encrypt) {
                     let encryptionKey = options.encrypt === true ?
@@ -10775,7 +10777,7 @@ Bitcoin.Util = {
         },
 
         //request General Data
-        requestGeneralData: function (type, options = {}) {
+        requestGeneralData: function(type, options = {}) {
             return new Promise((resolve, reject) => {
                 var fk = this.util.filterKey(type, options)
                 options.lowerVectorClock = options.lowerVectorClock || floGlobals.lastVC[fk] + 1;
@@ -10798,7 +10800,7 @@ Bitcoin.Util = {
         },
 
         //request an object data from supernode cloud
-        requestObjectData: function (objectName, options = {}) {
+        requestObjectData: function(objectName, options = {}) {
             return new Promise((resolve, reject) => {
                 options.lowerVectorClock = options.lowerVectorClock || floGlobals.lastVC[objectName] +
                     1;
@@ -10814,7 +10816,7 @@ Bitcoin.Util = {
                     }
                     delete options.callback;
                 }
-                this.requestApplicationData(objectName, options).then(data).then(dataSet => {
+                this.requestApplicationData(objectName, options).then(dataSet => {
                     this.util.updateObject(dataSet)
                     delete options.comment;
                     options.lowerVectorClock = floGlobals.lastVC[objectName] + 1
@@ -10836,8 +10838,21 @@ Bitcoin.Util = {
             })
         },
 
+        closeRequest: function(requestID) {
+            return new Promise((resolve, reject) => {
+                let conn = this.util.liveRequest[requestID]
+                if (!conn)
+                    return reject('Request not found')
+                conn.onclose = evt => {
+                    delete this.util.liveRequest[requestID]
+                    resolve('Request connection closed')
+                }
+                conn.close()
+            })
+        },
+
         //reset or initialize an object and send it to cloud
-        resetObjectData: function (objectName, options = {}) {
+        resetObjectData: function(objectName, options = {}) {
             return new Promise((resolve, reject) => {
                 let message = {
                     reset: floGlobals.appObjects[objectName]
@@ -10851,7 +10866,7 @@ Bitcoin.Util = {
         },
 
         //update the diff and send it to cloud
-        updateObjectData: function (objectName, options = {}) {
+        updateObjectData: function(objectName, options = {}) {
             return new Promise((resolve, reject) => {
                 let message = {
                     diff: findDiff(this.util.lastCommit("GET", objectName), floGlobals.appObjects[
@@ -10875,7 +10890,7 @@ Bitcoin.Util = {
         this.arbiter = options.arbiter || this.arbiter
         this.metadata = Object.assign({}, options.metadata)
 
-        this.createNode = function () {
+        this.createNode = function() {
             return {
                 contacts: [],
                 dontSplit: false,
@@ -10884,12 +10899,12 @@ Bitcoin.Util = {
             }
         }
 
-        this.ensureInt8 = function (name, val) {
+        this.ensureInt8 = function(name, val) {
             if (!(val instanceof Uint8Array))
                 throw new TypeError(name + ' is not a Uint8Array')
         }
 
-        this.arrayEquals = function (array1, array2) {
+        this.arrayEquals = function(array1, array2) {
             if (array1 === array2)
                 return true
             if (array1.length !== array2.length)
@@ -10903,11 +10918,11 @@ Bitcoin.Util = {
         this.ensureInt8('option.localNodeId as parameter 1', this.localNodeId)
         this.root = this.createNode()
 
-        this.arbiter = function (incumbent, candidate) {
+        this.arbiter = function(incumbent, candidate) {
             return incumbent.vectorClock > candidate.vectorClock ? incumbent : candidate
         }
 
-        this.distance = function (firstId, secondId) {
+        this.distance = function(firstId, secondId) {
             let distance = 0
             let i = 0
             const min = Math.min(firstId.length, secondId.length)
@@ -10918,7 +10933,7 @@ Bitcoin.Util = {
             return distance
         }
 
-        this.add = function (contact) {
+        this.add = function(contact) {
             this.ensureInt8('contact.id', (contact || {}).id)
             let bitIndex = 0
             let node = this.root
@@ -10939,7 +10954,7 @@ Bitcoin.Util = {
             return this.add(contact)
         }
 
-        this.closest = function (id, n = Infinity) {
+        this.closest = function(id, n = Infinity) {
             this.ensureInt8('id', id)
             if ((!Number.isInteger(n) && n !== Infinity) || n <= 0)
                 throw new TypeError('n is not positive number')
@@ -10960,7 +10975,7 @@ Bitcoin.Util = {
                 .map(a => a[1])
         }
 
-        this.count = function () {
+        this.count = function() {
             let count = 0
             for (const nodes = [this.root]; nodes.length > 0;) {
                 const node = nodes.pop()
@@ -10972,7 +10987,7 @@ Bitcoin.Util = {
             return count
         }
 
-        this._determineNode = function (node, id, bitIndex) {
+        this._determineNode = function(node, id, bitIndex) {
             const bytesDescribedByBitIndex = bitIndex >> 3
             const bitIndexWithinByte = bitIndex % 8
             if ((id.length <= bytesDescribedByBitIndex) && (bitIndexWithinByte !== 0))
@@ -10983,7 +10998,7 @@ Bitcoin.Util = {
             return node.left
         }
 
-        this.get = function (id) {
+        this.get = function(id) {
             this.ensureInt8('id', id)
             let bitIndex = 0
             let node = this.root
@@ -10993,14 +11008,14 @@ Bitcoin.Util = {
             return index >= 0 ? node.contacts[index] : null
         }
 
-        this._indexOf = function (node, id) {
+        this._indexOf = function(node, id) {
             for (let i = 0; i < node.contacts.length; ++i)
                 if (this.arrayEquals(node.contacts[i].id, id))
                     return i
             return -1
         }
 
-        this.remove = function (id) {
+        this.remove = function(id) {
             this.ensureInt8('the id as parameter 1', id)
             let bitIndex = 0
             let node = this.root
@@ -11012,7 +11027,7 @@ Bitcoin.Util = {
             return this
         }
 
-        this._split = function (node, bitIndex) {
+        this._split = function(node, bitIndex) {
             node.left = this.createNode()
             node.right = this.createNode()
             for (const contact of node.contacts)
@@ -11023,7 +11038,7 @@ Bitcoin.Util = {
             otherNode.dontSplit = true
         }
 
-        this.toArray = function () {
+        this.toArray = function() {
             let result = []
             for (const nodes = [this.root]; nodes.length > 0;) {
                 const node = nodes.pop()
@@ -11035,7 +11050,7 @@ Bitcoin.Util = {
             return result
         }
 
-        this._update = function (node, index, contact) {
+        this._update = function(node, index, contact) {
             if (!this.arrayEquals(node.contacts[index].id, contact.id))
                 throw new Error('wrong index for _update')
             const incumbent = node.contacts[index]
@@ -11822,7 +11837,7 @@ Bitcoin.Util = {
                         let newInfo = {
                             ...floGlobals.groups[groupID]
                         }
-                        newInfo.eKey = this.encrypt(newInfo.eKey)
+                        newInfo.eKey = utilFn.encrypt(newInfo.eKey)
                         compactIDB.writeData("groups", newInfo, groupID)
                     }
                     utilFn.UIcallback(newInbox)
@@ -12127,6 +12142,31 @@ Bitcoin.Util = {
                 compactIDB.addData("chats", 0, chatID)
                     .then(result => resolve("Added chat"))
                     .catch(error => reject(error))
+            })
+        },
+
+        rmChat(chatID) {
+            return new Promise((resolve, reject) => {
+                compactIDB.removeData("chats", chatID)
+                    .then(result => resolve("Chat removed"))
+                    .catch(error => reject(error))
+            })
+        },
+
+        clearChat(chatID) {
+            return new Promise((resolve, reject) => {
+                let options = {
+                    lowerKey: `${chatID}|`,
+                    upperKey: `${chatID}||`
+                }
+                compactIDB.searchData("messages", options).then(result => {
+                    let promises = []
+                    for (let i in result)
+                        promises.push(compactIDB.removeData("messages", i))
+                    Promise.all(promises)
+                        .then(result => resolve("Chat cleared"))
+                        .catch(error => reject(error))
+                }).catch(error => reject(error))
             })
         },
 
