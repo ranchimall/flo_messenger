@@ -1266,7 +1266,12 @@
                     messenger.getChat(floID).then(chat => {
                         let lastMessage = {message: '', time: 0}
                         if(Object.values(chat).length){
-                            lastMessage = Object.values(chat).pop()
+                            for(msg of Object.values(chat).reverse()){
+                                if(msg.message){
+                                    lastMessage = msg
+                                    break;
+                                }
+                            }
                         }
                         else if(type === 'group'){
                             lastMessage.time = floGlobals.groups[floID].created
@@ -1290,56 +1295,68 @@
                     }
                 }
             },
-            messageBubble(floID, message, timestamp, category, unconfirmed = false){
+            messageBubble(msg){
+                console.log(msg)
+                let {admin = false, newMembers = [], groupID, name, sender, floID, message, time: timestamp, category, unconfirmed = false} = msg
                 let card = getRef('message_template').content.cloneNode(true),
                     cardContainer = card.querySelector('.message')
 
-                cardContainer.id = `${floID}_${timestamp}`
-                if(unconfirmed)
-                    cardContainer.classList.add('unconfirmed')
-
-                cardContainer.classList.add(category)
-                if(isValidUrl(message)){
-                    const anchorTag = document.createElement('a')
-                    anchorTag.href = message
-                    anchorTag.target="_blank"
-                    anchorTag.textContent = message
-                    cardContainer.children[0].append(anchorTag)
-                }
-                else{
-                    let [messageBody, isOnlyEmoji] = isEmoji(message)
-                    if(isOnlyEmoji)
-                        cardContainer.classList.add('big-emoji')
-                    cardContainer.children[0].append(messageBody)
+                if(activeChat.isGroup){
+                    floID = groupID
+                    category = sender === myFloID ? 'sent': 'received'
                 }
 
-                let time = new Date(timestamp).toString(),
-                    minutes = String(new Date(timestamp).getMinutes()),
-                    hours = new Date(timestamp).getHours(),
-                    year = new Date(timestamp).getFullYear()
-                minutes = minutes.length === 1 ? `0${minutes}` : minutes
-                let finalHours = hours - 12 > 0 ? `${hours - 12}:${minutes} pm` : `${hours}:${minutes} am`
+                if(message){
+                    cardContainer.id = `${floID}_${timestamp}`
+                    if(unconfirmed)
+                        cardContainer.classList.add('unconfirmed')
+                
+                    cardContainer.classList.add(category)
+                    if(isValidUrl(message)){
+                        const anchorTag = document.createElement('a')
+                        anchorTag.href = message
+                        anchorTag.target="_blank"
+                        anchorTag.rel="noopener"
+                        anchorTag.textContent = message
+                        cardContainer.children[0].append(anchorTag)
+                    }
+                    else{
+                        let [messageBody, isOnlyEmoji] = isEmoji(message)
+                        if(isOnlyEmoji)
+                            cardContainer.classList.add('big-emoji')
+                        cardContainer.children[0].append(messageBody)
+                    }
+                    let time = new Date(timestamp).toString(),
+                        minutes = String(new Date(timestamp).getMinutes()),
+                        hours = new Date(timestamp).getHours(),
+                        year = new Date(timestamp).getFullYear()
+                    minutes = minutes.length === 1 ? `0${minutes}` : minutes
+                    let finalHours = hours - 12 > 0 ? `${hours - 12}:${minutes} pm` : `${hours}:${minutes} am`
+    
+                    cardContainer.children[1].textContent = finalHours
+                    if(currentFloID !== floID){
+                        currentDate = null
+                        currentFloID = floID
+                        renderedDates.clear()
+                    }
+    
+                    if(!renderedDates.has(`${time.slice(4, 10)} ${year}`) && `${time.slice(4, 10)} ${year}` !== currentDate){
+                        let dateCard = document.createElement('h5')
+                        dateCard.classList.add('date-card')
+                        dateCard.textContent = new Date().getFullYear() !== year ? `${time.slice(4, 10)} ${year}` : time.slice(4, 10)
+                        currentDate = `${time.slice(4, 10)} ${year}`
+                        let frag = document.createDocumentFragment()
+                        frag.append(dateCard, card)
+                        renderedDates.set(currentDate, currentDate)
+                        return frag
+                    }
+                    else
+                        return card;
+                }
+                else if(admin){
 
-                cardContainer.children[1].textContent = finalHours
-
-                if(currentFloID !== floID){
-                    currentDate = null
-                    currentFloID = floID
-                    renderedDates.clear()
                 }
 
-                if(!renderedDates.has(`${time.slice(4, 10)} ${year}`) && `${time.slice(4, 10)} ${year}` !== currentDate){
-                    let dateCard = document.createElement('h5')
-                    dateCard.classList.add('date-card')
-                    dateCard.textContent = new Date().getFullYear() !== year ? `${time.slice(4, 10)} ${year}` : time.slice(4, 10)
-                    currentDate = `${time.slice(4, 10)} ${year}`
-                    let frag = document.createDocumentFragment()
-                    frag.append(dateCard, card)
-                    renderedDates.set(currentDate, currentDate)
-                    return frag
-                }
-                else
-                    return card;
 			},
         }
         let currentDate, currentFloID, renderedDates = new Map()
@@ -1391,7 +1408,7 @@
         }
 
         function renderGroupUI(data){
-            console.log(data)
+            renderMessages(data.messages, {updateChatCard: true});
         }
 
         window.addEventListener('focus', e => {
@@ -1939,7 +1956,16 @@
 			getRef('type_message').value = ''
             if(message === '') return
             let time = Date.now()
-            getRef('messages_container').append(render.messageBubble(receiver, message, time, 'sent', true))
+            let msgObj = {message, time, unconfirmed: true}
+            if(activeChat.isGroup){
+                msgObj['groupID'] = activeChat.receiver
+                msgObj['sender'] = myFloID
+            }
+            else{
+                msgObj['floID'] = activeChat.receiver
+                msgObj['category'] = 'sent'
+            }
+            getRef('messages_container').append(render.messageBubble(msgObj))
             scrollToBottom(true)
             const contact = getRef('chat_container').querySelector(`.chat[flo-id="${receiver}"], .group[flo-id="${receiver}"]`)
             if(contact){
@@ -1966,8 +1992,8 @@
             if(activeChat.isGroup)
                 messenger.sendGroupMessage(message, receiver).then(data => {
                     console.log('sent group message')
-                    getRef('messages_container').querySelector(`#${receiver}_${time}`).classList.remove('unconfirmed')
-                    activeChat.chatCard.querySelector('.last-message').textContent = message
+                    getRef('messages_container').querySelector(`#${receiver}_${time}`).remove()
+                    activeChat.chatCard.querySelector('.last-message').textContent = `You: ${message}`
                     activeChat.chatCard.querySelector('.time').textContent = getFormatedTime(Date.now(), true)
                 }).catch(error => notify(error, "error"));
                 else
@@ -2033,7 +2059,7 @@
         }
 
         function scrollToBottom(smooth = false){
-            getRef('messages_container').scrollTo({top: getRef('messages_container').scrollHeight, behaviour: smooth ? 'smooth': ''})
+            getRef('messages_container').scrollTo(0, getRef('messages_container').scrollHeight)
         }
 
         let startIndex = 0,
@@ -2059,11 +2085,11 @@
                 endIndex = messages.length  
             }
 
-            for (i = startIndex; i < endIndex; i++) {
-                let {floID, message, time, category} = messages[i]
+            for (let i = startIndex; i < endIndex; i++) {
+                let {floID, groupID, sender, message, time, category} = messages[i]
                 //Stops message from rendering in wrong chat window
-                if(activeChat['receiver'] && activeChat['receiver'] === floID)
-                    frag.append(render.messageBubble(floID, message, time, category))
+                if(activeChat['receiver'] && activeChat['receiver'] === (floID || groupID))
+                    frag.append(render.messageBubble(messages[i]))
                 const contact = getRef('chat_container').querySelector(`.chat[flo-id='${floID}']`)
                 if (markUnread && contact){
                     contact.classList.add("unread");
@@ -2083,8 +2109,15 @@
                     }
                 }
                 if(updateChatCard){
-                    const chatCard = getRef('chat_container').querySelector(`[flo-id="${floID}"]`)
-                    chatCard.querySelector('.last-message').textContent = message
+                    const chatCard = getRef('chat_container').querySelector(`.contact[flo-id="${floID || groupID}"]`)
+                    let finalMessage
+                    if(floGlobals.contacts[sender])
+                        finalMessage = `${floGlobals.contacts[sender]}: ${message}`
+                    else if(sender === myFloID)
+                        finalMessage = `You: ${message}`
+                    else 
+                        finalMessage = message
+                    chatCard.querySelector('.last-message').textContent = finalMessage
                     chatCard.querySelector('.time').textContent = getFormatedTime(time, true)
                 }
             } 
@@ -12330,24 +12363,24 @@ Bitcoin.Util = {
             })
         },
 
-        changeGroupName(groupID, description) {
-            return new Promise((resolve, reject) => {
-                let groupInfo = floGlobals.groups[groupID]
-                if (myFloID !== groupInfo.admin)
-                    return reject("Access denied: Admin only!")
-                let message = this.util.encrypt(description, groupInfo.eKey)
-                this.util.sendRaw(message, groupID, "UP_NAME", false)
-                    .then(result => resolve('Description updated'))
-                    .catch(error => reject(error))
-            })
-        },
-
-        changeGroupDescription(groupID, name) {
+        changeGroupName(groupID, name) {
             return new Promise((resolve, reject) => {
                 let groupInfo = floGlobals.groups[groupID]
                 if (myFloID !== groupInfo.admin)
                     return reject("Access denied: Admin only!")
                 let message = this.util.encrypt(name, groupInfo.eKey)
+                this.util.sendRaw(message, groupID, "UP_NAME", false)
+                    .then(result => resolve('Name updated'))
+                    .catch(error => reject(error))
+            })
+        },
+
+        changeGroupDescription(groupID, description) {
+            return new Promise((resolve, reject) => {
+                let groupInfo = floGlobals.groups[groupID]
+                if (myFloID !== groupInfo.admin)
+                    return reject("Access denied: Admin only!")
+                let message = this.util.encrypt(description, groupInfo.eKey)
                 this.util.sendRaw(message, groupID, "UP_DESCRIPTION", false)
                     .then(result => resolve('Description updated'))
                     .catch(error => reject(error))
