@@ -1576,6 +1576,34 @@
             }
         })
 
+        let mygroup = [];
+        
+        function selectContact(contact){
+                
+                    if(mygroup.includes(clickedContact.floID)){
+                       alert("user is already selected");
+                    }
+                    else{
+                        mygroup.push(clickedContact.floID);
+                    }
+                    getRef("selected_contacts_container").innerHTML=mygroup;
+        }
+
+
+        function removeContact(floID){
+
+            mygroup=mygroup.filter(  item => item !== floID )
+            console.log(mygroup);
+
+        }
+
+        function clearAllMember(){
+            mygroup=[];
+            console.log("Empty "+ mygroup);
+
+        }
+
+
         let clickedContact = {}
         getRef('contacts').addEventListener('click', e => {
             //detect click on chat cards
@@ -1588,7 +1616,9 @@
                     showPopup('contact_details_popup')
                 }
                 else if(isCreatingGroup){
-                    // code for adding group members
+                    selectContact(contact); 
+            console.log(mygroup)
+            
                 }
                 else{
                     createRipple(e, contact)
