@@ -668,7 +668,7 @@ sm-button[variant=primary] .icon {
   background: rgba(var(--text-color), 0.1);
 }
 
-#warn_no_encryption, .date-card {
+#warn_no_encryption, .date-card, .group-event-card {
   padding: 0.4rem 0.8rem;
   background: rgba(var(--text-color), 0.1);
   font-weight: 500;
@@ -962,8 +962,10 @@ sm-button[variant=primary] .icon {
 
 #selected_contacts_container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
   gap: 1rem;
+  max-height: 8rem;
+  overflow-y: auto;
 }
 
 #contacts, #mails {
@@ -1009,7 +1011,7 @@ sm-button[variant=primary] .icon {
   width: 0.9rem;
 }
 #contacts .header sm-input::part(input), #mails .header sm-input::part(input), #settings_page .header sm-input::part(input) {
-  border-radius: 3rem;
+  border-radius: 0.5rem;
   padding: 0.2rem 0.8rem;
 }
 #contacts .header h4, #mails .header h4, #settings_page .header h4 {
@@ -1052,106 +1054,80 @@ sm-button[variant=primary] .icon {
   overflow-y: hidden;
 }
 
-#chat {
+#chat_left,
+#chat_details_panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  overflow-y: auto;
 }
-#chat header {
+
+#chat_details_panel {
+  background: rgba(var(--text-color), 0.04);
+  padding-bottom: 1.5rem;
+}
+#chat_details_panel .card {
+  margin: 0 1rem;
+  padding: 1.5rem 1rem;
+  border-radius: 0.8rem;
+  background: rgba(var(--text-color), 0.06);
+}
+#chat_details_panel .card:not(:last-of-type) {
+  margin-bottom: 1rem;
+}
+#chat_details_panel .card > h4 {
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: rgba(var(--text-color), 0.8);
+  margin-bottom: 0.5rem;
+}
+#chat_details_panel header {
   padding: 1rem;
   min-height: 4rem;
-  grid-template-columns: auto 1fr auto;
 }
-#chat header .back-button {
-  padding: 0.1rem;
-  stroke-width: 8;
-  margin-right: 0.5rem;
-  stroke: rgba(var(--text-color), 0.8);
-}
-#chat header .initial {
+#chat_details_panel header .icon {
+  height: 2.3rem;
+  width: 2.3rem;
+  padding: 0.7rem;
   cursor: pointer;
-  margin-right: 1rem;
-  height: 2.2rem;
-  width: 2.2rem;
-  flex-shrink: 0;
 }
-#chat header h4 {
+#chat_details_panel .contact {
+  padding: 0.5rem 0;
+}
+#chat_details_panel #chat_profile {
+  display: grid;
+  place-items: center;
+  margin-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+#chat_details_panel #chat_profile .initial {
+  margin-top: -5.5rem;
+  margin-bottom: 1rem;
+  height: 8rem;
+  width: 8rem;
+  border-radius: 50%;
+  font-size: 4rem;
+}
+#chat_details_panel #chat_profile .initial .icon {
+  height: 4rem;
+  width: 4rem;
+}
+#chat_details_panel #chat_profile #chat_name {
   font-weight: 500;
+  font-size: 1.2rem;
+}
+#chat_details_panel #chat_profile #last_interaction_time {
+  color: rgba(var(--text-color), 0.7);
   font-size: 0.9rem;
+  margin-top: 0.5rem;
 }
-#chat header #receiver_name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-#chat #scroll_to_bottom {
-  position: fixed;
-  right: 0;
-  bottom: 4rem;
-  width: 2.6rem;
-  height: 2.6rem;
-  padding: 0.9rem;
-  border-radius: 4rem;
-  z-index: 1;
-  margin: 1.5rem;
-  stroke-width: 8;
-  cursor: pointer;
-  transform: scale(0);
-  transition: transform 0.3s;
-}
-#chat footer #emoji_toggle {
-  align-self: center;
-  padding: 0.6rem;
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: 2rem;
-  cursor: pointer;
-}
-#chat footer #emoji_toggle path {
-  fill: rgba(var(--text-color), 0.5);
-}
-#chat footer #emoji_toggle.active path {
-  fill: var(--accent-color);
-}
-#chat footer .flex {
-  align-items: flex-end;
-  padding: 1rem 1rem 1rem 0.4rem;
-}
-#chat footer sm-textarea::part(textarea) {
-  background: rgba(var(--text-color), 0.1);
-  padding-right: 3rem;
-  border-radius: 2rem;
-}
-#chat #send_message_button {
-  position: absolute;
-  right: 1.5rem;
-  transform: scale(0);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 1;
-  align-self: center;
-  height: 2.4rem;
-  width: 2.4rem;
-  padding: 0.5rem;
-  cursor: pointer;
-  stroke: none;
-  fill: rgba(var(--text-color), 0.4);
-  margin-left: 1rem;
-  transition: 0.3s;
-}
-#chat #send_message_button.active {
-  opacity: 1;
-  fill: var(--accent-color);
-  transform: none;
-  pointer-events: all;
-}
-#chat #type_message {
-  margin: 0;
-}
+
 #chat .message {
   position: relative;
-  display: grid;
-  align-items: center;
-  gap: 0.2rem;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  width: auto;
   font-size: 0.92rem;
   max-width: max-content;
   margin-bottom: 0.2rem;
@@ -1159,8 +1135,13 @@ sm-button[variant=primary] .icon {
   padding: 0.6em 1em;
   transition: opacity 0.3s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+#chat .message .sender-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+}
 #chat .message .message-body {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   flex-wrap: wrap;
   overflow-wrap: break-word;
@@ -1171,7 +1152,7 @@ sm-button[variant=primary] .icon {
   -webkit-hyphens: auto;
   hyphens: auto;
   white-space: pre-wrap;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 #chat .message .message-body a {
   color: inherit;
@@ -1185,12 +1166,16 @@ sm-button[variant=primary] .icon {
   white-space: nowrap;
   font-size: 0.8em;
   opacity: 0.8;
+  justify-self: flex-end;
+  padding-left: 1rem;
+  align-self: flex-end;
+  margin-top: 0.2rem;
 }
 #chat .sent {
   margin-left: auto;
+  color: #efefef;
   background: var(--accent-color);
-  color: #f0f0f0;
-  border-radius: 1em 0 1em 1em;
+  border-radius: 0.8rem 0 0.8rem 0.8rem;
 }
 #chat .sent::after {
   content: "";
@@ -1203,12 +1188,9 @@ sm-button[variant=primary] .icon {
   border-width: 0.5em 0.3em 0 0;
   border-color: var(--accent-color) transparent transparent transparent;
 }
-#chat .sent .time {
-  margin-left: auto;
-}
 #chat .received {
   background: rgba(var(--text-color), 0.1);
-  border-radius: 0 1em 1em 1em;
+  border-radius: 0 0.8rem 0.8rem 0.8rem;
 }
 #chat .received::after {
   content: "";
@@ -1231,7 +1213,7 @@ sm-button[variant=primary] .icon {
 }
 #chat .sent + .sent,
 #chat .received + .received {
-  border-radius: 1em;
+  border-radius: 0.8rem;
 }
 #chat .unconfirmed {
   opacity: 0.7;
@@ -1247,6 +1229,98 @@ sm-button[variant=primary] .icon {
     transform: rotate(0) translate(0, 0);
   }
 }
+#chat_header {
+  padding: 1rem;
+  min-height: 4rem;
+  grid-template-columns: auto 1fr auto;
+}
+#chat_header .back-button {
+  padding: 0.1rem;
+  stroke-width: 8;
+  margin-right: 0.5rem;
+  stroke: rgba(var(--text-color), 0.8);
+}
+#chat_header .initial {
+  cursor: pointer;
+  margin-right: 1rem;
+  height: 2.2rem;
+  width: 2.2rem;
+  flex-shrink: 0;
+}
+#chat_header #receiver_name {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#scroll_to_bottom {
+  position: absolute;
+  right: 0;
+  bottom: 4rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 0.9rem;
+  border-radius: 4rem;
+  z-index: 1;
+  margin: 1.5rem;
+  stroke-width: 8;
+  cursor: pointer;
+  transform: scale(0);
+  transition: transform 0.3s;
+}
+
+#chat_footer #emoji_toggle {
+  align-self: center;
+  padding: 0.6rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 2rem;
+  cursor: pointer;
+}
+#chat_footer #emoji_toggle path {
+  fill: rgba(var(--text-color), 0.5);
+}
+#chat_footer #emoji_toggle.active path {
+  fill: var(--accent-color);
+}
+#chat_footer .flex {
+  align-items: flex-end;
+  padding: 1rem 1rem 1rem 0.4rem;
+}
+#chat_footer sm-textarea::part(textarea) {
+  padding-right: 3rem;
+  border-radius: 0.5rem;
+}
+
+#send_message_button {
+  position: absolute;
+  right: 1.5rem;
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  align-self: center;
+  height: 2.4rem;
+  width: 2.4rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  stroke: none;
+  fill: rgba(var(--text-color), 0.4);
+  margin-left: 1rem;
+  transition: 0.3s;
+}
+#send_message_button.active {
+  opacity: 1;
+  fill: var(--accent-color);
+  transform: none;
+  pointer-events: all;
+}
+
+#type_message {
+  margin: 0;
+}
+
 .big-emoji .message-body {
   font-size: 2.6rem;
 }
@@ -1615,8 +1689,10 @@ sm-panel {
     max-height: 18rem;
   }
 
-  #chat .message .message-body {
-    max-width: 65ch;
+  #chat .message {
+    width: auto;
+    align-self: flex-start;
+    max-width: 55ch;
   }
 
   #chat_page, #mail_page {
@@ -1669,11 +1745,26 @@ sm-panel {
     grid-template-columns: 21rem 1fr;
   }
 
-  #chat header {
-    padding: 0.8rem 1.5rem;
+  #chat.expand-side-panel {
+    grid-template-columns: 1fr 24rem;
   }
-  #chat #messages_container {
-    padding: 1rem 5rem;
+  #chat .active {
+    background: rgba(var(--text-color), 0.1);
+  }
+
+  .contact.active,
+.mail-card.active {
+    background: rgba(var(--text-color), 0.06);
+  }
+
+  .card {
+    display: inline-flex;
+    width: auto;
+  }
+
+  #settings_panel {
+    overflow-y: auto;
+    max-height: 100vh;
   }
 }
 @media (hover: hover) {
