@@ -225,12 +225,12 @@
                     <path
                         d="M46.73,14.81l7,7,7.65-7.6A7.15,7.15,0,0,0,61.39,4L60.11,2.77a7.23,7.23,0,0,0-10.19,0L3.87,48.57a5,5,0,0,0-1.39,2.6L.53,61.27a1.74,1.74,0,0,0,2,2l10.15-1.94A5.06,5.06,0,0,0,15.34,60L49.6,25.9" />
                 </svg>
-                <!--<svg id="delete_person" onclick="deletePerson()" class="icon" viewBox="0 0 64 64" title="Remove">
+                <svg id="delete_person" onclick="deleteChat()" class="icon" viewBox="0 0 64 64" title="Remove">
                     <title>remove</title>
                     <line x1="4" y1="6.3" x2="60" y2="6.3" />
                     <path d="M53.5,20.5v38.9c0,2.3-1.8,4.1-4.1,4.1h0H14.6c-2.3,0-4.1-1.8-4.1-4.1c0,0,0,0,0,0V20.5" />
                     <path d="M22.7,6.6V3.8c0-1.8,1.5-3.3,3.3-3.3h11.4c1.8,0,3.3,1.5,3.3,3.3v2.8" />
-                </svg>-->
+                </svg>
             </div>
         </div>
         <h5>FLO ID</h5>
@@ -444,10 +444,12 @@
                     <h5 id="warn_no_encryption">Messages are not encrypted until receiver replies</h5>
                     <section id="messages_container" class="flex direction-column">
                     </section>
-                    <svg id="scroll_to_bottom" onclick="scrollToBottom()" class="icon" viewBox="0 0 64 64">
-                        <title></title>
-                        <polyline points="63.65 15.99 32 47.66 0.35 15.99"/>
-                    </svg>
+                    <div id="scroll_to_bottom" onclick="scrollToBottom()">
+                        <svg class="icon" viewBox="0 0 64 64">
+                            <title></title>
+                            <polyline points="63.65 15.99 32 47.66 0.35 15.99"/>
+                        </svg>
+                    </div>
                     <footer id="chat_footer" class="grid">
                         <div id="emoji_picker" class="hide-completely"></div>
                         <div class="flex">
@@ -471,6 +473,17 @@
                         <div id="chat_dp" class="initial flex align-center"></div>
                         <h3 id="chat_name"></h3>
                         <p id="last_interaction_time"></p>
+                    </div>
+                    <div id="chat_flo_id_card" class="card">
+                        <h4 id="chat_type"></h4>
+                        <div class="copy-row grid">
+                            <h4 id="chat_flo_id" class="copy"></h4>
+                            <svg class="icon" onclick="copyToClipboard(this, 'Copied FLO ID')" viewBox="0 0 64 64">
+                                <title>Copy</title>
+                                <rect x="16" y="16" width="48" height="48" rx="6" />
+                                <path d="M.5,47.52V6.5a6,6,0,0,1,6-6h41" />
+                            </svg>
+                        </div>
                     </div>
                     <div id="group_description_card" class="card hide-completely">
                         <h4>Group description</h4>
@@ -1199,7 +1212,6 @@
 		// render elements 
 		const render = {
 			mailCard(floID, ref, subject, timestamp, content, markUnread){
-                console.log(timestamp)
                 let card = getRef('mail_card_template').content.cloneNode(true),
                     cardContainer = card.firstElementChild
                 let mailSummery = content.split(' ')
@@ -1305,8 +1317,11 @@
                         else if(type === 'group'){
                             lastMessage.time = floGlobals.groups[floID].created
                         }
+                        let lastText = document.createElement('p')
+                        lastText.textContent = lastMessage.message
+                        lastText.classList.add('last-message')
+                        cardContainer.append(lastText)
                         cardContainer.innerHTML += `
-                        <p class="last-message">${lastMessage.message}</p>
                         <h5 class="time">${getFormatedTime(lastMessage.time, true)}</h5>
                         <svg class="icon menu" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
                             <circle cx="5.59" cy="32" r="5.59"/>
@@ -1341,24 +1356,24 @@
                 }
 
                 if(message){
-
-                    if(updateChatCard && activeChat.isGroup && sender === myFloID) return
-
                     cardContainer.id = `${floID}_${timestamp}`
                     if(unconfirmed)
                         cardContainer.classList.add('unconfirmed')
                 
                     cardContainer.classList.add(category)
                     
-                    if(sender && sender !== myFloID){
-                        let senderName = document.createElement('div')
-                        senderName.classList.add('sender-name')
-                        senderName.style.color = contactColor(sender)
-                        senderName.textContent = floGlobals.contacts[sender] || sender
-                        cardContainer.prepend(senderName)
-
-                        messageContent = cardContainer.children[1]
-                        messageTime = cardContainer.children[2]
+                    if(sender){
+                        if(sender !== myFloID && lastSender !== sender){
+                            let senderName = document.createElement('div')
+                            senderName.classList.add('sender-name')
+                            senderName.style.color = contactColor(sender)
+                            senderName.textContent = floGlobals.contacts[sender] || sender
+                            cardContainer.prepend(senderName)
+    
+                            messageContent = cardContainer.children[1]
+                            messageTime = cardContainer.children[2]
+                        }
+                        lastSender = sender
                     }
                     
                     if(isValidUrl(message)){
@@ -1385,6 +1400,7 @@
                     messageTime.textContent = finalHours
                     if(currentFloID !== floID){
                         currentDate = null
+                        lastSender = null
                         currentFloID = floID
                         renderedDates.clear()
                     }
@@ -1404,6 +1420,7 @@
                 }
                 else if(admin){
                     if(newMembers.length){
+                        const cards = document.createDocumentFragment()
                         const {admin} = floGlobals.groups[groupID]
                         newMembers.forEach(member => {
                             let eventCard = document.createElement('p')
@@ -1414,14 +1431,21 @@
                             else    
                                 eventMessage = `${floGlobals.contacts[admin] || admin} added ${member}`
                             eventCard.textContent = eventMessage
-                            return eventCard
+                            cards.append(eventCard)
                         })
+                        return cards
+                    }
+                    else if(name){
+                        let eventCard = document.createElement('p')
+                        eventCard.classList.add('group-event-card')
+                        eventCard.textContent = `Changed group name to '${name}'`
+                        return eventCard
                     }
                 }
 
 			},
         }
-        let currentDate, currentFloID, renderedDates = new Map()
+        let currentDate, currentFloID, renderedDates = new Map(), lastSender
 
         const isValidUrl = (url) => {
             try {
@@ -1457,7 +1481,6 @@
         
 
         function renderDirectUI(data) {
-            console.log('called DM')
             renderMessages(data.messages, {updateChatCard: true});
             renderMailList(data.mails)
             //let order = Object.keys(data.messages).map(a => a.split('_')).sort((a, b) => a[0] - b[0]).map(a => a[1])
@@ -1471,15 +1494,15 @@
         }
         
         function renderGroupUI(data){
-            console.log('called grouu')
             renderMessages(data.messages, {updateChatCard: true});
         }
 
         window.addEventListener('focus', e => {
-            if(activeChat.chatCard && activeChat.chatCard.classList.contains('active'))
-                setTimeout(() => {
-                    activeChat.chatCard.classList.remove('unread')
-                }, 2000)
+            if(activeChat.chatCard){
+                if(!chatScrollInfo.isScrolledUp){
+                    scrollToBottom()
+                }
+            }
         })
         window.addEventListener('blur', e => {
             console.log('blured')
@@ -1547,12 +1570,12 @@
             chatScrollInfo['scrollTop'] = this.scrollTop
             chatScrollInfo['scrollheight'] = this.scrollHeight
             if((this.scrollHeight > this.clientHeight) && (this.scrollHeight - this.clientHeight - this.scrollTop >= 100)){
-                chatScrollInfo['scrolledUp'] = true
+                chatScrollInfo['isScrolledUp'] = true
                 getRef('scroll_to_bottom').classList.add('no-transformations')
             }
             else{
-                chatScrollInfo['scrolledUp'] = false
-                getRef('scroll_to_bottom').classList.remove('no-transformations')
+                chatScrollInfo['isScrolledUp'] = false
+                getRef('scroll_to_bottom').classList.remove('no-transformations', 'new-message')
             }
         }, {passive: true})
 
@@ -1648,7 +1671,7 @@
                 getRef('emoji_toggle').classList.remove('active')
                 getRef('emoji_picker').classList.add('hide-completely')
                 getRef('scroll_to_bottom').setAttribute('style', `top: calc(${getRef('messages_container').getBoundingClientRect().height}px - 1.5rem`)
-                if(!chatScrollInfo.scrolledUp)
+                if(!chatScrollInfo.isScrolledUp)
                     scrollToBottom()
             }
         })
@@ -1683,6 +1706,7 @@
                     createRipple(e, contact)
                     contact.classList.remove('unread')
                     if(activeChat['chatCard'] === contact && window.innerWidth > 640) return
+                    showChatDetails(false)
                     document.title = `FLO Messenger`
                     getRef('chat').classList.remove('hide-completely')
                     viewConversation(contact)
@@ -1879,7 +1903,7 @@
                 isEmojiPickerOpen = false
             else
                 isEmojiPickerOpen = true
-            if(!chatScrollInfo.scrolledUp)
+            if(!chatScrollInfo.isScrolledUp)
                 scrollToBottom()
         }
 
@@ -2219,6 +2243,11 @@
         }
 
         function scrollToBottom(){
+            if(activeChat.chatCard){
+                messenger.removeMark(activeChat.receiver, 'unread')
+                activeChat.chatCard.classList.remove('unread')
+            }
+            getRef('scroll_to_bottom').classList.remove('new-message')
             getRef('messages_container').scrollTo(0, getRef('messages_container').scrollHeight)
         }
 
@@ -2253,6 +2282,7 @@
                     let {floID, groupID, sender, message, time, category} = messages[i]
                     //Stops message from rendering in wrong chat window
                     if(activeChat['receiver'] && ( activeChat['receiver'] === floID || activeChat['receiver'] === groupID)){
+                        if(updateChatCard && activeChat.isGroup && message && sender === myFloID) return
                         frag.append(render.messageBubble({...messages[i], updateChatCard}))
                     }
                     const contact = getRef('chat_container').querySelector(`.chat[flo-id='${floID}']`)
@@ -2284,6 +2314,24 @@
                             finalMessage = message
                         chatCard.querySelector('.last-message').textContent = finalMessage
                         chatCard.querySelector('.time').textContent = getFormatedTime(time, true)
+
+                        if(activeChat.receiver === (floID || groupID)){
+                            if(chatScrollInfo.isScrolledUp)
+                                getRef('scroll_to_bottom').classList.add('new-message')
+                            else{
+                                if(document.hasFocus()){
+                                    messenger.removeMark((floID || groupID), 'unread')
+                                    setTimeout(() => {
+                                        document.title = 'FLO Messenger'
+                                        activeChat.chatCard.classList.remove('unread')
+                                    }, 1000);
+                                }
+                            }
+                        }
+                        if(!document.hasFocus() && navigator.onLine) {
+                            getRef('notification_sound').currentTime = 0;
+                            getRef('notification_sound').play();
+                        }
                     }
                 } 
             }
@@ -2291,11 +2339,12 @@
             if(!lazyLoad && !reRender){
                 endIndex = messages.length
                 getRef('messages_container').append(frag)
-                if(!chatScrollInfo['scrolledUp'])
+                if(!chatScrollInfo['isScrolledUp'])
                     scrollToBottom()
             }
             if(reRender || lazyLoad){
                 currentDate = null
+                lastSender = null
                 chatScrollInfo['scrollTop'] = getRef('messages_container').scrollTop
                 chatScrollInfo['scrollHeight'] = getRef('messages_container').scrollHeight
                 getRef('messages_container').prepend(frag)
@@ -2335,7 +2384,9 @@
                 name = contact.getAttribute('name'),
                 textColor = contact.getAttribute('text-color'),
                 backgroundColor = contact.getAttribute('background-color')
+            
             activeChat['receiver'] = floID
+            getRef("chat_flo_id").textContent = floID
             activeChat['isGroup'] = floGlobals.groups[floID] ? true : false
             if(activeChat.isGroup){
                 getRef("receiver_initial").innerHTML = `
@@ -2348,9 +2399,10 @@
                 getRef("chat_name").textContent = floGlobals.groups[floID].name;
                 getRef("last_interaction_time").textContent = `Created ${getFormatedTime(floGlobals.groups[floID].created)}`;
                 
+                getRef("chat_type").textContent = `Group FLO ID`;
+                
                 getRef('group_members_list').innerHTML = ''
                 floGlobals.groups[floID].members.forEach(member => {
-                    console.log(render.contactCard(member, floGlobals.contacts[member] || '', 'contact', {contactOnly: true}))
                     frag.append(render.contactCard(member, floGlobals.contacts[member] || '', 'contact', {contactOnly: true}))
                 })
                 getRef('group_members_list').append(frag)
@@ -2366,6 +2418,8 @@
                 getRef("chat_name").textContent = floGlobals.contacts[floID] || floID || ' ';
                 getRef("last_interaction_time").textContent = ``;
                 
+                getRef("chat_type").textContent = `FLO ID`;
+
                 getRef("group_description_card").classList.add('hide-completely')
                 getRef("group_members_card").classList.add('hide-completely')
             }
@@ -2378,7 +2432,7 @@
             renderMessages(await messenger.getChat(floID),{markUnread: false, reRender: true})
             messenger.removeMark(floID, "unread");
             if(this.scrollHeight <= this.clientHeight){
-                chatScrollInfo['scrolledUp'] = false
+                chatScrollInfo['isScrolledUp'] = false
                 getRef('scroll_to_bottom').classList.remove('no-transformations')
             }
         }
@@ -2633,6 +2687,18 @@
                 getRef('chat').classList.remove('expand-side-panel')
                 getRef('chat_left').classList.remove('hide-on-mobile')    
                 getRef('chat_details_panel').classList.add('hide-completely')    
+            }
+        }
+
+        async function deleteChat(){
+            if(await confirmation('Delete chat?', `Are you sure to delete this chat?`, 'No', "Yes")){
+                messenger.rmChat(clickedContact.floID).then(result => {
+                    clickedContact.card.remove()
+                    clickedContact.card = ''
+                    hidePopup()
+                    getRef('chat').classList.add('hide-completely')
+                    notify('Chat deleted', 'success')
+                })
             }
         }
 

@@ -677,6 +677,12 @@ sm-button[variant=primary] .icon {
   margin: 1rem 0;
   justify-self: center;
   align-self: center;
+  text-align: center;
+}
+
+.group-event-card {
+  font-size: 0.8rem;
+  font-weight: 400;
 }
 
 #warn_no_encryption {
@@ -1122,6 +1128,9 @@ sm-button[variant=primary] .icon {
   font-size: 0.9rem;
   margin-top: 0.5rem;
 }
+#chat_details_panel .copy {
+  font-weight: 500;
+}
 
 #chat .message {
   position: relative;
@@ -1256,18 +1265,32 @@ sm-button[variant=primary] .icon {
 
 #scroll_to_bottom {
   position: absolute;
+  display: flex;
   right: 0;
   bottom: 4rem;
-  width: 2.6rem;
-  height: 2.6rem;
-  padding: 0.9rem;
   border-radius: 4rem;
   z-index: 1;
+  aspect-ratio: 1/1;
   margin: 1.5rem;
-  stroke-width: 8;
   cursor: pointer;
   transform: scale(0);
   transition: transform 0.3s;
+}
+#scroll_to_bottom.new-message::after {
+  position: absolute;
+  content: "";
+  top: 0;
+  right: 0;
+  z-index: 2;
+  padding: 0.5rem;
+  border-radius: 50%;
+  background: #00E676;
+}
+#scroll_to_bottom .icon {
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 0.9rem;
+  stroke-width: 8;
 }
 
 #chat_footer #emoji_toggle {
@@ -1555,7 +1578,7 @@ sm-panel {
   }
 
   #main_navbar {
-    transform: translateX(-100%);
+    transform: translateX(-110%);
     transition: transform 0.3s;
     z-index: 4;
     box-shadow: 0 0 1rem rgba(0, 0, 0, 0.3);
@@ -1597,18 +1620,6 @@ sm-panel {
   }
 }
 @media only screen and (min-width: 640px) {
-  ::-webkit-scrollbar {
-    width: 0.5rem;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgba(var(--text-color), 0.3);
-    border-radius: 1rem;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(var(--text-color), 0.5);
-  }
-
   .hide-on-desktop {
     display: none !important;
   }
@@ -1650,11 +1661,13 @@ sm-panel {
     width: auto;
     padding-bottom: 0.5rem;
     background: rgba(var(--text-color), 0.06);
+    margin: 0.5rem;
+    border-radius: 0.8rem;
   }
   #main_navbar .logo-section {
     display: flex;
     justify-content: center;
-    margin: 1.5rem 0;
+    margin: 1rem 0 2rem 0;
   }
   #main_navbar .logo-section .main-logo {
     margin: 0;
@@ -1697,14 +1710,11 @@ sm-panel {
 
   #chat_page, #mail_page {
     grid-template-columns: 20rem 1fr;
-    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
-    z-index: 1;
   }
 
   #settings_page {
     display: grid;
     height: 100vh;
-    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
     grid-template-columns: 14rem 1fr;
   }
   #settings_page sm-button {
@@ -1751,6 +1761,9 @@ sm-panel {
   #chat .active {
     background: rgba(var(--text-color), 0.1);
   }
+  #chat #messages_container {
+    padding: 1rem 5rem;
+  }
 
   .contact.active,
 .mail-card.active {
@@ -1768,6 +1781,18 @@ sm-panel {
   }
 }
 @media (hover: hover) {
+  ::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(var(--text-color), 0.3);
+    border-radius: 1rem;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--text-color), 0.5);
+  }
+
   .contact:hover, .mail-card:hover, .navbar-item:hover {
     background: rgba(var(--text-color), 0.06);
     cursor: pointer;
