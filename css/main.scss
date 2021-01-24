@@ -620,7 +620,7 @@ sm-button[variant="primary"]{
         }
     }
 }
-#warn_no_encryption, .date-card, .group-event-card{
+#warn_no_encryption, .date-card{
     padding: 0.4rem 0.8rem;
     background: rgba(var(--text-color), 0.1);
     font-weight: 500;
@@ -629,11 +629,6 @@ sm-button[variant="primary"]{
     margin: 1rem 0;
     justify-self: center;
     align-self: center;
-    text-align: center;
-}
-.group-event-card{
-    font-size: 0.8rem;
-    font-weight: 400;
 }
 #warn_no_encryption{
     background: rgb(255, 253, 141);
@@ -905,10 +900,8 @@ sm-button[variant="primary"]{
 }
 #selected_contacts_container{
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
     gap: 1rem;
-    max-height: 8rem;
-    overflow-y: auto;
 }
 #contacts, #mails{
     position: relative;
@@ -952,7 +945,7 @@ sm-button[variant="primary"]{
             }
         }
         sm-input::part(input){
-            border-radius: 0.5rem;
+            border-radius: 3rem;
             padding: 0.2rem 0.8rem;
         }
         h4{
@@ -997,95 +990,114 @@ sm-button[variant="primary"]{
 #chat_page{
     overflow-y: hidden;
 }
-#chat_left,
-#chat_details_panel{
-    position: relative;
-    display: flex;
-    flex-direction: column;
+#chat{
     height: 100%;
-    overflow-y: auto;
-}
-#chat_details_panel{
-    background: rgba(var(--text-color), 0.04);
-    padding-bottom: 1.5rem;
-    .card{
-        margin: 0 1rem;
-        padding: 1.5rem 1rem;
-        border-radius: 0.8rem;
-        background: rgba(var(--text-color), 0.06);
-        &:not(:last-of-type){
-            margin-bottom: 1rem;
-        }
-        & > h4{
-            font-weight: 400;
-            font-size: 0.9rem;
-            color: rgba(var(--text-color), 0.8);
-            margin-bottom: 0.5rem;
-        }
-    }
     header{
         padding: 1rem;
         min-height: 4rem;
-        .icon{
-            height: 2.3rem;
-            width: 2.3rem;
-            padding: 0.7rem;
+        grid-template-columns: auto 1fr auto;
+        .back-button{
+            padding: 0.1rem;
+            stroke-width: 8;
+            margin-right: 0.5rem;
+            stroke: rgba(var(--text-color), 0.8);
+        }
+        .initial{
             cursor: pointer;
+            margin-right: 1rem;
+            height: 2.2rem;
+            width: 2.2rem;
+            flex-shrink: 0;
+        }
+        h4{
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        #receiver_name{
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
-    .contact{
-        padding: 0.5rem 0;
+    #scroll_to_bottom{
+        position: fixed;
+        right: 0;
+        bottom: 4rem;
+        width: 2.6rem;
+        height: 2.6rem;
+        padding: 0.9rem;
+        border-radius: 4rem;
+        z-index: 1;
+        margin: 1.5rem;
+        stroke-width: 8;
+        cursor: pointer;
+        transform: scale(0);
+        transition: transform 0.3s;
     }
-    #chat_profile{
-        display: grid;
-        place-items: center;
-        margin-top: 1.5rem;
-        padding-bottom: 1.5rem;
-        .initial{
-            margin-top: -5.5rem;
-            margin-bottom: 1rem;
-            height: 8rem;
-            width: 8rem;
-            border-radius: 50%;
-            font-size: 4rem;
-            .icon{
-                height: 4rem;
-                width: 4rem;
+    footer{
+        #emoji_toggle{
+            align-self: center;
+            padding: 0.6rem;
+            width: 2.6rem;
+            height: 2.6rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            path{
+                fill: rgba(var(--text-color), 0.5);
+            }
+            &.active path{
+                fill: var(--accent-color);
             }
         }
-        #chat_name{
-            font-weight: 500;
-            font-size: 1.2rem;
+        .flex{
+            align-items: flex-end;
+            padding: 1rem 1rem 1rem 0.4rem;
         }
-        #last_interaction_time{
-            color: rgba(var(--text-color), 0.7);
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
+        sm-textarea::part(textarea){
+            background: rgba(var(--text-color), 0.1);
+            padding-right: 3rem;
+            border-radius: 2rem;
         }
     }
-    .copy{
-        font-weight: 500;
+    #send_message_button{
+        position: absolute;
+        right: 1.5rem;
+        transform: scale(0);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 1;
+        align-self: center;
+        height: 2.4rem;
+        width: 2.4rem;
+        padding: 0.5rem;
+        cursor: pointer;
+        stroke: none;
+        fill: rgba(var(--text-color), 0.4);
+        margin-left: 1rem;
+        transition: 0.3s;
+        &.active{
+            opacity: 1;
+            fill: var(--accent-color);
+            transform: none;
+            pointer-events: all;
+        }
     }
-}
-#chat{
+    #type_message{
+        margin: 0;
+    }
     .message{
         position: relative;
-        display: flex;
-        flex-direction: column;
-        width: auto;
+        display: grid;
+        align-items: center;
+        gap: 0.2rem;
+        width: 100%;
         font-size: 0.92rem;
         max-width: max-content;
         margin-bottom: 0.2rem;
         margin-top: 0.8rem;
         padding: 0.6em 1em;
-        transition: opacity 0.3s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        .sender-name{
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin-bottom: 0.3rem;
-        }
         .message-body{
-            display: flex;
+            display: inline-flex;
             align-items: center;
             flex-wrap: wrap;
             overflow-wrap: break-word;
@@ -1096,7 +1108,7 @@ sm-button[variant="primary"]{
             -webkit-hyphens: auto;
             hyphens: auto;
             white-space: pre-wrap;
-            line-height: 1.5;
+            line-height: 1.6;
             a{
                 color: inherit;
             }
@@ -1110,17 +1122,13 @@ sm-button[variant="primary"]{
             white-space: nowrap;
             font-size: 0.8em;
             opacity: 0.8;   
-            justify-self: flex-end;
-            padding-left: 1rem;
-            align-self: flex-end;
-            margin-top: 0.2rem;
         }
     }
     .sent{
         margin-left: auto;
-        color: #efefef;
         background: var(--accent-color);
-        border-radius: 0.8rem 0 0.8rem 0.8rem;
+        color: #f0f0f0;
+        border-radius: 1em 0 1em 1em;
         &::after{
             content: '';
             position: absolute;
@@ -1132,10 +1140,13 @@ sm-button[variant="primary"]{
             border-width: 0.5em 0.3em 0 0;
             border-color: var(--accent-color) transparent transparent transparent;
         }
+        .time{
+            margin-left: auto;
+        }
     }
     .received{
         background: rgba(var(--text-color), 0.1);
-        border-radius: 0 0.8rem 0.8rem 0.8rem;
+        border-radius: 0 1em 1em 1em;
         &::after{
             content: '';
             position: absolute;
@@ -1158,124 +1169,21 @@ sm-button[variant="primary"]{
     }
     .sent + .sent,
     .received + .received{
-        border-radius: 0.8rem;
+        border-radius: 1em;
     }
     .unconfirmed{
         opacity: 0.7;
-        transform-origin: left;
-        animation: pop .3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transform-origin: right;
+        animation: slide-up 0.3s forwards;
     }
 }
-@keyframes pop{
-    0%{
-        transform: rotate(5deg) translate(-0.5rem, 1rem)
+@keyframes slide-up{
+    from{
+        transform: translateY(-2rem);
     }
-    100%{
-        transform: rotate(0) translate(0, 0)
-    }
-}
-#chat_header{
-    padding: 1rem;
-    min-height: 4rem;
-    grid-template-columns: auto 1fr auto;
-    .back-button{
-        padding: 0.1rem;
-        stroke-width: 8;
-        margin-right: 0.5rem;
-        stroke: rgba(var(--text-color), 0.8);
-    }
-    .initial{
-        cursor: pointer;
-        margin-right: 1rem;
-        height: 2.2rem;
-        width: 2.2rem;
-        flex-shrink: 0;
-    }
-    #receiver_name{
-        font-weight: 500;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-}
-#scroll_to_bottom{
-    position: absolute;
-    display: flex;
-    right: 0;
-    bottom: 4rem;
-    border-radius: 4rem;
-    z-index: 1;
-    aspect-ratio: 1/1;
-    margin: 1.5rem;
-    cursor: pointer;
-    transform: scale(0);
-    transition: transform 0.3s;
-    &.new-message::after{
-        position: absolute;
-        content: '';
-        top: 0;
-        right: 0;
-        z-index: 2;
-        padding: 0.5rem;
-        border-radius: 50%;
-        background: #00E676;
-    }
-    .icon{
-        width: 2.6rem;
-        height: 2.6rem;
-        padding: 0.9rem;
-        stroke-width: 8;
-    }
-}
-#chat_footer{
-    #emoji_toggle{
-        align-self: center;
-        padding: 0.6rem;
-        width: 2.6rem;
-        height: 2.6rem;
-        border-radius: 2rem;
-        cursor: pointer;
-        path{
-            fill: rgba(var(--text-color), 0.5);
-        }
-        &.active path{
-            fill: var(--accent-color);
-        }
-    }
-    .flex{
-        align-items: flex-end;
-        padding: 1rem 1rem 1rem 0.4rem;
-    }
-    sm-textarea::part(textarea){
-        padding-right: 3rem;
-        border-radius: 0.5rem;
-    }
-}
-#send_message_button{
-    position: absolute;
-    right: 1.5rem;
-    transform: scale(0);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 1;
-    align-self: center;
-    height: 2.4rem;
-    width: 2.4rem;
-    padding: 0.5rem;
-    cursor: pointer;
-    stroke: none;
-    fill: rgba(var(--text-color), 0.4);
-    margin-left: 1rem;
-    transition: 0.3s;
-    &.active{
-        opacity: 1;
-        fill: var(--accent-color);
+    to{
         transform: none;
-        pointer-events: all;
     }
-}
-#type_message{
-    margin: 0;
 }
 .big-emoji{
     .message-body{
@@ -1497,7 +1405,7 @@ sm-panel{
         grid-area: illustration;
     }
     #main_navbar{
-        transform: translateX(-110%);
+        transform: translateX(-100%);
         transition: transform 0.3s;
         z-index: 4;
         box-shadow: 0 0 1rem rgba(0, 0, 0, 0.3);
@@ -1537,6 +1445,17 @@ sm-panel{
     }
 }
 @media only screen and (min-width: 640px){
+    ::-webkit-scrollbar{
+        width: 0.5rem;
+    }
+    
+    ::-webkit-scrollbar-thumb{
+        background: rgba(var(--text-color), 0.3);
+        border-radius: 1rem;
+        &:hover{
+            background: rgba(var(--text-color), 0.5);
+        }
+    }
     .hide-on-desktop{
         display: none !important;
     }
@@ -1575,12 +1494,10 @@ sm-panel{
         width: auto;
         padding-bottom: 0.5rem;
         background: rgba(var(--text-color), 0.06);
-        margin: 0.5rem;
-        border-radius: 0.8rem;
         .logo-section{
             display: flex;
             justify-content: center;
-            margin: 1rem 0 2rem 0;
+            margin: 1.5rem 0;
             .main-logo{
                 margin: 0;
             }
@@ -1613,17 +1530,20 @@ sm-panel{
     }
     #chat{
         .message{
-            width: auto;
-            align-self: flex-start;
-            max-width: 55ch;
+            .message-body{
+                max-width: 65ch ;
+            }
         }
     }
     #chat_page, #mail_page{
         grid-template-columns: 20rem 1fr;
+        box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+        z-index: 1;
     }
     #settings_page{
         display: grid;
         height: 100vh;
+        box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
         grid-template-columns: 14rem 1fr;
         sm-button{
             width: max-content;
@@ -1660,41 +1580,15 @@ sm-panel{
         grid-template-columns: 21rem 1fr;
     }
     #chat{
-        &.expand-side-panel{
-            grid-template-columns: 1fr 24rem;
-        }
-        .active{
-            background: rgba(var(--text-color), 0.1);
+        header{
+            padding: 0.8rem 1.5rem;
         }
         #messages_container{
             padding: 1rem 5rem;
         }
     }
-    .contact.active,
-    .mail-card.active{
-        background: rgba(var(--text-color), 0.06);
-    }
-    .card{
-        display: inline-flex;
-        width: auto;
-    }
-    #settings_panel{
-        overflow-y: auto;
-        max-height: 100vh;
-    }
 }
 @media (hover: hover){
-    ::-webkit-scrollbar{
-        width: 0.5rem;
-    }
-    
-    ::-webkit-scrollbar-thumb{
-        background: rgba(var(--text-color), 0.3);
-        border-radius: 1rem;
-        &:hover{
-            background: rgba(var(--text-color), 0.5);
-        }
-    }
     .contact:hover, .mail-card:hover, .navbar-item:hover{
         background: rgba(var(--text-color), 0.06);
         cursor: pointer;
