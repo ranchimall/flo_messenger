@@ -1577,32 +1577,6 @@
         })
 
         let mygroup = [];
-        
-        function selectContact(contact){
-                
-                    if(mygroup.includes(clickedContact.floID)){
-                       alert("user is already selected");
-                    }
-                    else{
-                        mygroup.push(clickedContact.floID);
-                    }
-                    getRef("selected_contacts_container").innerHTML=mygroup;
-        }
-
-
-        function removeContact(floID){
-
-            mygroup=mygroup.filter(  item => item !== floID )
-            console.log(mygroup);
-
-        }
-
-        function clearAllMember(){
-            mygroup=[];
-            console.log("Empty "+ mygroup);
-
-        }
-
 
         let clickedContact = {}
         getRef('contacts').addEventListener('click', e => {
@@ -1617,7 +1591,7 @@
                 }
                 else if(isCreatingGroup){
                     selectContact(contact); 
-            console.log(mygroup)
+            // console.log(mygroup)
             
                 }
                 else{
@@ -1640,6 +1614,194 @@
                 }
             }
         })
+        function selectContact(contact){
+                
+                if(!mygroup.includes(clickedContact.floID)){
+                   
+                        let selectedContact = clickedContact['card'].querySelector('.initial').cloneNode(true);
+                        let selectedContactsContainer = getRef('selected_contacts_container');
+
+                        selectedContact.setAttribute('floID' , clickedContact['floID'] );
+                        selectedContact.onclick = removeContactCard;
+
+
+                        // creating close icon
+                        let closeIcon = createClose();
+                        
+                        
+                        // creating tick icon
+                        let tickIcon = createTick();
+                        
+
+                        // adding animation to contactCard
+                        let animatingCard = addAnimate();
+
+                        mygroup.push(clickedContact['floID']);
+                        selectedContactsContainer.appendChild(selectedContact);
+                        selectedContact.appendChild(closeIcon);
+                        selectedContact.animate(animatingCard[0], animatingCard[1]);
+
+                        selectedContactsContainer.style.display = "flex";
+                        selectedContactsContainer.style.flexWrap = "wrap";
+                        selectedContactsContainer.style.maxHeight = "70px";
+                        selectedContactsContainer.style.overflow = "auto";
+                        selectedContact.style.margin = "8px";
+                        selectedContact.style.cursor = "pointer";
+                        clickedContact['card'].querySelector('.initial').appendChild(tickIcon);
+                        tickIcon.animate(animatingCard[0], animatingCard[1]);
+
+                        
+                }      
+                      
+
+                
+                else{
+                        let selectedContactsContainer = getRef('selected_contacts_container');
+                        let removeIndex = mygroup.indexOf(clickedContact['floID']);
+                        let removeContact = selectedContactsContainer.querySelector('div:nth-of-type('+ (removeIndex + 1)+ ')');
+                        let tickIcon = clickedContact['card'].querySelector('.initial').querySelector('img');
+                        let animatingCardRemove = removeAnimate();
+
+
+                        if(removeIndex > -1){
+                            mygroup.splice(removeIndex,1);
+                        }
+
+                        removeContact.animate(animatingCardRemove[0],animatingCardRemove[1]);
+                        tickIcon.animate(animatingCardRemove[0], animatingCardRemove[1]);
+                        
+                        setTimeout( function(){
+                          
+                            removeContact.remove();
+                            tickIcon.remove();
+
+                        },300)
+                }
+
+    }
+
+
+    function clearAllMember(){
+        mygroup=[];
+        let selectedContactsContainer = getRef('selected_contacts_container');
+        let contacts = getRef('contacts').getElementsByClassName('initial');
+
+        selectedContactsContainer.innerHTML = "";
+       
+        for(let i =0 ; i< contacts.length ; i++){
+            if(contacts[i].querySelector('img'))
+              contacts[i].querySelector('img').remove();
+        }
+        
+
+    }
+
+
+
+    function createClose(){
+
+        let closeIcon = document.createElement('img');
+        closeIcon.src = "assets/close.svg";
+        closeIcon.style.width = "20px";
+        closeIcon.style.background = "#fff";
+        closeIcon.style.borderRadius = "50%";
+        closeIcon.style.position = "absolute";
+        closeIcon.style.marginTop = "32px";
+        closeIcon.style.marginLeft = "32px";
+
+         return closeIcon;
+          
+        }
+
+    function createTick(){
+
+        let tickIcon = document.createElement('img');
+        tickIcon.src = "assets/tick.svg";
+        tickIcon.style.width = "20px";
+        tickIcon.style.background = "#fff";
+        tickIcon.style.borderRadius = "50%";
+        tickIcon.style.position = "absolute";
+        tickIcon.style.marginTop = "32px";
+        tickIcon.style.marginLeft = "32px";
+
+        return tickIcon;
+
+           }
+
+    function removeContactCard(){
+        let contactFloID = this.getAttribute("floID");
+        let removeIndex = mygroup.indexOf(contactFloID);
+        let tickIcon = getRef('contacts').querySelector('[flo-id=' + contactFloID +']').querySelector('.initial').querySelector('img');
+        let animatingCardRemove = removeAnimate();
+        let removeCard = this;
+
+        if(removeIndex > -1){
+             mygroup.splice(removeIndex,1);
+
+            }
+
+        removeCard.animate(animatingCardRemove[0],animatingCardRemove[1]);
+        tickIcon.animate(animatingCardRemove[0], animatingCardRemove[1]);
+         
+
+         setTimeout(function(){
+              
+            removeCard.remove();
+            tickIcon.remove();
+
+        },300)
+
+    }
+
+    function addAnimate(){
+        const animation = [
+                {
+                   transform : "scale(0)",
+                   opacity: 0.2
+                },
+              
+                {
+                    transform : "none",
+                    opacity:1
+
+                }
+                         ]
+
+        const options = {
+                duration : 300,
+                iterations : 1,
+                easing : "linear"
+              
+                        };
+
+        return [animation,options];
+
+    }
+
+
+    function removeAnimate(){
+        const animation = [
+                {
+                    transform : "none",
+                     opacity:1
+                },
+
+                {    
+                    transform : "scale(0)",
+                    opacity: 0.2
+                }
+                        ]
+
+        const options = {
+                   duration : 300,
+                   iterations : 1,
+                   easing : "linear"
+   
+                        };
+
+        return [animation,options];
+
+    }
 
         const emojis = [
             "<", "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗","😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", 
