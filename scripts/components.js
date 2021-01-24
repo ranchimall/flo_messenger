@@ -2070,6 +2070,7 @@ customElements.define('sm-popup', class extends HTMLElement {
         cancelAnimationFrame(this.touchEndAnimataion)
         this.touchEndY = e.changedTouches[0].clientY
         this.popup.style.transition = 'transform 0.3s'
+        this.threshold = this.popup.getBoundingClientRect().height * 0.3
         if (this.touchEndTime - this.touchStartTime > 200) {
             if (this.touchEndY - this.touchStartY > this.threshold) {
                 if (this.pinned) {
@@ -2108,7 +2109,7 @@ customElements.define('sm-popup', class extends HTMLElement {
         this.touchStartTime = 0
         this.touchEndTime = 0
         this.touchEndAnimataion;
-        this.threshold
+        this.threshold = this.popup.getBoundingClientRect().height * 0.3
 
         if (this.hasAttribute('open'))
             this.show()
