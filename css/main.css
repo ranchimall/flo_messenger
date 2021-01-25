@@ -597,6 +597,9 @@ sm-button[variant=primary] .icon {
   grid-template-columns: auto 1fr auto;
   grid-template-areas: "dp . time" "dp . menu";
 }
+.contact.admin {
+  grid-template-columns: auto 1fr auto;
+}
 .contact .initial {
   grid-area: dp;
 }
@@ -626,6 +629,12 @@ sm-button[variant=primary] .icon {
   font-weight: 500;
   color: rgba(var(--text-color), 0.7);
   grid-area: time;
+}
+.contact .admin-tag {
+  padding: 0.1rem 0.6rem;
+  font-size: 0.8rem;
+  border: #00c465 1px solid;
+  border-radius: 0.3rem;
 }
 
 #contact_details_popup > .flex:first-of-type {
@@ -984,7 +993,7 @@ sm-button[variant=primary] .icon {
 }
 
 #contacts, #mails, #settings_page {
-  height: 100vh;
+  height: 100%;
   overflow-y: hidden;
 }
 #contacts .header, #mails .header, #settings_page .header {
@@ -1061,7 +1070,7 @@ sm-button[variant=primary] .icon {
 }
 
 #chat_page {
-  overflow-y: hidden;
+  overflow: hidden;
 }
 
 #chat_left,
@@ -1620,7 +1629,7 @@ sm-panel {
   }
 
   #chat .message {
-    width: fit-content;
+    width: auto;
     max-width: 90%;
   }
 
@@ -1677,13 +1686,11 @@ sm-panel {
     width: auto;
     padding-bottom: 0.5rem;
     background: rgba(var(--text-color), 0.06);
-    margin: 0.5rem;
-    border-radius: 0.8rem;
   }
   #main_navbar .logo-section {
     display: flex;
     justify-content: center;
-    margin: 1rem 0 2rem 0;
+    margin: 1.5rem 0 2rem 0;
   }
   #main_navbar .logo-section .main-logo {
     margin: 0;
@@ -1791,9 +1798,6 @@ sm-panel {
   #chat.expand-side-panel #messages_container {
     padding: 1rem;
   }
-  #chat .active {
-    background: rgba(var(--text-color), 0.1);
-  }
 
   .contact.active,
 .mail-card.active {
@@ -1823,17 +1827,17 @@ sm-panel {
     background: rgba(var(--text-color), 0.5);
   }
 
-  .contact {
+  .navbar-item:hover,
+.contact:hover {
     cursor: pointer;
+    background: rgba(var(--text-color), 0.06);
   }
+
   .contact .menu {
     opacity: 0;
     transition: opacity 0.3s;
   }
 
-  .contact:hover {
-    background: rgba(var(--text-color), 0.06);
-  }
   .contact:hover .menu {
     opacity: 1;
   }

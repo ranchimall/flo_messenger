@@ -546,6 +546,9 @@ sm-button[variant="primary"]{
         grid-template-areas: 'dp . time'
                             'dp . menu';
     }
+    &.admin{
+        grid-template-columns: auto 1fr auto;
+    }
     .initial{
         grid-area: dp;
     }
@@ -575,6 +578,12 @@ sm-button[variant="primary"]{
         font-weight: 500;
         color: rgba(var(--text-color), 0.7);
         grid-area: time;
+    }
+    .admin-tag{
+        padding: 0.1rem 0.6rem;
+        font-size: 0.8rem;
+        border: #00c465 1px solid;
+        border-radius: 0.3rem;
     }
 }
 #contact_details_popup{
@@ -919,7 +928,7 @@ sm-button[variant="primary"]{
     grid-template-rows: max-content 1fr;
 }
 #contacts, #mails, #settings_page{
-    height: 100vh;
+    height: 100%;
     overflow-y: hidden;
     .header{
         //background: rgba(var(--text-color), 0.06);
@@ -999,7 +1008,7 @@ sm-button[variant="primary"]{
     }
 }
 #chat_page{
-    overflow-y: hidden;
+    overflow: hidden;
 }
 #chat_left,
 #chat_details_panel{
@@ -1534,7 +1543,7 @@ sm-panel{
     }
     #chat{
         .message{
-            width: fit-content;
+            width: auto;
             max-width: 90%;
         }
     }
@@ -1588,12 +1597,10 @@ sm-panel{
         width: auto;
         padding-bottom: 0.5rem;
         background: rgba(var(--text-color), 0.06);
-        margin: 0.5rem;
-        border-radius: 0.8rem;
         .logo-section{
             display: flex;
             justify-content: center;
-            margin: 1rem 0 2rem 0;
+            margin: 1.5rem 0 2rem 0;
             .main-logo{
                 margin: 0;
             }
@@ -1694,9 +1701,6 @@ sm-panel{
                 padding: 1rem;
             }
         }
-        .active{
-            background: rgba(var(--text-color), 0.1);
-        }
     }
     .contact.active,
     .mail-card.active{
@@ -1723,15 +1727,18 @@ sm-panel{
             background: rgba(var(--text-color), 0.5);
         }
     }
-    .contact{
+    .navbar-item:hover,
+    .contact:hover{
         cursor: pointer;
+        background: rgba(var(--text-color), 0.06);
+    }
+    .contact{
         .menu{
             opacity: 0;
             transition: opacity 0.3s;
         }
     }
     .contact:hover{
-        background: rgba(var(--text-color), 0.06);
         .menu{
             opacity: 1;
         }

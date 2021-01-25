@@ -249,7 +249,7 @@
 	<!-- Templates -->
 
 	<template id="mail_card_template">
-		<div class="mail-card">
+		<div class="mail-card interact">
 			<div class="flex align-center">
 				<h5 class="sender"></h5>
 				<h5 class="date"></h5>
@@ -436,7 +436,7 @@
                             <line x1="1" y1="32" x2="64" y2="32"/>
                             <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
                         </svg>
-                        <div class="flex align-center interact" onclick="showChatDetails(true)">
+                        <div class="flex align-center interact" onclick="showChatDetails({show: true})">
                             <div id="receiver_initial" class="initial flex align-center"></div>
                             <h4 id="receiver_name"></h4>
                         </div>
@@ -466,7 +466,7 @@
                 </div>
                 <div id="chat_details_panel" class="hide-completely">
                     <header class="flex align-center">
-                        <svg class="icon" onclick="showChatDetails(false)" viewBox="0 0 64 64">
+                        <svg class="icon" onclick="showChatDetails({show: false})" viewBox="0 0 64 64">
                             <title>close</title>
                             <line x1="64" y1="0" x2="0" y2="64" />
                             <line x1="64" y1="64" x2="0" y2="0" />
@@ -493,8 +493,14 @@
                         <p id="group_description"></p>
                     </div>
                     <div id="group_members_card" class="card hide-completely">
-                        <h4>Group members</h4>
+                        <div class="flex align-center">
+                            <h4>Group members</h4>
+                            <sm-button class="admin-option justify-right round">Add member</sm-button>
+                        </div>
                         <div id="group_members_list"></div>
+                    </div>
+                    <div class="card">
+                        <sm-button>Clear chat</sm-button>
                     </div>
                 </div>
 			</div>
@@ -1288,7 +1294,7 @@
                 return card
             },
             contactCard(floID, options = {}){
-                let {name, type, prepend = false, markUnread = false, contactOnly = false} = options
+                let {name, type, prepend = false, markUnread = false, contactOnly = false, isAdmin = false} = options
                 let card = getRef('contact_template').content.cloneNode(true),
                     cardContainer = card.firstElementChild
                 if(!name)
@@ -1313,6 +1319,13 @@
                 initial.setAttribute(`style`, `background-color: ${color};`)     
                 
                 if(contactOnly){
+                    if(isAdmin){
+                        let adminTag = document.createElement('p')
+                        adminTag.textContent = 'Admin'
+                        cardContainer.classList.add('admin')
+                        adminTag.classList.add('admin-tag')
+                        cardContainer.append(adminTag)
+                    }
                     return card;
                 } 
                 else if(type === 'contact'){
@@ -1735,7 +1748,7 @@
                         contact = getRef('chat_container').querySelector(`[flo-id="${clickedContact['floID']}"]`)
                     contact.classList.remove('unread')
                     if(activeChat['chatCard'] === contact && window.innerWidth > 640) return
-                    showChatDetails(false)
+                    showChatDetails({show: false, animate: false})
                     document.title = `FLO Messenger`
                     getRef('chat').classList.remove('hide-completely')
                     viewConversation(contact)
@@ -2431,7 +2444,8 @@
                 
                 getRef('group_members_list').innerHTML = ''
                 floGlobals.groups[floID].members.forEach(member => {
-                    frag.append(render.contactCard(member, {type: 'contact', contactOnly: true}))
+                    let isAdmin = floGlobals.groups[floID].admin === member ? true : false
+                    frag.append(render.contactCard(member, {type: 'contact', contactOnly: true, isAdmin}))
                 })
                 getRef('group_members_list').append(frag)
 
@@ -2705,16 +2719,36 @@
                 getRef(target).children[1].focusIn()
         }
 
-        function showChatDetails(show){
+        let isChatDetailsOpen = false
+        function showChatDetails({show, animate= true}){
             if(show){
+                isChatDetailsOpen = true
                 getRef('chat').classList.add('expand-side-panel')
                 getRef('chat_left').classList.add('hide-on-medium')    
                 getRef('chat_details_panel').classList.remove('hide-completely')
+                animateTo(getRef('chat_details_panel'), [
+                    {transform: 'translateX(3rem)'},
+                    {transform: 'translateX(0)'},
+                ],
+                {
+                    duration: animate ? 300 : 0,
+                    easing: 'ease'
+                })
             }
-            else{
-                getRef('chat').classList.remove('expand-side-panel')
-                getRef('chat_left').classList.remove('hide-on-medium')    
-                getRef('chat_details_panel').classList.add('hide-completely')    
+            else if(isChatDetailsOpen){
+                isChatDetailsOpen = false
+                animateTo(getRef('chat_details_panel'), [
+                    {transform: 'translateX(0)'},
+                    {transform: 'translateX(3rem)'},
+                ],
+                {
+                    duration: animate ? 300 : 0,
+                    easing: 'ease'
+                }).onfinish = () => {
+                    getRef('chat').classList.remove('expand-side-panel')
+                    getRef('chat_left').classList.remove('hide-on-medium')    
+                    getRef('chat_details_panel').classList.add('hide-completely')    
+                }
             }
         }
 
