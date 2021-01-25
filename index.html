@@ -219,12 +219,8 @@
         </header>
         <div class="flex direction-column align-center">
             <div id="contact_initial" class="initial flex align-center"></div>
-            <h4 id="contact_name" ondblclick="setNameEditable()"></h4>
+            <text-field id="contact_name"></text-field>
             <div class="flex space-between align-center">
-                <svg tooltip="Edit" id="edit_contact_name" class="icon" onclick="setNameEditable()" viewBox="0 0 64 64">
-                    <path
-                        d="M46.73,14.81l7,7,7.65-7.6A7.15,7.15,0,0,0,61.39,4L60.11,2.77a7.23,7.23,0,0,0-10.19,0L3.87,48.57a5,5,0,0,0-1.39,2.6L.53,61.27a1.74,1.74,0,0,0,2,2l10.15-1.94A5.06,5.06,0,0,0,15.34,60L49.6,25.9" />
-                </svg>
                 <svg id="delete_person" onclick="deleteChat()" class="icon" viewBox="0 0 64 64" title="Remove">
                     <title>remove</title>
                     <line x1="4" y1="6.3" x2="60" y2="6.3" />
@@ -456,7 +452,7 @@
                     <footer id="chat_footer" class="grid">
                         <div id="emoji_picker" class="hide-completely"></div>
                         <div class="flex">
-                            <svg id="emoji_toggle" onclick="toggleEmoji()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M32,0A32,32,0,1,0,64,32,32,32,0,0,0,32,0ZM43.84,17.51a4.92,4.92,0,1,1-4.92,4.92A4.92,4.92,0,0,1,43.84,17.51Zm-23.62-.06a5,5,0,1,1-5,5A5,5,0,0,1,20.22,17.45ZM32,54.42A19.68,19.68,0,0,1,12.31,34.73H51.69A19.68,19.68,0,0,1,32,54.42Z"/></svg>
+                            <svg id="emoji_toggle" onclick="toggleEmoji('toggle')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M32,0A32,32,0,1,0,64,32,32,32,0,0,0,32,0ZM43.84,17.51a4.92,4.92,0,1,1-4.92,4.92A4.92,4.92,0,0,1,43.84,17.51Zm-23.62-.06a5,5,0,1,1-5,5A5,5,0,0,1,20.22,17.45ZM32,54.42A19.68,19.68,0,0,1,12.31,34.73H51.69A19.68,19.68,0,0,1,32,54.42Z"/></svg>
                             <sm-textarea id="type_message" placeholder="Type a message" class="rest"></sm-textarea>
                             <svg xmlns="http://www.w3.org/2000/svg" id="send_message_button" class="icon" viewBox="0 0 64 64">
                                 <path d="M63.34,31,3.07,4.71A2.19,2.19,0,0,0,.18,7.58L8.94,28.29,42.18,32,8.94,35.71.18,56.42a2.19,2.19,0,0,0,2.89,2.87L63.34,33A1.09,1.09,0,0,0,63.34,31Z"/>
@@ -490,17 +486,16 @@
                     </div>
                     <div id="group_description_card" class="card hide-completely">
                         <h4>Group description</h4>
-                        <p id="group_description"></p>
+                        <text-field id="group_description"></text-field>
                     </div>
                     <div id="group_members_card" class="card hide-completely">
-                        <div class="flex align-center">
-                            <h4>Group members</h4>
-                            <sm-button class="admin-option justify-right round">Add member</sm-button>
-                        </div>
+                        <h4>Group members</h4>
                         <div id="group_members_list"></div>
+                        <sm-button class="admin-option">Add member</sm-button>
                     </div>
                     <div class="card">
                         <sm-button>Clear chat</sm-button>
+                        <sm-button>Delete chat</sm-button>
                     </div>
                 </div>
 			</div>
@@ -770,14 +765,21 @@
 
             switch (e.detail.popup.id) {
                 case 'contact_details_popup':
-                    if(floGlobals.groups[clickedContact.floID])
+                    if(clickedContact.isGroup){
                         getRef("contact_initial").innerHTML = `
                             <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
                             `
-                    else
-                       getRef('contact_initial').textContent = clickedContact['name'].charAt(0)
+                        if(floGlobals.groups[clickedContact['floID']].admin === myFloID)
+                            getRef('contact_name').disabled = false
+                        else
+                            getRef('contact_name').disabled = true
+                    }
+                    else{
+                        getRef('contact_name').disabled = false
+                        getRef('contact_initial').textContent = clickedContact['name'].charAt(0)
+                    }
                     getRef('contact_initial').setAttribute('style', `background: ${clickedContact['card'].getAttribute('background-color')}`)
-                    getRef('contact_name').textContent = clickedContact['name']
+                    getRef('contact_name').value = clickedContact['name']
                     getRef('contact_flo_id').textContent = clickedContact['floID']
                 break;
             }
@@ -788,7 +790,8 @@
             let thisPopup = e.detail.popup
             switch (e.detail.popup.id) {
                 case 'contact_details_popup':
-                    clickedContact['name'] = getRef('contact_name').textContent
+                    clickedContact['name'] = getRef('contact_name').value.trim()
+                    getRef('contact_name').revert()
                 break;
             }
         })
@@ -1369,7 +1372,7 @@
                     .catch(error => console.error(error))
                     if(prepend){
                         getRef('chat_container').prepend(card);
-                        activeChat['receiver'] = floID
+                        activeChat['floID'] = floID
                         if(activeChat['chatCard'])
                             activeChat['chatCard'].classList.remove('active')
                         getRef('chat_container').children[0].classList.add('active')
@@ -1381,7 +1384,7 @@
                 }
             },
             messageBubble(msg){
-                let {admin = false, newMembers = [], groupID, name, sender, floID, message, time: timestamp, category, unconfirmed = false, updateChatCard = false} = msg
+                let {admin = false, newMembers = [], groupID, name, description, sender, floID, message, time: timestamp, category, unconfirmed = false, updateChatCard = false} = msg
                 let card = getRef('message_template').content.cloneNode(true),
                     cardContainer = card.querySelector('.message'),
                     messageContent = cardContainer.children[0],
@@ -1476,6 +1479,12 @@
                         let eventCard = document.createElement('p')
                         eventCard.classList.add('group-event-card')
                         eventCard.textContent = `Changed group name to '${name}'`
+                        return eventCard
+                    }
+                    else if(description){
+                        let eventCard = document.createElement('p')
+                        eventCard.classList.add('group-event-card')
+                        eventCard.textContent = `Changed group description to '${description}'`
                         return eventCard
                     }
                 }
@@ -1707,11 +1716,7 @@
             }
             // detect click outside emoji panel and emoji button
             if(isEmojiPickerOpen && (!e.target.closest('#emoji_picker') && !e.target.closest('#emoji_toggle') && !e.target.closest('#type_message'))){
-                isEmojiPickerOpen = false
-                getRef('emoji_toggle').classList.remove('active')
-                getRef('emoji_picker').classList.add('hide-completely')
-                if(!chatScrollInfo.isScrolledUp)
-                    scrollToBottom()
+                toggleEmoji('hide')
             }
         })
 
@@ -1734,6 +1739,8 @@
                 clickedContact['card'] = contact
                 clickedContact['floID'] = contact.getAttribute("flo-id")
                 clickedContact['name'] = contact.getAttribute("name")
+                clickedContact['isGroup'] = floGlobals.groups.hasOwnProperty(clickedContact['floID'])
+
                 if(clickedContact['floID'] === myFloID) return
                 if(e.target.closest(".initial") || e.target.closest(".menu")){
                     showPopup('contact_details_popup')
@@ -1937,13 +1944,20 @@
         }
         renderRecentEmojis()
 
-        function toggleEmoji(button){
-            getRef('emoji_toggle').classList.toggle('active')
-            getRef('emoji_picker').classList.toggle('hide-completely')
-            if(getRef('emoji_picker').classList.contains('hide-completely'))
-                isEmojiPickerOpen = false
-            else
-                isEmojiPickerOpen = true
+        function toggleEmoji(mode){
+            switch(mode){
+                case 'toggle':
+                    isEmojiPickerOpen = true
+                    getRef('emoji_toggle').classList.toggle('active')
+                    getRef('emoji_picker').classList.toggle('hide-completely')
+                break;
+                case 'hide':
+                    isEmojiPickerOpen = false
+                    getRef('emoji_toggle').classList.remove('active')
+                    getRef('emoji_picker').classList.add('hide-completely')
+                break;
+            }
+            getRef('scroll_to_bottom').setAttribute('style', `bottom: calc(${window.innerHeight - getRef('chat_footer').getBoundingClientRect().top}px - .5rem)`)
             if(!chatScrollInfo.isScrolledUp)
                 scrollToBottom()
         }
@@ -2176,7 +2190,7 @@
         function sendMessage() {
             if(window.innerWidth > 640)
                 getRef('type_message').focusIn()
-            let receiver = activeChat['receiver']
+            let receiver = activeChat['floID']
             let container;
             let message = getRef('type_message').value.trim();
 			getRef('type_message').value = ''
@@ -2184,11 +2198,11 @@
             let time = Date.now()
             let msgObj = {message, time, unconfirmed: true}
             if(activeChat.isGroup){
-                msgObj['groupID'] = activeChat.receiver
+                msgObj['groupID'] = activeChat.floID
                 msgObj['sender'] = myFloID
             }
             else{
-                msgObj['floID'] = activeChat.receiver
+                msgObj['floID'] = activeChat.floID
                 msgObj['category'] = 'sent'
             }
             getRef('messages_container').append(render.messageBubble(msgObj))
@@ -2285,7 +2299,7 @@
 
         function scrollToBottom(){
             if(activeChat.chatCard){
-                messenger.removeMark(activeChat.receiver, 'unread')
+                messenger.removeMark(activeChat.floID, 'unread')
                 activeChat.chatCard.classList.remove('unread')
             }
             getRef('scroll_to_bottom').classList.remove('new-message')
@@ -2322,7 +2336,7 @@
                 for (let i = startIndex; i < endIndex; i++) {
                     let {floID, groupID, sender, message, time, category} = messages[i]
                     //Stops message from rendering in wrong chat window
-                    if(activeChat['receiver'] && ( activeChat['receiver'] === floID || activeChat['receiver'] === groupID)){
+                    if(activeChat['floID'] && ( activeChat['floID'] === floID || activeChat['floID'] === groupID)){
                         if(updateChatCard && activeChat.isGroup && message && sender === myFloID) return
                         frag.append(render.messageBubble({...messages[i], updateChatCard}))
                     }
@@ -2356,7 +2370,7 @@
                         chatCard.querySelector('.last-message').textContent = finalMessage
                         chatCard.querySelector('.time').textContent = getFormatedTime(time, true)
 
-                        if(activeChat.receiver === (floID || groupID)){
+                        if(activeChat.floID === (floID || groupID)){
                             if(chatScrollInfo.isScrolledUp)
                                 getRef('scroll_to_bottom').classList.add('new-message')
                             else{
@@ -2426,7 +2440,7 @@
                 textColor = contact.getAttribute('text-color'),
                 backgroundColor = contact.getAttribute('background-color')
             
-            activeChat['receiver'] = floID
+            activeChat['floID'] = floID
             getRef("chat_flo_id").textContent = floID
             activeChat['isGroup'] = floGlobals.groups[floID] ? true : false
             if(activeChat.isGroup){
@@ -2451,7 +2465,7 @@
 
                 getRef("group_description_card").classList.remove('hide-completely')
                 getRef("group_members_card").classList.remove('hide-completely')
-                getRef("group_description").textContent = floGlobals.groups[floID].description;
+                getRef("group_description").value = floGlobals.groups[floID].description;
             }
             else{
                 getRef("receiver_initial").textContent = getContactName(floID).charAt(0);
@@ -2679,39 +2693,60 @@
             getRef('navbar_backdrop').classList.toggle('hide')
         }
 
-        function setNameEditable() {
-            if (!getRef('contact_name').isContentEditable) {
-                getRef('contact_name').contentEditable = 'true'
-                getRef('contact_name').focus()
-                document.execCommand('selectAll', false, null);
-                clickedContact['name'] = getRef('contact_name').textContent
+        
+        document.addEventListener('contentchanged', e => {
+            if (e.target.closest('#contact_name')) {
+                changeContactName(e.detail.value.trim())
             }
-        }
-
-        async function changeContactName() {
-            clickedContact['name'] = getRef('contact_name').textContent.trim()
-            if (clickedContact['name'] === '')
-                clickedContact['name'] = 'Unknown'
-            messenger.storeContact(clickedContact['floID'], clickedContact['name']).then(result => {
-                getRef('contact_initial').textContent = clickedContact['name'].charAt(0)
-                document.querySelectorAll(`.contact[flo-id="${clickedContact['floID']}"]`).forEach(contact => {
-                    contact.children[0].textContent = clickedContact['name'].charAt(0) 
-                    contact.children[1].textContent = clickedContact['name'] 
-                    contact.setAttribute('name', clickedContact['name']) 
+            else if(e.target.closest('#group_description')){
+                messenger.changeGroupDescription(activeChat.floID, e.detail.value.trim())
+                .then(res => {
+                    notify('Changed group description', 'success')
                 })
-                notify('Renamed contact', 'success')
-            })
-            .catch(error => notify(error, "error"));
-        }
-
-        document.getElementById('contact_details_popup').addEventListener('click', e => {
-            if (!e.target.closest('#contact_name') && !e.target.closest('#edit_contact_name')) {
-                if (getRef('contact_name').isContentEditable)
-                    getRef('contact_name').contentEditable = 'false'
-                if (clickedContact['name'] !== getRef('contact_name').textContent)
-                    changeContactName()
+                .catch(error => notify(error, "error"));
             }
         })
+
+        async function changeContactName(name) {
+            clickedContact['name'] = name
+            if (clickedContact['name'] === '')
+            clickedContact['name'] = 'Unknown'
+            if(clickedContact.isGroup){
+                messenger.changeGroupName(clickedContact.floID, name).then(res => {
+                    updatechatCards({isGroup: true})
+                    notify('Changed group name', 'success')
+                })
+                .catch(error => notify(error, "error"));
+            }
+            else{
+                messenger.storeContact(clickedContact['floID'], clickedContact['name']).then(result => {
+                    updatechatCards({isGroup: false})
+                    notify('Changed contact name', 'success')
+                })
+                .catch(error => notify(error, "error"));
+            }
+        }
+
+        function updatechatCards({isGroup = false}){
+            if(activeChat.floID && activeChat.floID === clickedContact.floID){
+                getRef('receiver_name').textContent = clickedContact['name']
+                getRef('chat_name').textContent = clickedContact['name']
+            }
+            if(!isGroup){
+                getRef('contact_initial').textContent = clickedContact['name'].charAt(0)
+                if(activeChat.floID && activeChat.floID === clickedContact.floID){
+                    getRef('receiver_initial').textContent = clickedContact['name'].charAt(0)
+                    getRef('chat_dp').textContent = clickedContact['name'].charAt(0)
+                }
+            }
+            document.querySelectorAll(`.contact[flo-id="${clickedContact['floID']}"]`).forEach(contact => {
+                if(!isGroup){
+                    contact.children[0].textContent = clickedContact['name'].charAt(0) 
+                    contact.children[1].textContent = clickedContact['name'] 
+                }
+                contact.setAttribute('name', clickedContact['name']) 
+            })
+        }
 
         function toggleSearch(target){
             getRef(target).classList.toggle('expand')
@@ -2722,6 +2757,7 @@
         let isChatDetailsOpen = false
         function showChatDetails({show, animate= true}){
             if(show){
+                if(isChatDetailsOpen) return
                 isChatDetailsOpen = true
                 getRef('chat').classList.add('expand-side-panel')
                 getRef('chat_left').classList.add('hide-on-medium')    

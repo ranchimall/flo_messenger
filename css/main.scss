@@ -268,12 +268,6 @@ sm-popup{
     flex-direction: column;
     margin: 1rem 0;
 }
-sm-button{
-    margin: 1rem 0;
-    .icon{
-        margin-right: 0.4rem;
-    }
-}
 sm-button[variant="primary"]{
     --foreground-color: 255, 255, 255;
     .icon{
@@ -623,13 +617,10 @@ sm-button[variant="primary"]{
         margin-bottom: 1rem;
     }
     #contact_name{
-        border-radius: 0.5rem;
-        max-width: 30ch;
-        padding: 0.6rem 1.2rem;
-        overflow-wrap: break-word;
-        &:focus{
-            outline: none;
-            background: rgba(var(--text-color), 0.1);
+        margin: 0.6rem 0;
+        &::part(text){
+            font-size: 1.2rem;
+            font-weight: 500;
         }
     }
 }
@@ -1149,6 +1140,7 @@ sm-button[variant="primary"]{
         }
     }
     .received{
+        margin-right: auto;
         background: rgba(var(--text-color), 0.1);
         border-radius: 0 0.8rem 0.8rem 0.8rem;
         &::after{
@@ -1216,7 +1208,7 @@ sm-button[variant="primary"]{
     }
 }
 #scroll_to_bottom{
-    position: absolute;
+    position: fixed;
     display: flex;
     right: 0;
     bottom: 4rem;
@@ -1303,9 +1295,6 @@ sm-button[variant="primary"]{
 #chat_middle{
     flex: 1;
     padding: 0 1rem;
-}
-#messages_container{
-    height: 100%;
 }
 #emoji_picker{
     display: grid;
@@ -1728,7 +1717,8 @@ sm-panel{
         }
     }
     .navbar-item:hover,
-    .contact:hover{
+    .contact:hover,
+    .emoji:hover{
         cursor: pointer;
         background: rgba(var(--text-color), 0.06);
     }

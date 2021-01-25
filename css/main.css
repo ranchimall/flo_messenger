@@ -313,13 +313,6 @@ sm-popup sm-input + sm-input {
   margin: 1rem 0;
 }
 
-sm-button {
-  margin: 1rem 0;
-}
-sm-button .icon {
-  margin-right: 0.4rem;
-}
-
 sm-button[variant=primary] {
   --foreground-color: 255, 255, 255;
 }
@@ -671,14 +664,11 @@ sm-button[variant=primary] .icon {
   margin-bottom: 1rem;
 }
 #contact_details_popup #contact_name {
-  border-radius: 0.5rem;
-  max-width: 30ch;
-  padding: 0.6rem 1.2rem;
-  overflow-wrap: break-word;
+  margin: 0.6rem 0;
 }
-#contact_details_popup #contact_name:focus {
-  outline: none;
-  background: rgba(var(--text-color), 0.1);
+#contact_details_popup #contact_name::part(text) {
+  font-size: 1.2rem;
+  font-weight: 500;
 }
 
 #warn_no_encryption, .date-card, .group-event-card {
@@ -1215,6 +1205,7 @@ sm-button[variant=primary] .icon {
   border-color: var(--accent-color) transparent transparent transparent;
 }
 #chat .received {
+  margin-right: auto;
   background: rgba(var(--text-color), 0.1);
   border-radius: 0 0.8rem 0.8rem 0.8rem;
 }
@@ -1283,7 +1274,7 @@ sm-button[variant=primary] .icon {
 }
 
 #scroll_to_bottom {
-  position: absolute;
+  position: fixed;
   display: flex;
   right: 0;
   bottom: 4rem;
@@ -1371,10 +1362,6 @@ sm-button[variant=primary] .icon {
 #chat_middle {
   flex: 1;
   padding: 0 1rem;
-}
-
-#messages_container {
-  height: 100%;
 }
 
 #emoji_picker {
@@ -1828,7 +1815,8 @@ sm-panel {
   }
 
   .navbar-item:hover,
-.contact:hover {
+.contact:hover,
+.emoji:hover {
     cursor: pointer;
     background: rgba(var(--text-color), 0.06);
   }
