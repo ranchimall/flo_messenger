@@ -254,7 +254,11 @@
             <h4>Select contact to add</h4>
             <sm-button id="add_members_button" variant="primary" disabled>Add</sm-button>
         </header>
-        <div id="popup_contacts_container"></div>
+        <p class="warning">*Contacts that haven't yet replied to you, can't be added to a group. So they won't be visible here.</p>
+        <div id="popup_contacts_container" class="observe-empty-state"></div>
+        <div class="empty-state">
+            <p>You don't have any other contacts to show.</p>
+        </div>
     </sm-popup>
 
 	<!-- Templates -->
@@ -383,7 +387,7 @@
                     </svg>
                     New chat
                 </sm-button>
-                <div id="chat_container" class="flex"></div>
+                <div id="chat_container" class="flex observe-empty-state"></div>
                 <div id="new_conversation" class="flex direction-column empty-state">
                     <svg class="icon new-conversation align-center" viewBox="0 0 512 512">
                         <title>new conversation</title>
@@ -506,7 +510,7 @@
                     <div id="group_members_card" class="card hide-completely">
                         <div class="flex align-center">
                             <h4 class="h4">Group members</h4>
-                            <sm-button id="edit_group_button" class="admin-option round small justify-right" onclick="editGroupMembers()">Edit</sm-button>
+                            <sm-button id="edit_group_button" class="admin-option hide-completely round small justify-right" onclick="editGroupMembers()">Edit</sm-button>
                         </div>
                         <p id="remove_members_tip" class="tip hide-completely">Select members to remove or add new members</p>
                         <div id="member_options" class="flex hide-completely">
@@ -516,8 +520,8 @@
                         <div id="group_members_list"></div>
                     </div>
                     <div class="card">
-                        <sm-button>Clear chat</sm-button>
-                        <sm-button>Delete chat</sm-button>
+                        <sm-button class="danger">Clear chat</sm-button>
+                        <sm-button class="danger">Delete chat</sm-button>
                     </div>
                 </div>
 			</div>
@@ -679,9 +683,9 @@
 
         //Checks for internet connection status
         if (!navigator.onLine)
-            notify('There seems to be a problem connecting to the internet.', 'error', '', true)
+            notify('There seems to be a problem connecting to the internet, Please check you internet connection.', 'error', '', true)
         window.addEventListener('offline', () => {
-            notify('There seems to be a problem connecting to the internet.', 'error', true, true)
+            notify('There seems to be a problem connecting to the internet, Please check you internet connection.', 'error', true, true)
         })
         window.addEventListener('online', () => {
             getRef('notification_drawer').clearAll()
@@ -807,7 +811,7 @@
                 case 'contacts_popup':
                     const contacts = []
                     for(contact in floGlobals.contacts){
-                        if(!floGlobals.groups[activeChat.floID].members.includes(contact)){
+                        if(!floGlobals.groups[activeChat.floID].members.includes(contact) && contact in floGlobals.pubKeys){
                             contacts.push(contact)
                         }
                     }
@@ -818,7 +822,6 @@
                     getRef('popup_contacts_container').querySelectorAll('.contact').forEach(cont => {
                         cont.classList.add('selectable')
                     })
-                    isAddingMember = true
                     isRemovingMember = false
                 break
             }
@@ -834,7 +837,6 @@
                 break;
                 case 'contacts_popup':
                     getRef('popup_contacts_container').innerHTML = ''
-                    isAddingMember = false
                     isRemovingMember = true
                     membersToAdd.clear()
                 break;
@@ -2856,10 +2858,12 @@
                     if(floGlobals.groups[activeChat['floID']].admin === myFloID){
                         getRef("chat_name").disabled = false
                         getRef('group_description').disabled = false
+                        getRef('edit_group_button').classList.remove('hide-completely')
                     }
                     else{
                         getRef("chat_name").disabled = true
                         getRef('group_description').disabled = true
+                        getRef('edit_group_button').classList.add('hide-completely')
                     }
                 }
                 else{
@@ -2916,7 +2920,6 @@
         
         let isGroupEditable = false
         let isRemovingMember = false
-        let isAddingMember = false
         function editGroupMembers(){
             if(!isChatDetailsOpen && !isGroupEditable) return
             if(isGroupEditable){
@@ -2935,7 +2938,6 @@
                 getRef('remove_members_tip').classList.add('hide-completely')
                 getRef('member_options').classList.add('hide-completely')
                 isGroupEditable = false
-                isAddingMember = false
                 isRemovingMember = false
             }
             else{
@@ -2953,7 +2955,6 @@
                 getRef('remove_members_button').classList.add('hide-completely')
                 getRef('init_add_members_button').classList.remove('hide-completely')
                 isGroupEditable = true
-                isAddingMember = false
                 isRemovingMember = true
             }
         }
@@ -3001,6 +3002,7 @@
         }
         
         function addTick(contact){
+            contact.classList.add('selected')
             const initial = contact.querySelector('.initial')
             const tick = document.createElement('div');
             tick.innerHTML = `
@@ -3022,7 +3024,8 @@
                 }
             )
         }
-        function removeTick(contact, options){
+        function removeTick(contact){
+            contact.classList.remove('selected')
             const tick = contact.querySelector('.tick')
             tick.animate([
                 {transform: 'scale(1)'},
@@ -3054,9 +3057,10 @@
         function removeGroupMembers(){
             messenger.rmGroupMembers(activeChat.floID, [...membersToRemove])
             .then(res => {
-                getRef('group_members_list').querySelectorAll('.contact .tick').forEach(contact => {
+                getRef('group_members_list').querySelectorAll('.selected').forEach(contact => {
                     contact.remove()
                 })
+                editGroupMembers()
             })
             .catch(err =>  console.log(err))
         }

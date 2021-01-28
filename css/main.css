@@ -202,6 +202,11 @@ a:any-link {
   font-weight: normal;
 }
 
+.warning {
+  background: wheat;
+  color: #111;
+}
+
 .icon {
   fill: none;
   stroke-width: 6;
@@ -590,6 +595,7 @@ sm-button.danger {
   padding: 0.8rem 1.5rem;
   align-items: center;
   flex-shrink: 0;
+  user-select: none;
   overflow: hidden;
 }
 .contact:not(.chat) {
@@ -602,6 +608,9 @@ sm-button.danger {
 }
 .contact.admin {
   grid-template-columns: auto 1fr auto;
+}
+.contact.selected {
+  background-color: rgba(var(--text-color), 0.06);
 }
 .contact .initial {
   grid-area: dp;
@@ -1291,9 +1300,12 @@ sm-button.danger {
   }
 }
 #chat_header {
-  padding: 1rem;
+  padding: 0 1rem;
   min-height: 4rem;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr;
+}
+#chat_header .flex {
+  height: 100%;
 }
 #chat_header .back-button {
   height: 2rem;
@@ -1478,11 +1490,11 @@ sm-button.danger {
   overflow-y: auto;
 }
 
-#chat_container:empty {
+.observe-empty-state:empty {
   display: none;
 }
 
-#chat_container:not(:empty) ~ .empty-state {
+.observe-empty-state:not(:empty) ~ .empty-state {
   display: none;
 }
 
@@ -1492,6 +1504,12 @@ sm-button.danger {
 
 #contacts_popup::part(popup-body) {
   padding: 0;
+}
+#contacts_popup .popup-header {
+  padding: 1.5rem;
+}
+#contacts_popup .warning {
+  padding: 0.5rem 1.5rem;
 }
 
 sm-tab-panels {
@@ -1666,6 +1684,10 @@ sm-panel {
   #chat .message {
     width: auto;
     max-width: 90%;
+  }
+
+  #chat_header {
+    grid-template-columns: auto 1fr;
   }
 
   #settings_page {
