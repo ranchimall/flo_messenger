@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/main.min.css">
 </head>
 
-<body data-theme="light" onload="onLoadStartUp()" class="hide-completely">
+<body data-theme="dark" onload="onLoadStartUp()" class="hide-completely">
     <audio id="notification_sound">
         <source src="https://rmservices.duckdns.org/files/notification-sound.mp3" type="audio/mpeg">
         <source src="https://rmservices.duckdns.org/files/notification-sound.ogg" type="audio/ogg">
@@ -242,6 +242,21 @@
         </div>
     </sm-popup>
 
+    <!-- all contacts popup -->
+
+    <sm-popup id="contacts_popup">
+        <header class="popup-header" slot="header">
+            <svg class="icon" onclick="this.closest('sm-popup').hide()" viewBox="0 0 64 64">
+                <title>close</title>
+                <line x1="64" y1="0" x2="0" y2="64" />
+                <line x1="64" y1="64" x2="0" y2="0" />
+            </svg>
+            <h4>Select contact to add</h4>
+            <sm-button id="add_members_button" variant="primary" disabled>Add</sm-button>
+        </header>
+        <div id="popup_contacts_container"></div>
+    </sm-popup>
+
 	<!-- Templates -->
 
 	<template id="mail_card_template">
@@ -470,11 +485,11 @@
                     </header>
                     <div id="chat_profile" class="card">
                         <div id="chat_dp" class="initial flex align-center"></div>
-                        <h3 id="chat_name"></h3>
+                        <text-field id="chat_name"></text-field>
                         <p id="last_interaction_time"></p>
                     </div>
                     <div id="chat_flo_id_card" class="card">
-                        <h4 id="chat_type"></h4>
+                        <h4 class="h4" id="chat_type"></h4>
                         <div class="copy-row grid">
                             <h4 id="chat_flo_id" class="copy"></h4>
                             <svg class="icon" onclick="copyToClipboard(this, 'Copied FLO ID')" viewBox="0 0 64 64">
@@ -485,13 +500,20 @@
                         </div>
                     </div>
                     <div id="group_description_card" class="card hide-completely">
-                        <h4>Group description</h4>
+                        <h4 class="h4">Group description</h4>
                         <text-field id="group_description"></text-field>
                     </div>
                     <div id="group_members_card" class="card hide-completely">
-                        <h4>Group members</h4>
+                        <div class="flex align-center">
+                            <h4 class="h4">Group members</h4>
+                            <sm-button id="edit_group_button" class="admin-option round small justify-right" onclick="editGroupMembers()">Edit</sm-button>
+                        </div>
+                        <p id="remove_members_tip" class="tip hide-completely">Select members to remove or add new members</p>
+                        <div id="member_options" class="flex hide-completely">
+                            <sm-button id="remove_members_button" class="danger hide-completely" onclick="removeGroupMembers()">Remove selected</sm-button>
+                            <sm-button id="init_add_members_button" onclick="showPopup('contacts_popup')">Add member</sm-button>
+                        </div>
                         <div id="group_members_list"></div>
-                        <sm-button class="admin-option">Add member</sm-button>
                     </div>
                     <div class="card">
                         <sm-button>Clear chat</sm-button>
@@ -782,6 +804,23 @@
                     getRef('contact_name').value = clickedContact['name']
                     getRef('contact_flo_id').textContent = clickedContact['floID']
                 break;
+                case 'contacts_popup':
+                    const contacts = []
+                    for(contact in floGlobals.contacts){
+                        if(!floGlobals.groups[activeChat.floID].members.includes(contact)){
+                            contacts.push(contact)
+                        }
+                    }
+                    contacts.forEach(member => {
+                        frag.append(render.contactCard(member, {type: 'contact', contactOnly: true}))
+                    })
+                    getRef('popup_contacts_container').append(frag)
+                    getRef('popup_contacts_container').querySelectorAll('.contact').forEach(cont => {
+                        cont.classList.add('selectable')
+                    })
+                    isAddingMember = true
+                    isRemovingMember = false
+                break
             }
         })
 
@@ -792,6 +831,12 @@
                 case 'contact_details_popup':
                     clickedContact['name'] = getRef('contact_name').value.trim()
                     getRef('contact_name').revert()
+                break;
+                case 'contacts_popup':
+                    getRef('popup_contacts_container').innerHTML = ''
+                    isAddingMember = false
+                    isRemovingMember = true
+                    membersToAdd.clear()
                 break;
             }
         })
@@ -1358,7 +1403,15 @@
                             lastMessage.time = floGlobals.groups[floID].created
                         }
                         let lastText = document.createElement('p')
-                        lastText.textContent = lastMessage.message
+                        if(type === 'chat' && lastMessage.category === 'sent'){
+                            lastText.textContent = `You: ${lastMessage.message}`
+                        }
+                        else if(type === 'group' && lastMessage.sender === myFloID){
+                            lastText.textContent = `You: ${lastMessage.message}`
+                        }
+                        else{
+                            lastText.textContent = lastMessage.message
+                        }
                         lastText.classList.add('last-message')
                         cardContainer.append(lastText)
                         cardContainer.innerHTML += `
@@ -1384,7 +1437,7 @@
                 }
             },
             messageBubble(msg){
-                let {admin = false, newMembers = [], groupID, name, description, sender, floID, message, time: timestamp, category, unconfirmed = false, updateChatCard = false} = msg
+                let {admin = false, newMembers = [], rmMembers = [], groupID, name, description, sender, floID, message, time: timestamp, category, unconfirmed = false, updateChatCard = false} = msg
                 let card = getRef('message_template').content.cloneNode(true),
                     cardContainer = card.querySelector('.message'),
                     messageContent = cardContainer.children[0],
@@ -1468,8 +1521,24 @@
                             let eventMessage = ''
                             if(member === myFloID)
                                 eventMessage = `${getContactName(admin)} added you`
+                                else    
+                                eventMessage = `${getContactName(admin)} added ${getContactName(member)}`
+                            eventCard.textContent = eventMessage
+                            cards.append(eventCard)
+                        })
+                        return cards
+                    }
+                    else if(rmMembers.length){
+                        const cards = document.createDocumentFragment()
+                        const {admin} = floGlobals.groups[groupID]
+                        rmMembers.forEach(member => {
+                            let eventCard = document.createElement('p')
+                            eventCard.classList.add('group-event-card')
+                            let eventMessage = ''
+                            if(member === myFloID)
+                                eventMessage = `${getContactName(admin)} removed you`
                             else    
-                                eventMessage = `${getContactName(admin)} added ${member}`
+                                eventMessage = `${getContactName(admin)} removed ${getContactName(member)}`
                             eventCard.textContent = eventMessage
                             cards.append(eventCard)
                         })
@@ -1742,7 +1811,12 @@
                 clickedContact['isGroup'] = floGlobals.groups.hasOwnProperty(clickedContact['floID'])
 
                 if(clickedContact['floID'] === myFloID) return
-                if(e.target.closest(".initial") || e.target.closest(".menu")){
+
+                if(e.target.closest(".selectable")){
+                    if(isRemovingMember)
+                        selectMemberToRemove(e.target.closest(".selectable"))
+                }
+                else if(e.target.closest(".initial") || e.target.closest(".menu")){
                     showPopup('contact_details_popup')
                 }
                 else if(isCreatingGroup){
@@ -1770,6 +1844,12 @@
                         getRef('main_navbar').classList.add('hide-on-mobile')
                     }
                 }
+            }
+        })
+        getRef('contacts_popup').addEventListener('click', e => {
+            //detect click on contacts
+            if (e.target.closest(".selectable")){
+                selectMemberToAdd(e.target.closest(".selectable"))
             }
         })
 
@@ -2231,7 +2311,6 @@
             scrollToBottom()
             if(activeChat.isGroup)
                 messenger.sendGroupMessage(message, receiver).then(data => {
-                    console.log('sent group message')
                     getRef('messages_container').querySelector(`#${receiver}_${time}`).classList.remove('unconfirmed')
                     activeChat.chatCard.querySelector('.last-message').textContent = `You: ${message}`
                     activeChat.chatCard.querySelector('.time').textContent = getFormatedTime(Date.now(), true)
@@ -2239,7 +2318,7 @@
             else
                 messenger.sendMessage(message, receiver).then(data => {
                     getRef('messages_container').querySelector(`#${receiver}_${time}`).classList.remove('unconfirmed')
-                    activeChat.chatCard.querySelector('.last-message').textContent = message
+                    activeChat.chatCard.querySelector('.last-message').textContent = `You: ${message}`
                     activeChat.chatCard.querySelector('.time').textContent = getFormatedTime(Date.now(), true)
                 }).catch(error => notify(error, "error"));
         }
@@ -2337,7 +2416,11 @@
                     let {floID, groupID, sender, message, time, category} = messages[i]
                     //Stops message from rendering in wrong chat window
                     if(activeChat['floID'] && ( activeChat['floID'] === floID || activeChat['floID'] === groupID)){
-                        if(updateChatCard && activeChat.isGroup && message && sender === myFloID) return
+                        // Stops message rendering if message is sent from original user causing duplication
+                        if(updateChatCard && activeChat.isGroup && message && sender === myFloID){
+                            messenger.removeMark(groupID, 'unread')
+                            return
+                        } 
                         frag.append(render.messageBubble({...messages[i], updateChatCard}))
                     }
                     const contact = getRef('chat_container').querySelector(`.chat[flo-id='${floID}']`)
@@ -2441,46 +2524,18 @@
                 backgroundColor = contact.getAttribute('background-color')
             
             activeChat['floID'] = floID
-            getRef("chat_flo_id").textContent = floID
             activeChat['isGroup'] = floGlobals.groups[floID] ? true : false
+            getRef("chat_dp").setAttribute('style', `color: ${textColor}; background-color: ${backgroundColor};`)
+            getRef("receiver_name").textContent = getContactName(floID);
             if(activeChat.isGroup){
                 getRef("receiver_initial").innerHTML = `
                     <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
                     `
-                getRef("chat_dp").innerHTML = `
-                    <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
-                    `
-                getRef("receiver_name").textContent = floGlobals.groups[floID].name;
-                getRef("chat_name").textContent = floGlobals.groups[floID].name;
-                getRef("last_interaction_time").textContent = `Created ${getFormatedTime(floGlobals.groups[floID].created)}`;
-                
-                getRef("chat_type").textContent = `Group FLO ID`;
-                
-                getRef('group_members_list').innerHTML = ''
-                floGlobals.groups[floID].members.forEach(member => {
-                    let isAdmin = floGlobals.groups[floID].admin === member ? true : false
-                    frag.append(render.contactCard(member, {type: 'contact', contactOnly: true, isAdmin}))
-                })
-                getRef('group_members_list').append(frag)
-
-                getRef("group_description_card").classList.remove('hide-completely')
-                getRef("group_members_card").classList.remove('hide-completely')
-                getRef("group_description").value = floGlobals.groups[floID].description;
             }
             else{
                 getRef("receiver_initial").textContent = getContactName(floID).charAt(0);
-                getRef("chat_dp").textContent = getContactName(floID).charAt(0);
-                getRef("receiver_name").textContent = getContactName(floID);
-                getRef("chat_name").textContent = getContactName(floID);
-                getRef("last_interaction_time").textContent = ``;
-                
-                getRef("chat_type").textContent = `FLO ID`;
-
-                getRef("group_description_card").classList.add('hide-completely')
-                getRef("group_members_card").classList.add('hide-completely')
             }
             getRef("receiver_initial").setAttribute('style', `color: ${textColor}; background-color: ${backgroundColor};`)
-            getRef("chat_dp").setAttribute('style', `color: ${textColor}; background-color: ${backgroundColor};`)
             if (floGlobals.pubKeys[floID] || activeChat.isGroup)
                 getRef("warn_no_encryption").classList.add("hide-completely");
             else
@@ -2705,46 +2760,64 @@
                 })
                 .catch(error => notify(error, "error"));
             }
+            else if (e.target.closest('#chat_name')) {
+                changeContactName(e.detail.value.trim(), true)
+            }
         })
 
-        async function changeContactName(name) {
-            clickedContact['name'] = name
-            if (clickedContact['name'] === '')
-            clickedContact['name'] = 'Unknown'
-            if(clickedContact.isGroup){
-                messenger.changeGroupName(clickedContact.floID, name).then(res => {
-                    updatechatCards({isGroup: true})
+        async function changeContactName(name, isChat = false) {
+            let isGroup,
+                floID
+            if(isChat){
+                activeChat['name'] = name
+                if (activeChat['name'] === '')
+                    activeChat['name'] = 'Unknown'
+                isGroup = activeChat.isGroup
+                floID = activeChat.floID
+                name = activeChat['name']
+            }
+            else{
+                clickedContact['name'] = name
+                if (clickedContact['name'] === '')
+                clickedContact['name'] = 'Unknown'
+                isGroup = clickedContact.isGroup
+                floID = clickedContact.floID
+                name = clickedContact['name']
+            }
+            if(isGroup){
+                messenger.changeGroupName(floID, name).then(res => {
+                    updatechatCards({name, floID, isGroup: true})
                     notify('Changed group name', 'success')
                 })
                 .catch(error => notify(error, "error"));
             }
             else{
-                messenger.storeContact(clickedContact['floID'], clickedContact['name']).then(result => {
-                    updatechatCards({isGroup: false})
+                messenger.storeContact(floID, name).then(result => {
+                    updatechatCards({name, floID, isGroup: false})
                     notify('Changed contact name', 'success')
                 })
                 .catch(error => notify(error, "error"));
             }
         }
 
-        function updatechatCards({isGroup = false}){
+        function updatechatCards({name, floID, isGroup = false}){
             if(activeChat.floID && activeChat.floID === clickedContact.floID){
-                getRef('receiver_name').textContent = clickedContact['name']
-                getRef('chat_name').textContent = clickedContact['name']
+                getRef('receiver_name').textContent = name
+                getRef('chat_name').value = name
             }
             if(!isGroup){
-                getRef('contact_initial').textContent = clickedContact['name'].charAt(0)
+                getRef('contact_initial').textContent = name.charAt(0)
                 if(activeChat.floID && activeChat.floID === clickedContact.floID){
-                    getRef('receiver_initial').textContent = clickedContact['name'].charAt(0)
-                    getRef('chat_dp').textContent = clickedContact['name'].charAt(0)
+                    getRef('receiver_initial').textContent = name.charAt(0)
+                    getRef('chat_dp').textContent = name.charAt(0)
                 }
             }
-            document.querySelectorAll(`.contact[flo-id="${clickedContact['floID']}"]`).forEach(contact => {
+            document.querySelectorAll(`.contact[flo-id="${floID}"]`).forEach(contact => {
                 if(!isGroup){
-                    contact.children[0].textContent = clickedContact['name'].charAt(0) 
-                    contact.children[1].textContent = clickedContact['name'] 
+                    contact.children[0].textContent = name.charAt(0) 
+                    contact.children[1].textContent = name
                 }
-                contact.setAttribute('name', clickedContact['name']) 
+                contact.setAttribute('name', name) 
             })
         }
 
@@ -2758,7 +2831,47 @@
         function showChatDetails({show, animate= true}){
             if(show){
                 if(isChatDetailsOpen) return
+                const floID = activeChat.floID
                 isChatDetailsOpen = true
+                getRef("chat_name").value = getContactName(floID);
+                getRef("chat_flo_id").textContent = floID
+                if(activeChat.isGroup){
+                    getRef("chat_dp").innerHTML = `
+                        <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
+                        `
+                    getRef("last_interaction_time").textContent = `Created ${getFormatedTime(floGlobals.groups[floID].created)}`;
+                    getRef("chat_type").textContent = `Group FLO ID`;
+
+                    getRef('group_members_list').innerHTML = ''
+                    floGlobals.groups[floID].members.forEach(member => {
+                        let isAdmin = floGlobals.groups[floID].admin === member ? true : false
+                        frag.append(render.contactCard(member, {type: 'contact', contactOnly: true, isAdmin}))
+                    })
+                    getRef('group_members_list').append(frag)
+
+                    getRef("group_description_card").classList.remove('hide-completely')
+                    getRef("group_members_card").classList.remove('hide-completely')
+                    getRef("group_description").value = floGlobals.groups[floID].description;
+
+                    if(floGlobals.groups[activeChat['floID']].admin === myFloID){
+                        getRef("chat_name").disabled = false
+                        getRef('group_description').disabled = false
+                    }
+                    else{
+                        getRef("chat_name").disabled = true
+                        getRef('group_description').disabled = true
+                    }
+                }
+                else{
+                    getRef("chat_dp").textContent = getContactName(floID).charAt(0);
+                    getRef("last_interaction_time").textContent = ``;
+                    
+                    getRef("chat_type").textContent = `FLO ID`;
+
+                    getRef("group_description_card").classList.add('hide-completely')
+                    getRef("group_members_card").classList.add('hide-completely')
+                }
+
                 getRef('chat').classList.add('expand-side-panel')
                 getRef('chat_left').classList.add('hide-on-medium')    
                 getRef('chat_details_panel').classList.remove('hide-completely')
@@ -2785,6 +2898,7 @@
                     getRef('chat_left').classList.remove('hide-on-medium')    
                     getRef('chat_details_panel').classList.add('hide-completely')    
                 }
+                editGroupMembers()
             }
         }
 
@@ -2798,6 +2912,153 @@
                     notify('Chat deleted', 'success')
                 })
             }
+        }
+        
+        let isGroupEditable = false
+        let isRemovingMember = false
+        let isAddingMember = false
+        function editGroupMembers(){
+            if(!isChatDetailsOpen && !isGroupEditable) return
+            if(isGroupEditable){
+                getRef('group_members_list').querySelectorAll('.contact').forEach(contact => {
+                    if(contact.classList.contains('selectable')){
+                        contact.classList.remove('selectable')
+                        if(membersToRemove.has(contact.getAttribute('flo-id')))
+                            removeTick(contact)
+                        }
+                    else if(contact.classList.contains('admin')){
+                        contact.classList.remove('hide-completely')
+                    }
+                })
+                membersToRemove.clear()
+                getRef('edit_group_button').textContent = 'Edit'
+                getRef('remove_members_tip').classList.add('hide-completely')
+                getRef('member_options').classList.add('hide-completely')
+                isGroupEditable = false
+                isAddingMember = false
+                isRemovingMember = false
+            }
+            else{
+                getRef('group_members_list').querySelectorAll('.contact').forEach(contact => {
+                    if(contact.classList.contains('admin')){
+                        contact.classList.add('hide-completely')
+                    }
+                    else{
+                        contact.classList.add('selectable')
+                    }
+                })
+                getRef('edit_group_button').textContent = 'Done'
+                getRef('remove_members_tip').classList.remove('hide-completely')
+                getRef('member_options').classList.remove('hide-completely')
+                getRef('remove_members_button').classList.add('hide-completely')
+                getRef('init_add_members_button').classList.remove('hide-completely')
+                isGroupEditable = true
+                isAddingMember = false
+                isRemovingMember = true
+            }
+        }
+
+        const membersToRemove = new Set()
+        function selectMemberToRemove(contact){
+            const floID = contact.getAttribute('flo-id')
+            if(membersToRemove.has(floID)){
+                membersToRemove.delete(floID)
+                removeTick(contact)
+            }
+            else{
+                membersToRemove.add(floID)
+                addTick(contact)
+            }
+            if(membersToRemove.size){
+                getRef('remove_members_tip').classList.add('hide-completely')
+                getRef('init_add_members_button').classList.add('hide-completely')
+                getRef('remove_members_button').classList.remove('hide-completely')
+            }
+            else{
+                getRef('remove_members_tip').classList.remove('hide-completely')
+                getRef('init_add_members_button').classList.remove('hide-completely')
+                getRef('remove_members_button').classList.add('hide-completely')
+            }
+        }
+
+        const membersToAdd = new Set()
+        function selectMemberToAdd(contact){
+            const floID = contact.getAttribute('flo-id')
+            if(membersToAdd.has(floID)){
+                membersToAdd.delete(floID)
+                removeTick(contact)
+            }
+            else{
+                membersToAdd.add(floID)
+                addTick(contact)
+            }
+            if(membersToAdd.size){
+                getRef('add_members_button').disabled = false
+            }
+            else{
+                getRef('add_members_button').disabled = true
+            }
+        }
+        
+        function addTick(contact){
+            const initial = contact.querySelector('.initial')
+            const tick = document.createElement('div');
+            tick.innerHTML = `
+                <svg class="icon" viewBox="0 0 64 64">
+                    <polyline points="0.35 31.82 21.45 52.98 63.65 10.66"/>
+                </svg>
+            `
+            tick.classList.add('tick')
+            initial.append(tick)
+            tick.animate(
+                [
+                    {transform: 'scale(0)'},
+                    {transform: 'scale(1)'},
+                ],
+                {
+                    duration: 300,
+                    fill: 'forwards',
+                    easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                }
+            )
+        }
+        function removeTick(contact, options){
+            const tick = contact.querySelector('.tick')
+            tick.animate([
+                {transform: 'scale(1)'},
+                {transform: 'scale(0)'},
+            ],
+            {
+                duration: 150,
+                fill: 'forwards',
+            }
+            ).onfinish = () => {
+                tick.remove()
+            }
+        }
+
+        document.getElementById('add_members_button').addEventListener('clicked', addGroupMembers)
+
+        function addGroupMembers(){
+            messenger.addGroupMembers(activeChat.floID, [...membersToAdd])
+            .then(res => {
+                membersToAdd.forEach(member => {
+                    frag.append(render.contactCard(member, {type: 'contact', contactOnly: true}))
+                })
+                getRef('group_members_list').append(frag)
+                hidePopup()
+            })
+            .catch(err =>  console.log(err))
+        }
+
+        function removeGroupMembers(){
+            messenger.rmGroupMembers(activeChat.floID, [...membersToRemove])
+            .then(res => {
+                getRef('group_members_list').querySelectorAll('.contact .tick').forEach(contact => {
+                    contact.remove()
+                })
+            })
+            .catch(err =>  console.log(err))
         }
 
     </script>
@@ -12223,7 +12484,9 @@ Bitcoin.Util = {
                             if (data.message)
                                 data.message = utilFn.decrypt(data.message);
                             newInbox.messages[vc] = data;
-                            utilFn.addMark(data.groupID, "unread")
+                            console.log(data)
+                            if(data.sender !== myFloID)
+                                utilFn.addMark(data.groupID, "unread")
                             if (!floGlobals.appendix[`lastReceived_${groupID}`] ||
                                 floGlobals.appendix[`lastReceived_${groupID}`] < vc)
                                 floGlobals.appendix[`lastReceived_${groupID}`] = vc;

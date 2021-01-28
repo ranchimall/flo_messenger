@@ -34,6 +34,7 @@ body[data-theme='dark']{
     --text-color: 240, 240, 240;
     --text-color-light: 170, 170, 170;
     --foreground-color: 20, 20, 20;
+    --error-color: rgb(255, 87, 87);
     .initial{
         color: rgba(var(--text-color), 1) !important;
         box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.16);
@@ -268,6 +269,10 @@ sm-popup{
     flex-direction: column;
     margin: 1rem 0;
 }
+.tip{
+    font-size: 0.9rem;
+    color: rgba(var(--text-color), 0.8);
+}
 sm-button[variant="primary"]{
     --foreground-color: 255, 255, 255;
     .icon{
@@ -278,6 +283,9 @@ sm-button[variant="primary"]{
         stroke-width: 6;
         stroke: white;
     }
+}
+sm-button.danger{
+    color: var(--error-color);
 }
 .logo-section{
     display: flex;
@@ -576,8 +584,24 @@ sm-button[variant="primary"]{
     .admin-tag{
         padding: 0.1rem 0.6rem;
         font-size: 0.8rem;
-        border: #00c465 1px solid;
-        border-radius: 0.3rem;
+        border: var(--accent-color) thin solid;
+        border-radius: 3rem;
+    }
+    .tick{
+        position: absolute;
+        bottom: -0.2rem;
+        right: -0.2rem;
+        height: 1.2rem;
+        width: 1.2rem;
+        .icon{
+            height: 100%;
+            width: 100%;
+            padding: 0.4rem;
+            stroke-width: 12;
+            border-radius: 1rem;
+            background: rgba(var(--text-color), 1);
+            stroke: rgba(var(--foreground-color), 0.8);
+        }
     }
 }
 #contact_details_popup{
@@ -626,8 +650,8 @@ sm-button[variant="primary"]{
 }
 #warn_no_encryption, .date-card, .group-event-card{
     padding: 0.4rem 0.8rem;
-    background: rgba(var(--text-color), 0.1);
     font-weight: 500;
+    background-color: rgba(var(--text-color), 0.04);
     border-radius: 0.5rem;
     color: rgba(var(--text-color), 0.8);
     margin: 1rem 0;
@@ -655,17 +679,17 @@ sm-button[variant="primary"]{
 .contact .initial::after{
     content: '';
     position: absolute;
-    height: calc(100% + 0.8rem);
-    width: calc(100% + 0.8rem);
-    border: solid var(--accent-color) 0.2rem;
+    bottom: -0.2rem;
+    right: -0.2rem;
+    height: 1.2rem;
+    width: 1.2rem;
+    background: var(--accent-color);
     border-radius: 100%;
-    transform: scale(0.8);
-    opacity: 0;
-    transition: transform 0.3s, opacity 0.3s;
+    transform: scale(0);
+    transition: transform 0.3s;
 }
 .contact.unread .initial::after{
     transform: scale(1);
-    opacity: 1;
 }
 .mail-card.unread,
 .contact.unread{
@@ -886,7 +910,7 @@ sm-button[variant="primary"]{
         overflow-y: auto;
     }
     #contacts_container{
-        padding-bottom: 5rem;
+        padding-bottom: 6rem;
         &::before{
             display: flex;
             content: 'Contacts';
@@ -1020,16 +1044,29 @@ sm-button[variant="primary"]{
         &:not(:last-of-type){
             margin-bottom: 1rem;
         }
-        & > h4{
+        .h4{
             font-weight: 400;
             font-size: 0.9rem;
             color: rgba(var(--text-color), 0.8);
             margin-bottom: 0.5rem;
         }
+        & > .flex{
+            margin-bottom: 1rem;
+            .h4{
+                margin-bottom: 0;
+            }
+        }
+        .tip{
+            margin-bottom: 0.5rem;
+        }
     }
     header{
+        position: sticky;
+        top: 0;
         padding: 1rem;
         min-height: 4rem;
+        backdrop-filter: blur(1rem);
+        z-index: 1;
         .icon{
             height: 2.3rem;
             width: 2.3rem;
@@ -1043,7 +1080,7 @@ sm-button[variant="primary"]{
     #chat_profile{
         display: grid;
         place-items: center;
-        margin-top: 1.5rem;
+        margin-top: 5.5rem;
         padding-bottom: 1.5rem;
         .initial{
             margin-top: -5.5rem;
@@ -1070,6 +1107,10 @@ sm-button[variant="primary"]{
     .copy{
         font-weight: 400;
     }
+}
+#group_members_list{
+    max-height: 50vh;
+    overflow-y: auto;
 }
 #chat{
     position: relative;
@@ -1208,7 +1249,7 @@ sm-button[variant="primary"]{
     }
 }
 #scroll_to_bottom{
-    position: fixed;
+    position: absolute;
     display: flex;
     right: 0;
     bottom: 4rem;
@@ -1371,6 +1412,9 @@ sm-button[variant="primary"]{
 #chat_container{
     padding-bottom: 6rem;
 }
+#contacts_popup::part(popup-body){
+    padding: 0;
+}
 sm-tab-panels{
     overflow: hidden auto;
 }
@@ -1382,7 +1426,7 @@ sm-panel{
 #inbox_mail_container,
 #sent_mail_container
 {
-    padding-bottom: 5rem;
+    padding-bottom: 6rem;
 }
 #chat, #mail{
     background: rgba(var(--foreground-color), 1);
@@ -1554,6 +1598,9 @@ sm-panel{
     .page{
         padding-bottom: 0;
     }
+    .popup-header{
+        padding-top: 1.5rem;
+    }
     .fab{
         position: absolute;
     }
@@ -1574,11 +1621,6 @@ sm-panel{
             h4{
                 color: var(--accent-color);
             }
-        }
-    }
-    #sign_in_popup{
-        .popup-header{
-            padding-top: 1.5rem;
         }
     }
     #main_navbar{

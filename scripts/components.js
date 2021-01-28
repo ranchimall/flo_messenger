@@ -896,6 +896,15 @@ customElements.define('sm-checkbox', class extends HTMLElement {
         this.setAttribute('checked', value)
     }
 
+    set value(val) {
+        this.val = val
+        this.setAttribute('value', value)
+    }
+
+    get value() {
+        return getAttribute('value')
+    }
+
     dispatch() {
         this.dispatchEvent(new CustomEvent('change', {
             bubbles: true,
@@ -904,6 +913,7 @@ customElements.define('sm-checkbox', class extends HTMLElement {
     }
 
     connectedCallback() {
+        this.val = ''
         this.addEventListener('keyup', e => {
             if ((e.code === "Enter" || e.code === "Space") && this.isDisabled == false) {
                 this.isChecked = !this.isChecked
@@ -1830,6 +1840,17 @@ smPopup.innerHTML = `
     display: -ms-grid;
     display: grid;
     z-index: 10;
+}
+::-webkit-scrollbar{
+    width: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb{
+    background: rgba(var(--text-color), 0.3);
+    border-radius: 1rem;
+    &:hover{
+        background: rgba(var(--text-color), 0.5);
+    }
 }
 .popup-container{
     display: -ms-grid;
@@ -3038,6 +3059,7 @@ smMenuOption.innerHTML = `
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
+    user-select: none;
     -webkit-box-align: center;
         -ms-flex-align: center;
             align-items: center;
@@ -3545,7 +3567,7 @@ textField.innerHTML = `
         position: absolute;
         cursor: pointer;
         fill: none;
-        stroke-width: 6;
+        stroke-width: 8;
         stroke: rgba(var(--text-color), 1);
         height: 1.8rem;
         width: 1.8rem;

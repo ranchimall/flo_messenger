@@ -38,6 +38,7 @@ body[data-theme=dark] {
   --text-color: 240, 240, 240;
   --text-color-light: 170, 170, 170;
   --foreground-color: 20, 20, 20;
+  --error-color: rgb(255, 87, 87);
 }
 body[data-theme=dark] .initial {
   color: rgba(var(--text-color), 1) !important;
@@ -313,6 +314,11 @@ sm-popup sm-input + sm-input {
   margin: 1rem 0;
 }
 
+.tip {
+  font-size: 0.9rem;
+  color: rgba(var(--text-color), 0.8);
+}
+
 sm-button[variant=primary] {
   --foreground-color: 255, 255, 255;
 }
@@ -323,6 +329,10 @@ sm-button[variant=primary] .icon {
   margin-left: 0.8rem;
   stroke-width: 6;
   stroke: white;
+}
+
+sm-button.danger {
+  color: var(--error-color);
 }
 
 .logo-section {
@@ -626,8 +636,24 @@ sm-button[variant=primary] .icon {
 .contact .admin-tag {
   padding: 0.1rem 0.6rem;
   font-size: 0.8rem;
-  border: #00c465 1px solid;
-  border-radius: 0.3rem;
+  border: var(--accent-color) thin solid;
+  border-radius: 3rem;
+}
+.contact .tick {
+  position: absolute;
+  bottom: -0.2rem;
+  right: -0.2rem;
+  height: 1.2rem;
+  width: 1.2rem;
+}
+.contact .tick .icon {
+  height: 100%;
+  width: 100%;
+  padding: 0.4rem;
+  stroke-width: 12;
+  border-radius: 1rem;
+  background: rgba(var(--text-color), 1);
+  stroke: rgba(var(--foreground-color), 0.8);
 }
 
 #contact_details_popup > .flex:first-of-type {
@@ -673,8 +699,8 @@ sm-button[variant=primary] .icon {
 
 #warn_no_encryption, .date-card, .group-event-card {
   padding: 0.4rem 0.8rem;
-  background: rgba(var(--text-color), 0.1);
   font-weight: 500;
+  background-color: rgba(var(--text-color), 0.04);
   border-radius: 0.5rem;
   color: rgba(var(--text-color), 0.8);
   margin: 1rem 0;
@@ -706,18 +732,18 @@ sm-button[variant=primary] .icon {
 .contact .initial::after {
   content: "";
   position: absolute;
-  height: calc(100% + 0.8rem);
-  width: calc(100% + 0.8rem);
-  border: solid var(--accent-color) 0.2rem;
+  bottom: -0.2rem;
+  right: -0.2rem;
+  height: 1.2rem;
+  width: 1.2rem;
+  background: var(--accent-color);
   border-radius: 100%;
-  transform: scale(0.8);
-  opacity: 0;
-  transition: transform 0.3s, opacity 0.3s;
+  transform: scale(0);
+  transition: transform 0.3s;
 }
 
 .contact.unread .initial::after {
   transform: scale(1);
-  opacity: 1;
 }
 
 .mail-card.unread .time,
@@ -947,7 +973,7 @@ sm-button[variant=primary] .icon {
   overflow-y: auto;
 }
 #contacts #contacts_container {
-  padding-bottom: 5rem;
+  padding-bottom: 6rem;
 }
 #contacts #contacts_container::before {
   display: flex;
@@ -1085,15 +1111,28 @@ sm-button[variant=primary] .icon {
 #chat_details_panel .card:not(:last-of-type) {
   margin-bottom: 1rem;
 }
-#chat_details_panel .card > h4 {
+#chat_details_panel .card .h4 {
   font-weight: 400;
   font-size: 0.9rem;
   color: rgba(var(--text-color), 0.8);
   margin-bottom: 0.5rem;
 }
+#chat_details_panel .card > .flex {
+  margin-bottom: 1rem;
+}
+#chat_details_panel .card > .flex .h4 {
+  margin-bottom: 0;
+}
+#chat_details_panel .card .tip {
+  margin-bottom: 0.5rem;
+}
 #chat_details_panel header {
+  position: sticky;
+  top: 0;
   padding: 1rem;
   min-height: 4rem;
+  backdrop-filter: blur(1rem);
+  z-index: 1;
 }
 #chat_details_panel header .icon {
   height: 2.3rem;
@@ -1107,7 +1146,7 @@ sm-button[variant=primary] .icon {
 #chat_details_panel #chat_profile {
   display: grid;
   place-items: center;
-  margin-top: 1.5rem;
+  margin-top: 5.5rem;
   padding-bottom: 1.5rem;
 }
 #chat_details_panel #chat_profile .initial {
@@ -1133,6 +1172,11 @@ sm-button[variant=primary] .icon {
 }
 #chat_details_panel .copy {
   font-weight: 400;
+}
+
+#group_members_list {
+  max-height: 50vh;
+  overflow-y: auto;
 }
 
 #chat {
@@ -1274,7 +1318,7 @@ sm-button[variant=primary] .icon {
 }
 
 #scroll_to_bottom {
-  position: fixed;
+  position: absolute;
   display: flex;
   right: 0;
   bottom: 4rem;
@@ -1446,6 +1490,10 @@ sm-button[variant=primary] .icon {
   padding-bottom: 6rem;
 }
 
+#contacts_popup::part(popup-body) {
+  padding: 0;
+}
+
 sm-tab-panels {
   overflow: hidden auto;
 }
@@ -1457,7 +1505,7 @@ sm-panel {
 
 #inbox_mail_container,
 #sent_mail_container {
-  padding-bottom: 5rem;
+  padding-bottom: 6rem;
 }
 
 #chat, #mail {
@@ -1640,6 +1688,10 @@ sm-panel {
     padding-bottom: 0;
   }
 
+  .popup-header {
+    padding-top: 1.5rem;
+  }
+
   .fab {
     position: absolute;
   }
@@ -1662,10 +1714,6 @@ sm-panel {
   }
   #landing .left h4 {
     color: var(--accent-color);
-  }
-
-  #sign_in_popup .popup-header {
-    padding-top: 1.5rem;
   }
 
   #main_navbar {
