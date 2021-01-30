@@ -81,7 +81,7 @@
                         <p>Enter your <span id="type_of_key">FLO private key</span> to continue.</p>
                         <form action="" onsubmit="return false">
                             <sm-input id="private_key_input_field" class="outlined" type="password" placeholder="FLO private key" privateKey animate></sm-input>
-                            <sm-button id="sign_in_button" width="cover" variant="primary" disabled>continue</sm-button>
+                            <sm-button id="sign_in_button" width="cover" variant="primary" disable>continue</sm-button>
                             <sm-button id="remove_account" variant="outlined">Remove Account</sm-button>
                         </form>
                     </sm-panel>
@@ -173,7 +173,7 @@
 				<line x1="64" y1="64" x2="0" y2="0" />
 			</svg>
 			<h4>Add contact</h4>
-			<sm-button id="add_contact_button" variant="primary" disabled>Add</sm-button>
+			<sm-button id="add_contact_button" variant="primary" disable>Add</sm-button>
 		</header>
 		<sm-input id="add_contact_floID" class="outlined" floId placeholder="FLO address" animate required></sm-input>
 		<sm-input id="add_contact_name" class="outlined" placeholder="Name" animate required></sm-input>
@@ -186,7 +186,7 @@
 				<line x1="64" y1="64" x2="0" y2="0" />
 			</svg>
 			<h4>Compose Mail</h4>
-			<sm-button id="send_mail_button" variant="primary" disabled>Send</sm-button>
+			<sm-button id="send_mail_button" variant="primary" disable>Send</sm-button>
         </header>
         <div id="auto_complete_contact" class="flex direction-column">
             <sm-input id="send_mail_to" placeholder="To" animate required></sm-input>
@@ -203,7 +203,7 @@
 				<line x1="64" y1="64" x2="0" y2="0" />
 			</svg>
 			<h4>Reply</h4>
-			<sm-button id="reply_mail_button" variant="primary" disabled>Send</sm-button>
+			<sm-button id="reply_mail_button" variant="primary" disable>Send</sm-button>
 		</header>
 		<sm-input id="subject_of_reply_mail" placeholder="Subject" animate></sm-input>
 		<textarea id="reply_mail_content" placeholder="Type a mail" id="" rows="10" required></textarea>
@@ -252,7 +252,7 @@
                 <line x1="64" y1="64" x2="0" y2="0" />
             </svg>
             <h4>Select contact to add</h4>
-            <sm-button id="add_members_button" variant="primary" disabled>Add</sm-button>
+            <sm-button id="add_members_button" variant="primary" disable>Add</sm-button>
         </header>
         <p class="warning">*Contacts that haven't yet replied to you, can't be added to a group. So they won't be visible here.</p>
         <div id="popup_contacts_container" class="observe-empty-state"></div>
@@ -379,7 +379,7 @@
                         </sm-input>
                     </div>
                 </header>
-                <sm-button variant="primary" id="new_message_button" onclick="showContacts()" class="fab round">
+                <sm-button variant="primary" id="new_message_button" onclick="showContacts({show: true})" class="fab round">
                     <svg xmlns="http://www.w3.org/2000/svg"class="icon" viewBox="0 0 64 64">
                         <title>Send new message</title>
                         <path d="M55.76,20.13,59,23.34l3.5-3.48a3.26,3.26,0,0,0,.05-4.63l0-.05-.59-.56a3.3,3.3,0,0,0-4.67,0l-21.1,21a2.34,2.34,0,0,0-.63,1.19l-.9,4.63a.8.8,0,0,0,.66.91.57.57,0,0,0,.26,0l4.65-.88a2.36,2.36,0,0,0,1.22-.61l15.7-15.63"/>
@@ -402,7 +402,7 @@
                 <div id="all_contacts" class="flex direction-column hide-completely">
                     <header class="grid header">
                         <div class="flex align-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon back" onclick="showContacts(false)" viewBox="0 0 64 64">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon back" onclick="showContacts({show: false})" viewBox="0 0 64 64">
                                 <title>back-arrow</title>
                                 <line x1="1" y1="32" x2="64" y2="32"/>
                                 <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
@@ -417,34 +417,51 @@
                         </div>
                     </header>
                     <div id="selected_contacts" class="hide-completely">
-                        <h4>Add group members</h4>
-                        <div id="selected_contacts_container">
-                        </div>
+                        <h4>Select group members</h4>
+                        <div id="selected_contacts_container" class="observe-empty-state"></div>
+                        <p class="warning empty-state">*Contacts that haven't yet replied to you, can't be added to a group. So they won't be visible here.</p>
                     </div>
                     <div class="scrolling-wrapper">
-                        <div id="create_group_option" class="option interact" onclick="initGroupCreation()">
-                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M14.77,20.69c-1.72,0-4.95-2.46-5.59-3.74A22.74,22.74,0,0,1,7.76,9.27s-.28-6.36,7-6.36a6.69,6.69,0,0,1,7,6.36A23,23,0,0,1,20.36,17c-.65,1.28-3.88,3.74-5.59,3.74"/><path d="M34,24.52c-2.32,0-6.68-3.32-7.55-5.06A30.72,30.72,0,0,1,24.57,9.1S24.2.5,34,.5c9.09,0,9.46,8.6,9.46,8.6a30.72,30.72,0,0,1-1.92,10.36c-.86,1.74-5.23,5.06-7.54,5.06"/><path d="M51.11,31.69c-4.36-1.92-9-3.23-10.84-6.71A12.57,12.57,0,0,1,34,28.89,12.57,12.57,0,0,1,27.8,25C26,28.46,21.32,29.77,17,31.69,15.18,32.43,13.71,42,15.78,42"/><path d="M25,25c-2.38-1-4.55-2-5.57-3.93a9.38,9.38,0,0,1-4.62,2.89A9.32,9.32,0,0,1,10.15,21c-1.37,2.57-4.8,3.54-8,5-1.31.55-2.41,7.66-.87,7.66a25.71,25.71,0,0,0,11.38,3.46"/><line x1="52" y1="40" x2="52" y2="64"/><line x1="64" y1="52" x2="40" y2="52"/></svg>
-                            Create new group
+                        <div id="contact_options">
+                            <div id="create_group_option" class="option interact" onclick="initGroupCreation()">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon filled" viewBox="0 0 64 64"><path d="M13.61,19.27c-1.63,0-4.72-2.35-5.33-3.57A21.71,21.71,0,0,1,6.93,8.37S6.67,2.3,13.61,2.3A6.38,6.38,0,0,1,20.3,8.37,21.71,21.71,0,0,1,19,15.7c-.62,1.22-3.7,3.57-5.34,3.57"/><path d="M32,22.92c-2.21,0-6.37-3.17-7.2-4.82A29.42,29.42,0,0,1,23,8.21S22.62,0,32,0c8.68,0,9,8.21,9,8.21A29.42,29.42,0,0,1,39.2,18.1c-.82,1.65-5,4.82-7.2,4.82"/><path d="M14.82,27.75c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,22.41,19,21.43,18,19.6a8.85,8.85,0,0,1-4.41,2.75,8.85,8.85,0,0,1-4.4-2.75C7.9,22.05,4.63,23,1.55,24.33c-1.26.53-2.3,7.32-.84,7.32A24.66,24.66,0,0,0,11.57,35C11.89,32,12.86,28.57,14.82,27.75Z"/><path d="M49.15,34.3A14.85,14.85,0,1,0,64,49.15,14.85,14.85,0,0,0,49.15,34.3Zm8,16.31H50.58v6.61H47.66V50.61H41.05V47.69h6.61V41.08h2.92v6.61h6.61Z"/><path d="M48.93,30.42a1.56,1.56,0,0,0-.64-.66c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88a33,33,0,0,0,16.5,4.52A18.73,18.73,0,0,1,48.93,30.42Z"/></svg>
+                                Create new group
+                            </div>
+                            <div id="add_contact_option" class="option interact" onclick="showPopup('add_contact_popup')">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon filled" viewBox="0 0 64 64"><path d="M49.15,34.3A14.85,14.85,0,1,0,64,49.15,14.85,14.85,0,0,0,49.15,34.3Zm8,16.31H50.58v6.61H47.66V50.61H41.05V47.69h6.61V41.08h2.92v6.61h6.61Z"/><path d="M21.36,26.63C18.79,26.63,14,23,13,21s-2.12-7.45-2.12-11.49c0,0-.41-9.53,10.49-9.53C31.45,0,31.85,9.53,31.85,9.53c0,4-1.17,9.58-2.12,11.49s-5.8,5.61-8.37,5.61"/><path d="M28.78,49.15A20.28,20.28,0,0,1,36.7,33.07c-3.6-1.49-6.88-3-8.42-5.93a14,14,0,0,1-6.92,4.33,14,14,0,0,1-6.92-4.33c-2,3.85-7.18,5.3-12,7.43-2,.82-3.61,11.48-1.31,11.48a38.44,38.44,0,0,0,19.34,5.26h1.8a37.94,37.94,0,0,0,6.6-.59C28.82,50.2,28.78,49.68,28.78,49.15Z"/></svg>
+                                Add a contact
+                            </div>
                         </div>
-                        <div id="send_message_option" class="option interact" onclick="initGroupCreation()">
-                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M14.77,20.69c-1.72,0-4.95-2.46-5.59-3.74A22.74,22.74,0,0,1,7.76,9.27s-.28-6.36,7-6.36a6.69,6.69,0,0,1,7,6.36A23,23,0,0,1,20.36,17c-.65,1.28-3.88,3.74-5.59,3.74"/><path d="M34,24.52c-2.32,0-6.68-3.32-7.55-5.06A30.72,30.72,0,0,1,24.57,9.1S24.2.5,34,.5c9.09,0,9.46,8.6,9.46,8.6a30.72,30.72,0,0,1-1.92,10.36c-.86,1.74-5.23,5.06-7.54,5.06"/><path d="M51.11,31.69c-4.36-1.92-9-3.23-10.84-6.71A12.57,12.57,0,0,1,34,28.89,12.57,12.57,0,0,1,27.8,25C26,28.46,21.32,29.77,17,31.69,15.18,32.43,13.71,42,15.78,42"/><path d="M25,25c-2.38-1-4.55-2-5.57-3.93a9.38,9.38,0,0,1-4.62,2.89A9.32,9.32,0,0,1,10.15,21c-1.37,2.57-4.8,3.54-8,5-1.31.55-2.41,7.66-.87,7.66a25.71,25.71,0,0,0,11.38,3.46"/><line x1="52" y1="40" x2="52" y2="64"/><line x1="64" y1="52" x2="40" y2="52"/></svg>
-                            Send message to 
+                        <div id="contacts_container" class="observe-empty-state"></div>
+                        <div class="empty-state">
+                            <p>No contacts found.</p>
                         </div>
-                        <div id="contacts_container"></div>
-                        <sm-button id="show_contact_popup_button" variant="primary" class="fab round" onclick="showPopup('add_contact_popup')">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 64 64">
-                                <title>Add contact</title>
-                                <path d="M21.7,5.73c6.88,0,11.78,4.64,11.78,12.44S29.58,32.6,22,32.6,10.59,26,10.59,18.25,15.48,5.81,22.36,5.81"/>
-                                <path d="M16.56,33C14.49,36.91,7.85,38.9,3,41.06,1,41.89-.69,52.67,1.63,52.67A40.31,40.31,0,0,0,22.53,58,36.52,36.52,0,0,0,42.6,52.67c2.32,0,.66-10.7-1.33-11.61C36.38,38.9,29.75,36.91,27.67,33"/>
-                                <line x1="54.32" y1="12.32" x2="54.32" y2="31.68"/>
-                                <line x1="64" y1="22" x2="44.64" y2="22"/>
+                    </div>
+                    <sm-button id="skip_members_button" variant="primary" class="fab round hide-completely" onclick="skipToGroupCreation()">
+                        Skip
+                    </sm-button>
+                </div>
+                <div id="group_creation_panel" class="flex direction-column hide-completely">
+                    <header class="grid header">
+                        <div class="flex align-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon back" onclick="backToContacts()" viewBox="0 0 64 64">
+                                <title>back-arrow</title>
+                                <line x1="1" y1="32" x2="64" y2="32"/>
+                                <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
                             </svg>
-                            Add a contact
-                        </sm-button>
-                        <sm-button id="create_group_button" variant="primary" class="fab round hide-completely">
+                            <h4>Create group</h4>
+                        </div>
+                    </header>
+                    <form action="" onsubmit="return false">
+                        <div class="grid">
+                            <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
+                            <sm-input id="group_name_field" placeholder="Group name" required></sm-input>
+                            <sm-textarea id="group_description_field" placeholder="Group description"></sm-textarea>
+                        </div>
+                        <sm-button id="create_group_button" variant="primary" class="fab round" type="submit" disable>
                             Create
                         </sm-button>
-                    </div>
+                    </form>
                 </div>
 			</div>
 			<div id="chat" class="grid hide-on-mobile hide-completely">
@@ -1398,14 +1415,11 @@
                                 }
                             }
                         }
-                        else if(type === 'group'){
+                        if(type === 'group' && lastMessage.time === 0){
                             lastMessage.time = floGlobals.groups[floID].created
                         }
                         let lastText = document.createElement('p')
-                        if(type === 'chat' && lastMessage.category === 'sent'){
-                            lastText.textContent = `You: ${lastMessage.message}`
-                        }
-                        else if(type === 'group' && lastMessage.sender === myFloID){
+                        if((type === 'chat' && lastMessage.category === 'sent') || (type === 'group' && lastMessage.sender === myFloID)){
                             lastText.textContent = `You: ${lastMessage.message}`
                         }
                         else{
@@ -1719,17 +1733,15 @@
         })
 
         getRef('search_contacts').addEventListener('input', function() {
-            const contacts = {}
             if(this.value.trim !== ''){
-                for(cont in floGlobals.contacts){
-                    if(cont.toLowerCase().includes(this.value.toLowerCase()) || floGlobals.contacts[cont].toLowerCase().includes(this.value.toLowerCase()))
-                    contacts[cont] = floGlobals.contacts[cont]
+                for(child of getRef('contacts_container').children) {
+                    if(child.getAttribute('name').toLowerCase().includes(this.value.toLowerCase()) || child.getAttribute('flo-id').toLowerCase().includes(this.value.toLowerCase())){
+                        child.classList.remove('hide-completely')
+                    }
+                    else{
+                        child.classList.add('hide-completely')
+                    }
                 }
-                getRef('contacts_container').innerHTML = ''
-                renderContactList(contacts)
-            }
-            if([...contacts].length){
-                
             }
         })
 
@@ -1806,9 +1818,7 @@
         })
 
 
-        let clickedContact = {}
-
-        let selectedGroupMembers = new Set()
+        const clickedContact = {}
 
         getRef('chat_page').addEventListener('click', e => {
             //detect click on chat cards
@@ -1825,12 +1835,12 @@
                     if(isRemovingMember)
                         selectMemberToRemove(e.target.closest(".selectable"))
                 }
-                else if(e.target.closest(".initial") || e.target.closest(".menu")){
-                    showPopup('contact_details_popup')
-                }
                 else if(isCreatingGroup){
                     // code for adding group members
                     selectContact(contact)
+                }
+                else if(e.target.closest(".initial") || e.target.closest(".menu")){
+                    showPopup('contact_details_popup')
                 }
                 else{
                     createRipple(e, contact)
@@ -1852,6 +1862,9 @@
                     }
                 }
             }
+            else if(e.target.closest('.contact-preview')){
+                removeSelectedContact(e.target.closest('.contact-preview'))
+            }
         })
         getRef('contacts_popup').addEventListener('click', e => {
             //detect click on contacts
@@ -1860,94 +1873,214 @@
             }
         })
 
-        function selectContact(contact){
-                
-            if(!selectedGroupMembers.has(clickedContact.floID)){
-                
-                let selectedContact = clickedContact['card'].querySelector('.initial').cloneNode(true);
-                let selectedContactsContainer = getRef('selected_contacts_container');
-
-                selectedContact.setAttribute('floID' , clickedContact['floID'] );
-                selectedContact.onclick = removeContactCard;
-
-                // adding animation to contactCard
-                let animatingCard = addAnimate();
-
-                mygroup.push(clickedContact['floID']);
-                selectedContactsContainer.appendChild(selectedContact);
-                selectedContact.appendChild(closeIcon);
-                selectedContact.animate(animatingCard[0], animatingCard[1]);
-
-                selectedContact.style.margin = "8px";
-                selectedContact.style.cursor = "pointer";
-                clickedContact['card'].querySelector('.initial').appendChild(tickIcon);
-                tickIcon.animate(animatingCard[0], animatingCard[1]); 
-            }      
-            
-            else{
-                let selectedContactsContainer = getRef('selected_contacts_container');
-                let removeIndex = mygroup.indexOf(clickedContact['floID']);
-                let removeContact = selectedContactsContainer.querySelector('div:nth-of-type('+ (removeIndex + 1)+ ')');
-                let tickIcon = clickedContact['card'].querySelector('.initial').querySelector('img');
-                let animatingCardRemove = removeAnimate();
-
-
-                if(removeIndex > -1){
-                    mygroup.splice(removeIndex,1);
+        // Function to show all contacts side drawer
+        let contactsDrawerAnimation
+        function showContacts(options){
+            const {show = true, onlyValid = false} = options
+            let contacts = {}
+            if(show){
+                getRef('contacts_container').innerHTML = ''
+                // Show contacts which replied
+                if(onlyValid){
+                    for(contact in floGlobals.contacts){
+                        if(contact in floGlobals.pubKeys){
+                            contacts[contact] = floGlobals.contacts[contact]
+                        }
+                    }
                 }
-
-                removeContact.animate(animatingCardRemove[0],animatingCardRemove[1]);
-                tickIcon.animate(animatingCardRemove[0], animatingCardRemove[1]);
-                
-                setTimeout( function(){
-                    
-                    removeContact.remove();
-                    tickIcon.remove();
-
-                },300)
+                else{
+                    contacts = floGlobals.contacts
+                }
+                renderContactList(contacts)
+                getRef('all_contacts').classList.remove('hide-completely')
+                contactsDrawerAnimation = animateTo(getRef('all_contacts'), [
+                    {transform: 'translateY(2rem)'},
+                    {transform: 'translateY(0)'},
+                ],{
+                    duration: 300,
+                    easing: 'ease'
+                })
             }
-
-    }
-
-    let mygroup = []
-    function clearAllMember(){
-        mygroup=[];
-        let selectedContactsContainer = getRef('selected_contacts_container');
-        let contacts = getRef('contacts').getElementsByClassName('initial');
-
-        selectedContactsContainer.innerHTML = "";
-       
-        for(let i =0 ; i< contacts.length ; i++){
-            if(contacts[i].querySelector('img'))
-              contacts[i].querySelector('img').remove();
+            else{
+                isCreatingGroup = false
+                clearAllMembers()
+                contactsDrawerAnimation.reverse()
+                contactsDrawerAnimation.onfinish = () => {
+                    getRef('all_contacts').classList.add('hide-completely')
+                    getRef('contact_options').classList.remove('hide-completely')
+                    getRef('selected_contacts').classList.add('hide-completely')
+                    getRef('skip_members_button').classList.add('hide-completely')
+                    getRef('contacts_container').innerHTML = ''
+                }
+            }
         }
-        
 
-    }
-
-    function removeContactCard(){
-        let contactFloID = this.getAttribute("floID");
-        let removeIndex = mygroup.indexOf(contactFloID);
-        let tickIcon = getRef('contacts').querySelector('[flo-id=' + contactFloID +']').querySelector('.initial').querySelector('img');
-        let animatingCardRemove = removeAnimate();
-        let removeCard = this;
-
-        if(removeIndex > -1){
-             mygroup.splice(removeIndex,1);
-
+        function transformScroll(event) {
+            if (!event.deltaY) {
+                return;
             }
 
-        removeCard.animate(animatingCardRemove[0],animatingCardRemove[1]);
-        tickIcon.animate(animatingCardRemove[0], animatingCardRemove[1]);
-         
+            event.currentTarget.scrollLeft += event.deltaY + event.deltaX;
+            event.preventDefault();
+        }
 
-         setTimeout(function(){
-        
-            removeCard.remove();
-            tickIcon.remove();
-        },300)
-    }
+        getRef('selected_contacts_container').addEventListener('wheel', transformScroll);
 
+        const selectedGroupMembers = new Set()
+        function selectContact(contact){
+            if(!selectedGroupMembers.has(clickedContact.floID)){
+                selectedGroupMembers.add(clickedContact.floID)
+                const clonedInitial = contact.querySelector('.initial').cloneNode(true);
+                const clonedName = contact.querySelector('.name').cloneNode(true);
+                const preview = document.createElement('div')
+                preview.classList.add('contact-preview')
+                preview.setAttribute('flo-id' , clickedContact['floID'] );
+                preview.append(clonedInitial, clonedName)
+                addCross(preview)
+                getRef('selected_contacts_container').append(preview)
+                preview.scrollIntoView({behavior: "smooth", inline: "end"});
+                
+                preview.animate(
+                    [
+                        {transform: 'scale(0)'},
+                        {transform: 'scale(1)'},
+                    ],
+                    {
+                        duration: 300,
+                        easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                        fill: 'forwards'
+                    }
+                )
+                addTick(contact)
+            }      
+            else{
+                selectedGroupMembers.delete(clickedContact.floID)
+                const relatedPreview = getRef('selected_contacts_container').querySelector(`[flo-id="${clickedContact.floID}"]`)
+                relatedPreview.animate(
+                    [
+                        {transform: 'scale(1)'},
+                        {transform: 'scale(0)'},
+                    ],
+                    {
+                        duration: 150,
+                        easing: 'ease',
+                        fill: 'forwards'
+                    }
+                ).onfinish = () => {
+                    relatedPreview.remove()
+                }
+                removeTick(contact)
+            }
+            if(selectedGroupMembers.size){
+                getRef('skip_members_button').textContent = 'Next'
+            }
+            else{
+                getRef('skip_members_button').textContent = 'Skip'
+            }
+        }
+
+        function removeSelectedContact(preview){
+            getRef('contacts_container').querySelector(`[flo-id="${preview.getAttribute('flo-id')}"]`).click()
+        }
+
+        function clearAllMembers(){
+            getRef('selected_contacts_container').innerHTML = ''        
+            selectedGroupMembers.clear()
+        }
+        let isCreatingGroup = false
+        function initGroupCreation(){
+            isCreatingGroup = true
+            showContacts({show: true, onlyValid: true})
+            getRef('contact_options').classList.add('hide-completely')
+            getRef('selected_contacts').classList.remove('hide-completely')
+            getRef('skip_members_button').classList.remove('hide-completely')
+        }
+
+        function skipToGroupCreation(){
+            const animOptions = {
+                duration: 300,
+                fill: 'forwards',
+                easing: 'ease'
+            }
+            getRef('all_contacts').animate(
+                [
+                    {transform: 'translateX(0)'},
+                    {transform: 'translateX(-25%)'},
+                ],
+                animOptions
+            ).onfinish = () => {
+                getRef('all_contacts').classList.add('hide-completely')
+            }
+            getRef('group_creation_panel').classList.remove('hide-completely')
+            getRef('group_creation_panel').animate(
+                [
+                    {transform: 'translateX(100%)'},
+                    {transform: 'translateX(0)'},
+                ],
+                animOptions
+            )
+        }
+        function backToContacts(){
+            const animOptions = {
+                duration: 300,
+                fill: 'forwards',
+                easing: 'ease'
+            }
+            getRef('group_creation_panel').animate(
+                [
+                    {transform: 'translateX(0)'},
+                    {transform: 'translateX(100%)'},
+                ],
+                animOptions
+            ).onfinish = () => {
+                getRef('group_creation_panel').classList.add('hide-completely')
+            }
+            getRef('all_contacts').classList.remove('hide-completely')
+            getRef('all_contacts').animate(
+                [
+                    {transform: 'translateX(-25%)'},
+                    {transform: 'translateX(0)'},
+                ],
+                animOptions
+            )
+        }
+
+        document.getElementById('create_group_button').addEventListener('clicked', createGroup)
+        function createGroup(){
+            const groupName = getRef('group_name_field').value.trim()
+            const groupDescription = getRef('group_description_field').value.trim()
+            messenger.createGroup(groupName, groupDescription)
+            .then(groupInfo => {
+                isCreatingGroup = false
+                getRef('chat_container').prepend(render.contactCard(groupInfo.groupID, {type: 'group'}))
+                getRef('chat_container').children[0].click()
+                getRef('group_creation_panel').animate(
+                    [
+                        {transform: 'translateY(0)'},
+                        {transform: 'translateY(2rem)'},
+                    ],
+                    {
+                        duration: 150,
+                        fill: 'forwards',
+                        easing: 'ease'
+                    }
+                ).onfinish = () => {
+                    getRef('all_contacts').classList.add('hide-completely')
+                    getRef('group_creation_panel').classList.add('hide-completely')
+                    getRef('contact_options').classList.remove('hide-completely')
+                    getRef('selected_contacts').classList.add('hide-completely')
+                }
+                notify('Group created', 'success')
+                if(selectedGroupMembers.size){
+                    messenger.addGroupMembers(groupInfo.groupID, [...selectedGroupMembers])
+                    .then(res => {
+                        clearAllMembers()
+                    })
+                    .catch(err => console.error(err))
+                }
+            })
+            .catch(err => console.error(err))
+        }
 
         const emojis = [
             "<", "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗","😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", 
@@ -2086,34 +2219,6 @@
                 localStorage.setItem("isEnterSend", 'false');
             }
         })
-
-        // Function to show all contacts side drawer
-        let contactsDrawerAnimation
-        function showContacts(show = true){
-            if(show){
-                renderContactList(floGlobals.contacts)
-                getRef('all_contacts').classList.remove('hide-completely')
-                contactsDrawerAnimation = animateTo(getRef('all_contacts'), [
-                    {transform: 'translateY(2rem)'},
-                    {transform: 'translateY(0)'},
-                ],{
-                    duration: 300,
-                    easing: 'ease'
-                })
-            }
-            else{
-                isCreatingGroup = false
-                contactsDrawerAnimation.reverse()
-                contactsDrawerAnimation.onfinish = () => {
-                    getRef('all_contacts').classList.add('hide-completely')
-                    getRef('create_group_option').classList.remove('hide-completely')
-                    getRef('selected_contacts').classList.add('hide-completely')
-                    getRef('create_group_button').classList.add('hide-completely')
-                    getRef('show_contact_popup_button').classList.remove('hide-completely')
-                    getRef('contacts_container').innerHTML = ''
-                }
-            }
-        }
 
         function updateHeight(){
             if(window.innerWidth < 640){
@@ -2585,16 +2690,6 @@
             }
         }
 
-        let isCreatingGroup = false
-        function initGroupCreation(){
-            isCreatingGroup = true
-            showContacts()
-            getRef('create_group_option').classList.add('hide-completely')
-            getRef('selected_contacts').classList.remove('hide-completely')
-            getRef('show_contact_popup_button').classList.add('hide-completely')
-            getRef('create_group_button').classList.remove('hide-completely')
-        }
-
         function viewMail(mailRef, newView = true) {
             //clear the container and display popup (if needed)
             if (newView)
@@ -2868,7 +2963,7 @@
 
                     getRef("group_description_card").classList.remove('hide-completely')
                     getRef("group_members_card").classList.remove('hide-completely')
-                    getRef("group_description").value = floGlobals.groups[floID].description;
+                    getRef("group_description").value = floGlobals.groups[floID].description === '' ? 'Add group description' : floGlobals.groups[floID].description;
 
                     if(floGlobals.groups[activeChat['floID']].admin === myFloID){
                         getRef("chat_name").disabled = false
@@ -3053,6 +3148,18 @@
             ).onfinish = () => {
                 tick.remove()
             }
+        }
+        function addCross(contact){
+            const cross = document.createElement('div');
+            cross.innerHTML = `
+            <svg class="icon" viewBox="0 0 64 64">
+                <title>Remove</title>
+                <line x1="64" y1="0" x2="0" y2="64"/>
+                <line x1="64" y1="64" x2="0" y2="0"/>
+            </svg>
+            `
+            cross.classList.add('tick')
+            contact.append(cross)
         }
 
         document.getElementById('add_members_button').addEventListener('clicked', addGroupMembers)

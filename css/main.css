@@ -184,8 +184,10 @@ strong {
 .fab .icon {
   margin-left: 0 !important;
   margin-right: 0.5rem;
-  height: 0.9rem !important;
-  stroke-width: 8 !important;
+  height: 1.2rem;
+  width: 1.2rem;
+  stroke-width: 8;
+  stroke: white;
 }
 
 a:any-link {
@@ -326,14 +328,6 @@ sm-popup sm-input + sm-input {
 
 sm-button[variant=primary] {
   --foreground-color: 255, 255, 255;
-}
-sm-button[variant=primary] .icon {
-  align-self: center;
-  height: 1rem;
-  width: 1rem;
-  margin-left: 0.8rem;
-  stroke-width: 6;
-  stroke: white;
 }
 
 sm-button.danger {
@@ -568,6 +562,11 @@ sm-button.danger {
     transform: scale(1);
   }
 }
+#main {
+  width: 100%;
+  height: 100%;
+}
+
 .initial {
   position: relative;
   justify-content: center;
@@ -579,6 +578,11 @@ sm-button.danger {
   border-radius: 2rem;
   text-transform: uppercase;
   user-select: none;
+}
+
+.filled {
+  fill: white;
+  stroke: none !important;
 }
 
 .group-icon {
@@ -616,6 +620,7 @@ sm-button.danger {
   grid-area: dp;
 }
 .contact .name {
+  width: 100%;
   font-size: 1em;
   font-weight: 500;
   color: rgba(var(--text-color), 0.8);
@@ -648,21 +653,74 @@ sm-button.danger {
   border: var(--accent-color) thin solid;
   border-radius: 3rem;
 }
-.contact .tick {
+
+.tick {
   position: absolute;
   bottom: -0.2rem;
   right: -0.2rem;
   height: 1.2rem;
   width: 1.2rem;
 }
-.contact .tick .icon {
+.tick .icon {
   height: 100%;
   width: 100%;
   padding: 0.4rem;
-  stroke-width: 12;
+  stroke-width: 16;
   border-radius: 1rem;
   background: rgba(var(--text-color), 1);
   stroke: rgba(var(--foreground-color), 0.8);
+}
+
+#selected_contacts {
+  padding: 1rem 1.5rem;
+}
+#selected_contacts h4 {
+  font-weight: 500;
+  font-size: 1rem;
+}
+#selected_contacts .warning {
+  font-size: 0.9rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  line-height: 1.5;
+}
+#selected_contacts sm-button {
+  margin-bottom: 0;
+}
+
+#selected_contacts_container {
+  display: flex;
+  overflow: auto hidden;
+}
+#selected_contacts_container:not(:empty) {
+  margin-top: 1.5rem;
+}
+#selected_contacts_container .contact-preview {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  background: rgba(var(--text-color), 0.1);
+  padding: 0.4rem 0.5rem;
+  border-radius: 2rem;
+}
+#selected_contacts_container .contact-preview .initial {
+  width: 1.6rem;
+  height: 1.6rem;
+  font-size: 0.9rem;
+}
+#selected_contacts_container .contact-preview .name {
+  font-size: 0.9rem;
+  color: rgba(var(--text-color), 0.8);
+  margin-left: 0.5rem;
+}
+#selected_contacts_container .contact-preview .tick {
+  position: relative;
+  bottom: auto;
+  right: auto;
+  margin-left: 0.5rem;
 }
 
 #contact_details_popup > .flex:first-of-type {
@@ -741,10 +799,10 @@ sm-button.danger {
 .contact .initial::after {
   content: "";
   position: absolute;
-  bottom: -0.2rem;
-  right: -0.2rem;
-  height: 1.2rem;
-  width: 1.2rem;
+  bottom: -0.1rem;
+  right: -0.1rem;
+  height: 1rem;
+  width: 1rem;
   background: var(--accent-color);
   border-radius: 100%;
   transform: scale(0);
@@ -954,8 +1012,10 @@ sm-button.danger {
 
 #contacts {
   position: relative;
+  overflow-x: hidden;
 }
-#contacts #all_contacts {
+#contacts #all_contacts,
+#contacts #group_creation_panel {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -964,17 +1024,23 @@ sm-button.danger {
   z-index: 1;
   background: rgba(var(--foreground-color), 1);
 }
-#contacts #all_contacts .header {
+#contacts #all_contacts .header,
+#contacts #group_creation_panel .header {
   padding-top: 0.7rem;
 }
 #contacts .option {
   display: flex;
   align-items: center;
-  padding: 1rem 1.5rem;
+  padding: 0.8rem 1.5rem;
 }
 #contacts .option .icon {
+  height: 2.4rem;
+  width: 2.4rem;
+  padding: 0.6rem;
+  background: var(--accent-color);
+  border-radius: 50%;
   margin-right: 1rem;
-  stroke: rgba(var(--text-color), 0.7);
+  stroke: rgba(255, 255, 255, 0.8);
 }
 #contacts .scrolling-wrapper {
   height: 100%;
@@ -992,24 +1058,19 @@ sm-button.danger {
   padding: 1rem 1.5rem;
 }
 
-#selected_contacts {
+#group_creation_panel .grid {
   padding: 1.5rem;
-  background: rgba(var(--text-color), 0.06);
-}
-#selected_contacts h4 {
-  font-weight: 500;
-  font-size: 1rem;
-}
-#selected_contacts sm-button {
-  margin-bottom: 0;
-}
-
-#selected_contacts_container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
   gap: 1rem;
-  max-height: 8rem;
-  overflow-y: auto;
+}
+#group_creation_panel .group-icon {
+  background: var(--accent-color);
+  justify-self: center;
+  height: 8rem;
+  width: 8rem;
+  margin-bottom: 1rem;
+  padding: 2rem;
+  border-radius: 50%;
+  font-size: 4rem;
 }
 
 #contacts, #mails {
@@ -1647,7 +1708,7 @@ sm-panel {
     width: 100% !important;
   }
 
-  #sing_in {
+  #sign_in {
     max-height: 90vh;
   }
 
@@ -1773,8 +1834,6 @@ sm-panel {
   }
 
   #main {
-    width: 100vw;
-    height: 100vh;
     grid-template-columns: auto 1fr;
   }
 
@@ -1874,6 +1933,7 @@ sm-panel {
 @media (hover: hover) {
   ::-webkit-scrollbar {
     width: 0.5rem;
+    height: 0.5rem;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -1886,7 +1946,8 @@ sm-panel {
 
   .navbar-item:hover,
 .contact:hover,
-.emoji:hover {
+.emoji:hover,
+.option:hover {
     cursor: pointer;
     background: rgba(var(--text-color), 0.06);
   }
@@ -1901,6 +1962,12 @@ sm-panel {
   }
 }
 @media (hover: none) {
+  .contact-preview,
+.contact,
+.icon {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   .contact .menu {
     display: none;
   }

@@ -13,7 +13,7 @@ smButton.innerHTML = `
     display: -ms-inline-flexbox;
     display: inline-flex;
 }
-:host([disabled]) .button{
+:host([disable]) .button{
     cursor: not-allowed;
     opacity: 0.6;
     background: rgba(var(--text-color), 0.3) !important;
@@ -74,7 +74,7 @@ span.ripple {
     transform: scale(0);
     background: rgba(var(--text-color), 0.2);
 }
-:host(:not([disabled])) .button:focus-visible{
+:host(:not([disable])) .button:focus-visible{
     -webkit-box-shadow: 0 0 0 0.1rem var(--accent-color);
             box-shadow: 0 0 0 0.1rem var(--accent-color);
 }
@@ -83,7 +83,7 @@ span.ripple {
             box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0 0 0.1rem var(--accent-color);
 }
 @media (hover: hover){
-    :host(:not([disabled])) .button:hover{
+    :host(:not([disable])) .button:hover{
         -webkit-box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
                 box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
     }
@@ -93,7 +93,7 @@ span.ripple {
     }
 }
 @media (hover: none){
-    :host(:not([disabled])) .button:active{
+    :host(:not([disable])) .button:active{
         -webkit-box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
                 box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
     }
@@ -122,17 +122,17 @@ customElements.define('sm-button',
         set disabled(value) {
             if (value && !this.isDisabled) {
                 this.isDisabled = true
-                this.setAttribute('disabled', '')
+                this.setAttribute('disable', '')
                 this.button.removeAttribute('tabindex')
             } else if (!value && this.isDisabled) {
                 this.isDisabled = false
-                this.removeAttribute('disabled')
+                this.removeAttribute('disable')
             }
         }
 
         dispatch() {
             if (this.isDisabled) {
-                this.dispatchEvent(new CustomEvent('disabled', {
+                this.dispatchEvent(new CustomEvent('disable', {
                     bubbles: true,
                     composed: true
                 }))
@@ -147,7 +147,7 @@ customElements.define('sm-button',
         connectedCallback() {
             this.isDisabled = false
             this.button = this.shadowRoot.querySelector('.button')
-            if (this.hasAttribute('disabled') && !this.isDisabled)
+            if (this.hasAttribute('disable') && !this.isDisabled)
                 this.isDisabled = true
             this.addEventListener('click', (e) => {
                 this.dispatch()
