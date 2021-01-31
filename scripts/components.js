@@ -579,6 +579,10 @@ smTextarea.innerHTML = `
 :host{
     display: grid;
 }
+:host(.outlined) .textarea {
+    box-shadow: 0 0 0 0.1rem rgba(var(--text-color), 0.4) inset;
+    background: rgba(var(--foreground-color), 1);
+}
 .textarea{
     display: grid;
     position: relative;

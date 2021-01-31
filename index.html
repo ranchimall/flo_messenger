@@ -189,10 +189,10 @@
 			<sm-button id="send_mail_button" variant="primary" disable>Send</sm-button>
         </header>
         <div id="auto_complete_contact" class="flex direction-column">
-            <sm-input id="send_mail_to" placeholder="To" animate required></sm-input>
+            <sm-input id="send_mail_to" class="outlined" placeholder="To" animate required></sm-input>
             <div id="mail_contact_list" class="hide-completely contact-list"></div>
         </div>
-		<sm-input id="subject_of_mail" placeholder="Subject" animate></sm-input>
+		<sm-input id="subject_of_mail" class="outlined" placeholder="Subject" animate></sm-input>
 		<textarea id="mail_content" placeholder="Type a mail" name="" id="" rows="10" required></textarea>
 	</sm-popup>
 	<sm-popup id="reply_mail_popup">
@@ -205,7 +205,7 @@
 			<h4>Reply</h4>
 			<sm-button id="reply_mail_button" variant="primary" disable>Send</sm-button>
 		</header>
-		<sm-input id="subject_of_reply_mail" placeholder="Subject" animate></sm-input>
+		<sm-input id="subject_of_reply_mail" class="outlined" placeholder="Subject" animate></sm-input>
 		<textarea id="reply_mail_content" placeholder="Type a mail" id="" rows="10" required></textarea>
     </sm-popup>
     <!-- Contact popup -->
@@ -220,26 +220,36 @@
         <div class="flex direction-column align-center">
             <div id="contact_initial" class="initial flex align-center"></div>
             <text-field id="contact_name"></text-field>
-            <div class="flex space-between align-center">
-                <svg id="delete_person" onclick="deleteChat()" class="icon" viewBox="0 0 64 64" title="Remove">
-                    <title>remove</title>
+        </div>
+        <section class="popup-section">
+            <h5>FLO ID</h5>
+            <div class="copy-row grid">
+                <h4 id="contact_flo_id" class="copy"></h4>
+                <svg class="icon" onclick="copyToClipboard(this, 'Copied FLO ID')" viewBox="0 0 64 64">
+                    <title>Copy</title>
+                    <rect x="16" y="16" width="48" height="48" rx="6" />
+                    <path d="M.5,47.52V6.5a6,6,0,0,1,6-6h41" />
+                </svg>
+            </div>
+        </section>
+        <ul id="contact_options">
+            <li class="option" onclick="clearChat()">
+                <svg class="icon" viewBox="0 0 64 64">
                     <line x1="4" y1="6.3" x2="60" y2="6.3" />
                     <path d="M53.5,20.5v38.9c0,2.3-1.8,4.1-4.1,4.1h0H14.6c-2.3,0-4.1-1.8-4.1-4.1c0,0,0,0,0,0V20.5" />
                     <path d="M22.7,6.6V3.8c0-1.8,1.5-3.3,3.3-3.3h11.4c1.8,0,3.3,1.5,3.3,3.3v2.8" />
                 </svg>
-            </div>
-        </div>
-        <h5>FLO ID</h5>
-        <div class="copy-row grid">
-            <h4 id="contact_flo_id" class="copy"></h4>
-            <svg class="icon" onclick="copyToClipboard(this, 'Copied FLO ID')" viewBox="0 0 64 64">
-                <title>Copy</title>
-                <rect x="16" y="16" width="48" height="48" rx="6" />
-                <path d="M.5,47.52V6.5a6,6,0,0,1,6-6h41" />
-            </svg>
-        </div>
-        <div class="flex">
-        </div>
+                Clear this chat
+            </li>
+            <li id="delete_chat_option" class="option" onclick="deleteChat()">
+                <svg class="icon" viewBox="0 0 64 64">
+                    <line x1="4" y1="6.3" x2="60" y2="6.3" />
+                    <path d="M53.5,20.5v38.9c0,2.3-1.8,4.1-4.1,4.1h0H14.6c-2.3,0-4.1-1.8-4.1-4.1c0,0,0,0,0,0V20.5" />
+                    <path d="M22.7,6.6V3.8c0-1.8,1.5-3.3,3.3-3.3h11.4c1.8,0,3.3,1.5,3.3,3.3v2.8" />
+                </svg>
+                Delete this chat
+            </li>
+        </ul>
     </sm-popup>
 
     <!-- all contacts popup -->
@@ -422,14 +432,14 @@
                         <p class="warning empty-state">*Contacts that haven't yet replied to you, can't be added to a group. So they won't be visible here.</p>
                     </div>
                     <div class="scrolling-wrapper">
-                        <div id="contact_options">
+                        <div id="all_contacts_options">
                             <div id="create_group_option" class="option interact" onclick="initGroupCreation()">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon filled" viewBox="0 0 64 64"><path d="M13.61,19.27c-1.63,0-4.72-2.35-5.33-3.57A21.71,21.71,0,0,1,6.93,8.37S6.67,2.3,13.61,2.3A6.38,6.38,0,0,1,20.3,8.37,21.71,21.71,0,0,1,19,15.7c-.62,1.22-3.7,3.57-5.34,3.57"/><path d="M32,22.92c-2.21,0-6.37-3.17-7.2-4.82A29.42,29.42,0,0,1,23,8.21S22.62,0,32,0c8.68,0,9,8.21,9,8.21A29.42,29.42,0,0,1,39.2,18.1c-.82,1.65-5,4.82-7.2,4.82"/><path d="M14.82,27.75c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,22.41,19,21.43,18,19.6a8.85,8.85,0,0,1-4.41,2.75,8.85,8.85,0,0,1-4.4-2.75C7.9,22.05,4.63,23,1.55,24.33c-1.26.53-2.3,7.32-.84,7.32A24.66,24.66,0,0,0,11.57,35C11.89,32,12.86,28.57,14.82,27.75Z"/><path d="M49.15,34.3A14.85,14.85,0,1,0,64,49.15,14.85,14.85,0,0,0,49.15,34.3Zm8,16.31H50.58v6.61H47.66V50.61H41.05V47.69h6.61V41.08h2.92v6.61h6.61Z"/><path d="M48.93,30.42a1.56,1.56,0,0,0-.64-.66c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88a33,33,0,0,0,16.5,4.52A18.73,18.73,0,0,1,48.93,30.42Z"/></svg>
                                 Create new group
                             </div>
                             <div id="add_contact_option" class="option interact" onclick="showPopup('add_contact_popup')">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon filled" viewBox="0 0 64 64"><path d="M49.15,34.3A14.85,14.85,0,1,0,64,49.15,14.85,14.85,0,0,0,49.15,34.3Zm8,16.31H50.58v6.61H47.66V50.61H41.05V47.69h6.61V41.08h2.92v6.61h6.61Z"/><path d="M21.36,26.63C18.79,26.63,14,23,13,21s-2.12-7.45-2.12-11.49c0,0-.41-9.53,10.49-9.53C31.45,0,31.85,9.53,31.85,9.53c0,4-1.17,9.58-2.12,11.49s-5.8,5.61-8.37,5.61"/><path d="M28.78,49.15A20.28,20.28,0,0,1,36.7,33.07c-3.6-1.49-6.88-3-8.42-5.93a14,14,0,0,1-6.92,4.33,14,14,0,0,1-6.92-4.33c-2,3.85-7.18,5.3-12,7.43-2,.82-3.61,11.48-1.31,11.48a38.44,38.44,0,0,0,19.34,5.26h1.8a37.94,37.94,0,0,0,6.6-.59C28.82,50.2,28.78,49.68,28.78,49.15Z"/></svg>
-                                Add a contact
+                                Add contact
                             </div>
                         </div>
                         <div id="contacts_container" class="observe-empty-state"></div>
@@ -455,7 +465,7 @@
                     <form action="" onsubmit="return false">
                         <div class="grid">
                             <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
-                            <sm-input id="group_name_field" placeholder="Group name" required></sm-input>
+                            <sm-input id="group_name_field" class="outlined" placeholder="Group name" animate required></sm-input>
                             <sm-textarea id="group_description_field" placeholder="Group description"></sm-textarea>
                         </div>
                         <sm-button id="create_group_button" variant="primary" class="fab round" type="submit" disable>
@@ -541,8 +551,8 @@
                         <div id="group_members_list"></div>
                     </div>
                     <div class="card">
-                        <sm-button class="danger">Clear chat</sm-button>
-                        <sm-button class="danger">Delete chat</sm-button>
+                        <sm-button class="danger" onclick="clearChat()">Clear chat</sm-button>
+                        <sm-button id="delete_chat_button" class="danger" onclick="deleteChat()">Delete chat</sm-button>
                     </div>
                 </div>
 			</div>
@@ -812,6 +822,12 @@
 
             switch (e.detail.popup.id) {
                 case 'contact_details_popup':
+                    if(clickedContact.chatCard.closest('#chat_container')){
+                        getRef('contact_options').classList.remove('hide-completely')
+                    }
+                    else{
+                        getRef('contact_options').classList.add('hide-completely')
+                    }
                     if(clickedContact.isGroup){
                         getRef("contact_initial").innerHTML = `
                             <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
@@ -820,12 +836,14 @@
                             getRef('contact_name').disabled = false
                         else
                             getRef('contact_name').disabled = true
+                        getRef('delete_chat_option').classList.add('hide-completely')
                     }
                     else{
                         getRef('contact_name').disabled = false
                         getRef('contact_initial').textContent = clickedContact['name'].charAt(0)
+                        getRef('delete_chat_option').classList.remove('hide-completely')
                     }
-                    getRef('contact_initial').setAttribute('style', `background: ${clickedContact['card'].getAttribute('background-color')}`)
+                    getRef('contact_initial').setAttribute('style', `background: ${clickedContact['chatCard'].getAttribute('background-color')}`)
                     getRef('contact_name').value = clickedContact['name']
                     getRef('contact_flo_id').textContent = clickedContact['floID']
                 break;
@@ -1104,7 +1122,7 @@
                 }
             })
 
-            document.addEventListener('mousedown', (e) => {
+            document.addEventListener('pointerdown', (e) => {
                 if (e.target.closest('sm-button, .interact')) {
                     createRipple(e, e.target.closest('sm-button, .interact'))
                 }
@@ -1148,7 +1166,7 @@
 
         const signIn = (type) => {
             return new Promise((resolve, reject) => {
-                mainPage.classList.add('hide-completely')
+                getRef('main').classList.add('hide-completely')
                 getRef('loading_page').classList.add('hide-completely')
                 getRef('landing_page').classList.remove('hide-completely')
                 getRef('sign_in_button').addEventListener('clicked', () => {
@@ -1275,7 +1293,7 @@
                         console.log(`Load Successful!`)
                         //hide loading screen
                         getRef('loading_page').classList.add("hide-completely")
-                        mainPage.classList.remove('hide-completely')
+                        getRef('main').classList.remove('hide-completely')
                         getRef('chat').classList.add('hide-completely')
                         getRef('mail').classList.add('hide-completely')
                         getRef('chat_page_button').click()
@@ -1303,8 +1321,6 @@
             activeChat = {},
             activeMail,
             frag = document.createDocumentFragment()
-
-		const	mainPage = document.querySelector('main')
 
 		// render elements 
 		const render = {
@@ -1364,7 +1380,7 @@
                 return card
             },
             contactCard(floID, options = {}){
-                let {name, type, prepend = false, markUnread = false, contactOnly = false, isAdmin = false} = options
+                let {name, type, prepend = false, markUnread = false, contactOnly = false, isAdmin = false, isSelected = false} = options
                 let card = getRef('contact_template').content.cloneNode(true),
                     cardContainer = card.firstElementChild
                 if(!name)
@@ -1442,6 +1458,8 @@
                             activeChat['chatCard'].classList.remove('active')
                     }
                 }
+                if(isSelected)
+                    addTick(cardContainer, {animate: false})
                 return card
             },
             messageBubble(msg){
@@ -1734,14 +1752,16 @@
 
         getRef('search_contacts').addEventListener('input', function() {
             if(this.value.trim !== ''){
-                for(child of getRef('contacts_container').children) {
-                    if(child.getAttribute('name').toLowerCase().includes(this.value.toLowerCase()) || child.getAttribute('flo-id').toLowerCase().includes(this.value.toLowerCase())){
-                        child.classList.remove('hide-completely')
-                    }
-                    else{
-                        child.classList.add('hide-completely')
+                const contacts = {}
+                for(contact in floGlobals.contacts) {
+                    if(contact.toLowerCase().includes(this.value.toLowerCase()) || floGlobals.contacts[contact].toLowerCase().includes(this.value.toLowerCase())){
+                        contacts[contact] = floGlobals.contacts[contact]
+                        if(isCreatingGroup && !(contact in floGlobals.pubKeys))
+                            delete contacts[contact]
                     }
                 }
+                getRef('contacts_container').innerHTML = ''
+                renderContactList(contacts)
             }
         })
 
@@ -1810,6 +1830,36 @@
             }
         })
 
+        getRef('chat_page').addEventListener('contextmenu', e => {
+            if(e.target.closest('.contact')){
+                e.preventDefault()
+            }
+        })
+
+        let touchStartTime = 0
+        let touchEndTime = 0
+        let holdThreshold = 500
+
+        getRef('chat_page').addEventListener('touchstart', e => {
+            if(e.target.closest('.contact')){
+                touchStartTime = e.timeStamp
+            }
+        })
+
+        getRef('chat_page').addEventListener('touchend', e => {
+            if(e.target.closest('.contact')){
+                touchEndTime = e.timeStamp
+                if(touchEndTime - touchStartTime > holdThreshold){
+                    let contact = e.target.closest(".contact")
+                    clickedContact['chatCard'] = contact
+                    clickedContact['floID'] = contact.getAttribute("flo-id")
+                    clickedContact['name'] = contact.getAttribute("name")
+                    clickedContact['isGroup'] = floGlobals.groups.hasOwnProperty(clickedContact['floID'])
+                    showPopup('contact_details_popup')
+                }
+            }
+        })
+
         getRef('mail_contact_list').addEventListener('click', e => {
             if(e.target.closest('.contact')){
                 getRef('send_mail_to').value = e.target.closest('.contact').getAttribute('flo-id')
@@ -1824,7 +1874,7 @@
             //detect click on chat cards
             if (e.target.closest(".contact")){
                 let contact = e.target.closest(".contact")
-                clickedContact['card'] = contact
+                clickedContact['chatCard'] = contact
                 clickedContact['floID'] = contact.getAttribute("flo-id")
                 clickedContact['name'] = contact.getAttribute("name")
                 clickedContact['isGroup'] = floGlobals.groups.hasOwnProperty(clickedContact['floID'])
@@ -1863,7 +1913,7 @@
                 }
             }
             else if(e.target.closest('.contact-preview')){
-                removeSelectedContact(e.target.closest('.contact-preview'))
+                removeSelectedContact(e.target.closest('.contact-preview').getAttribute('flo-id'))
             }
         })
         getRef('contacts_popup').addEventListener('click', e => {
@@ -1907,7 +1957,7 @@
                 contactsDrawerAnimation.reverse()
                 contactsDrawerAnimation.onfinish = () => {
                     getRef('all_contacts').classList.add('hide-completely')
-                    getRef('contact_options').classList.remove('hide-completely')
+                    getRef('all_contacts_options').classList.remove('hide-completely')
                     getRef('selected_contacts').classList.add('hide-completely')
                     getRef('skip_members_button').classList.add('hide-completely')
                     getRef('contacts_container').innerHTML = ''
@@ -1954,22 +2004,7 @@
                 addTick(contact)
             }      
             else{
-                selectedGroupMembers.delete(clickedContact.floID)
-                const relatedPreview = getRef('selected_contacts_container').querySelector(`[flo-id="${clickedContact.floID}"]`)
-                relatedPreview.animate(
-                    [
-                        {transform: 'scale(1)'},
-                        {transform: 'scale(0)'},
-                    ],
-                    {
-                        duration: 150,
-                        easing: 'ease',
-                        fill: 'forwards'
-                    }
-                ).onfinish = () => {
-                    relatedPreview.remove()
-                }
-                removeTick(contact)
+                removeSelectedContact(clickedContact.floID)
             }
             if(selectedGroupMembers.size){
                 getRef('skip_members_button').textContent = 'Next'
@@ -1979,8 +2014,25 @@
             }
         }
 
-        function removeSelectedContact(preview){
-            getRef('contacts_container').querySelector(`[flo-id="${preview.getAttribute('flo-id')}"]`).click()
+        function removeSelectedContact(floID){
+            selectedGroupMembers.delete(floID)
+            const relatedContact = getRef('contacts_container').querySelector(`[flo-id="${floID}"]`)
+            const relatedPreview = getRef('selected_contacts_container').querySelector(`[flo-id="${floID}"]`)
+            if(relatedContact)
+                removeTick(relatedContact)
+            relatedPreview.animate(
+                [
+                    {transform: 'scale(1)'},
+                    {transform: 'scale(0)'},
+                ],
+                {
+                    duration: 150,
+                    easing: 'ease',
+                    fill: 'forwards'
+                }
+            ).onfinish = () => {
+                relatedPreview.remove()
+            }
         }
 
         function clearAllMembers(){
@@ -1991,7 +2043,7 @@
         function initGroupCreation(){
             isCreatingGroup = true
             showContacts({show: true, onlyValid: true})
-            getRef('contact_options').classList.add('hide-completely')
+            getRef('all_contacts_options').classList.add('hide-completely')
             getRef('selected_contacts').classList.remove('hide-completely')
             getRef('skip_members_button').classList.remove('hide-completely')
         }
@@ -2067,7 +2119,7 @@
                 ).onfinish = () => {
                     getRef('all_contacts').classList.add('hide-completely')
                     getRef('group_creation_panel').classList.add('hide-completely')
-                    getRef('contact_options').classList.remove('hide-completely')
+                    getRef('all_contacts_options').classList.remove('hide-completely')
                     getRef('selected_contacts').classList.add('hide-completely')
                 }
                 notify('Group created', 'success')
@@ -2468,8 +2520,10 @@
 
         function renderContactList(contactList = {}) {
             const frag = document.createDocumentFragment()
-            for (floID in contactList)
-                frag.append(render.contactCard(floID, {type: 'contact'}))
+            for (floID in contactList){
+                let isSelected = selectedGroupMembers.has(floID)
+                frag.append(render.contactCard(floID, {type: 'contact', isSelected}))
+            }
             getRef('contacts_container').append(frag)
         }
 
@@ -2963,6 +3017,9 @@
 
                     getRef("group_description_card").classList.remove('hide-completely')
                     getRef("group_members_card").classList.remove('hide-completely')
+
+                    getRef('delete_chat_button').classList.add('hide-completely')
+                    
                     getRef("group_description").value = floGlobals.groups[floID].description === '' ? 'Add group description' : floGlobals.groups[floID].description;
 
                     if(floGlobals.groups[activeChat['floID']].admin === myFloID){
@@ -2984,6 +3041,8 @@
 
                     getRef("group_description_card").classList.add('hide-completely')
                     getRef("group_members_card").classList.add('hide-completely')
+
+                    getRef('delete_chat_button').classList.remove('hide-completely')
                 }
 
                 getRef('chat').classList.add('expand-side-panel')
@@ -3016,11 +3075,21 @@
             }
         }
 
+        async function clearChat(){
+            if(await confirmation('Clear chat?', `Are you sure to clear this chat?`, 'No', "Yes")){
+                messenger.clearChat(clickedContact.floID).then(result => {
+                    getRef('messages_container').innerHTML = ''
+                    hidePopup()
+                    notify('Chat cleared', 'success')
+                })
+            }
+        }
+
         async function deleteChat(){
             if(await confirmation('Delete chat?', `Are you sure to delete this chat?`, 'No', "Yes")){
                 messenger.rmChat(clickedContact.floID).then(result => {
-                    clickedContact.card.remove()
-                    clickedContact.card = ''
+                    clickedContact.chatCard.remove()
+                    clickedContact.chatCard = ''
                     hidePopup()
                     getRef('chat').classList.add('hide-completely')
                     notify('Chat deleted', 'success')
@@ -3111,7 +3180,8 @@
             }
         }
         
-        function addTick(contact){
+        function addTick(contact, options = {}){
+            const {animate = true} = options
             contact.classList.add('selected')
             const initial = contact.querySelector('.initial')
             const tick = document.createElement('div');
@@ -3122,17 +3192,18 @@
             `
             tick.classList.add('tick')
             initial.append(tick)
-            tick.animate(
-                [
-                    {transform: 'scale(0)'},
-                    {transform: 'scale(1)'},
-                ],
-                {
-                    duration: 300,
-                    fill: 'forwards',
-                    easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-                }
-            )
+            if(animate)
+                tick.animate(
+                    [
+                        {transform: 'scale(0)'},
+                        {transform: 'scale(1)'},
+                    ],
+                    {
+                        duration: 300,
+                        fill: 'forwards',
+                        easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                    }
+                )
         }
         function removeTick(contact){
             contact.classList.remove('selected')
