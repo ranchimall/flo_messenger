@@ -695,7 +695,7 @@ sm-button.danger{
         margin-bottom: 0.5rem;
     }
     #contact_name{
-        margin: 0.6rem 0;
+        margin: 0.6rem 1.5rem;
         &::part(text){
             font-size: 1.2rem;
             font-weight: 500;
@@ -857,6 +857,7 @@ sm-button.danger{
     display: flex;
     align-items: center;
     padding: 0.8rem 1.5rem;
+    user-select: none;
     .icon{
         height: 1.4rem;
         width: 1.4rem;
@@ -974,7 +975,8 @@ sm-button.danger{
         flex: 1;
         overflow-y: auto;
         .empty-state{
-            padding: 0 1.5rem;
+            padding: 1.5rem;
+            text-align: center;
         }
     }
     #contacts_container{
@@ -1132,7 +1134,7 @@ sm-button.danger{
         top: 0;
         padding: 1rem;
         min-height: 4rem;
-        backdrop-filter: blur(1rem);
+        background-color: rgba(var(--foreground-color), 0.8);
         z-index: 1;
         .icon{
             height: 2.3rem;
@@ -1860,7 +1862,8 @@ sm-panel{
 @media (hover: none){
     .contact-preview,
     .contact,
-    .icon{
+    .icon,
+    .option{
         -webkit-tap-highlight-color: transparent;
     }
     .contact .menu{

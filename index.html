@@ -752,8 +752,8 @@
             }
         })
 
+        let isHapticOn
         if(hapticFeedbackSwitcher){
-            let isHapticOn
             if(localStorage.getItem('haptic') === null)
                 localStorage.setItem("haptic", "on");
         
@@ -1836,27 +1836,27 @@
             }
         })
 
-        let touchStartTime = 0
-        let touchEndTime = 0
+        let holdTimeout
         let holdThreshold = 500
 
         getRef('chat_page').addEventListener('touchstart', e => {
             if(e.target.closest('.contact')){
-                touchStartTime = e.timeStamp
-            }
-        })
-
-        getRef('chat_page').addEventListener('touchend', e => {
-            if(e.target.closest('.contact')){
-                touchEndTime = e.timeStamp
-                if(touchEndTime - touchStartTime > holdThreshold){
+                holdTimeout = setTimeout(() => {
+                    if(isHapticOn)
+                        navigator.vibrate(100)
                     let contact = e.target.closest(".contact")
                     clickedContact['chatCard'] = contact
                     clickedContact['floID'] = contact.getAttribute("flo-id")
                     clickedContact['name'] = contact.getAttribute("name")
                     clickedContact['isGroup'] = floGlobals.groups.hasOwnProperty(clickedContact['floID'])
                     showPopup('contact_details_popup')
-                }
+                }, 500)
+            }
+        })
+
+        getRef('chat_page').addEventListener('touchend', e => {
+            if(e.target.closest('.contact')){
+                clearTimeout(holdTimeout)
             }
         })
 
