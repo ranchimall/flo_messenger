@@ -205,6 +205,7 @@ a:any-link {
 }
 
 .warning {
+  display: flex;
   background: wheat;
   color: #111;
 }
@@ -401,6 +402,9 @@ sm-button.danger {
   font-size: 1.1rem;
   color: rgba(var(--text-color), 0.8);
 }
+#landing .left .flex sm-button:first-of-type {
+  margin-right: 1rem;
+}
 
 #landing_page {
   background: rgba(var(--foreground-color), 1);
@@ -415,95 +419,76 @@ sm-button.danger {
   width: 100%;
 }
 
-#sign_in_popup::part(popup-body) {
-  padding: 0;
-}
-
-.sign-in-box {
-  width: 100%;
-  margin: 0 -2rem;
-  z-index: 1;
-  justify-self: center;
+#sign_in {
   padding: 1.5rem;
-  border-radius: 0.5rem;
-  background: rgba(var(--foreground-color), 1);
-}
-.sign-in-box sm-input {
-  margin-top: 1.5rem;
-}
-.sign-in-box sm-panel {
   width: 100%;
+  height: 100%;
+  align-items: flex-start;
 }
-.sign-in-box sm-tab-header {
-  margin: 0;
-  background: none;
-  align-self: flex-start;
-}
-.sign-in-box sm-tab-header::part(tab-header) {
-  padding-bottom: 0.4rem;
-  gap: 1.5rem;
-}
-.sign-in-box sm-tab::part(tab) {
-  padding: 0.4rem 0;
-}
-.sign-in-box sm-tab-panels {
-  margin-top: 1.5rem;
-}
-.sign-in-box form {
+#sign_in .flex {
   width: 100%;
+  flex: 1;
 }
-.sign-in-box h2 {
-  margin-bottom: 0.5rem;
+#sign_in sm-input {
+  margin: 1.5rem 0;
 }
-.sign-in-box h3 {
+#sign_in h2 {
+  margin-top: 2rem;
   font-weight: 500;
 }
-.sign-in-box h4 {
+#sign_in h4 {
   font-weight: 500;
   margin-bottom: 1.5rem;
 }
-.sign-in-box h5 {
+#sign_in h5 {
   opacity: 0.8;
   font-weight: 500;
 }
-.sign-in-box strong {
-  display: flex;
-  background: #ffd92e;
-  padding: 0.4em 0.6em;
-  border-radius: 0.4em;
-  color: #111;
-  margin-top: 0.5rem;
-}
-.sign-in-box .copy-row h4 {
-  max-width: 34ch;
-}
-.sign-in-box .copy-row:not(:last-of-type) {
-  margin-bottom: 1rem;
-}
-.sign-in-box button {
-  margin-top: 2rem;
-  padding: 0.6rem 1.6rem;
-}
-.sign-in-box sm-button {
+#sign_in sm-button {
   width: 100%;
 }
-.sign-in-box sm-button::part(button) {
+#sign_in sm-button::part(button) {
   padding: 0.8rem 1.6rem;
 }
-.sign-in-box p {
+#sign_in p {
   margin-bottom: 0.5rem;
   max-width: 35ch;
   margin-top: 0.5rem;
 }
-.sign-in-box #credentials_section {
-  border-top: 1px rgba(var(--text-color), 0.2) solid;
-  margin-top: 1rem;
-  padding-top: 1.5rem;
-  animation: slide-down 0.3s forwards;
+
+.frame {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: min(24rem, 100%);
+  justify-self: center;
+  padding: 1.5rem;
 }
-.sign-in-box #sign_in_with, .sign-in-box sm-button {
-  margin-top: 2rem;
-  margin-bottom: 0;
+.frame .h2 {
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+.frame sm-button[variant=primary] {
+  margin-top: 1.5rem;
+}
+
+#frame_1 .warning {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+#frame_1 #generate_flo_id {
+  width: 100%;
+}
+#frame_1 #credentials_section {
+  animation: slide-down 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  margin: 2rem 0;
+}
+#frame_1 h4, #frame_1 h5 {
+  font-weight: 500;
+}
+#frame_1 .copy-row:not(:last-of-type) {
+  margin-bottom: 1.5rem;
 }
 
 @keyframes slide-down {
@@ -515,7 +500,7 @@ sm-button.danger {
   }
 }
 #loading_page {
-  height: 100vh;
+  height: 100%;
   display: grid;
   place-content: center;
   justify-items: center;
@@ -1156,6 +1141,14 @@ sm-button.danger {
   margin-right: 0.5rem;
 }
 
+#chat_page,
+#mail_page,
+#settings_page {
+  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+}
+
 #chat_page {
   overflow: hidden;
 }
@@ -1712,12 +1705,17 @@ sm-panel {
     width: 100% !important;
   }
 
-  #sign_in {
-    max-height: 90vh;
-  }
-
   #landing_illustration {
     grid-area: illustration;
+  }
+
+  .frame .h2,
+#sign_in .h2 {
+    margin-top: 3rem;
+  }
+  .frame sm-button[variant=primary],
+#sign_in sm-button[variant=primary] {
+    margin-top: auto;
   }
 
   #main_navbar {
@@ -1801,6 +1799,18 @@ sm-panel {
   }
   #landing .left h4 {
     color: var(--accent-color);
+  }
+
+  #sign_in_page {
+    place-content: center;
+  }
+
+  #sign_in {
+    width: 24rem;
+  }
+
+  .frame {
+    justify-content: center;
   }
 
   #main_navbar {

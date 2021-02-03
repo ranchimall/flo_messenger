@@ -171,6 +171,7 @@ a:any-link{
     font-weight: normal;
 }
 .warning{
+    display: flex;
     background: wheat;
     color: #111;
 }
@@ -350,6 +351,11 @@ sm-button.danger{
             font-size: 1.1rem;
             color: rgba(var(--text-color), 0.8);
         }
+        .flex{
+            sm-button:first-of-type{
+                margin-right: 1rem;
+            }
+        }
     }
 }
 #landing_page{
@@ -362,47 +368,20 @@ sm-button.danger{
     position: relative;
     width: 100%;
 }
-#sign_in_popup{
-    &::part(popup-body){
-        padding: 0;
-    }
-}
-.sign-in-box{
-    width: 100%;
-    margin: 0 -2rem;
-    z-index: 1;
-    justify-self: center;
+#sign_in{
     padding: 1.5rem;
-    border-radius: 0.5rem;
-    background: rgba(var(--foreground-color), 1);
+    width: 100%;
+    height: 100%;
+    align-items: flex-start;
+    .flex{
+        width: 100%;
+        flex: 1;
+    }
     sm-input{
-        margin-top: 1.5rem;
-    }
-    sm-panel{
-        width: 100%;
-    }
-    sm-tab-header{
-        margin: 0;
-        background: none;
-        align-self: flex-start;
-        &::part(tab-header){
-            padding-bottom: 0.4rem;
-            gap: 1.5rem;
-        }
-    }
-    sm-tab::part(tab){
-        padding: 0.4rem 0;
-    }
-    sm-tab-panels{
-        margin-top: 1.5rem;
-    }
-    form{
-        width: 100%;
+        margin: 1.5rem 0;
     }
     h2{
-        margin-bottom: 0.5rem;
-    }
-    h3{
+        margin-top: 2rem;
         font-weight: 500;
     }
     h4 {
@@ -412,26 +391,6 @@ sm-button.danger{
     h5{
         opacity: 0.8;
         font-weight: 500;
-    }
-    strong{
-        display: flex;
-        background: #ffd92e;
-        padding: 0.4em 0.6em;
-        border-radius: 0.4em;
-        color: #111;
-        margin-top: 0.5rem;
-    }
-    .copy-row{
-        h4{
-            max-width: 34ch;
-        }
-    }
-    .copy-row:not(:last-of-type){
-        margin-bottom: 1rem;
-    }
-    button {
-        margin-top: 2rem;
-        padding: 0.6rem 1.6rem;
     }
     sm-button{
         width: 100%;
@@ -444,15 +403,42 @@ sm-button.danger{
         max-width: 35ch;
         margin-top: 0.5rem;
     }
-    #credentials_section{
-        border-top: 1px rgba(var(--text-color), 0.2) solid;
-        margin-top: 1rem;
-        padding-top: 1.5rem;
-        animation: slide-down 0.3s forwards;
+}
+#on_boarding_page{
+}
+.frame{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    width: min(24rem, 100%);
+    justify-self: center;
+    padding: 1.5rem;
+    .h2{
+        margin-bottom: 1rem;
+        font-weight: 500;
     }
-    #sign_in_with, sm-button{
-        margin-top: 2rem;
-        margin-bottom: 0;
+    sm-button[variant="primary"]{
+        margin-top: 1.5rem;
+    }
+}
+#frame_1{
+    .warning{
+        margin: 1rem 0;
+        padding: 1rem;
+        border-radius: 0.5rem;
+    }
+    #generate_flo_id{
+        width: 100%;
+    }
+    #credentials_section{
+        animation: slide-down 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        margin: 2rem 0;
+    }
+    h4, h5{
+        font-weight: 500;
+    }
+    .copy-row:not(:last-of-type){
+        margin-bottom: 1.5rem;
     }
 }
 @keyframes slide-down{
@@ -464,7 +450,7 @@ sm-button.danger{
     }
 }
 #loading_page{
-    height: 100vh;
+    height: 100%;
     display: grid;
     place-content: center;
     justify-items: center;
@@ -1088,6 +1074,13 @@ sm-button.danger{
         }
     }
 }
+#chat_page,
+#mail_page,
+#settings_page{
+    align-items: flex-start;
+    width: 100%;
+    height: 100%;
+}
 #chat_page{
     overflow: hidden;
 }
@@ -1625,11 +1618,17 @@ sm-panel{
             width: 100% !important;
         }
     }
-    #sign_in{
-        max-height: 90vh;
-    }
     #landing_illustration{
         grid-area: illustration;
+    }
+    .frame,
+    #sign_in{
+        .h2{
+            margin-top: 3rem;
+        }
+        sm-button[variant="primary"]{
+            margin-top: auto;
+        }
     }
     #main_navbar{
         transform: translateX(-110%);
@@ -1705,6 +1704,15 @@ sm-panel{
                 color: var(--accent-color);
             }
         }
+    }
+    #sign_in_page{
+        place-content: center;
+    }
+    #sign_in{
+        width: 24rem;
+    }
+    .frame{
+        justify-content: center;
     }
     #main_navbar{
         position: relative;
