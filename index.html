@@ -1161,6 +1161,7 @@
                 showPage('landing_page')
                 getRef('sign_in_button').addEventListener('clicked', () => {
                     let key = getRef('private_key_input_field').value;
+                    showPage('loading_page')
                     resolve(key)
                 })
                 getRef('sign_in_with').addEventListener('clicked', () => {
@@ -1367,6 +1368,7 @@
 
                 cardContainer.setAttribute("name", name)
                 cardContainer.setAttribute("flo-id", floID)
+                cardContainer.setAttribute("search-tags", `${name}${floID}`)
                 let initial = card.querySelector('.initial')
                 let color = contactColor(floID)
 
@@ -1718,20 +1720,21 @@
         })
 
         getRef('search_chats').addEventListener('input', function(e) {
-            if(this.value.trim !== ''){
-                for(child of getRef('chat_container').children) {
-                    if(child.getAttribute('name').toLowerCase().includes(this.value.toLowerCase()) || child.getAttribute('flo-id').toLowerCase().includes(this.value.toLowerCase())){
+            if(this.value.trim() !== ''){
+                const contacts = getRef('chat_container').querySelectorAll('.contact')
+                contacts.forEach( child => {
+                    if(child.getAttribute('search-tags').toLowerCase().includes(this.value.toLowerCase())){
                         child.classList.remove('hide-completely')
                     }
                     else{
                         child.classList.add('hide-completely')
                     }
-                }
+                })
             }
         })
 
         getRef('search_contacts').addEventListener('input', function() {
-            if(this.value.trim !== ''){
+            if(this.value.trim() !== ''){
                 const contacts = {}
                 for(contact in floGlobals.contacts) {
                     if(contact.toLowerCase().includes(this.value.toLowerCase()) || floGlobals.contacts[contact].toLowerCase().includes(this.value.toLowerCase())){
