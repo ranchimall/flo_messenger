@@ -1,3 +1,99 @@
+//Color Grid
+const colorGrid = document.createElement('template');
+colorGrid.innerHTML =`
+<style>
+*{
+    padding:0;
+    margin:0;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+}
+
+.color-grid{
+    width:120px;
+    height:140px;
+    display:flex;
+    flex-direction: column;
+    align-content: space-around;
+}
+
+.color-grid .colorRow{
+    display:flex;
+    justify-content: space-around;
+    margin-top:10px;
+    width:230px;
+  }
+  
+  .color-grid .colorRow  div{
+    width:50px;
+    height:50px;
+    
+   
+  }
+  
+  #themeRed{
+      background-color:#ff0000;
+  }
+
+  #themeBlue{
+    background-color: #0000ff;
+}
+
+#themeGreen{
+    background-color: #00ff00;
+}
+
+#themeMustard{
+    background-color: #ffdb58;
+}
+
+#themeSalmon{
+    background-color: #FFA07A;
+}
+
+#themeYellow{
+    background-color: #ffff00;
+}
+
+#themeCyan{
+    background-color: #00FFFF;
+}
+
+#themePink{
+    background-color:#ffc0cb;
+}
+
+</style>
+<div class="colorGrid">
+    <div class="colorRow">
+        <div id="themeRed"></div>
+        <div id="themeBlue"></div>
+        <div id="themeGreen"></div>
+        <div id="themeYellow"></div>
+    </div>
+
+    <div class="colorRow">
+        <div id="themeCyan"></div>
+        <div id="themePink"></div>
+        <div id="themeMustard"></div>
+        <div id="themeSalmon"></div>
+    </div>
+
+</div> `;
+
+customElements.define('color-grid',
+    class extends HTMLElement {
+        constructor() {
+            super()
+            this.attachShadow({
+                mode: 'open'
+            }).append(colorGrid.content.cloneNode(true))
+        }
+
+    
+    })
+
+
 //Button
 const smButton = document.createElement('template')
 smButton.innerHTML = `

@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.min.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body data-theme="dark" onload="onLoadStartUp()" class="hide-completely">
@@ -656,6 +657,27 @@
                         <p>If this toggle is ON then pressing 'Enter' key will send messages</p>
                         <sm-switch id="is_enter_send_toggle" class="justify-right"></sm-switch>
                     </section>
+                    <section class="color-grid">
+                     <h4>Colors</h4>
+                     <div class="colorGrid">
+                        <div class="colorRow">
+                           <div id="themeRed" onclick="setTheme('Red')"></div>
+                           <div id="themeBlue" onclick="setTheme('Blue')"></div>
+                           <div id="themeGreen" onclick="setTheme('Green')"></div>
+                           <div id="themePurple" onclick="setTheme('Purple')"></div>
+                        </div>
+
+                        <div class="colorRow">
+                            <div id="themeCyan" onclick="setTheme('Cyan')"></div>
+                            <div id="themePink" onclick="setTheme('Pink')"></div>
+                            <div id="themeMustard" onclick="setTheme('Mustard')"></div>
+                            <div id="themeSalmon" onclick="setTheme('Salmon')"></div>
+                         </div>
+
+                    </div>
+                    <!-- <color-grid></color-grid> -->
+                    </section>
+
                 </div>
                 <div id="backup_panel" class="panel hide-completely">
                     <section>
@@ -682,6 +704,7 @@
 		</section>
     </main>
     <script src="scripts/components.js"></script>
+    <script src="scripts/script.js"></script>
     <script id="standard_UI_functions">
 
         const domRefs = {}
@@ -691,6 +714,7 @@
                 domRefs[elementId] = document.getElementById(elementId)
             return domRefs[elementId]
         }
+
 
         //Checks for internet connection status
         if (!navigator.onLine)
