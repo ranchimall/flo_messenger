@@ -1,99 +1,3 @@
-//Color Grid
-const colorGrid = document.createElement('template');
-colorGrid.innerHTML =`
-<style>
-*{
-    padding:0;
-    margin:0;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-}
-
-.color-grid{
-    width:120px;
-    height:140px;
-    display:flex;
-    flex-direction: column;
-    align-content: space-around;
-}
-
-.color-grid .colorRow{
-    display:flex;
-    justify-content: space-around;
-    margin-top:10px;
-    width:230px;
-  }
-  
-  .color-grid .colorRow  div{
-    width:50px;
-    height:50px;
-    
-   
-  }
-  
-  #themeRed{
-      background-color:#ff0000;
-  }
-
-  #themeBlue{
-    background-color: #0000ff;
-}
-
-#themeGreen{
-    background-color: #00ff00;
-}
-
-#themeMustard{
-    background-color: #ffdb58;
-}
-
-#themeSalmon{
-    background-color: #FFA07A;
-}
-
-#themeYellow{
-    background-color: #ffff00;
-}
-
-#themeCyan{
-    background-color: #00FFFF;
-}
-
-#themePink{
-    background-color:#ffc0cb;
-}
-
-</style>
-<div class="colorGrid">
-    <div class="colorRow">
-        <div id="themeRed"></div>
-        <div id="themeBlue"></div>
-        <div id="themeGreen"></div>
-        <div id="themeYellow"></div>
-    </div>
-
-    <div class="colorRow">
-        <div id="themeCyan"></div>
-        <div id="themePink"></div>
-        <div id="themeMustard"></div>
-        <div id="themeSalmon"></div>
-    </div>
-
-</div> `;
-
-customElements.define('color-grid',
-    class extends HTMLElement {
-        constructor() {
-            super()
-            this.attachShadow({
-                mode: 'open'
-            }).append(colorGrid.content.cloneNode(true))
-        }
-
-    
-    })
-
-
 //Button
 const smButton = document.createElement('template')
 smButton.innerHTML = `
@@ -3844,5 +3748,123 @@ customElements.define('text-field', class extends HTMLElement{
         this.textContainer.removeEventListener('dblclick', this.setEditable)
         this.editButton.removeEventListener('click', this.setEditable)
         this.saveButton.removeEventListener('click', this.setNonEditable)
+    }
+})
+
+//Color Grid
+const colorGrid = document.createElement('template');
+colorGrid.innerHTML =`
+<style>
+    *{
+        padding:0;
+        margin:0;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+    }
+    :host{
+        display: flex;
+    }
+    .color-tile-container{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .color-tile{
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        height: 3rem;
+        width: 3rem;
+        border-radius: 0.5rem;
+    }
+    .color-tile input[type="radio"]{
+        display: none;
+    }
+    .border{
+        position: absolute;
+        z-index: 1;
+        border-radius: 0.5rem;
+        box-shadow: 0 0 0 0.5rem rgba(var(--text-color), 1) inset;
+        display: none;
+        height: 100%;
+        width: 100%;
+    }
+    .color-tile input[type="radio"]:checked ~ .border{
+        display: flex;
+    }
+
+</style>
+<div class="color-tile-container">
+</div>`;
+
+customElements.define('color-grid',
+class extends HTMLElement {
+    constructor() {
+        super()
+        this.attachShadow({
+            mode: 'open'
+        }).append(colorGrid.content.cloneNode(true))
+
+        this.colorArray = []
+        this.container = this.shadowRoot.querySelector('.color-tile-container')
+    }
+
+    set colors(arr) {
+        this.colorArray = arr
+        this.renderTiles()
+    }
+
+    set selectedColor(color) {
+        if (this.colorArray.includes(color) && this.container.querySelector(`[data-color="${color}"]`)) {
+            this.container.querySelector(`[data-color="${color}"] input`).checked = true
+        }
+    }
+
+    randString(length) {
+        let result = '';
+        let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+        for (let i = 0; i < length; i++)
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+        return result;
+    }
+
+    renderTiles() {
+        this.container.innerHTML = ''
+        const frag = document.createDocumentFragment()
+        const groupName = this.randString(6)
+        this.colorArray.forEach(color => {
+            const label = document.createElement('label')
+            label.classList.add('color-tile')
+            label.setAttribute('data-color', color)
+            label.setAttribute('style', `background-color: ${color}`)
+            label.innerHTML = `
+                <input type="radio" name="${groupName}">
+                <div class="border"></div>
+                `
+            frag.append(label)
+        })
+        this.container.append(frag)
+    }
+    
+    handleChange(e) {
+        const clickedTile = e.target.closest('.color-tile')
+        const clickedTileColor = clickedTile.dataset.color
+        const tileSelected = new CustomEvent('colorselected', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                value: clickedTileColor,
+            }
+        })
+        this.dispatchEvent(tileSelected)
+    }
+
+    connectedCallback() {
+        this.container.addEventListener('change', this.handleChange)
+    }
+
+    disconnectedCallback() {
+        this.container.removeEventListener('change', this.handleChange)
     }
 })

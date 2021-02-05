@@ -34,7 +34,7 @@ body[data-theme='dark']{
     --text-color: 240, 240, 240;
     --text-color-light: 170, 170, 170;
     --foreground-color: 20, 20, 20;
-    --error-color: rgb(255, 87, 87);
+    --theme-color-red: #f8fc22;
     .initial{
         color: rgba(var(--text-color), 1) !important;
         box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.16);
@@ -407,7 +407,7 @@ sm-button.danger{
 #on_boarding_page{
 }
 .frame{
-    height: 100vh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     width: min(24rem, 100%);
@@ -1592,6 +1592,9 @@ sm-panel{
     }
     #sign_out::part(button){
         color: var(--error-color);
+    }
+    color-grid{
+        width: min(24rem, 100%);
     }
 }
 @media screen and (max-width: 640px){

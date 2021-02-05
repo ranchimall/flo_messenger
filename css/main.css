@@ -38,7 +38,7 @@ body[data-theme=dark] {
   --text-color: 240, 240, 240;
   --text-color-light: 170, 170, 170;
   --foreground-color: 20, 20, 20;
-  --error-color: rgb(255, 87, 87);
+  --theme-color-red: #f8fc22;
 }
 body[data-theme=dark] .initial {
   color: rgba(var(--text-color), 1) !important;
@@ -457,7 +457,7 @@ sm-button.danger {
 }
 
 .frame {
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   width: min(24rem, 100%);
@@ -1677,6 +1677,9 @@ sm-panel {
 }
 #settings_page #sign_out::part(button) {
   color: var(--error-color);
+}
+#settings_page color-grid {
+  width: min(24rem, 100%);
 }
 
 @media screen and (max-width: 640px) {

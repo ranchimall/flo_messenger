@@ -657,25 +657,9 @@
                         <p>If this toggle is ON then pressing 'Enter' key will send messages</p>
                         <sm-switch id="is_enter_send_toggle" class="justify-right"></sm-switch>
                     </section>
-                    <section class="color-grid">
-                     <h4>Colors</h4>
-                     <div class="colorGrid">
-                        <div class="colorRow">
-                           <div id="themeRed" onclick="setTheme('Red')"></div>
-                           <div id="themeBlue" onclick="setTheme('Blue')"></div>
-                           <div id="themeGreen" onclick="setTheme('Green')"></div>
-                           <div id="themePurple" onclick="setTheme('Purple')"></div>
-                        </div>
-
-                        <div class="colorRow">
-                            <div id="themeCyan" onclick="setTheme('Cyan')"></div>
-                            <div id="themePink" onclick="setTheme('Pink')"></div>
-                            <div id="themeMustard" onclick="setTheme('Mustard')"></div>
-                            <div id="themeSalmon" onclick="setTheme('Salmon')"></div>
-                         </div>
-
-                    </div>
-                    <!-- <color-grid></color-grid> -->
+                    <section>
+                        <h4>Colors</h4>
+                        <color-grid id="accent_color_selector"></color-grid>
                     </section>
 
                 </div>
@@ -1279,9 +1263,9 @@
             //invoke the startup functions
             floDapps.launchStartUp().then(result => {
                 console.log(result)
-                if(!isPinSet){
+/*                 if(!isPinSet){
                     showFrame(2)
-                }
+                } */
                 getRef("greet_tag").textContent = myFloID
                 //load messages from IDB and render them
                 console.log(`Loading Data! Please Wait...`)
@@ -1303,9 +1287,10 @@
                         messenger.requestGroupInbox()
                             .then(r => console.log(r))
                         console.log(`Load Successful!`)
-                        if(isPinSet){
+/*                         if(isPinSet){
                             showPage('main')
-                        }
+                        } */
+                        showPage('main')
                     }).catch(error => {
                         //console.error(`Failed to load data`)
                         notify(error, "error")
@@ -1845,12 +1830,20 @@
                     clickedContact['isGroup'] = floGlobals.groups.hasOwnProperty(clickedContact['floID'])
                     showPopup('contact_details_popup')
                 }, 500)
+                getRef('chat_page').addEventListener('touchmove', handleTouchMove)
             }
         })
+        
+        function handleTouchMove(e){
+            if(e.target.closest('.contact')){
+                clearTimeout(holdTimeout)
+            }
+        }
 
         getRef('chat_page').addEventListener('touchend', e => {
             if(e.target.closest('.contact')){
                 clearTimeout(holdTimeout)
+                getRef('chat_page').removeEventListener('touchmove', handleTouchMove)
             }
         })
 
@@ -3293,6 +3286,20 @@
                 notify("Securing Failed", "error", error)
             }
         }
+
+        getRef('accent_color_selector').colors = selectedColors
+
+        if(localStorage.getItem('accent-color')){
+            const color = localStorage.getItem('accent-color')
+            getRef('accent_color_selector').selectedColor = color
+            document.body.style.setProperty('--accent-color', color);
+        }
+
+        document.addEventListener('colorselected', e => {
+            const color = e.detail.value
+            localStorage.setItem("accent-color", color);
+            document.body.style.setProperty('--accent-color', color);
+        })
 
     </script>
 
