@@ -969,6 +969,22 @@ smSwitch.innerHTML = `
         display: -ms-inline-flexbox;
         display: inline-flex;
     }
+    label{
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-align: center;
+            -ms-flex-align: center;
+                align-items: center;
+        width: 100%;
+        outline: none;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+    :host(:not([disable])) label:focus-visible{
+        -webkit-box-shadow: 0 0 0 0.1rem var(--accent-color);
+            box-shadow: 0 0 0 0.1rem var(--accent-color);
+    }
     .switch {
         position: relative;
         display: -webkit-box;
@@ -978,11 +994,10 @@ smSwitch.innerHTML = `
             -ms-flex-align: center;
                 align-items: center;
         width: 2.4rem;
+        margin-left: auto;
         padding: 0.2rem;
         cursor: pointer;
-        outline: none;
         border-radius: 2rem;
-        -webkit-tap-highlight-color: transparent;
     }
     
     input {
@@ -1065,10 +1080,13 @@ smSwitch.innerHTML = `
         pointer-events: none;
     }
 </style>
-<label class="switch" tabindex="0">
-    <input type="checkbox">
-    <div class="track"></div>
-    <div class="button"></div>
+<label tabindex="0">
+    <slot name="left"></slot>
+    <div part="switch" class="switch">
+        <input type="checkbox">
+        <div class="track"></div>
+        <div class="button"></div>
+    </div>
 </label>`
 
 customElements.define('sm-switch', class extends HTMLElement {
@@ -1996,7 +2014,8 @@ customElements.define('sm-popup', class extends HTMLElement {
         const scrollY = document.body.style.top;
         window.scrollTo(0, parseInt(scrollY || '0') * -1);
         setTimeout(() => {
-            document.body.setAttribute('style', `overflow: auto; top: initial`)
+            document.body.style.overflow = 'auto';
+            document.body.style.top= 'initial'
         }, 300);
     }
 
@@ -2025,7 +2044,8 @@ customElements.define('sm-popup', class extends HTMLElement {
         }
         this.popupContainer.classList.remove('hide')
         this.popup.style.transform = 'none';
-        document.body.setAttribute('style', `overflow: hidden; top: -${window.scrollY}px`)
+        document.body.style.overflow = 'hidden';
+        document.body.style.top= `-${window.scrollY}px`
         return this.popupStack
     }
     hide = () => {

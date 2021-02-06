@@ -605,6 +605,7 @@
                     </div>
 				</header>
                 <div class="sidebar-item interact active" data-target="profile_panel">Account</div>
+                <div class="sidebar-item interact" data-target="chat_panel">chat</div>
                 <div class="sidebar-item interact" data-target="personalise_panel">personalise</div>
                 <div class="sidebar-item interact" data-target="backup_panel">backup & restore</div>
                 <div class="sidebar-item interact" data-target="about_panel">About</div>
@@ -641,27 +642,40 @@
                         <sm-button id="sign_out" onclick="signOut()">Sign Out</sm-button>
                     </section>
                 </div>
+                <div id="chat_panel" class="panel hide-completely">
+                    <sm-switch id="is_enter_send_toggle">
+                        <div slot="left" class="flex direction-column">
+                            <h4>Send by Enter</h4>
+                            <p>If this toggle is ON then pressing 'Enter' key will send messages</p>
+                        </div>
+                    </sm-switch>
+                    <sm-switch id="haptic_feedback_switcher">
+                        <div slot="left" class="flex direction-column">
+                            <h4>Haptic feedback</h4>
+                            <p>Turn haptic feedback (vibrations) on/off.</p>
+                        </div>
+                    </sm-switch>
+                </div>
                 <div id="personalise_panel" class="panel hide-completely">
-                    <section class="setting-toggle">
-                        <h4>Dark mode</h4>
-                        <p>Toggle dark mode on/off.<br><strong>*Setting applies to this browser only</strong></p>
-                        <sm-switch id="theme_switcher"></sm-switch>
-                    </section>
-                    <section class="setting-toggle">
-                        <h4>Haptic feedback</h4>
-                        <p>Turn haptic feedback (vibrations) on/off.</p>
-                        <sm-switch id="haptic_feedback_switcher"></sm-switch>
-                    </section>
-                    <section class="setting-toggle">
-                        <h4>Enter key is send</h4>
-                        <p>If this toggle is ON then pressing 'Enter' key will send messages</p>
-                        <sm-switch id="is_enter_send_toggle" class="justify-right"></sm-switch>
-                    </section>
+                    <sm-switch id="theme_switcher">
+                        <div slot="left" class="flex direction-column">
+                            <h4>Dark mode</h4>
+                            <p>Toggle dark mode on/off.<br><strong>*Setting applies to this browser only</strong></p>
+                        </div>
+                    </sm-switch>
                     <section>
-                        <h4>Colors</h4>
+                        <h4>Accent color</h4>
                         <color-grid id="accent_color_selector"></color-grid>
+                        <h4>Chat preview</h4>
+                        <div class="message sent">              
+                            <p class="message-body">Hey there!</p>
+                            <time class="time">12:00PM</time>
+                        </div>
+                        <div class="message received">              
+                            <p class="message-body">How are you?</p>
+                            <time class="time">12:00PM</time>
+                        </div>
                     </section>
-
                 </div>
                 <div id="backup_panel" class="panel hide-completely">
                     <section>
@@ -1267,6 +1281,18 @@
                     showFrame(2)
                 } */
                 getRef("greet_tag").textContent = myFloID
+
+                getRef('accent_color_selector').colors = selectedColors
+
+                if(localStorage.getItem(`accent-color${myFloID}`)){
+                    const color = localStorage.getItem(`accent-color${myFloID}`)
+                    getRef('accent_color_selector').selectedColor = color
+                    document.body.style.setProperty('--accent-color', color);
+                }
+                else{
+                    getRef('accent_color_selector').selectedColor = '#3D5AFE'
+                }
+
                 //load messages from IDB and render them
                 console.log(`Loading Data! Please Wait...`)
                 messenger.initUserDB().then(result => {
@@ -1478,6 +1504,8 @@
                             senderName.style.color = contactColor(sender)
                             senderName.textContent = getContactName(sender)
                             cardContainer.prepend(senderName)
+
+                            cardContainer.classList.add('distinct-sender')
     
                             messageContent = cardContainer.children[1]
                             messageTime = cardContainer.children[2]
@@ -3287,17 +3315,9 @@
             }
         }
 
-        getRef('accent_color_selector').colors = selectedColors
-
-        if(localStorage.getItem('accent-color')){
-            const color = localStorage.getItem('accent-color')
-            getRef('accent_color_selector').selectedColor = color
-            document.body.style.setProperty('--accent-color', color);
-        }
-
         document.addEventListener('colorselected', e => {
             const color = e.detail.value
-            localStorage.setItem("accent-color", color);
+            localStorage.setItem(`accent-color${myFloID}`, color);
             document.body.style.setProperty('--accent-color', color);
         })
 
