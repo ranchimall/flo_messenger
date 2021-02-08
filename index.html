@@ -12993,7 +12993,7 @@ Bitcoin.Util = {
                     let data = {
                         floID: receiver,
                         time: result[vc].time,
-                        category,
+                        category: 'sent',
                         message: this.util.encrypt(message)
                     }
                     floGlobals.chats[receiver] = parseInt(vc)
