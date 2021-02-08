@@ -994,6 +994,7 @@ smSwitch.innerHTML = `
             -ms-flex-align: center;
                 align-items: center;
         width: 2.4rem;
+        flex-shrink: 0;
         margin-left: auto;
         padding: 0.2rem;
         cursor: pointer;
@@ -3804,7 +3805,7 @@ colorGrid.innerHTML =`
         position: absolute;
         z-index: 1;
         border-radius: 0.5rem;
-        box-shadow: 0 0 0 0.5rem rgba(var(--text-color), 1) inset;
+        box-shadow: 0 0 0 0.5rem rgba(var(--text-color), 0.8) inset;
         display: none;
         height: 100%;
         width: 100%;
@@ -3857,7 +3858,10 @@ class extends HTMLElement {
             const label = document.createElement('label')
             label.classList.add('color-tile')
             label.setAttribute('data-color', color)
-            label.setAttribute('style', `background-color: ${color}`)
+            if(color.includes('--'))
+                label.setAttribute('style', `background-color: var(${color})`)
+            else
+                label.setAttribute('style', `background-color: ${color}`)
             label.innerHTML = `
                 <input type="radio" name="${groupName}">
                 <div class="border"></div>

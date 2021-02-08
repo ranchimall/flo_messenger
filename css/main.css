@@ -236,6 +236,9 @@ span.ripple {
   -webkit-tap-highlight-color: transparent;
 }
 
+sm-popup sm-input::part(input) {
+  border-radius: 0.5rem;
+}
 sm-popup sm-input + sm-input {
   margin-top: 1rem;
 }
@@ -568,7 +571,7 @@ sm-button.danger {
 }
 
 .filled {
-  fill: white;
+  fill: rgba(var(--text-color), 0.7);
   stroke: none !important;
 }
 
@@ -583,7 +586,7 @@ sm-button.danger {
   position: relative;
   display: grid;
   gap: 0 1rem;
-  padding: 1rem 1.5rem;
+  padding: 0.8rem 1.5rem;
   align-items: center;
   flex-shrink: 0;
   user-select: none;
@@ -790,6 +793,7 @@ sm-button.danger {
   width: 1rem;
   background: var(--accent-color);
   border-radius: 100%;
+  border: solid rgba(var(--foreground-color), 1) 1px;
   transform: scale(0);
   transition: transform 0.3s;
 }
@@ -801,6 +805,10 @@ sm-button.danger {
 .mail-card.unread .time,
 .contact.unread .time {
   color: var(--accent-color);
+}
+.mail-card.unread h4,
+.contact.unread h4 {
+  color: rgba(var(--text-color), 1);
 }
 .mail-card.unread h4, .mail-card.unread h5, .mail-card.unread p,
 .contact.unread h4,
@@ -921,6 +929,7 @@ sm-button.danger {
 #main_navbar {
   position: fixed;
   flex-direction: column;
+  height: 100%;
   bottom: 0;
   top: 0;
   padding: 0;
@@ -1256,7 +1265,7 @@ sm-button.danger {
 .message {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   width: auto;
   font-size: 0.92rem;
   max-width: max-content;
@@ -1300,6 +1309,7 @@ sm-button.danger {
   padding-left: 1rem;
   align-self: flex-end;
   margin-top: 0.2rem;
+  margin-left: auto;
 }
 
 .sent {
@@ -1353,6 +1363,7 @@ sm-button.danger {
 }
 
 .distinct-sender {
+  display: grid;
   border-radius: 0 0.8rem 0.8rem 0.8rem !important;
   margin-top: 0.8rem !important;
 }
@@ -1386,7 +1397,7 @@ sm-button.danger {
 #chat_header {
   padding: 0 1rem;
   min-height: 4rem;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr auto;
 }
 #chat_header .flex {
   height: 100%;
@@ -1443,7 +1454,16 @@ sm-button.danger {
   stroke-width: 8;
 }
 
-#chat_footer #emoji_toggle {
+#chat_footer .flex {
+  align-items: flex-end;
+  padding: 1rem 1rem 1rem 0.4rem;
+}
+#chat_footer sm-textarea::part(textarea) {
+  padding-right: 3rem;
+  border-radius: 0.5rem;
+}
+
+#emoji_toggle {
   align-self: center;
   padding: 0.6rem;
   margin-right: 0.5rem;
@@ -1452,19 +1472,11 @@ sm-button.danger {
   border-radius: 2rem;
   cursor: pointer;
 }
-#chat_footer #emoji_toggle path {
+#emoji_toggle path {
   fill: rgba(var(--text-color), 0.5);
 }
-#chat_footer #emoji_toggle.active path {
+#emoji_toggle.active path {
   fill: var(--accent-color);
-}
-#chat_footer .flex {
-  align-items: flex-end;
-  padding: 1rem 1rem 1rem 0.4rem;
-}
-#chat_footer sm-textarea::part(textarea) {
-  padding-right: 3rem;
-  border-radius: 0.5rem;
 }
 
 #send_message_button {
@@ -1495,6 +1507,9 @@ sm-button.danger {
   margin: 0;
 }
 
+.big-emoji {
+  flex-direction: column;
+}
 .big-emoji .message-body {
   font-size: 2.6rem;
 }
@@ -1516,8 +1531,7 @@ sm-button.danger {
 }
 #emoji_picker section {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(3.6rem, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
   padding: 0 1rem;
   width: 100%;
 }
@@ -1610,8 +1624,23 @@ sm-panel {
   padding-bottom: 6rem;
 }
 
-#chat, #mail {
+.has-bg-image .received,
+.has-bg-image .group-event-card,
+.has-bg-image .date-card {
+  background: rgba(var(--foreground-color), 0.6);
+}
+.has-bg-image #emoji_picker,
+.has-bg-image #emoji_picker .section-header {
   background: rgba(var(--foreground-color), 1);
+}
+.has-bg-image #emoji_toggle path {
+  fill: rgba(var(--text-color), 0.8);
+}
+.has-bg-image sm-textarea::part(textarea) {
+  background: rgba(var(--foreground-color), 0.6);
+}
+.has-bg-image #chat_details_panel {
+  background: rgba(var(--foreground-color), 0.8);
 }
 
 #mail {
@@ -1665,9 +1694,16 @@ sm-panel {
   margin-left: 1rem;
 }
 #settings_page sm-switch {
+  padding: 1rem 1.5rem;
   display: flex;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   width: min(60ch, 100%);
+}
+#settings_page sm-switch .flex {
+  margin-right: 1rem;
+}
+#settings_page sm-switch h4 {
+  margin-bottom: 0.5rem;
 }
 #settings_page sm-button {
   width: 100%;
@@ -1679,9 +1715,14 @@ sm-panel {
   height: 100%;
 }
 #settings_page #settings_panel {
-  padding: 0 1.5rem;
+  overflow-y: auto;
+  height: 100%;
+}
+#settings_page #settings_panel .panel > *:first-of-type {
+  margin-top: 2rem;
 }
 #settings_page section {
+  padding: 1rem 1.5rem;
   width: min(60ch, 100%);
   display: grid;
   gap: 0.3rem;
@@ -1691,7 +1732,7 @@ sm-panel {
   margin-bottom: 0;
 }
 #settings_page section:not(:last-of-type) {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 #settings_page #sign_out::part(button) {
   color: var(--error-color);
@@ -1699,6 +1740,61 @@ sm-panel {
 #settings_page color-grid {
   margin: 0.5rem 0 1.5rem 0;
   width: min(60ch, 100%);
+}
+#settings_page #bg_preview_container {
+  padding: 1rem 0;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+#settings_page .bg-preview {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 8rem;
+  width: 8rem;
+  cursor: pointer;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: rgba(var(--text-color), 0.1);
+}
+#settings_page .bg-preview img {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+}
+#settings_page .bg-preview.selected::after {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  box-shadow: 0 0 0 0.5rem rgba(var(--text-color), 0.8) inset;
+}
+#settings_page #selected_bg_preview[src=""] {
+  display: none;
+}
+
+#video_call_page {
+  position: relative;
+  display: grid;
+}
+#video_call_page video {
+  position: fixed;
+  object-fit: cover;
+  object-position: center;
+}
+#video_call_page #their_video {
+  height: 100%;
+}
+#video_call_page #my_video {
+  width: max(20vh, 12rem);
+  bottom: 0;
+  right: 0;
+  border-radius: 1rem;
+}
+#video_call_page #call_controls {
+  padding: 1.5rem;
+  margin-top: auto;
+  justify-self: center;
 }
 
 @media screen and (max-width: 640px) {
@@ -1772,7 +1868,7 @@ sm-panel {
   }
 
   #chat_header {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto 1fr auto;
   }
 
   #settings_page {
@@ -1895,9 +1991,6 @@ sm-panel {
   #settings_page sm-button {
     width: max-content;
   }
-  #settings_page #settings_panel {
-    padding: 1.5rem;
-  }
   #settings_page .active {
     background: rgba(var(--text-color), 0.1);
   }
@@ -1910,11 +2003,6 @@ sm-panel {
   .card {
     display: inline-flex;
     width: auto;
-  }
-
-  #settings_panel {
-    overflow-y: auto;
-    max-height: 100vh;
   }
 }
 @media only screen and (max-width: 1280px) {
@@ -1959,11 +2047,6 @@ sm-panel {
   .card {
     display: inline-flex;
     width: auto;
-  }
-
-  #settings_panel {
-    overflow-y: auto;
-    max-height: 100vh;
   }
 }
 @media (hover: hover) {

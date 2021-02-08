@@ -305,7 +305,7 @@
 		</div>
     </template>
     <div id="navbar_backdrop" class="hide" onclick="toggleDrawer()"></div>
-	<main id="main" class="grid hide-completely">
+	<main id="main" class="page grid hide-completely">
 		<nav id="main_navbar" class="flex">
 			<div class="logo-section" title="RanchiMall FLO Messenger">			
 				<svg class="main-logo" viewBox="0 0 27.25 32">
@@ -369,7 +369,7 @@
                             <line x1="1" y1="32" x2="64" y2="32"/>
                             <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
                         </svg>
-                        <sm-input id="search_chats" type="search" placeholder="Search">
+                        <sm-input id="search_chats" class="outlined" type="search" placeholder="Search">
                             <svg slot="icon" class="icon" viewBox="0 0 64 64">
                                 <title>Search</title>
                                 <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
@@ -406,7 +406,7 @@
                                 <line x1="1" y1="32" x2="64" y2="32"/>
                                 <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
                             </svg>
-                            <sm-input id="search_contacts" type="search" placeholder="Enter name or FLO ID">
+                            <sm-input id="search_contacts" class="outlined" type="search" placeholder="Enter name or FLO ID">
                                 <svg slot="icon" class="icon" viewBox="0 0 64 64">
                                     <title>Search</title>
                                     <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
@@ -475,6 +475,7 @@
                             <div id="receiver_initial" class="initial flex align-center"></div>
                             <h4 id="receiver_name"></h4>
                         </div>
+                        <sm-button id="video_call_button" class="hide-completely" onclick="createOffer()">Call</sm-button>
                     </header>
                     <section id="chat_middle" class="flex direction-column">
                         <div id="chat_first_child"></div>
@@ -492,7 +493,7 @@
                         <div id="emoji_picker" class="hide-completely"></div>
                         <div class="flex">
                             <svg id="emoji_toggle" onclick="toggleEmoji('toggle')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M32,0A32,32,0,1,0,64,32,32,32,0,0,0,32,0ZM43.84,17.51a4.92,4.92,0,1,1-4.92,4.92A4.92,4.92,0,0,1,43.84,17.51Zm-23.62-.06a5,5,0,1,1-5,5A5,5,0,0,1,20.22,17.45ZM32,54.42A19.68,19.68,0,0,1,12.31,34.73H51.69A19.68,19.68,0,0,1,32,54.42Z"/></svg>
-                            <sm-textarea id="type_message" placeholder="Type a message" class="rest"></sm-textarea>
+                            <sm-textarea id="type_message" placeholder="Type a message" class="rest outlined"></sm-textarea>
                             <svg xmlns="http://www.w3.org/2000/svg" id="send_message_button" class="icon" viewBox="0 0 64 64">
                                 <path d="M63.34,31,3.07,4.71A2.19,2.19,0,0,0,.18,7.58L8.94,28.29,42.18,32,8.94,35.71.18,56.42a2.19,2.19,0,0,0,2.89,2.87L63.34,33A1.09,1.09,0,0,0,63.34,31Z"/>
                             </svg>
@@ -664,6 +665,19 @@
                         </div>
                     </sm-switch>
                     <section>
+                        <h4>Set chat and mail background image</h4>
+                        <div id="bg_preview_container" class="flex">
+                            <div id="selected_bg_preview" class="bg-preview selected" onclick="setBgImage()">
+                                <img src="" alt="background perview">
+                            </div>
+                            <div id="default_bg_preview" class="bg-preview selected" onclick="setDefaultBg()">Default</div>
+                        </div>
+                        <label class="select-file">
+                            <sm-button id="select_bg_button">Select background</sm-button>
+                            <input type="file" id="select_bg_image" accept="image/*" />
+                        </label>
+                    </section>
+                    <section>
                         <h4>Accent color</h4>
                         <color-grid id="accent_color_selector"></color-grid>
                         <h4>Chat preview</h4>
@@ -701,8 +715,110 @@
             </div>
 		</section>
     </main>
+    <div id="video_call_page" class="page">
+        <video id="my_video" autoplay></video>
+        <video id="their_video" autoplay></video>
+        <div id="call_controls" class="flex">
+            <sm-button id="pick_up_call" onclick="createAnswer()">Answer</sm-button>
+            <sm-button id="end_call" class="danger" onclick="endCall()">End call</sm-button>
+        </div>
+    </div>
     <script src="scripts/components.js"></script>
     <script src="scripts/script.js"></script>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script id="WEBRTC">
+        
+        const myVideo = document.getElementById('my_video')
+        const theirVideo = document.getElementById('their_video')
+        
+        let dataChannel
+        let peerConnection
+        let localStream
+        let remoteSdp = ''
+        const server = { urls: "stun:stun.l.google.com:19302" };
+
+        async function initPeerConnection(){
+            peerConnection = new RTCPeerConnection({ iceServers: [server] });
+            peerConnection.ontrack = (e) => theirVideo.srcObject = e.streams[0];
+            peerConnection.ondatachannel = e => initDataChannel(dataChannel = e.channel);
+            peerConnection.oniceconnectionstatechange = e => console.log(peerConnection.iceConnectionState);
+
+            try{
+                localStream = await navigator.mediaDevices.getUserMedia({video:true, audio:true})
+                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            }
+            catch(err) {
+                console.log("An error occurred: " + err);
+            }
+        }
+
+        function initDataChannel() {
+            dataChannel.onopen = () => console.log("Chat!");
+            dataChannel.onmessage = e => console.log(e.data);
+        }
+
+        async function createOffer() {
+            await initPeerConnection()
+            showPage('video_call_page')
+            initDataChannel(dataChannel = peerConnection.createDataChannel("chat"));
+            try{
+                myVideo.srcObject = localStream
+                const offer = await peerConnection.createOffer()
+                peerConnection.setLocalDescription(offer)
+            }
+            catch(err){
+                console.log(err)
+            }
+            peerConnection.onicecandidate = e => {
+                if (e.candidate) return;
+                // Send invitation
+                const sdp = peerConnection.localDescription.sdp
+                messenger.sendMessage(sdp, activeChat.floID).then(data => {
+                    console.log('offer sent')
+                }).catch(error => notify(error, "error"));
+            }
+        }
+
+        async function createAnswer(){
+            await initPeerConnection()
+            if (peerConnection.signalingState !== "stable") return;
+            button.disabled = offer.disabled = true;
+            let desc = new RTCSessionDescription({ type:"offer", sdp: remoteSdp});
+            try{
+                await peerConnection.setRemoteDescription(desc)
+                const answer = await peerConnection.createAnswer()
+                peerConnection.setLocalDescription(answer)
+            }
+            catch(err){
+                console.log(err)
+            }
+            peerConnection.onicecandidate = e => {
+                if (e.candidate) return;
+                const sdp = peerConnection.localDescription.sdp
+                messenger.sendMessage(sdp, activeChat.floID, 'answer').then(data => {
+                    console.log('answer sent')
+                }).catch(error => notify(error, "error"));
+            };
+        }
+
+        function startVideoCall(answer){
+            if (peerConnection.signalingState != "have-local-offer") return;
+            let desc = new RTCSessionDescription({ type:"answer", sdp: answer});
+            peerConnection.setRemoteDescription(desc).catch(log);
+        }
+
+        function endCall(){
+            remoteSdp = ''
+            peerConnection.close()
+        }
+        /* 
+        chat.onkeypress = e => {
+            if (!enterPressed(e)) return;
+            dataChannel.send(chat.value);
+            log(chat.value);
+            chat.value = "";
+        }; */
+    </script>
     <script id="standard_UI_functions">
 
         const domRefs = {}
@@ -1280,6 +1396,7 @@
 /*                 if(!isPinSet){
                     showFrame(2)
                 } */
+
                 getRef("greet_tag").textContent = myFloID
 
                 getRef('accent_color_selector').colors = selectedColors
@@ -1297,6 +1414,8 @@
                 console.log(`Loading Data! Please Wait...`)
                 messenger.initUserDB().then(result => {
                     console.log(result)
+                    //Check for availble bg image
+                    setBgImage()
                     messenger.loadDataFromIDB().then(data => {
                         console.log(data)
                         floGlobals.appendix = data.appendix;
@@ -1491,6 +1610,28 @@
                 }
 
                 if(message){
+                    if(updateChatCard){
+                        if(category === 'offer'){
+                            showPage('video_call_page')
+                            remoteSdp = message
+                        }
+                        else if(category === 'answer'){
+                            startVideoCall(message)
+                            return
+                        }
+                    }
+                    else if(category === 'offer'){
+                        let eventCard = document.createElement('p')
+                        eventCard.classList.add('group-event-card')
+                        eventCard.textContent = `You called ${getContactName(floID)}`
+                        return eventCard
+                    }
+                    else if(category === 'answer'){
+                        let eventCard = document.createElement('p')
+                        eventCard.classList.add('group-event-card')
+                        eventCard.textContent = `${getContactName(floID)} called you`
+                        return eventCard
+                    }
                     cardContainer.id = `${floID}_${timestamp}`
                     if(unconfirmed)
                         cardContainer.classList.add('unconfirmed')
@@ -1757,32 +1898,28 @@
         })
 
         getRef('search_chats').addEventListener('input', function(e) {
-            if(this.value.trim() !== ''){
-                const contacts = getRef('chat_container').querySelectorAll('.contact')
-                contacts.forEach( child => {
-                    if(child.getAttribute('search-tags').toLowerCase().includes(this.value.toLowerCase())){
-                        child.classList.remove('hide-completely')
-                    }
-                    else{
-                        child.classList.add('hide-completely')
-                    }
-                })
-            }
+            const contacts = getRef('chat_container').querySelectorAll('.contact')
+            contacts.forEach( child => {
+                if(child.getAttribute('search-tags').toLowerCase().includes(this.value.toLowerCase())){
+                    child.classList.remove('hide-completely')
+                }
+                else{
+                    child.classList.add('hide-completely')
+                }
+            })
         })
 
         getRef('search_contacts').addEventListener('input', function() {
-            if(this.value.trim() !== ''){
-                const contacts = {}
-                for(contact in floGlobals.contacts) {
-                    if(contact.toLowerCase().includes(this.value.toLowerCase()) || floGlobals.contacts[contact].toLowerCase().includes(this.value.toLowerCase())){
-                        contacts[contact] = floGlobals.contacts[contact]
-                        if(isCreatingGroup && !(contact in floGlobals.pubKeys))
-                            delete contacts[contact]
-                    }
+            const contacts = {}
+            for(contact in floGlobals.contacts) {
+                if(contact.toLowerCase().includes(this.value.toLowerCase()) || floGlobals.contacts[contact].toLowerCase().includes(this.value.toLowerCase())){
+                    contacts[contact] = floGlobals.contacts[contact]
+                    if(isCreatingGroup && !(contact in floGlobals.pubKeys))
+                        delete contacts[contact]
                 }
-                getRef('contacts_container').innerHTML = ''
-                renderContactList(contacts)
             }
+            getRef('contacts_container').innerHTML = ''
+            renderContactList(contacts)
         })
 
         document.addEventListener('click', e => {
@@ -2604,7 +2741,11 @@
                         }
                     }
                     if(updateChatCard){
-                        const chatCard = getRef('chat_container').querySelector(`.contact[flo-id="${floID || groupID}"]`)
+                        let chatCard = getRef('chat_container').querySelector(`.contact[flo-id="${floID || groupID}"]`)
+                        if(!chatCard){
+                            chatCard = render.contactCard(floID, {type: 'chat', markUnread: true})
+                            getRef('chat_container').prepend(chatCard)
+                        }
                         let finalMessage
                         if(floGlobals.contacts[sender])
                             finalMessage = `${floGlobals.contacts[sender]}: ${message}`
@@ -2693,9 +2834,11 @@
                 getRef("receiver_initial").innerHTML = `
                     <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
                     `
+                getRef('video_call_button').classList.add('hide-completely')    
             }
             else{
                 getRef("receiver_initial").textContent = getContactName(floID).charAt(0);
+                // getRef('video_call_button').classList.remove('hide-completely')    
             }
             getRef("receiver_initial").setAttribute('style', `color: ${textColor}; background-color: ${backgroundColor};`)
             if (floGlobals.pubKeys[floID] || activeChat.isGroup)
@@ -3320,6 +3463,49 @@
             localStorage.setItem(`accent-color${myFloID}`, color);
             document.body.style.setProperty('--accent-color', color);
         })
+
+        document.getElementById('select_bg_image').addEventListener('change', function(e){
+            console
+            compactIDB.writeData('userSettings', this.files[0], 'bgImage')
+            .then(async res => {
+                setBgImage()
+                notify('Background applied', 'success')
+            })     
+            .catch(err => console.error(err))       
+        })
+        
+        async function setBgImage(){
+            try{
+                const image = await compactIDB.readData('userSettings', 'bgImage')
+                console.log(image)
+                if(image){
+                    const url = URL.createObjectURL(image)
+                    getRef('chat').style.background = `linear-gradient(rgba(var(--foreground-color), 0.6), rgba(var(--foreground-color), 0.6)), url(${url}) center no-repeat`
+                    getRef('mail').style.background = `linear-gradient(rgba(var(--foreground-color), 0.6), rgba(var(--foreground-color), 0.6)), url(${url}) center no-repeat`
+                    getRef('chat').style.backgroundSize = 'cover'
+                    getRef('mail').style.backgroundSize = 'cover'
+                    getRef('chat').classList.add('has-bg-image')
+                    getRef('mail').classList.add('has-bg-image')
+                    getRef('selected_bg_preview').firstElementChild.src = url
+                    getRef('selected_bg_preview').classList.add('selected')
+                    getRef('default_bg_preview').classList.remove('selected')
+                    getRef('select_bg_button').textContent = 'Change background'
+                }
+            }
+            catch(err){
+                console.error(err)
+            }
+        }
+        
+        function setDefaultBg(){
+            getRef('chat').style.background = ``
+            getRef('mail').style.background = ``
+            getRef('chat').classList.remove('has-bg-image')
+            getRef('mail').classList.remove('has-bg-image')
+            getRef('selected_bg_preview').classList.remove('selected')
+            getRef('default_bg_preview').classList.add('selected')
+            notify('Default background applied', 'success')
+        }
 
     </script>
 
@@ -12789,7 +12975,8 @@ Bitcoin.Util = {
                     chats: {},
                     groups: {},
                     gkeys: {},
-                    appendix: {}
+                    appendix: {},
+                    userSettings: {}
                 }
                 compactIDB.initDB(`${floGlobals.application}_${myFloID}`, obj).then(result => {
                     console.info(result)
@@ -12806,7 +12993,7 @@ Bitcoin.Util = {
                     let data = {
                         floID: receiver,
                         time: result[vc].time,
-                        category: "sent",
+                        category,
                         message: this.util.encrypt(message)
                     }
                     floGlobals.chats[receiver] = parseInt(vc)

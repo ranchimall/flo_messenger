@@ -199,6 +199,9 @@ span.ripple{
     -webkit-tap-highlight-color: transparent;
 }
 sm-popup{
+    sm-input::part(input){
+        border-radius: 0.5rem;
+    }
     sm-input + sm-input{
         margin-top: 1rem;
     }
@@ -515,7 +518,7 @@ sm-button.danger{
     user-select: none;
 }
 .filled{
-    fill: white;
+    fill: rgba(var(--text-color), 0.7);
     stroke: none !important;
 }
 .group-icon{
@@ -528,7 +531,7 @@ sm-button.danger{
     position: relative;
     display: grid;
     gap: 0 1rem;
-    padding: 1rem 1.5rem;
+    padding: 0.8rem 1.5rem;
     align-items: center;
     flex-shrink: 0;
     user-select: none;
@@ -734,6 +737,7 @@ sm-button.danger{
     width: 1rem;
     background: var(--accent-color);
     border-radius: 100%;
+    border: solid rgba(var(--foreground-color), 1) 1px;
     transform: scale(0);
     transition: transform 0.3s;
 }
@@ -744,6 +748,9 @@ sm-button.danger{
 .contact.unread{
     .time{
         color: var(--accent-color);
+    }
+    h4{
+        color: rgba(var(--text-color), 1);
     }
     h4, h5 ,p{
         font-weight: 700;
@@ -856,6 +863,7 @@ sm-button.danger{
 #main_navbar{
     position: fixed;
     flex-direction: column;
+    height: 100%;
     bottom: 0;
     top: 0;
     padding: 0;
@@ -1183,7 +1191,7 @@ sm-button.danger{
 .message{
     position: relative;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     width: auto;
     font-size: 0.92rem;
     max-width: max-content;
@@ -1226,6 +1234,7 @@ sm-button.danger{
         padding-left: 1rem;
         align-self: flex-end;
         margin-top: 0.2rem;
+        margin-left: auto;
     }
 }
 .sent{
@@ -1274,6 +1283,7 @@ sm-button.danger{
     border-radius: 0.8rem;
 }
 .distinct-sender{
+    display: grid;
     border-radius: 0 0.8rem 0.8rem 0.8rem !important;
     margin-top: 0.8rem !important;
     &::after{
@@ -1305,7 +1315,7 @@ sm-button.danger{
 #chat_header{
     padding: 0 1rem;
     min-height: 4rem;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr auto;
     .flex{
         height: 100%;
     }
@@ -1361,21 +1371,6 @@ sm-button.danger{
     }
 }
 #chat_footer{
-    #emoji_toggle{
-        align-self: center;
-        padding: 0.6rem;
-        margin-right: 0.5rem;
-        width: 2.6rem;
-        height: 2.6rem;
-        border-radius: 2rem;
-        cursor: pointer;
-        path{
-            fill: rgba(var(--text-color), 0.5);
-        }
-        &.active path{
-            fill: var(--accent-color);
-        }
-    }
     .flex{
         align-items: flex-end;
         padding: 1rem 1rem 1rem 0.4rem;
@@ -1383,6 +1378,21 @@ sm-button.danger{
     sm-textarea::part(textarea){
         padding-right: 3rem;
         border-radius: 0.5rem;
+    }
+}
+#emoji_toggle{
+    align-self: center;
+    padding: 0.6rem;
+    margin-right: 0.5rem;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    path{
+        fill: rgba(var(--text-color), 0.5);
+    }
+    &.active path{
+        fill: var(--accent-color);
     }
 }
 #send_message_button{
@@ -1412,6 +1422,7 @@ sm-button.danger{
     margin: 0;
 }
 .big-emoji{
+    flex-direction: column;
     .message-body{
         font-size: 2.6rem;
     }
@@ -1431,8 +1442,7 @@ sm-button.danger{
     max-height: 30vh;
     section{
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(3.6rem, 1fr));
-        gap: 0.5rem;
+        grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
         padding: 0 1rem;
         width: 100%;
     }
@@ -1519,8 +1529,27 @@ sm-panel{
 {
     padding-bottom: 6rem;
 }
-#chat, #mail{
-    background: rgba(var(--foreground-color), 1);
+.has-bg-image{
+    .received, 
+    .group-event-card,
+    .date-card{
+        background: rgba(var(--foreground-color), 0.6);
+    }
+    #emoji_picker,
+    #emoji_picker .section-header{
+        background: rgba(var(--foreground-color), 1);
+    }
+    #emoji_toggle{
+        path{
+            fill: rgba(var(--text-color), 0.8);
+        }
+    }
+    sm-textarea::part(textarea){
+        background: rgba(var(--foreground-color), 0.6);
+    }
+    #chat_details_panel{
+        background: rgba(var(--foreground-color), 0.8);
+    }
 }
 #mail{
     height: 100vh;
@@ -1571,9 +1600,16 @@ sm-panel{
         margin-left: 1rem;
     }
     sm-switch{
+        padding: 1rem 1.5rem;
         display: flex;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
         width: min(60ch, 100%);
+        .flex{
+            margin-right: 1rem;
+        }
+        h4{
+            margin-bottom: 0.5rem;
+        }
     }
     sm-button{
         width: 100%;
@@ -1585,9 +1621,14 @@ sm-panel{
         height: 100%;
     }
     #settings_panel{
-        padding: 0 1.5rem;
+        overflow-y: auto;
+        height: 100%;
+        .panel > *:first-of-type{
+            margin-top: 2rem;
+        }
     }
     section{
+        padding: 1rem 1.5rem;
         width: min(60ch, 100%);
         display: grid;
         gap: .3rem;
@@ -1596,7 +1637,7 @@ sm-panel{
             margin-bottom: 0;
         }
         &:not(:last-of-type){
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
     }
     #sign_out::part(button){
@@ -1605,6 +1646,60 @@ sm-panel{
     color-grid{
         margin: 0.5rem 0 1.5rem 0;
         width: min(60ch, 100%);
+    }
+    #bg_preview_container{
+        padding: 1rem 0;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    .bg-preview{
+        position: relative;
+        display: grid;
+        place-items: center;
+        height: 8rem;
+        width: 8rem;
+        cursor: pointer;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: rgba(var(--text-color), 0.1);
+        img{
+            object-fit: cover;
+            height: 100%;
+            width: 100%;
+        }
+        &.selected::after{
+            content: '';
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            box-shadow: 0 0 0 0.5rem rgba(var(--text-color), 0.8) inset;
+        }
+    }
+    #selected_bg_preview[src=""]{
+        display: none;
+    }
+}
+#video_call_page{
+    position: relative;
+    display: grid;
+    video{
+        position: fixed;
+        object-fit: cover;
+        object-position: center;
+    }
+    #their_video{
+        height: 100%;
+    }
+    #my_video{
+        width: max(20vh, 12rem);
+        bottom: 0;
+        right: 0;
+        border-radius: 1rem;
+    }
+    #call_controls{
+        padding: 1.5rem;
+        margin-top: auto;
+        justify-self: center;
     }
 }
 @media screen and (max-width: 640px){
@@ -1673,7 +1768,7 @@ sm-panel{
         }
     }
     #chat_header{
-        grid-template-columns: auto 1fr;
+        grid-template-columns: auto 1fr auto;
     }
     #settings_page{
         overflow-x: hidden;
@@ -1781,9 +1876,6 @@ sm-panel{
         sm-button{
             width: max-content;
         }
-        #settings_panel{
-            padding: 1.5rem;
-        }
         .active{
             background: rgba(var(--text-color), 0.1);
         }
@@ -1795,10 +1887,6 @@ sm-panel{
     .card{
         display: inline-flex;
         width: auto;
-    }
-    #settings_panel{
-        overflow-y: auto;
-        max-height: 100vh;
     }
 }
 @media only screen and (max-width: 1280px){
@@ -1842,10 +1930,6 @@ sm-panel{
     .card{
         display: inline-flex;
         width: auto;
-    }
-    #settings_panel{
-        overflow-y: auto;
-        max-height: 100vh;
     }
 }
 @media (hover: hover){
