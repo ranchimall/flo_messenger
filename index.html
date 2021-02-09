@@ -1874,17 +1874,23 @@
         })
 
         const chatScrollInfo = {};
+        let debounceTimer
         getRef('chat_middle').addEventListener('scroll', function() {
-            chatScrollInfo['scrollTop'] = this.scrollTop
-            chatScrollInfo['scrollheight'] = this.scrollHeight
-            if((this.scrollHeight > this.clientHeight) && (this.scrollHeight - this.clientHeight - this.scrollTop >= 100)){
-                chatScrollInfo['isScrolledUp'] = true
-                getRef('scroll_to_bottom').classList.add('no-transformations')
+            if(debounceTimer){
+                window.clearTimeout(debounceTimer)
             }
-            else{
-                chatScrollInfo['isScrolledUp'] = false
-                getRef('scroll_to_bottom').classList.remove('no-transformations', 'new-message')
-            }
+            debounceTimer = setTimeout(e => {
+                chatScrollInfo['scrollTop'] = this.scrollTop
+                chatScrollInfo['scrollheight'] = this.scrollHeight
+                if((this.scrollHeight > this.clientHeight) && (this.scrollHeight - this.clientHeight - this.scrollTop >= 100)){
+                    chatScrollInfo['isScrolledUp'] = true
+                    getRef('scroll_to_bottom').classList.add('no-transformations')
+                }
+                else{
+                    chatScrollInfo['isScrolledUp'] = false
+                    getRef('scroll_to_bottom').classList.remove('no-transformations', 'new-message')
+                }
+            }, 100)
         }, {passive: true})
 
         getRef('send_mail_to').addEventListener('input', function() {

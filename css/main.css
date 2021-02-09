@@ -1456,7 +1456,7 @@ sm-button.danger {
 
 #chat_footer .flex {
   align-items: flex-end;
-  padding: 1rem 1rem 1rem 0.4rem;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
 }
 #chat_footer sm-textarea::part(textarea) {
   padding-right: 3rem;
@@ -1526,6 +1526,8 @@ sm-button.danger {
   --input-border-color: rgba(var(--text-color), 0.6);
   --input-padding: 0.4rem 1rem;
   --outline-color: var(--accent-color);
+  --input-font-color: var(--text-color);
+  --input-placeholder-color: rgba(var(--text-color), 0.6);
   user-select: none;
   width: 100%;
   max-height: 40vh;
@@ -1614,6 +1616,9 @@ sm-panel {
 .has-bg-image .group-event-card,
 .has-bg-image .date-card {
   background: rgba(var(--foreground-color), 0.6);
+}
+.has-bg-image .received::after {
+  border-color: transparent rgba(var(--foreground-color), 0.6) transparent transparent;
 }
 .has-bg-image #emoji_picker {
   --background: rgba(var(--foreground-color), 0.6);
@@ -1859,6 +1864,7 @@ sm-panel {
   #settings_page #settings_header {
     position: sticky;
     top: 0;
+    z-index: 1;
     padding: 1rem 1.5rem;
     margin-bottom: 0.5rem;
     background: rgba(var(--foreground-color), 1);
@@ -1997,7 +2003,7 @@ sm-panel {
 }
 @media only screen and (min-width: 1080px) {
   #chat #messages_container {
-    padding: 1rem 5rem;
+    padding: 1rem 4rem;
   }
 }
 @media only screen and (min-width: 1280px) {
