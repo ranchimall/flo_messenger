@@ -1223,7 +1223,7 @@ sm-button.danger{
         .text-emoji{
             align-self: center;
             font-size: 1.4em;
-            letter-spacing: 0ch;
+            letter-spacing: 0;
         }
     }
     .time{
@@ -1424,6 +1424,7 @@ sm-button.danger{
 .big-emoji{
     flex-direction: column;
     .message-body{
+        justify-content: center;
         font-size: 2.6rem;
     }
 }
@@ -1431,30 +1432,15 @@ sm-button.danger{
     flex: 1;
     padding: 0 1rem;
 }
-#emoji_picker{
-    display: grid;
-    gap: 1rem;
-    background: rgba(var(--text-color), 0.06);
-    border-radius: 1rem;
-    margin: 0 1rem;
-    box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.3);
-    overflow-y: auto;
-    max-height: 30vh;
-    section{
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
-        padding: 0 1rem;
-        width: 100%;
-    }
-    .section-header{
-        grid-column: 1/-1;
-        position: sticky;
-        top: 0;
-        background: linear-gradient(rgba(var(--text-color), 0.06), rgba(var(--text-color), 0.06)), rgba(var(--foreground-color), 1);
-        padding: 1rem 0;
-        z-index: 1;
-        user-select: none;
-    }
+#emoji_picker{   
+    --background: rgba(var(--text-color), 0.06);
+    --border-size: 0;
+    --input-border-color: rgba(var(--text-color), 0.6);
+    --input-padding: 0.4rem 1rem;
+    --outline-color: var(--accent-color);
+    user-select: none;
+    width: 100%;
+    max-height: 40vh;
 }
 .emoji{
     font-size: 1.6rem;
@@ -1535,9 +1521,8 @@ sm-panel{
     .date-card{
         background: rgba(var(--foreground-color), 0.6);
     }
-    #emoji_picker,
-    #emoji_picker .section-header{
-        background: rgba(var(--foreground-color), 1);
+    #emoji_picker{
+        --background: rgba(var(--foreground-color), 0.6);
     }
     #emoji_toggle{
         path{
@@ -1623,9 +1608,6 @@ sm-panel{
     #settings_panel{
         overflow-y: auto;
         height: 100%;
-        .panel > *:first-of-type{
-            margin-top: 2rem;
-        }
     }
     section{
         padding: 1rem 1.5rem;
@@ -1772,10 +1754,10 @@ sm-panel{
     }
     #settings_page{
         overflow-x: hidden;
-        #settings_panel header{
+        #settings_header{
             position: sticky;
             top: 0;
-            padding: 1rem 0;
+            padding: 1rem 1.5rem;
             margin-bottom: 0.5rem;
             background: rgba(var(--foreground-color), 1);
         }
@@ -1879,6 +1861,9 @@ sm-panel{
         .active{
             background: rgba(var(--text-color), 0.1);
         }
+        .panel > *:first-of-type{
+            margin-top: 0.5rem;
+        }
     }
     .contact.active,
     .mail-card.active{
@@ -1922,6 +1907,9 @@ sm-panel{
                 padding: 1rem;
             }
         }
+    }
+    #emoji_picker{
+        --num-columns: 16;
     }
     .contact.active,
     .mail-card.active{
