@@ -508,14 +508,16 @@ sm-button.danger {
   place-content: center;
   justify-items: center;
 }
-#loading_page svg {
+
+.page__loader {
   z-index: 1;
   transform-origin: bottom;
   height: 6rem;
   width: 6rem;
   animation: bounce 0.5s infinite alternate ease-in;
 }
-#loading_page .shadow {
+
+.shadow {
   margin-top: -1rem;
   width: 5rem;
   height: 2rem;
@@ -524,7 +526,8 @@ sm-button.danger {
   animation: scale 0.5s infinite alternate ease-in;
   margin-left: 1rem;
 }
-#loading_page h4 {
+
+.page__tag-line {
   margin-top: 2rem;
 }
 
@@ -1045,7 +1048,7 @@ sm-button.danger {
   text-align: center;
 }
 #contacts #contacts_container {
-  padding-bottom: 6rem;
+  padding-bottom: 1.5rem;
 }
 #contacts #contacts_container::before {
   display: flex;
@@ -1107,14 +1110,9 @@ sm-button.danger {
   margin: 0;
   width: 100%;
 }
-#contacts .header sm-input .icon, #mails .header sm-input .icon, #settings_page .header sm-input .icon {
-  stroke: rgba(var(--text-color), 0.5);
-  height: 0.9rem;
-  width: 0.9rem;
-}
 #contacts .header sm-input::part(input), #mails .header sm-input::part(input), #settings_page .header sm-input::part(input) {
   border-radius: 0.5rem;
-  padding: 0.2rem 0.8rem;
+  padding: 0.5rem 1rem;
 }
 #contacts .header h4, #mails .header h4, #settings_page .header h4 {
   text-transform: capitalize;
@@ -1122,6 +1120,7 @@ sm-button.danger {
 }
 #contacts .header .icon, #mails .header .icon, #settings_page .header .icon {
   -webkit-tap-highlight-color: transparent;
+  margin-right: 1rem;
 }
 #contacts .header .flex .hamburger-menu-button, #mails .header .flex .hamburger-menu-button, #settings_page .header .flex .hamburger-menu-button {
   -webkit-tap-highlight-color: transparent;
@@ -1615,7 +1614,7 @@ sm-panel {
 .has-bg-image .received,
 .has-bg-image .group-event-card,
 .has-bg-image .date-card {
-  background: rgba(var(--foreground-color), 0.6);
+  background: rgba(var(--foreground-color), 0.8);
 }
 .has-bg-image .received::after {
   border-color: transparent rgba(var(--foreground-color), 0.6) transparent transparent;
@@ -1728,6 +1727,11 @@ sm-panel {
   margin: 0.5rem 0 1.5rem 0;
   width: min(60ch, 100%);
 }
+#settings_page #chat_preview {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
 #settings_page #bg_preview_container {
   padding: 1rem 0;
   gap: 0.5rem;
@@ -1744,20 +1748,17 @@ sm-panel {
   overflow: hidden;
   background: rgba(var(--text-color), 0.1);
 }
-#settings_page .bg-preview img {
-  object-fit: cover;
-  height: 100%;
-  width: 100%;
-}
-#settings_page .bg-preview.selected::after {
+#settings_page .bg-preview--selected::after {
   content: "";
   position: absolute;
   height: 100%;
   width: 100%;
   box-shadow: 0 0 0 0.5rem rgba(var(--text-color), 0.8) inset;
 }
-#settings_page #selected_bg_preview[src=""] {
-  display: none;
+#settings_page .bg-preview__image {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
 }
 
 #video_call_page {
@@ -1769,16 +1770,19 @@ sm-panel {
   object-fit: cover;
   object-position: center;
 }
-#video_call_page #their_video {
+
+#their_video {
   height: 100%;
 }
-#video_call_page #my_video {
+
+#my_video {
   width: max(20vh, 12rem);
   bottom: 0;
   right: 0;
   border-radius: 1rem;
 }
-#video_call_page #call_controls {
+
+#call_controls {
   padding: 1.5rem;
   margin-top: auto;
   justify-self: center;

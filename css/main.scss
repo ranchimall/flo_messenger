@@ -457,25 +457,25 @@ sm-button.danger{
     display: grid;
     place-content: center;
     justify-items: center;
-    svg{
-        z-index: 1;
-        transform-origin: bottom;
-        height: 6rem;
-        width: 6rem;
-        animation: bounce 0.5s infinite alternate ease-in;
-    }
-    .shadow{
-        margin-top: -1rem;
-        width: 5rem;
-        height: 2rem;
-        background: rgba(var(--text-color), 0.1);
-        border-radius: 50%;
-        animation:  scale 0.5s infinite alternate ease-in;
-        margin-left: 1rem;
-    }
-    h4{
-        margin-top: 2rem;
-    }
+}
+.page__loader{
+    z-index: 1;
+    transform-origin: bottom;
+    height: 6rem;
+    width: 6rem;
+    animation: bounce 0.5s infinite alternate ease-in;
+}
+.shadow{
+    margin-top: -1rem;
+    width: 5rem;
+    height: 2rem;
+    background: rgba(var(--text-color), 0.1);
+    border-radius: 50%;
+    animation:  scale 0.5s infinite alternate ease-in;
+    margin-left: 1rem;
+}
+.page__tag-line{
+    margin-top: 2rem;
 }
 @keyframes bounce{
     0%{
@@ -976,7 +976,7 @@ sm-button.danger{
         }
     }
     #contacts_container{
-        padding-bottom: 6rem;
+        padding-bottom: 1.5rem;
         &::before{
             display: flex;
             content: 'Contacts';
@@ -1035,15 +1035,10 @@ sm-button.danger{
         sm-input{
             margin: 0;
             width: 100%;
-            .icon{
-                stroke: rgba(var(--text-color), 0.5);
-                height: 0.9rem;
-                width: 0.9rem;
-            }
         }
         sm-input::part(input){
             border-radius: 0.5rem;
-            padding: 0.2rem 0.8rem;
+            padding: 0.5rem 1rem;
         }
         h4{
             text-transform: capitalize;
@@ -1051,6 +1046,7 @@ sm-button.danger{
         }
         .icon{
             -webkit-tap-highlight-color: transparent;
+            margin-right: 1rem;
         }
         .flex{
             .hamburger-menu-button{
@@ -1521,7 +1517,7 @@ sm-panel{
     .received, 
     .group-event-card,
     .date-card{
-        background: rgba(var(--foreground-color), 0.6);
+        background: rgba(var(--foreground-color), 0.8);
     }
     .received::after{
         border-color: transparent rgba(var(--foreground-color), 0.6) transparent transparent;
@@ -1634,6 +1630,11 @@ sm-panel{
         margin: 0.5rem 0 1.5rem 0;
         width: min(60ch, 100%);
     }
+    #chat_preview{
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 0.5rem;
+    }
     #bg_preview_container{
         padding: 1rem 0;
         gap: 0.5rem;
@@ -1649,12 +1650,7 @@ sm-panel{
         border-radius: 1rem;
         overflow: hidden;
         background: rgba(var(--text-color), 0.1);
-        img{
-            object-fit: cover;
-            height: 100%;
-            width: 100%;
-        }
-        &.selected::after{
+        &--selected::after{
             content: '';
             position: absolute;
             height: 100%;
@@ -1662,8 +1658,10 @@ sm-panel{
             box-shadow: 0 0 0 0.5rem rgba(var(--text-color), 0.8) inset;
         }
     }
-    #selected_bg_preview[src=""]{
-        display: none;
+    .bg-preview__image{
+        object-fit: cover;
+        height: 100%;
+        width: 100%;
     }
 }
 #video_call_page{
@@ -1674,20 +1672,20 @@ sm-panel{
         object-fit: cover;
         object-position: center;
     }
-    #their_video{
-        height: 100%;
-    }
-    #my_video{
-        width: max(20vh, 12rem);
-        bottom: 0;
-        right: 0;
-        border-radius: 1rem;
-    }
-    #call_controls{
-        padding: 1.5rem;
-        margin-top: auto;
-        justify-self: center;
-    }
+}
+#their_video{
+    height: 100%;
+}
+#my_video{
+    width: max(20vh, 12rem);
+    bottom: 0;
+    right: 0;
+    border-radius: 1rem;
+}
+#call_controls{
+    padding: 1.5rem;
+    margin-top: auto;
+    justify-self: center;
 }
 @media screen and (max-width: 640px){
     .hide-on-mobile{
