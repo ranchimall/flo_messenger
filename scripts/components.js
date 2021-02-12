@@ -12,6 +12,9 @@ smButton.innerHTML = `
     display: -webkit-inline-box;
     display: -ms-inline-flexbox;
     display: inline-flex;
+    --padding: 0.6rem 1.2rem;
+    --border-radius: 0.3rem;
+    --background: rgba(var(--text-color), 0.1);
 }
 :host([disable]) .button{
     cursor: not-allowed;
@@ -45,13 +48,13 @@ smButton.innerHTML = `
     display: -ms-flexbox;
     display: flex;
     width: 100%;
-    padding: 0.6rem 1.2rem;
+    padding: var(--padding);
     cursor: pointer;
     -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none;
-    border-radius: 0.3rem; 
+    border-radius: var(--border-radius); 
     -webkit-box-pack: center; 
         -ms-flex-pack: center; 
             justify-content: center;
@@ -63,16 +66,10 @@ smButton.innerHTML = `
     text-transform: capitalize;
     font-size: 0.9rem;
     font-weight: 500;
-    background: rgba(var(--text-color), 0.1); 
+    background: var(--background); 
     -webkit-tap-highlight-color: transparent;
     outline: none;
     overflow: hidden;
-}
-span.ripple {
-    position: absolute;
-    border-radius: 50%;
-    transform: scale(0);
-    background: rgba(var(--text-color), 0.2);
 }
 :host(:not([disable])) .button:focus-visible{
     -webkit-box-shadow: 0 0 0 0.1rem var(--accent-color);
@@ -199,6 +196,8 @@ border: none;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
+    --border-radius: 0.3rem;
+    --padding: 0.7rem 1rem;
 }
 .hide{
    opacity: 0 !important;
@@ -236,8 +235,8 @@ border: none;
             align-items: center;
     position: relative;
     gap: 0.5rem;
-    padding: 0.7rem 1rem;
-    border-radius: 0.3rem;
+    padding: var(--padding);
+    border-radius: var(--border-radius);
     -webkit-transition: opacity 0.3s;
     -o-transition: opacity 0.3s;
     transition: opacity 0.3s;
@@ -578,6 +577,7 @@ smTextarea.innerHTML = `
 }
 :host{
     display: grid;
+    --border-radius: 0.3s;
 }
 :host(.outlined) .textarea {
     box-shadow: 0 0 0 0.1rem rgba(var(--text-color), 0.4) inset;
@@ -594,7 +594,7 @@ smTextarea.innerHTML = `
     align-items: stretch;
     max-height: 8rem;
     background: rgba(var(--text-color), 0.06);
-    border-radius: 0.3rem;
+    border-radius: var(--border-radius);
 }
 .textarea::after,
 textarea{

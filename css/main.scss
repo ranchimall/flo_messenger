@@ -147,9 +147,7 @@ strong{
     right: 0;
     bottom: 0;
     z-index: 1;
-    &::part(button){
-        padding: 0.9rem 1.6rem;
-    }
+    --padding: 0.9rem 1.6rem;
     .icon{
         margin-left: 0 !important;
         margin-right: 0.5rem;
@@ -198,10 +196,10 @@ span.ripple{
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
+sm-input{
+    --border-radius: 0.5rem;
+}
 sm-popup{
-    sm-input::part(input){
-        border-radius: 0.5rem;
-    }
     sm-input + sm-input{
         margin-top: 1rem;
     }
@@ -397,9 +395,7 @@ sm-button.danger{
     }
     sm-button{
         width: 100%;
-        &::part(button){
-            padding: 0.8rem 1.6rem;
-        }
+        --padding: 0.8rem 1.6rem;
     }
     p {
         margin-bottom: 0.5rem;
@@ -499,7 +495,7 @@ sm-button.danger{
         transform: scale(1);
     }
 }
-#main{
+#main_page{
     width: 100%;
     height: 100%;
 }
@@ -870,7 +866,6 @@ sm-button.danger{
     width: max(16rem, 60vw);
     background: rgba(var(--foreground-color), 1);
     .logo-section{
-        margin: 1rem 0 1.5rem 0;
         padding: 0 1rem;
     }
     .active{
@@ -1035,10 +1030,7 @@ sm-button.danger{
         sm-input{
             margin: 0;
             width: 100%;
-        }
-        sm-input::part(input){
-            border-radius: 0.5rem;
-            padding: 0.5rem 1rem;
+            --padding: 0.5rem 1rem;
         }
         h4{
             text-transform: capitalize;
@@ -1423,6 +1415,9 @@ sm-button.danger{
         justify-content: center;
         font-size: 2.6rem;
     }
+    .text-emoji{
+        font-size: 2.6rem !important;
+    }
 }
 #chat_middle{
     flex: 1;
@@ -1681,11 +1676,26 @@ sm-panel{
     bottom: 0;
     right: 0;
     border-radius: 1rem;
+    border: solid;
+    margin: 1.5rem;
 }
 #call_controls{
     padding: 1.5rem;
     margin-top: auto;
     justify-self: center;
+}
+#pick_up_call{
+    color: #00C853;
+}
+.circular-button{
+    align-items: center;
+    .filled{
+        height: 3rem;
+        width: 3rem;
+        padding: 1rem;
+    }
+    --padding: 0;
+    --border-radius: 50%;
 }
 @media screen and (max-width: 640px){
     .hide-on-mobile{
@@ -1839,7 +1849,7 @@ sm-panel{
     #reply_mail_popup::part(popup){
         min-width: 36rem;
     }
-    #main{
+    #main_page{
         grid-template-columns: auto 1fr;
     }
     #emoji_picker{
