@@ -578,6 +578,9 @@ smTextarea.innerHTML = `
 :host{
     display: grid;
     --border-radius: 0.3s;
+    --background: rgba(var(--text-color), 0.06);
+    --padding-right: initial;
+    --padding-left: initial;
 }
 :host(.outlined) .textarea {
     box-shadow: 0 0 0 0.1rem rgba(var(--text-color), 0.4) inset;
@@ -593,8 +596,10 @@ smTextarea.innerHTML = `
     grid-template-columns: 1fr;
     align-items: stretch;
     max-height: 8rem;
-    background: rgba(var(--text-color), 0.06);
+    background: var(--background);
     border-radius: var(--border-radius);
+    padding-left: var(--padding-left);
+    padding-right: var(--padding-right);
 }
 .textarea::after,
 textarea{
@@ -1863,6 +1868,10 @@ smPopup.innerHTML = `
     display: -ms-grid;
     display: grid;
     z-index: 10;
+    --width: 100%;
+    --min-width: auto;
+    --body-padding: 1.5rem;
+    --border-radius: 0.8rem 0.8rem 0 0;
 }
 ::-webkit-scrollbar{
     width: 0.5rem;
@@ -1908,8 +1917,9 @@ smPopup.innerHTML = `
     -webkit-box-align: start;
         -ms-flex-align: start;
             align-items: flex-start;
-    width: 100%;
-    border-radius: 0.8rem 0.8rem 0 0;
+    width: var(--width);
+    min-width: var(--min-width);
+    border-radius: var(--border-radius);
     -webkit-transform: scale(1) translateY(100%);
             transform: scale(1) translateY(100%);
     -webkit-transition: -webkit-transform 0.3s;
@@ -1948,7 +1958,7 @@ smPopup.innerHTML = `
         -ms-flex: 1;
             flex: 1;
     width: 100%;
-    padding: 1.5rem;
+    padding: var(--body-padding);
     overflow-y: auto;
 }
 .hide{
@@ -1957,14 +1967,14 @@ smPopup.innerHTML = `
     visiblity: none;
 }
 @media screen and (min-width: 640px){
+    :host{
+        --border-radius: 0.4rem;
+    }
     .popup{
-        width: -webkit-max-content;
-        width: -moz-max-content;
-        width: max-content;
         -ms-flex-item-align: center;
             -ms-grid-row-align: center;
             align-self: center;
-        border-radius: 0.4rem;
+        border-radius: var(--border-radius);
         height: auto;
         -webkit-transform: scale(1) translateY(3rem);
                 transform: scale(1) translateY(3rem);
@@ -1983,7 +1993,7 @@ smPopup.innerHTML = `
     .handle{
         height: 0.3rem;
         width: 2rem;
-        background: rgba(var(--text-color), .2);
+        background: rgba(var(--text-color), .4);
         border-radius: 1rem;
         margin: 0.5rem 0;
     }

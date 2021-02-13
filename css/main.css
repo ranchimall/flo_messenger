@@ -713,8 +713,8 @@ sm-button.danger {
   margin-left: 0.5rem;
 }
 
-#contact_details_popup::part(popup-body) {
-  padding: 0 0 1.5rem 0;
+#contact_details_popup {
+  --body-padding: 0 0 1.5rem 0;
 }
 #contact_details_popup .popup-section {
   margin: 1.5rem;
@@ -1450,9 +1450,9 @@ sm-button.danger {
   align-items: flex-end;
   padding: 0.5rem 1rem 0.5rem 0.5rem;
 }
-#chat_footer sm-textarea::part(textarea) {
-  padding-right: 3rem;
-  border-radius: 0.5rem;
+#chat_footer sm-textarea {
+  --padding-right: 3rem;
+  --border-radius: 0.5rem;
 }
 
 #emoji_toggle {
@@ -1523,6 +1523,8 @@ sm-button.danger {
   --outline-color: var(--accent-color);
   --input-font-color: var(--text-color);
   --input-placeholder-color: rgba(var(--text-color), 0.6);
+  --indicator-color: var(--accent-color);
+  --button-hover-background: rgba(var(--text-color), 0.2);
   user-select: none;
   width: 100%;
   max-height: 40vh;
@@ -1583,8 +1585,8 @@ sm-button.danger {
   padding-bottom: 6rem;
 }
 
-#contacts_popup::part(popup-body) {
-  padding: 0;
+#contacts_popup {
+  --body-padding: 0;
 }
 #contacts_popup .popup-header {
   padding: 1.5rem;
@@ -1621,8 +1623,8 @@ sm-panel {
 .has-bg-image #emoji_toggle path {
   fill: rgba(var(--text-color), 0.8);
 }
-.has-bg-image sm-textarea::part(textarea) {
-  background: rgba(var(--foreground-color), 0.6);
+.has-bg-image sm-textarea {
+  --background: rgba(var(--foreground-color), 0.6);
 }
 .has-bg-image #chat_details_panel {
   background: rgba(var(--foreground-color), 0.8);
@@ -1802,6 +1804,10 @@ sm-panel {
 }
 
 @media screen and (max-width: 640px) {
+  sm-popup {
+    --border-radius: 1rem 1rem 0 0;
+  }
+
   .hide-on-mobile {
     position: fixed;
     max-height: 0;
@@ -1909,9 +1915,10 @@ sm-panel {
     margin: 0.5rem 0;
   }
 
-  sm-popup::part(popup) {
-    width: 24rem;
-    min-width: 24rem;
+  sm-popup {
+    --width: 24rem;
+    --min-width: 24rem;
+    --border-radius: 0.5rem;
   }
 
   #landing {
@@ -1961,13 +1968,13 @@ sm-panel {
     display: none;
   }
 
-  #add_contact_popup::part(popup) {
-    min-width: 24rem;
+  #add_contact_popup {
+    --min-width: 24rem;
   }
 
-  #compose_mail_popup::part(popup),
-#reply_mail_popup::part(popup) {
-    min-width: 36rem;
+  #compose_mail_popup,
+#reply_mail_popup {
+    --min-width: 36rem;
   }
 
   #main_page {

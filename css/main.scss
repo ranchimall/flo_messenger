@@ -653,9 +653,7 @@ sm-button.danger{
     }
 }
 #contact_details_popup{
-    &::part(popup-body){
-        padding: 0 0 1.5rem 0;
-    }
+    --body-padding: 0 0 1.5rem 0;
     .popup-section{
         margin: 1.5rem;
     }
@@ -1363,9 +1361,9 @@ sm-button.danger{
         align-items: flex-end;
         padding: 0.5rem 1rem 0.5rem 0.5rem;
     }
-    sm-textarea::part(textarea){
-        padding-right: 3rem;
-        border-radius: 0.5rem;
+    sm-textarea{
+        --padding-right: 3rem;
+        --border-radius: 0.5rem;
     }
 }
 #emoji_toggle{
@@ -1431,6 +1429,8 @@ sm-button.danger{
     --outline-color: var(--accent-color);
     --input-font-color: var(--text-color);
     --input-placeholder-color: rgba(var(--text-color), 0.6);
+    --indicator-color: var(--accent-color);
+    --button-hover-background: rgba(var(--text-color), 0.2);
     user-select: none;
     width: 100%;
     max-height: 40vh;
@@ -1485,9 +1485,7 @@ sm-button.danger{
     padding-bottom: 6rem;
 }
 #contacts_popup{
-    &::part(popup-body){
-        padding: 0;
-    }
+    --body-padding: 0;
     .popup-header{
         padding: 1.5rem;
     }
@@ -1525,8 +1523,8 @@ sm-panel{
             fill: rgba(var(--text-color), 0.8);
         }
     }
-    sm-textarea::part(textarea){
-        background: rgba(var(--foreground-color), 0.6);
+    sm-textarea{
+        --background: rgba(var(--foreground-color), 0.6);
     }
     #chat_details_panel{
         background: rgba(var(--foreground-color), 0.8);
@@ -1698,6 +1696,9 @@ sm-panel{
     --border-radius: 50%;
 }
 @media screen and (max-width: 640px){
+    sm-popup{
+        --border-radius: 1rem 1rem 0 0;
+    }
     .hide-on-mobile{
         position: fixed;
         max-height: 0;
@@ -1794,9 +1795,10 @@ sm-panel{
         padding: 2rem 3rem 0 3rem;
         margin: 0.5rem 0;
     }
-    sm-popup::part(popup){
-        width: 24rem;
-        min-width: 24rem;
+    sm-popup{
+        --width: 24rem;
+        --min-width: 24rem;
+        --border-radius: 0.5rem;
     }
     #landing{
         align-items: center;
@@ -1842,12 +1844,12 @@ sm-panel{
             display: none;
         }
     }
-    #add_contact_popup::part(popup){
-        min-width: 24rem;
+    #add_contact_popup{
+        --min-width: 24rem;
     }
-    #compose_mail_popup::part(popup),
-    #reply_mail_popup::part(popup){
-        min-width: 36rem;
+    #compose_mail_popup,
+    #reply_mail_popup{
+        --min-width: 36rem;
     }
     #main_page{
         grid-template-columns: auto 1fr;

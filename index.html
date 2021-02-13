@@ -73,7 +73,7 @@
                 <sm-input id="private_key_input_field" class="outlined" type="password" placeholder="FLO private key" privateKey animate></sm-input>
                 <sm-button id="sign_in_button" width="cover" variant="primary" disable>continue</sm-button>
             </form>
-            <sm-button id="remove_account" class="hide-completely" variant="outlined" onclick="signOut()">Remove Account</sm-button>
+            <sm-button id="remove_account" class="hide-completely" onclick="signOut()">Remove Account</sm-button>
         </div>
     </section>
     <div id="on_boarding_page" class="page grid hide-completely">
@@ -226,6 +226,9 @@
             </div>
         </section>
         <ul id="contact_options">
+            <li id="add_as_contact_option" class="option" onclick="addAsContact()">
+                Add as contact
+            </li>
             <li id="mark_read_option" class="option" onclick="markAsRead()">
                 Mark as read
             </li>
@@ -395,8 +398,8 @@
                         <line  x1="423.3" y1="306.34" x2="423.3" y2="379.64"/>
                         <line x1="459.95" y1="342.99" x2="386.65" y2="342.99"/>
                     </svg>                  
-                    <h4>Add a contact for getting started</h4>
-                    <p class="light-text">Tap/click on added contact to start a conversation</p>
+                    <h4>Start your first conversation</h4>
+                    <p class="light-text">Tap/click on 'New chat' to add or select a contact.</p>
                 </div>
                 <div id="all_contacts" class="flex direction-column hide-completely">
                     <header class="grid header">
@@ -588,8 +591,8 @@
 				<div id="mail_container">
 				</div>
 				<div class="flex">
-					<sm-button id="prev_mail" variant="outlined">View Previous Mail</sm-button>
-					<sm-button id="show_reply_popup" variant="outlined">reply</sm-button>
+					<sm-button id="prev_mail">View Previous Mail</sm-button>
+					<sm-button id="show_reply_popup">reply</sm-button>
 				</div>
 			</div>
 		</section>
@@ -954,6 +957,13 @@
 
             switch (e.detail.popup.id) {
                 case 'contact_details_popup':
+                    if(floGlobals.contacts.hasOwnProperty(clickedContact.floID)){
+                        getRef('add_as_contact_option').classList.add('hide-completely')
+                    }
+                    else{
+                        getRef('add_as_contact_option').classList.remove('hide-completely')
+                    }
+
                     const markUnread = floGlobals.marked[clickedContact.floID]?.includes('unread')
                     if(markUnread){
                         getRef('mark_read_option').classList.remove('hide-completely')
@@ -3180,6 +3190,11 @@
                 }
                 editGroupMembers()
             }
+        }
+
+        function addAsContact(){
+            showPopup('add_contact_popup')
+            getRef('add_contact_floID').value = clickedContact.floID
         }
 
         function markAsUnread(){
