@@ -70,7 +70,8 @@
             <h2>Sign in</h2>
             <p>Enter your <span id="type_of_key">FLO private key</span> to continue.</p>
             <form class="flex direction-column" action="" onsubmit="return false">
-                <sm-input id="private_key_input_field" class="outlined" type="password" placeholder="FLO private key" privateKey animate></sm-input>
+                <pin-input id="get_pin" class="hide-completely"></pin-input>
+                <sm-input id="private_key_input_field" type="password" placeholder="FLO private key" privateKey animate></sm-input>
                 <sm-button id="sign_in_button" width="cover" variant="primary" disable>continue</sm-button>
             </form>
             <sm-button id="remove_account" class="hide-completely" onclick="signOut()">Remove Account</sm-button>
@@ -106,7 +107,12 @@
         <div id="frame_2" class="frame">
             <h2 class="h2">Set pin</h2>
             <p>*This pin is saved on this browser only, it won't work anywhere else.</p>
-            <sm-button variant="primary" id="set_pin_button" onclick="setPin()">Set pin</sm-button>
+            <form class="flex direction-column" onsubmit="return false">
+                <pin-input id="first_pin"></pin-input>
+                <pin-input id="confirm_pin"></pin-input>
+                <p id="pin_error" class="danger hide-completely">Pin doesn't match</p>
+                <sm-button variant="primary" id="set_pin_button" onclick="setPin()" disable>Set pin</sm-button>
+            </form>
         </div>
     </div>
     <div id="loading_page" class="page hide-completely">
@@ -168,8 +174,8 @@
 			<h4>Add contact</h4>
 			<sm-button id="add_contact_button" variant="primary" disable>Add</sm-button>
 		</header>
-		<sm-input id="add_contact_floID" class="outlined" floId placeholder="FLO address" animate required></sm-input>
-		<sm-input id="add_contact_name" class="outlined" placeholder="Name" animate required></sm-input>
+		<sm-input id="add_contact_floID" floId placeholder="FLO address" animate required></sm-input>
+		<sm-input id="add_contact_name" placeholder="Name" animate required></sm-input>
 	</sm-popup>
 	<sm-popup id="compose_mail_popup">
 		<header class="popup-header" slot="header">
@@ -182,10 +188,10 @@
 			<sm-button id="send_mail_button" variant="primary" disable>Send</sm-button>
         </header>
         <div id="auto_complete_contact" class="flex direction-column">
-            <sm-input id="send_mail_to" class="outlined" placeholder="To" animate required></sm-input>
+            <sm-input id="send_mail_to" placeholder="To" animate required></sm-input>
             <div id="mail_contact_list" class="hide-completely contact-list"></div>
         </div>
-		<sm-input id="subject_of_mail" class="outlined" placeholder="Subject" animate></sm-input>
+		<sm-input id="subject_of_mail" placeholder="Subject" animate></sm-input>
 		<textarea id="mail_content" placeholder="Type a mail" name="" id="" rows="10" required></textarea>
 	</sm-popup>
 	<sm-popup id="reply_mail_popup">
@@ -198,7 +204,7 @@
 			<h4>Reply</h4>
 			<sm-button id="reply_mail_button" variant="primary" disable>Send</sm-button>
 		</header>
-		<sm-input id="subject_of_reply_mail" class="outlined" placeholder="Subject" animate></sm-input>
+		<sm-input id="subject_of_reply_mail" placeholder="Subject" animate></sm-input>
 		<textarea id="reply_mail_content" placeholder="Type a mail" id="" rows="10" required></textarea>
     </sm-popup>
     <!-- Contact popup -->
@@ -372,7 +378,7 @@
                             <line x1="1" y1="32" x2="64" y2="32"/>
                             <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
                         </svg>
-                        <sm-input id="search_chats" class="outlined" type="search" placeholder="Search">
+                        <sm-input id="search_chats" type="search" placeholder="Search">
 <!--                             <svg slot="icon" class="icon" viewBox="0 0 64 64">
                                 <title>Search</title>
                                 <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
@@ -409,7 +415,7 @@
                                 <line x1="1" y1="32" x2="64" y2="32"/>
                                 <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
                             </svg>
-                            <sm-input id="search_contacts" class="outlined" type="search" placeholder="Enter name or FLO ID">
+                            <sm-input id="search_contacts" type="search" placeholder="Enter name or FLO ID">
 <!--                                 <svg slot="icon" class="icon" viewBox="0 0 64 64">
                                     <title>Search</title>
                                     <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
@@ -457,8 +463,8 @@
                     <form action="" onsubmit="return false">
                         <div class="grid">
                             <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
-                            <sm-input id="group_name_field" class="outlined" placeholder="Group name" animate required></sm-input>
-                            <sm-textarea id="group_description_field" class="outlined" placeholder="Group description"></sm-textarea>
+                            <sm-input id="group_name_field" placeholder="Group name" animate required></sm-input>
+                            <sm-textarea id="group_description_field" placeholder="Group description"></sm-textarea>
                         </div>
                         <sm-button id="create_group_button" variant="primary" class="fab round" type="submit" disable>
                             Create
@@ -1210,7 +1216,7 @@
         }
 
         function areInputsValid(parent) {
-            let allInputs = parent.querySelectorAll("sm-input:not([disabled])"),
+            let allInputs = parent.querySelectorAll("sm-input:not([disable]), pin-input:not([disable])"),
                 inputsFilled = [...allInputs].every(input => {
                     if (input.hasAttribute('floId')) {
                         if (floCrypto.validateAddr(input.value.trim())) return true
@@ -1261,9 +1267,12 @@
                             input.setValidity('Invalid FLO private key.')
                     }
                 }
+                else if(e.target.closest('pin-input')){
+                    formValidation(e.target.closest('pin-input'))
+                }
             })
             document.addEventListener('keyup', (e) => {
-                if (e.target.closest('sm-input')) {
+                if (e.target.closest('sm-input, pin-input')) {
                     if (e.key === 'Enter') {
                         let parent = e.target.closest('sm-popup') || e.target.closest('form')
                         parent.querySelector("button[type='submit'], sm-button[variant='primary'], sm-button[type='submit']")
@@ -1321,29 +1330,40 @@
         const signIn = (type) => {
             return new Promise((resolve, reject) => {
                 showPage('landing_page')
+                if (type === "PRIVATE_KEY") {
+                    getRef('get_pin').setAttribute('disable', '')
+                    getRef('get_pin').classList.add('hide-completely')
+                    getRef('private_key_input_field').removeAttribute('disable')
+                    getRef('private_key_input_field').classList.remove('hide-completely')
+                    getRef("type_of_key").textContent = 'FLO private key'
+                    getRef("remove_account").classList.add("hide-completely");
+                } else if (type === "PIN/Password") {
+                    getRef('get_pin').removeAttribute('disable')
+                    getRef('get_pin').classList.remove('hide-completely')
+                    getRef('private_key_input_field').setAttribute('disable', '')
+                    getRef('private_key_input_field').classList.add('hide-completely')
+                    getRef("type_of_key").textContent = 'PIN'
+                    getRef("remove_account").classList.remove("hide-completely");
+                    showPage('sign_in_page')
+                    isPinSet = true;
+                }
                 getRef('sign_in_button').addEventListener('clicked', () => {
-                    let key = getRef('private_key_input_field').value;
-                    showPage('loading_page')
+                    let key
+                    if (type === "PRIVATE_KEY"){
+                        key = getRef('private_key_input_field').value;
+                        getRef('private_key_input_field').value = ''
+                    }
+                    else if (type === "PIN/Password") {
+                        key = getRef('get_pin').value;
+                        getRef('get_pin').clear()
+                    }
+                    console.log(key)
                     resolve(key)
                 })
                 getRef('sign_in_with').addEventListener('clicked', () => {
                     showFrame(2)
                     resolve(getRef('generated_key').textContent)
                 })
-                if (type === "PRIVATE_KEY") {
-                    getRef('private_key_input_field').setAttribute("placeholder", "Private Key")
-                    getRef('private_key_input_field').setAttribute("privatekey", "")
-                    getRef("type_of_key").textContent = 'FLO private key'
-                    getRef("remove_account").classList.add("hide-completely");
-                    console.log('signed in')
-                } else if (type === "PIN/Password") {
-                    getRef('private_key_input_field').setAttribute("placeholder", "PIN/Password")
-                    getRef('private_key_input_field').removeAttribute("privatekey")
-                    getRef("type_of_key").textContent = 'PIN/Password'
-                    getRef("remove_account").classList.remove("hide-completely");
-                    showPage('sign_in_page')
-                    isPinSet = true;
-                }
             })
         }
 
@@ -1432,9 +1452,9 @@
             //invoke the startup functions
             floDapps.launchStartUp().then(result => {
                 console.log(result)
-/*                 if(!isPinSet){
+                if(!isPinSet){
                     showFrame(2)
-                } */
+                }
 
                 getRef("greet_tag").textContent = myFloID
 
@@ -1471,10 +1491,9 @@
                         messenger.requestGroupInbox()
                             .then(r => console.log(r))
                         console.log(`Load Successful!`)
-/*                         if(isPinSet){
+                        if(isPinSet){
                             showPage('main_page')
-                        } */
-                        showPage('main_page')
+                        }
                     }).catch(error => {
                         //console.error(`Failed to load data`)
                         notify(error, "error")
@@ -3410,10 +3429,16 @@
                 document.querySelectorAll('.page').forEach(page => page.classList.add('hide-completely'))
                 switch(targetPage){
                     case 'sign_in_page':
-                        console.log('signing in')
-                        setTimeout(() => {
-                            getRef('private_key_input_field').focusIn()    
-                        },100)
+                        if(isPinSet){
+                            setTimeout(() => {
+                                getRef('get_pin').focusIn()
+                            }, 100);
+                        }
+                        else{
+                            setTimeout(() => {
+                                getRef('private_key_input_field').focusIn()    
+                            },100)
+                        }
                     break;
                 }
             }
@@ -3432,28 +3457,42 @@
             const frames = ['frame_1', 'frame_2', 'frame_3']
             document.querySelectorAll('.frame').forEach(frame => frame.classList.add('hide-completely'))
             getRef(frames[frameNo - 1]).classList.remove('hide-completely')
+            switch(frames[frameNo - 1]){
+                case 'frame_2':
+                    getRef('first_pin').focusIn()
+                break;
+            }
         }
 
         async function setPin(){
             try{
-                if(isPinSet){
-                    let value = await getPromptInput("Change password", 'New Password', false);
-                    floDapps.securePrivKey(value).then(result => {
-                        notify("Password changed", 'success');
-                    })
+                const firstPin = getRef('first_pin').value
+                const confirmPin = getRef('confirm_pin').value
+                if(firstPin === confirmPin){
+                    let value = getRef('confirm_pin').value
+                    getRef('pin_error').classList.add('hide-completely')
+                    if(isPinSet){
+                        floDapps.securePrivKey(value).then(result => {
+                            notify("Pin changed", 'success');
+                            getRef('first_pin').clear()
+                            getRef('confirm_pin').clear()
+                        })
+                    }
+                    else{
+                        floDapps.securePrivKey(value).then(result => {
+                            getRef('first_pin').clear()
+                            getRef('confirm_pin').clear()
+                            isPinSet = true;
+                            showPage('main_page')
+                        })
+                    }
                 }
                 else{
-                    let value = await getPromptInput("Set password", 'Enter Password', false);
-                    floDapps.securePrivKey(value).then(result => {
-                        isPinSet = true;
-                        notify("Private Key secured", 'success');
-                        this.textContent = 'Change Password'
-                        showPage('main_page')
-                    })
+                    getRef('pin_error').classList.remove('hide-completely')
                 }
             }
             catch(error){
-                notify("Securing Failed", "error", error)
+                notify("Setting pin Failed", "error", error)
             }
         }
 

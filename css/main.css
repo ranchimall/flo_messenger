@@ -333,7 +333,7 @@ sm-button[variant=primary] {
   --foreground-color: 255, 255, 255;
 }
 
-sm-button.danger {
+.danger {
   color: var(--error-color);
 }
 
@@ -446,9 +446,15 @@ sm-button.danger {
   opacity: 0.8;
   font-weight: 500;
 }
+#sign_in pin-input {
+  margin: 1rem 0 2rem 0;
+}
 #sign_in sm-button {
   width: 100%;
   --padding: 0.8rem 1.6rem;
+}
+#sign_in #remove_account {
+  margin-top: 1rem;
 }
 #sign_in p {
   margin-bottom: 0.5rem;
@@ -489,6 +495,10 @@ sm-button.danger {
 }
 #frame_1 .copy-row:not(:last-of-type) {
   margin-bottom: 1.5rem;
+}
+
+#frame_2 pin-input {
+  margin: 1rem 0;
 }
 
 @keyframes slide-down {
@@ -1837,6 +1847,10 @@ sm-panel {
     grid-area: illustration;
   }
 
+  .frame form,
+#sign_in form {
+    height: 100%;
+  }
   .frame .h2,
 #sign_in .h2 {
     margin-top: 3rem;

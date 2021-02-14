@@ -9,30 +9,11 @@
 <body data-theme="dark">
     <script src="scripts/components.js"></script>
     <script src="scripts/script.js"></script>
-    <color-grid id="color_grid"></color-grid>
-    <sm-input id="my_input"></sm-input>
+    <pin-input id="input" pin-length="4"></pin-input>
     <script>
-        const colors = ['#ff0000', '#ff7500', '#ffa500', '#ff0465', '#ff0048', '#ff0040', '#ff00d4']
-        const themeSelector = document.getElementById('color_grid')
-        themeSelector.colors = colors
-        
-        document.addEventListener('colorselected', e => {
-            const color = e.detail.value
-            localStorage.setItem("color", color);
-            document.body.style.setProperty('--accent-color', color);
-        })
-        const myInput = document.getElementById('my_input')
-
-        myInput.addEventListener('keydown', function(e) {
-            if(e.key.match(/[0-9]/)){
-                if(this.value.trim().length < 6){
-                    console.log('type more')
-                }
-                else{
-                    e.preventDefault()
-                    console.log('stop')
-                }
-            }
+        const input = document.getElementById('input')
+        document.addEventListener('pincomplete', e => {
+            console.log(e.detail.value)
         })
     </script>
 </body>
