@@ -320,7 +320,6 @@ sm-button[variant="primary"]{
     padding: 0 1.5rem;  
     height: 100%;
     align-items: center;
-    overflow-y: auto;
     .logo-section{
         padding: 1.5rem;
         display: flex;
@@ -336,7 +335,8 @@ sm-button[variant="primary"]{
         padding-bottom: 1.5rem;
         z-index: 1;
         h4{
-            color: rgba(var(--foreground-color), 1);
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
             font-weight: 500;
         }
         sm-button{
@@ -360,6 +360,7 @@ sm-button[variant="primary"]{
     }
 }
 #landing_page{
+    overflow-y: auto;
     background: rgba(var(--foreground-color), 1);
 }
 .logo-section{
@@ -724,16 +725,8 @@ sm-button[variant="primary"]{
     background: rgb(255, 253, 141);
     color: #111;
 }
-.mail-card.unread::before{
-    content: '';
-    position: absolute;
-    padding: 0.4rem;
-    border-radius: 1rem;
-    top: 0;
-    left: 0;
-    background: var(--accent-color);
-}
-.contact .initial::after{
+.contact .initial::after,
+.mail-card .initial::after{
     content: '';
     position: absolute;
     bottom: -0.1rem;
@@ -746,12 +739,13 @@ sm-button[variant="primary"]{
     transform: scale(0);
     transition: transform 0.3s;
 }
-.contact.unread .initial::after{
+.contact.unread .initial::after,
+.mail-card.unread .initial::after{
     transform: scale(1);
 }
 .mail-card.unread,
 .contact.unread{
-    .time{
+    .time, .date{
         color: var(--accent-color);
     }
     h4{
@@ -763,28 +757,46 @@ sm-button[variant="primary"]{
 }
 .mail-card{
     position: relative;
-    display: flex;
-    flex-direction: column;
-    padding: 1rem 1.5rem;
+    display: grid;
+    gap: 0 1rem;
+    padding: 0.8rem 1.5rem;
+    align-items: center;
+    flex-shrink: 0;
+    user-select: none;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 'dp sender date'
+                         'dp subject subject'
+                         'dp desc desc' ;
+    .initial{
+        grid-area: dp;
+        align-self: flex-start;
+        height: 2rem;
+        width: 2rem;
+        font-size: 1rem;
+    }
     .sender{
-        color: rgba(var(--text-color), 0.9);
+        width: 100%;
+        font-size: 0.8rem;
         font-weight: 500;
-        overflow: hidden;
+        color: rgba(var(--text-color), 0.8);
         text-overflow: ellipsis;
         white-space: nowrap;
-        margin-right: 1rem;
+        overflow: hidden;
     }
     .date{
+        grid-area: date;
         margin-left: auto;
         font-weight: 500;
         white-space: nowrap;
     }
     .subject{
+        grid-area: subject;
         font-size: 1em;
-        margin-top: 0.5rem;
+        margin-top: 0.3rem;
         font-weight: 500;
     }
     .description{
+        grid-area: desc;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;  
@@ -822,21 +834,28 @@ sm-button[variant="primary"]{
         height: 100%;
         background: rgba(var(--text-color), 0.2);
     }
-    header{
+    .mail-header{
         align-self: start;
         margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: solid 1px rgba(var(--text-color), 0.2);
-        h4{
-            font-weight: 500;
-        }
-        .flo-id{
-            font-weight: 400;
-            max-width: 90%;
-        }
+        padding: 1.5rem;
+    }
+    .sender-name{
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    .flo-id{
+        font-weight: 400;
+        max-width: 90%;
+    }
+    .flex:first-of-type{
+        margin-bottom: 1rem;
+    }
+    .back{
+        margin: 0 0 0 -0.5rem;
     }
     .mail-subject,
     .mail-content{
+        padding: 0 1.5rem;
         overflow-wrap: break-word;
         word-wrap: break-word;
     }
@@ -1011,16 +1030,13 @@ sm-button[variant="primary"]{
     grid-template-rows: max-content 1fr;
 }
 #contacts, #mails, #settings_page{
-    height: 100%;
+    height: 100vh;
     overflow-y: hidden;
     .header{
         padding: 1rem 1.5rem 1rem 1.5rem;
         position: relative;
         gap: 0.5rem;
         min-height: 4rem;
-        sm-tab::part(tab){
-            padding: 0.8rem 1rem;
-        }
         .expanding-search{
             position: absolute;
             width: 100%;
@@ -1435,7 +1451,7 @@ sm-button[variant="primary"]{
 #emoji_picker{   
     --background: rgba(var(--text-color), 0.06);
     --border-size: 0;
-    --input-border-color: rgba(var(--text-color), 0.6);
+    --input-border-color: none;
     --input-padding: 0.4rem 1rem;
     --outline-color: var(--accent-color);
     --input-font-color: var(--text-color);
@@ -1504,17 +1520,16 @@ sm-button[variant="primary"]{
         padding: 0.5rem 1.5rem;
     }
 }
-sm-tab-panels{
-    overflow: hidden auto;
-}
-sm-panel{
-    width: 100%;
+.mail-container{
+    height: 100%;
+    flex-direction: column;
     overflow-y: auto;
 }
 
 #inbox_mail_container,
 #sent_mail_container
 {
+    gap: 0.2rem;
     padding-bottom: 6rem;
 }
 .has-bg-image{
@@ -1543,9 +1558,10 @@ sm-panel{
 }
 #mail{
     height: 100vh;
-    padding: 0 1.5rem;
     align-items: flex-start;
-    .flex{margin-top: 1rem;
+    & > .flex{
+        padding: 0 1.5rem;
+        margin-top: 2rem;
         sm-button:first-of-type{
             margin-right: 0.5rem;
         }
@@ -1720,12 +1736,8 @@ sm-panel{
         grid-template-areas: 'illustration' '.';
         align-items: flex-start;
         .title-font{
-            text-align: center;
             font-size: 2rem;
             font-weight: 500;
-        }
-        .left p {
-            text-align: center;
         }
         sm-button{
             width: 100%;
@@ -1819,11 +1831,6 @@ sm-panel{
         gap: 4vw;
         grid-template-columns: 1fr 1fr;
         padding: 0 4vw;
-        .left{
-            h4{
-                color: var(--accent-color);
-            }
-        }
     }
     #sign_in_page{
         place-content: center;
@@ -1925,7 +1932,7 @@ sm-panel{
         }
     }
     #chat_page, #mail_page{
-        grid-template-columns: 21rem 1fr;
+        grid-template-columns: 23rem 1fr;
     }
     #chat_details_panel{
         position: relative;

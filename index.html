@@ -272,28 +272,29 @@
 	<!-- Templates -->
 
 	<template id="mail_card_template">
-		<div class="mail-card interact">
-			<div class="flex align-center">
-				<h5 class="sender"></h5>
-				<h5 class="date"></h5>
-			</div>
+		<li class="mail-card interact">
+            <div class="initial flex align-center"></div>
+            <h5 class="sender"></h5>
+            <h5 class="date"></h5>
 			<h4 class="subject text-overflow"></h4>
 			<p class="description"></p>
-		</div>
+		</li>
     </template>
     
     <template id="mail_template">
         <div class="mail">
-            <header class="flex align-center">
-                <svg class="icon hide-on-desktop back-button" onclick="goto('mails')" viewBox="0 0 64 64">
-					<title>Go to main page</title>
-					<polyline points="48.01 0.35 16.35 32 48.01 63.65"/>
-				</svg>
-                <div class="rest">                            
+            <header class="mail-header flex direction-column">
+                <div class="flex space-between">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon back hide-on-desktop" onclick="goto('mails')" viewBox="0 0 64 64">
+                        <line x1="1" y1="32" x2="64" y2="32"/>
+                        <polyline points="29.64 60.97 0.65 32 29.64 3.03"/>
+                    </svg>
+                    <h5 class="date justify-right"></h5>
+                </div>
+                <div class="mail-details flex direction-column">                            
                     <h4 class="sender-name"></h4>
                     <h5 class="flo-id text-overflow"></h5>
                 </div>
-                <h5 class="date justify-right"></h5>
             </header>
             <h4 class="mail-subject"></h4>
             <p class="mail-content"></p>
@@ -502,7 +503,7 @@
                         <emoji-picker id="emoji_picker" class="hide-completely"></emoji-picker>
                         <div class="flex">
                             <svg id="emoji_toggle" onclick="toggleEmoji('toggle')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M32,0A32,32,0,1,0,64,32,32,32,0,0,0,32,0ZM43.84,17.51a4.92,4.92,0,1,1-4.92,4.92A4.92,4.92,0,0,1,43.84,17.51Zm-23.62-.06a5,5,0,1,1-5,5A5,5,0,0,1,20.22,17.45ZM32,54.42A19.68,19.68,0,0,1,12.31,34.73H51.69A19.68,19.68,0,0,1,32,54.42Z"/></svg>
-                            <sm-textarea id="type_message" placeholder="Type a message" class="rest outlined"></sm-textarea>
+                            <sm-textarea id="type_message" placeholder="Type a message" class="rest"></sm-textarea>
                             <svg xmlns="http://www.w3.org/2000/svg" id="send_message_button" class="icon" viewBox="0 0 64 64">
                                 <path d="M63.34,31,3.07,4.71A2.19,2.19,0,0,0,.18,7.58L8.94,28.29,42.18,32,8.94,35.71.18,56.42a2.19,2.19,0,0,0,2.89,2.87L63.34,33A1.09,1.09,0,0,0,63.34,31Z"/>
                             </svg>
@@ -566,11 +567,11 @@
                             <line y1="53.34" x2="64" y2="53.34"/>
                         </svg>
                         <h4>Mail</h4>
+                        <sm-select id="mail_type_selector">
+                            <sm-option value="inbox">Inbox</sm-option>
+                            <sm-option value="sent">Sent</sm-option>
+                        </sm-select>
                     </div>
-                    <sm-tab-header target="all_mail_container">
-                        <sm-tab>Inbox</sm-tab>
-                        <sm-tab>Sent</sm-tab>
-                    </sm-tab-header>
 				</header>
                 <sm-button variant="primary" id="new_mail_button" class="fab round">
                     <svg class="icon" viewBox="0 0 64 64">
@@ -579,23 +580,27 @@
                     </svg>
                     New Mail
                 </sm-button>
-                <div class="empty-state flex direction-column align-center" id="no_mails">
+                <ul id="inbox_mail_container" class="mail-container flex observe-empty-state"></ul>
+                <div class="empty-state flex direction-column align-center">
                     <svg class="icon new-conversation" viewBox="0 0 512 512">
                         <path d="M227,26.16,20.5,177.56a49,49,0,0,0-20,39.53V446.35a49,49,0,0,0,49,49h413a49,49,0,0,0,49-49h0V217.09a49,49,0,0,0-20-39.53L285,26.16A49,49,0,0,0,227,26.16Z"/>
                         <path d="M71,250.29l166.31,86.88a39,39,0,0,0,36.22,0L441,249.66"/>
                     </svg>
-                    <h4>All your mails will appear here.</h4>
+                    <h4>All your received mails will appear here.</h4>
                     <p class="light-text">Tap/click on 'New Mail' button below to compose new mail.</p>
                 </div>
-                <sm-tab-panels id="all_mail_container">
-                    <sm-panel id="inbox_mail_container" class="flex">
-                    </sm-panel>
-                    <sm-panel id="sent_mail_container" class="flex"></sm-panel>
-                </sm-tab-panels>
+                <ul id="sent_mail_container" class="mail-container flex observe-empty-state hide-completely"></ul>
+                <div class="empty-state flex direction-column align-center">
+                    <svg class="icon new-conversation" viewBox="0 0 512 512">
+                        <path d="M227,26.16,20.5,177.56a49,49,0,0,0-20,39.53V446.35a49,49,0,0,0,49,49h413a49,49,0,0,0,49-49h0V217.09a49,49,0,0,0-20-39.53L285,26.16A49,49,0,0,0,227,26.16Z"/>
+                        <path d="M71,250.29l166.31,86.88a39,39,0,0,0,36.22,0L441,249.66"/>
+                    </svg>
+                    <h4>All your sent mails will appear here.</h4>
+                    <p class="light-text">Tap/click on 'New Mail' button below to compose new mail.</p>
+                </div>
 			</div>
 			<div id="mail" class="flex hide-on-mobile hide-completely">
-				<div id="mail_container">
-				</div>
+				<div id="mail_container"></div>
 				<div class="flex">
 					<sm-button id="prev_mail">View Previous Mail</sm-button>
 					<sm-button id="show_reply_popup">reply</sm-button>
@@ -1049,6 +1054,9 @@
                 case 'page':
                     showPage(e.state.id)
                     break;
+                case 'subpage':
+                    showPage(e.state.id, true)
+                    break;
             }
         })
 
@@ -1195,7 +1203,7 @@
                         return `${month} ${year}`;
                 }
                 else
-                    return `${month} ${date} ${year}`;
+                    return `${finalHours} ${month} ${date} ${year}`;
             } catch (e) {
                 console.error(e);
                 return time;
@@ -1503,7 +1511,7 @@
                             .then(r => console.log(r))
                         console.log(`Load Successful!`)
                         if(isPinSet){
-                            showPage('main_page')
+                            showPage('chat_page', true)
                         }
                     }).catch(error => {
                         //console.error(`Failed to load data`)
@@ -1515,10 +1523,7 @@
         }
     </script>
 	<script>
-		let activePage = {
-                page: getRef('chat_page'),
-                button: getRef('chat_page_button')
-            },
+		let activePage = {},
             activeChatPage = getRef('contacts'),
             activeMailPage = getRef('mails'),
             activeChat = {},
@@ -1549,6 +1554,12 @@
                     contact = floGlobals.contacts[floID] || floID
                 if(markUnread)
                     cardContainer.classList.add('unread')
+                
+                let initial = cardContainer.querySelector('.initial')
+                let color = contactColor(floID)
+                initial.textContent = contact.charAt(0)
+                cardContainer.setAttribute("background-color", color)
+                initial.setAttribute(`style`, `background-color: ${color}`)  
                 cardContainer.querySelector('.sender').textContent = contact
                 cardContainer.querySelector('.subject').textContent = subject
                 cardContainer.querySelector('.date').textContent = getFormatedTime(timestamp, true)
@@ -1572,7 +1583,7 @@
                     }
                     floID = to.join(', ')
                 } else {
-                    senderName = `From : ${floGlobals.contacts[from] || ''}`;
+                    senderName = `${floGlobals.contacts[from] || ''}`;
                     floID = from
                 }
                 card.querySelector('.sender-name').textContent = senderName
@@ -1594,6 +1605,8 @@
                 cardContainer.setAttribute("search-tags", `${name}${floID}`)
                 let initial = card.querySelector('.initial')
                 let color = contactColor(floID)
+                cardContainer.setAttribute("background-color", color)
+                initial.setAttribute(`style`, `background-color: ${color}`)     
 
                 if(type === 'group'){
                     initial.innerHTML = `
@@ -1605,8 +1618,6 @@
                     cardContainer.querySelector('.name').textContent = name !== 'Unknown' ? name : floID
                     initial.textContent = name !== 'Unknown' ? name.charAt(0) : floID.charAt(0)
                 }
-                cardContainer.setAttribute("background-color", color)
-                initial.setAttribute(`style`, `background-color: ${color};`)     
                 
                 if(contactOnly || type === 'contact'){
                     if(isAdmin){
@@ -2011,7 +2022,9 @@
                     showPanel(target, target.dataset.target)
             }
             if(e.target.closest('.navbar-item') && activePage.button !== e.target.closest('.navbar-item')){
-                showPage(e.target.closest('.navbar-item').dataset.target, e.target.closest('.navbar-item'), true)
+                const targetPage = e.target.closest('.navbar-item').dataset.target
+                showPage(targetPage, true)
+                history.pushState({type: 'subpage', id: targetPage}, null, `#${targetPage}`)
             }
             if(e.target.closest('#send_mail_to') || e.target.closest('#mail_contact_list')){
                 getRef('mail_contact_list').classList.remove('hide-completely')
@@ -2462,7 +2475,7 @@
 		}
 
         getRef("mails").addEventListener('click', function (e) {
-			if (e.target.closest(".mail-card") && e.target.closest(".mail-card") !== activeMail){
+			if (e.target.closest(".mail-card")){
                 getRef('mail_page_button').setAttribute('data-notifications', '0')
                 getRef('mail').classList.remove('hide-completely')
                 e.target.closest(".mail-card").classList.remove('unread')
@@ -2695,7 +2708,9 @@
                 activeChat.chatCard.classList.remove('unread')
             }
             getRef('scroll_to_bottom').classList.remove('new-message')
-            getRef('chat_middle').scrollTo({top: getRef('chat_middle').scrollHeight, behavior: smooth ? 'smooth': undefined})
+            setTimeout(() => {
+                getRef('chat_middle').scrollTo({top: getRef('chat_middle').scrollHeight, behavior: smooth ? 'smooth': undefined})
+            }, smooth ? 300 : 0);
         }
 
         let startIndex = 0,
@@ -2874,8 +2889,8 @@
         }
 
         function renderMailList(mails, markUnread = true) {
-            let inboxMailFrag = document.createDocumentFragment()
-            let sentMailFrag = document.createDocumentFragment()
+            const inboxMailFrag = document.createDocumentFragment()
+            const sentMailFrag = document.createDocumentFragment()
             for (let m in mails) {
                 let { from, to, prev, ref, subject, time, content } = mails[m]
                 if(from === myFloID)
@@ -2885,18 +2900,12 @@
             }
             getRef('inbox_mail_container').prepend(inboxMailFrag)
             getRef('sent_mail_container').prepend(sentMailFrag)
-            if(getRef('inbox_mail_container').children.length || getRef('sent_mail_container').children.length){
-                getRef('no_mails').classList.add('hide-completely')
-                getRef('all_mail_container').classList.remove('hide-completely')
-            }
-            else{
-                getRef('all_mail_container').classList.add('hide-completely')
-                getRef('no_mails').classList.remove('hide-completely')
-            }
         }
 
         function viewMail(mailRef, newView = true) {
-            //clear the container and display popup (if needed)
+            //stop rerendering if same mail is already open
+            if(mailRef === (activeMail ? activeMail.getAttribute('name') : '')) return
+            //clear the container
             if (newView)
                 clearElement(getRef("mail_container"))
 
@@ -2957,6 +2966,11 @@
                 hidePopup()
             }).catch(error => notify("Failed to reply mail!", "error", error))
         }
+
+        document.getElementById('mail_type_selector').addEventListener('change', e => {
+            document.querySelectorAll('.mail-container').forEach(container => container.classList.add('hide-completely'))
+            getRef(`${e.detail.value}_mail_container`).classList.remove('hide-completely')
+        })
 
         const   allPanels = document.querySelectorAll('.panel'),
                 allSidebarItems = document.querySelectorAll('.sidebar-item')
@@ -3426,8 +3440,9 @@
             .catch(err =>  console.log(err))
         }
 
-        function showPage(targetPage, targetButton, subpage){
+        function showPage(targetPage, subpage){
             if(subpage){
+                const targetButton = document.querySelector(`.navbar-item[data-target="${targetPage}"]`)
                 targetButton.classList.add('active')
                 if(activePage.page){
                     activePage.page.classList.add('hide-completely')
@@ -3435,6 +3450,10 @@
                 }
                 activePage.button = targetButton
                 activePage.page = getRef(targetPage);
+                if(getRef('main_page').classList.contains('hide-completely')){
+                    document.querySelectorAll('.page').forEach(page => page.classList.add('hide-completely'))
+                    getRef('main_page').classList.remove('hide-completely')
+                }
                 if(getRef('main_navbar').classList.contains('no-transformations')){
                     getRef('main_navbar').classList.remove('no-transformations')
                     getRef('navbar_backdrop').classList.add('hide')
@@ -3488,7 +3507,7 @@
                             getRef('first_pin').clear()
                             getRef('confirm_pin').clear()
                             isPinSet = true;
-                            showPage('main_page')
+                            showPage('chat_page', true)
                         })
                     }
                 }

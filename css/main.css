@@ -370,7 +370,6 @@ sm-button[variant=primary] {
   padding: 0 1.5rem;
   height: 100%;
   align-items: center;
-  overflow-y: auto;
 }
 #landing .logo-section {
   padding: 1.5rem;
@@ -388,7 +387,8 @@ sm-button[variant=primary] {
   z-index: 1;
 }
 #landing .left h4 {
-  color: rgba(var(--foreground-color), 1);
+  color: var(--accent-color);
+  margin-bottom: 0.5rem;
   font-weight: 500;
 }
 #landing .left sm-button {
@@ -409,6 +409,7 @@ sm-button[variant=primary] {
 }
 
 #landing_page {
+  overflow-y: auto;
   background: rgba(var(--foreground-color), 1);
 }
 
@@ -784,17 +785,8 @@ sm-button[variant=primary] {
   color: #111;
 }
 
-.mail-card.unread::before {
-  content: "";
-  position: absolute;
-  padding: 0.4rem;
-  border-radius: 1rem;
-  top: 0;
-  left: 0;
-  background: var(--accent-color);
-}
-
-.contact .initial::after {
+.contact .initial::after,
+.mail-card .initial::after {
   content: "";
   position: absolute;
   bottom: -0.1rem;
@@ -808,12 +800,14 @@ sm-button[variant=primary] {
   transition: transform 0.3s;
 }
 
-.contact.unread .initial::after {
+.contact.unread .initial::after,
+.mail-card.unread .initial::after {
   transform: scale(1);
 }
 
-.mail-card.unread .time,
-.contact.unread .time {
+.mail-card.unread .time, .mail-card.unread .date,
+.contact.unread .time,
+.contact.unread .date {
   color: var(--accent-color);
 }
 .mail-card.unread h4,
@@ -829,29 +823,45 @@ sm-button[variant=primary] {
 
 .mail-card {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  padding: 1rem 1.5rem;
+  display: grid;
+  gap: 0 1rem;
+  padding: 0.8rem 1.5rem;
+  align-items: center;
+  flex-shrink: 0;
+  user-select: none;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "dp sender date" "dp subject subject" "dp desc desc";
+}
+.mail-card .initial {
+  grid-area: dp;
+  align-self: flex-start;
+  height: 2rem;
+  width: 2rem;
+  font-size: 1rem;
 }
 .mail-card .sender {
-  color: rgba(var(--text-color), 0.9);
+  width: 100%;
+  font-size: 0.8rem;
   font-weight: 500;
-  overflow: hidden;
+  color: rgba(var(--text-color), 0.8);
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-right: 1rem;
+  overflow: hidden;
 }
 .mail-card .date {
+  grid-area: date;
   margin-left: auto;
   font-weight: 500;
   white-space: nowrap;
 }
 .mail-card .subject {
+  grid-area: subject;
   font-size: 1em;
-  margin-top: 0.5rem;
+  margin-top: 0.3rem;
   font-weight: 500;
 }
 .mail-card .description {
+  grid-area: desc;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -891,21 +901,28 @@ sm-button[variant=primary] {
   height: 100%;
   background: rgba(var(--text-color), 0.2);
 }
-.mail header {
+.mail .mail-header {
   align-self: start;
   margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: solid 1px rgba(var(--text-color), 0.2);
+  padding: 1.5rem;
 }
-.mail header h4 {
+.mail .sender-name {
   font-weight: 500;
+  margin-bottom: 0.5rem;
 }
-.mail header .flo-id {
+.mail .flo-id {
   font-weight: 400;
   max-width: 90%;
 }
+.mail .flex:first-of-type {
+  margin-bottom: 1rem;
+}
+.mail .back {
+  margin: 0 0 0 -0.5rem;
+}
 .mail .mail-subject,
 .mail .mail-content {
+  padding: 0 1.5rem;
   overflow-wrap: break-word;
   word-wrap: break-word;
 }
@@ -1085,7 +1102,7 @@ sm-button[variant=primary] {
 }
 
 #contacts, #mails, #settings_page {
-  height: 100%;
+  height: 100vh;
   overflow-y: hidden;
 }
 #contacts .header, #mails .header, #settings_page .header {
@@ -1093,9 +1110,6 @@ sm-button[variant=primary] {
   position: relative;
   gap: 0.5rem;
   min-height: 4rem;
-}
-#contacts .header sm-tab::part(tab), #mails .header sm-tab::part(tab), #settings_page .header sm-tab::part(tab) {
-  padding: 0.8rem 1rem;
 }
 #contacts .header .expanding-search, #mails .header .expanding-search, #settings_page .header .expanding-search {
   position: absolute;
@@ -1528,7 +1542,7 @@ sm-button[variant=primary] {
 #emoji_picker {
   --background: rgba(var(--text-color), 0.06);
   --border-size: 0;
-  --input-border-color: rgba(var(--text-color), 0.6);
+  --input-border-color: none;
   --input-padding: 0.4rem 1rem;
   --outline-color: var(--accent-color);
   --input-font-color: var(--text-color);
@@ -1605,17 +1619,15 @@ sm-button[variant=primary] {
   padding: 0.5rem 1.5rem;
 }
 
-sm-tab-panels {
-  overflow: hidden auto;
-}
-
-sm-panel {
-  width: 100%;
+.mail-container {
+  height: 100%;
+  flex-direction: column;
   overflow-y: auto;
 }
 
 #inbox_mail_container,
 #sent_mail_container {
+  gap: 0.2rem;
   padding-bottom: 6rem;
 }
 
@@ -1642,13 +1654,13 @@ sm-panel {
 
 #mail {
   height: 100vh;
-  padding: 0 1.5rem;
   align-items: flex-start;
 }
-#mail .flex {
-  margin-top: 1rem;
+#mail > .flex {
+  padding: 0 1.5rem;
+  margin-top: 2rem;
 }
-#mail .flex sm-button:first-of-type {
+#mail > .flex sm-button:first-of-type {
   margin-right: 0.5rem;
 }
 
@@ -1830,12 +1842,8 @@ sm-panel {
     align-items: flex-start;
   }
   #landing .title-font {
-    text-align: center;
     font-size: 2rem;
     font-weight: 500;
-  }
-  #landing .left p {
-    text-align: center;
   }
   #landing sm-button {
     width: 100%;
@@ -1940,9 +1948,6 @@ sm-panel {
     gap: 4vw;
     grid-template-columns: 1fr 1fr;
     padding: 0 4vw;
-  }
-  #landing .left h4 {
-    color: var(--accent-color);
   }
 
   #sign_in_page {
@@ -2054,7 +2059,7 @@ sm-panel {
   }
 
   #chat_page, #mail_page {
-    grid-template-columns: 21rem 1fr;
+    grid-template-columns: 23rem 1fr;
   }
 
   #chat_details_panel {
