@@ -367,8 +367,8 @@ sm-button[variant=primary] {
   display: grid;
   border-radius: 0.6rem;
   width: 100%;
-  padding: 0 1.5rem;
   height: 100%;
+  padding: 0 1.5rem;
   align-items: center;
 }
 #landing .logo-section {
@@ -409,6 +409,7 @@ sm-button[variant=primary] {
 }
 
 #landing_page {
+  grid-template-rows: auto 1fr;
   overflow-y: auto;
   background: rgba(var(--foreground-color), 1);
 }

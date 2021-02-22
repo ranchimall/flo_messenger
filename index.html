@@ -95,7 +95,7 @@
                 <h5>Private key (Password)</h5>
                 <div class="copy-row">
                     <h4 id="generated_key" class="copy"></h4>
-                    <svg class="icon" onclick="copyToClipboard('this, Copied private key')" viewBox="0 0 64 64">
+                    <svg class="icon" onclick="copyToClipboard(this, 'Copied private key')" viewBox="0 0 64 64">
                         <title>Copy</title>
                         <rect x="16" y="16" width="48" height="48" rx="6" />
                         <path d="M.5,47.52V6.5a6,6,0,0,1,6-6h41"/>
@@ -352,7 +352,7 @@
                     <h5 class="label">Settings</h5>
                 </div>
             </nav>
-		<section id="chat_page" class="grid">
+		<section id="chat_page" class="sub-page grid">
 			<div id="contacts" class="grid">
 				<header class="grid header">
                     <div class="flex align-center">
@@ -557,7 +557,7 @@
                 </div>
 			</div>
 		</section>
-		<section class="grid hide-completely" id="mail_page">
+		<section class="sub-page grid hide-completely" id="mail_page">
 			<div id="mails" class="grid">
 				<header class="grid header">
                     <div class="flex align-center">
@@ -607,7 +607,7 @@
 				</div>
 			</div>
 		</section>
-		<section id="settings_page" class="hide-completely">
+		<section id="settings_page" class="sub-page hide-completely">
             <aside id="settings_sidebar">
                 <header class="grid header">
                     <div class="flex align-center">
@@ -1397,14 +1397,11 @@
         }
        async function loadPage(){
             if(location.hash === ''){
-                if(history.length === 2)
-                    history.pushState({type: 'page', id: 'homepage'}, null, '')
-                showPage('homepage')
+                history.pushState({type: 'subpage', id: 'chat_page'}, null, '#chat_page')
+                showPage('chat_page', true)
             }
             else{
-                if(history.length === 2)
-                    history.pushState({type: 'page', id: 'article_page', articleId: location.hash.slice(1)}, null, ``)
-                renderArticle(location.hash.slice(1))
+                showPage(location.hash.split('#')[1], true)
             }
         }
         function debounce(func, wait, immediate) {
@@ -1452,6 +1449,7 @@
     </script>
     <script id="onLoadStartUp">
         function onLoadStartUp() {
+            
             document.body.classList.remove('hide-completely')
             isPinSet = false;
             
@@ -1511,7 +1509,7 @@
                             .then(r => console.log(r))
                         console.log(`Load Successful!`)
                         if(isPinSet){
-                            showPage('chat_page', true)
+                            loadPage()
                         }
                     }).catch(error => {
                         //console.error(`Failed to load data`)
@@ -1879,8 +1877,7 @@
                 document.title = `New message(s)`
             }
             if(Object.keys(data.mails).length && activePage.button !== getRef('mail_page_button')){
-                getRef('mail_page_button').setAttribute('data-notifications', Object.keys(data.mails).length)
-                notify(`${Object.keys(data.mails).length} new mail(s)`)
+                document.title = `New mail(s)`
             }
         }
         
@@ -3442,6 +3439,8 @@
 
         function showPage(targetPage, subpage){
             if(subpage){
+                document.querySelectorAll('.sub-page').forEach(page => page.classList.add('hide-completely'))
+                document.querySelectorAll(`.navbar-item`).forEach(item => item.classList.remove('active'))
                 const targetButton = document.querySelector(`.navbar-item[data-target="${targetPage}"]`)
                 targetButton.classList.add('active')
                 if(activePage.page){
