@@ -197,6 +197,7 @@ border: none;
     display: flex;
     --border-radius: 0.3rem;
     --padding: 0.7rem 1rem;
+    --background: rgba(var(--text-color), 0.06);
 }
 .hide{
    opacity: 0 !important;
@@ -239,7 +240,7 @@ border: none;
     -webkit-transition: opacity 0.3s;
     -o-transition: opacity 0.3s;
     transition: opacity 0.3s;
-    background: rgba(var(--text-color), 0.06);
+    background: var(--background);
     width: 100%;
     outline: none;
 }
@@ -658,12 +659,13 @@ customElements.define('sm-textarea',
             this.attachShadow({
                 mode: 'open'
             }).append(smTextarea.content.cloneNode(true))
+            this.textarea = this.shadowRoot.querySelector('textarea')
         }
         get value() {
-            return this.shadowRoot.querySelector('textarea').value
+            return this.textarea.value
         }
         set value(val) {
-            this.shadowRoot.querySelector('textarea').value = val;
+            this.textarea.value = val;
             this.textareaBox.dataset.value = val
             this.checkInput()
             this.fireEvent()
@@ -679,7 +681,7 @@ customElements.define('sm-textarea',
             });
             this.dispatchEvent(event);
         }
-        checkInput() {
+        checkInput = () => {
             if (!this.hasAttribute('placeholder') || this.getAttribute('placeholder') === '')
                 return;
             if (this.textarea.value !== '') {
@@ -691,7 +693,6 @@ customElements.define('sm-textarea',
         connectedCallback() {
             this.textareaBox = this.shadowRoot.querySelector('.textarea')
             this.placeholder = this.shadowRoot.querySelector('.placeholder')
-            this.textarea = this.shadowRoot.querySelector('textarea')
 
             if(this.hasAttribute('placeholder'))
                 this.placeholder.textContent = this.getAttribute('placeholder')
@@ -705,6 +706,9 @@ customElements.define('sm-textarea',
             }
             if (this.hasAttribute('readonly')) {
                 this.textarea.setAttribute('readonly', '')
+            }
+            if (this.hasAttribute('rows')) {
+                this.textarea.setAttribute('rows', this.getAttribute('rows'))
             }
             this.textarea.addEventListener('input', e => {
                 this.textareaBox.dataset.value = this.textarea.value
@@ -793,6 +797,10 @@ smCheckbox.innerHTML = `
         display: -webkit-inline-box;
         display: -ms-inline-flexbox;
         display: inline-flex;
+        --height: 1.6rem;
+        --width: 1.6rem;
+        --border-radius: 0.2rem;
+        --border-color: rgba(var(--text-color), 0.7);
     }
     .checkbox {
         position: relative;
@@ -808,13 +816,9 @@ smCheckbox.innerHTML = `
         -webkit-tap-highlight-color: transparent;
     }
     
-    p{
-        margin-left: 2rem;
-    }
-    
     .checkbox:active .icon,
-    .checkbox:focus .icon{
-        background: rgba(var(--text-color), 0.2);
+    .checkbox:focus-within .icon{
+        box-shadow: 0 0 0 0.3rem var(--accent-color) inset;
     }
     
     .checkbox input {
@@ -833,28 +837,29 @@ smCheckbox.innerHTML = `
         stroke-dashoffset: 0;
         stroke: rgba(var(--foreground-color), 1);
     }
-    .checkbox input:checked ~ svg {
-        stroke: var(--accent-color);
-        fill: var(--accent-color);
+    .checkbox input:checked ~ .icon {
         stroke-width: 8; 
+        stroke: var(--accent-color);
+        background: var(--accent-color);
+    }
+    .checkbox input:not(:checked) ~ .icon {
+        box-shadow: 0 0 0 0.2rem var(--border-color) inset;
     }
     
     .icon {
-        position: absolute;
         fill: none;
-        height: 2.6rem;
-        width: 2.6rem;
-        padding: 0.7rem;
+        height: var(--height);
+        width: var(--width);
+        padding: 0.2rem;
         stroke: rgba(var(--text-color), 0.7);
         stroke-width: 6;
         overflow: visible;
         stroke-linecap: round;
         stroke-linejoin: round;
-        border-radius: 2rem;
         -webkit-transition: background 0.3s;
         -o-transition: background 0.3s;
         transition: background 0.3s;
-        left: -0.5rem;
+        border-radius: var(--border-radius);
     }
     .disabled {
         opacity: 0.6;
@@ -865,10 +870,9 @@ smCheckbox.innerHTML = `
     <input type="checkbox">
     <svg class="icon" viewBox="0 0 64 64">
         <title>checkbox</title>
-        <rect class="box" x="0" y="0" width="64" height="64" rx="4" />
         <path class="checkmark" d="M50.52,19.56,26,44.08,13.48,31.56" />
     </svg>
-    <p><slot></slot></p>
+    <slot></slot>
 </label>`
 customElements.define('sm-checkbox', class extends HTMLElement {
     constructor() {
@@ -897,11 +901,16 @@ customElements.define('sm-checkbox', class extends HTMLElement {
     }
 
     get checked() {
-        return this.getAttribute('checked')
+        return this.isChecked
     }
 
     set checked(value) {
-        this.setAttribute('checked', value)
+        if (value) {
+            this.setAttribute('checked', '')
+        }
+        else {
+            this.removeAttribute('checked')
+        }
     }
 
     set value(val) {
@@ -913,21 +922,37 @@ customElements.define('sm-checkbox', class extends HTMLElement {
         return getAttribute('value')
     }
 
-    dispatch() {
+    dispatch = () => {
         this.dispatchEvent(new CustomEvent('change', {
             bubbles: true,
             composed: true
         }))
     }
-
+    handleKeyup = e => {
+        if ((e.code === "Enter" || e.code === "Space") && this.isDisabled == false) {
+            if (this.hasAttribute('checked')) {
+                this.input.checked = false
+                this.removeAttribute('checked')
+            }
+            else {
+                this.input.checked = true
+                this.setAttribute('checked', '')
+            }
+        }
+    }
+    handleChange = e => {
+        if (this.input.checked) {
+            this.setAttribute('checked', '')
+        }
+        else {
+            this.removeAttribute('checked')
+        }
+    }
+    
     connectedCallback() {
         this.val = ''
-        this.addEventListener('keyup', e => {
-            if ((e.code === "Enter" || e.code === "Space") && this.isDisabled == false) {
-                this.isChecked = !this.isChecked
-                this.setAttribute('checked', this.isChecked)
-            }
-        })
+        this.addEventListener('keyup', this.handleKeyup)
+        this.input.addEventListener('change', this.handleChange)
     }
     attributeChangedCallback(name, oldValue, newValue) {
         if (oldValue !== newValue) {
@@ -940,20 +965,23 @@ customElements.define('sm-checkbox', class extends HTMLElement {
                     this.isDisabled = false
                 }
             }
-            if (name === 'checked') {
-                if (newValue == 'true') {
+            else if (name === 'checked') {
+                if (this.hasAttribute('checked')) {
                     this.isChecked = true
                     this.input.checked = true
-                    this.dispatch()
-                } else {
-                    this.isChecked = false
-                    this.input.checked = false
-                    this.dispatch()
                 }
+                else {
+                    this.input.checked = false
+                    this.isChecked = false
+                }
+                this.dispatch()
             }
         }
     }
-
+    disconnectedCallback() {
+        this.removeEventListener('keyup', this.handleKeyup)
+        this.removeEventListener('change', this.handleChange)
+    }
 })
 
 //switch
@@ -3723,6 +3751,10 @@ customElements.define('text-field', class extends HTMLElement{
 
     connectedCallback(){
         this.text
+        if (this.hasAttribute('value')) {
+            this.text = this.getAttribute('value')
+            this.textContainer.textContent = this.text
+        }
         if(this.hasAttribute('disable'))
             this.isDisabled = true
         else
@@ -4053,12 +4085,15 @@ customElements.define('pin-input',
 		}
 
 		handleKeydown = (e) => {
-			const activeInput = e.target.closest('input')
+            const activeInput = e.target.closest('input')
 			if (/[0-9]/.test(e.key)) {
-				if (activeInput.value.trim().length > 2) {
-					e.preventDefault();
+                if (activeInput.value.trim().length > 2) {
+                    e.preventDefault();
 				}
 				else {
+                    if (activeInput.value.trim().length === 1) {
+                        activeInput.value = e.key
+                    }
 					if (activeInput.nextElementSibling) {
 						setTimeout(() => {
 							activeInput.nextElementSibling.focus();
