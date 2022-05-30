@@ -188,6 +188,18 @@ strong {
   stroke: white;
 }
 
+a:-webkit-any-link {
+  word-wrap: break-word;
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+a:-moz-any-link {
+  word-wrap: break-word;
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
 a:any-link {
   word-wrap: break-word;
   color: var(--accent-color);
@@ -341,6 +353,8 @@ sm-button[variant=primary] {
   display: flex;
   position: relative;
   align-items: center;
+  height: -webkit-max-content;
+  height: -moz-max-content;
   height: max-content;
   margin: 0.5rem 0;
 }
@@ -393,6 +407,8 @@ sm-button[variant=primary] {
 }
 #landing .left sm-button {
   margin: 1.5rem 0 2rem 0;
+  width: -webkit-max-content;
+  width: -moz-max-content;
   width: max-content;
 }
 #landing .left h3 {
@@ -489,7 +505,8 @@ sm-button[variant=primary] {
   width: 100%;
 }
 #frame_1 #credentials_section {
-  animation: slide-down 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  -webkit-animation: slide-down 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          animation: slide-down 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   margin: 2rem 0;
 }
 #frame_1 h4, #frame_1 h5 {
@@ -501,6 +518,15 @@ sm-button[variant=primary] {
 
 #frame_2 pin-input {
   margin: 1rem 0;
+}
+
+@-webkit-keyframes slide-down {
+  from {
+    transform: translateY(-1rem);
+  }
+  to {
+    transform: none;
+  }
 }
 
 @keyframes slide-down {
@@ -523,7 +549,8 @@ sm-button[variant=primary] {
   transform-origin: bottom;
   height: 6rem;
   width: 6rem;
-  animation: bounce 0.5s infinite alternate ease-in;
+  -webkit-animation: bounce 0.5s infinite alternate ease-in;
+          animation: bounce 0.5s infinite alternate ease-in;
 }
 
 .shadow {
@@ -532,12 +559,25 @@ sm-button[variant=primary] {
   height: 2rem;
   background: rgba(var(--text-color), 0.1);
   border-radius: 50%;
-  animation: scale 0.5s infinite alternate ease-in;
+  -webkit-animation: scale 0.5s infinite alternate ease-in;
+          animation: scale 0.5s infinite alternate ease-in;
   margin-left: 1rem;
 }
 
 .page__tag-line {
   margin-top: 2rem;
+}
+
+@-webkit-keyframes bounce {
+  0% {
+    transform: scaleY(1) translateY(-4rem);
+  }
+  90% {
+    transform: scaleY(1) translateY(0);
+  }
+  100% {
+    transform: scaleY(0.8);
+  }
 }
 
 @keyframes bounce {
@@ -549,6 +589,17 @@ sm-button[variant=primary] {
   }
   100% {
     transform: scaleY(0.8);
+  }
+}
+@-webkit-keyframes scale {
+  0% {
+    transform: scale(0.5);
+  }
+  90% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 @keyframes scale {
@@ -579,7 +630,10 @@ sm-button[variant=primary] {
   box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.06);
   border-radius: 2rem;
   text-transform: uppercase;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .filled {
@@ -601,7 +655,10 @@ sm-button[variant=primary] {
   padding: 0.8rem 1.5rem;
   align-items: center;
   flex-shrink: 0;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   overflow: hidden;
 }
 .contact:not(.chat) {
@@ -829,7 +886,10 @@ sm-button[variant=primary] {
   padding: 0.8rem 1.5rem;
   align-items: center;
   flex-shrink: 0;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   grid-template-columns: auto 1fr auto;
   grid-template-areas: "dp sender date" "dp subject subject" "dp desc desc";
 }
@@ -872,6 +932,17 @@ sm-button[variant=primary] {
   color: rgba(var(--text-color), 0.8);
 }
 
+@-webkit-keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateX(-1rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes slide {
   from {
     opacity: 0;
@@ -891,7 +962,8 @@ sm-button[variant=primary] {
 }
 .mail:not(:first-of-type) {
   margin-top: 2rem;
-  padding-inline-start: 1rem;
+  -webkit-padding-start: 1rem;
+          padding-inline-start: 1rem;
 }
 .mail:not(:first-of-type)::before {
   content: "";
@@ -931,6 +1003,8 @@ sm-button[variant=primary] {
   margin-bottom: 0.4em;
 }
 .mail .mail-content {
+  height: -webkit-max-content;
+  height: -moz-max-content;
   height: max-content;
   max-width: 60ch;
   white-space: pre-wrap;
@@ -945,7 +1019,10 @@ sm-button[variant=primary] {
   display: flex;
   align-items: center;
   padding: 0.8rem 1.5rem;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 .option .icon {
   height: 1.4rem;
@@ -1099,6 +1176,7 @@ sm-button[variant=primary] {
 
 #contacts, #mails {
   position: relative;
+  grid-template-rows: -webkit-max-content 1fr;
   grid-template-rows: max-content 1fr;
 }
 
@@ -1285,6 +1363,8 @@ sm-button[variant=primary] {
   flex-wrap: wrap;
   width: auto;
   font-size: 0.92rem;
+  max-width: -webkit-max-content;
+  max-width: -moz-max-content;
   max-width: max-content;
   margin-bottom: 0.2rem;
   margin-top: 0.8rem;
@@ -1304,9 +1384,9 @@ sm-button[variant=primary] {
   word-wrap: break-word;
   word-break: break-all;
   word-break: break-word;
-  -moz-hyphens: auto;
   -webkit-hyphens: auto;
-  hyphens: auto;
+  -ms-hyphens: auto;
+      hyphens: auto;
   white-space: pre-wrap;
   line-height: 1.5;
 }
@@ -1400,7 +1480,17 @@ sm-button[variant=primary] {
 .unconfirmed {
   opacity: 0.7;
   transform-origin: left;
-  animation: pop 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  -webkit-animation: pop 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          animation: pop 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@-webkit-keyframes pop {
+  0% {
+    transform: rotate(5deg) translate(-0.5rem, 1rem);
+  }
+  100% {
+    transform: rotate(0) translate(0, 0);
+  }
 }
 
 @keyframes pop {
@@ -1550,7 +1640,10 @@ sm-button[variant=primary] {
   --input-placeholder-color: rgba(var(--text-color), 0.6);
   --indicator-color: var(--accent-color);
   --button-hover-background: rgba(var(--text-color), 0.2);
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   width: 100%;
   max-height: 40vh;
 }
@@ -1560,7 +1653,10 @@ sm-button[variant=primary] {
   cursor: pointer;
   padding: 0.4rem;
   border-radius: 0.6rem;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   text-align: center;
 }
 
@@ -1777,7 +1873,8 @@ sm-button[variant=primary] {
   box-shadow: 0 0 0 0.5rem rgba(var(--text-color), 0.8) inset;
 }
 #settings_page .bg-preview__image {
-  object-fit: cover;
+  -o-object-fit: cover;
+     object-fit: cover;
   height: 100%;
   width: 100%;
 }
@@ -1788,8 +1885,10 @@ sm-button[variant=primary] {
 }
 #video_call_page video {
   position: fixed;
-  object-fit: cover;
-  object-position: center;
+  -o-object-fit: cover;
+     object-fit: cover;
+  -o-object-position: center;
+     object-position: center;
 }
 
 #their_video {
@@ -2021,6 +2120,8 @@ sm-button[variant=primary] {
     grid-template-columns: 14rem 1fr;
   }
   #settings_page sm-button {
+    width: -webkit-max-content;
+    width: -moz-max-content;
     width: max-content;
   }
   #settings_page .active {
@@ -2130,4 +2231,4 @@ sm-button[variant=primary] {
   .contact .menu {
     display: none;
   }
-}
+}/*# sourceMappingURL=main.css.map */

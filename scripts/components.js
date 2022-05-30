@@ -717,71 +717,6 @@ customElements.define('sm-textarea',
         }
     })
 
-// tab
-const smTab = document.createElement('template')
-smTab.innerHTML = `
-<style>
-    *{
-        padding: 0;
-        margin: 0;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-    } 
-    :host{
-        position: relative;
-        display: -webkit-inline-box;
-        display: -ms-inline-flexbox;
-        display: inline-flex;
-        z-index: 1;
-    }
-    .tab{
-        position: relative;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-            -ms-user-select: none;
-                user-select: none;
-        -webkit-box-pack: center;
-            -ms-flex-pack: center;
-                justify-content: center;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        white-space: nowrap;
-        padding: 0.4rem 0.8rem;
-        font-weight: 500;
-        word-spacing: 0.1rem;
-        text-align: center;
-        -webkit-transition: color 0.3s;
-        -o-transition: color 0.3s;
-        transition: color 0.3s;
-        text-transform: capitalize;
-        height: 100%;
-    }
-    @media (hover: hover){
-        :host(.active) .tab{
-            opacity: 1;
-        }
-        .tab{
-            opacity: 0.7
-        }
-        .tab:hover{
-            opacity: 1
-        }
-    }
-</style>
-<div part="tab" class="tab">
-<slot></slot>
-</div>
-`;
-
-customElements.define('sm-tab', class extends HTMLElement {
-    constructor() {
-        super()
-        this.shadow = this.attachShadow({
-            mode: 'open'
-        }).append(smTab.content.cloneNode(true))
-    }
-})
-
 //chcekbox
 
 const smCheckbox = document.createElement('template')
@@ -3353,6 +3288,71 @@ customElements.define('sm-tab-header', class extends HTMLElement {
             threshold: 1.0
         })
         observer.observe(this)
+    }
+})
+
+// tab
+const smTab = document.createElement('template')
+smTab.innerHTML = `
+<style>
+    *{
+        padding: 0;
+        margin: 0;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+    } 
+    :host{
+        position: relative;
+        display: -webkit-inline-box;
+        display: -ms-inline-flexbox;
+        display: inline-flex;
+        z-index: 1;
+    }
+    .tab{
+        position: relative;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+            -ms-user-select: none;
+                user-select: none;
+        -webkit-box-pack: center;
+            -ms-flex-pack: center;
+                justify-content: center;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        white-space: nowrap;
+        padding: 0.4rem 0.8rem;
+        font-weight: 500;
+        word-spacing: 0.1rem;
+        text-align: center;
+        -webkit-transition: color 0.3s;
+        -o-transition: color 0.3s;
+        transition: color 0.3s;
+        text-transform: capitalize;
+        height: 100%;
+    }
+    @media (hover: hover){
+        :host(.active) .tab{
+            opacity: 1;
+        }
+        .tab{
+            opacity: 0.7
+        }
+        .tab:hover{
+            opacity: 1
+        }
+    }
+</style>
+<div part="tab" class="tab">
+<slot></slot>
+</div>
+`;
+
+customElements.define('sm-tab', class extends HTMLElement {
+    constructor() {
+        super()
+        this.shadow = this.attachShadow({
+            mode: 'open'
+        }).append(smTab.content.cloneNode(true))
     }
 })
 
