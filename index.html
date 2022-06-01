@@ -61,35 +61,21 @@
 
                 //load messages from IDB and render them
                 console.log(`Loading Data! Please Wait...`)
-                messenger.initUserDB().then(result => {
-                    console.log(result)
-                    //Check for availble bg image
-                    setBgImage()
-                    messenger.loadDataFromIDB().then(data => {
-                        console.log(data)
-                        floGlobals.appendix = data.appendix;
-                        floGlobals.groups = data.groups;
-                        floGlobals.chats = data.chats
-                        floGlobals['marked'] = data.marked
-                        renderChatList()
-                        renderMailList(data.mails, false)
-                        renderMarked(data.marked)
-                        messenger.setUIcallbacks(renderDirectUI, renderGroupUI)
-                        messenger.requestDirectInbox()
-                            .then(r => console.log("DirectConn:", r))
-                            .catch(e => console.error("Request error:", e))
-                        messenger.requestGroupInbox()
-                            .then(r => console.log(r))
-                        console.log(`Load Successful!`)
-                        if(isPinSet){
-                            loadPage()
-                        }
-                    }).catch(error => {
-                        //console.error(`Failed to load data`)
-                        notify(error, "error")
-                    })
-                })
-
+                //Check for availble bg image
+                setBgImage();
+                //Set UI render functions
+                messenger.renderUI.chats = renderChatList;
+                messenger.renderUI.directChat = renderDirectUI;
+                messenger.renderUI.groupChat = renderGroupUI;
+                messenger.renderUI.mails = m => renderMailList(m, false);
+                messenger.renderUI.marked = renderMarked;
+                //init messenger
+                messenger.init().then(result => {
+                    console.log(result);
+                    if(isPinSet){
+                        loadPage()
+                    }
+                }).catch(error => notify(error, "error"));
             }).catch(error => notify(error, "error"))
         }
     </script>
@@ -1143,7 +1129,7 @@
                         getRef('add_as_contact_option').classList.remove('hide-completely')
                     }
 
-                    const markUnread = floGlobals.marked[clickedContact.floID]?.includes('unread')
+                    const markUnread = messenger.marked[clickedContact.floID]?.includes('unread')
                     if (markUnread) {
                         getRef('mark_read_option').classList.remove('hide-completely')
                         getRef('mark_unread_option').classList.add('hide-completely')
@@ -1162,7 +1148,7 @@
                         getRef("contact_initial").innerHTML = `
                             <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
                             `
-                        if (floGlobals.groups[clickedContact['floID']].admin === myFloID)
+                        if (messenger.groups[clickedContact['floID']].admin === myFloID)
                             getRef('contact_name').disabled = false
                         else
                             getRef('contact_name').disabled = true
@@ -1180,7 +1166,7 @@
                 case 'contacts_popup':
                     const contacts = []
                     for (contact in floGlobals.contacts) {
-                        if (!floGlobals.groups[activeChat.floID].members.includes(contact) && contact in floGlobals.pubKeys) {
+                        if (!messenger.groups[activeChat.floID].members.includes(contact) && contact in floGlobals.pubKeys) {
                             contacts.push(contact)
                         }
                     }
@@ -1382,8 +1368,8 @@
             let name
             if (floGlobals.contacts[floID])
                 name = floGlobals.contacts[floID]
-            else if (floGlobals.groups[floID])
-                name = floGlobals.groups[floID].name
+            else if (messenger.groups[floID])
+                name = messenger.groups[floID].name
             else if (floID === myFloID)
                 name = 'You'
             else
@@ -1678,7 +1664,7 @@
                     initial.innerHTML = `
                     <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
                     `
-                    cardContainer.querySelector('.name').textContent = floGlobals.groups[floID].name
+                    cardContainer.querySelector('.name').textContent = messenger.groups[floID].name
                 }
                 else {
                     cardContainer.querySelector('.name').textContent = name !== 'Unknown' ? name : floID
@@ -1713,7 +1699,7 @@
                             }
                         }
                         if (type === 'group' && lastMessage.time === 0) {
-                            lastMessage.time = floGlobals.groups[floID].created
+                            lastMessage.time = messenger.groups[floID].created
                         }
                         let lastText = document.createElement('p')
                         if ((type === 'chat' && lastMessage.category === 'sent') || (type === 'group' && lastMessage.sender === myFloID)) {
@@ -1856,7 +1842,7 @@
                 else if (admin) {
                     if (newMembers.length) {
                         const cards = document.createDocumentFragment()
-                        const { admin } = floGlobals.groups[groupID]
+                        const { admin } = messenger.groups[groupID]
                         newMembers.forEach(member => {
                             let eventCard = document.createElement('p')
                             eventCard.classList.add('group-event-card')
@@ -1872,7 +1858,7 @@
                     }
                     else if (rmMembers.length) {
                         const cards = document.createDocumentFragment()
-                        const { admin } = floGlobals.groups[groupID]
+                        const { admin } = messenger.groups[groupID]
                         rmMembers.forEach(member => {
                             let eventCard = document.createElement('p')
                             eventCard.classList.add('group-event-card')
@@ -2134,7 +2120,7 @@
                     clickedContact['chatCard'] = contact
                     clickedContact['floID'] = contact.getAttribute("flo-id")
                     clickedContact['name'] = contact.getAttribute("name")
-                    clickedContact['isGroup'] = floGlobals.groups.hasOwnProperty(clickedContact['floID'])
+                    clickedContact['isGroup'] = messenger.groups.hasOwnProperty(clickedContact['floID'])
                     showPopup('contact_details_popup')
                 }, 500)
                 getRef('chat_page').addEventListener('touchmove', handleTouchMove)
@@ -2171,7 +2157,7 @@
                 clickedContact['chatCard'] = contact
                 clickedContact['floID'] = contact.getAttribute("flo-id")
                 clickedContact['name'] = contact.getAttribute("name")
-                clickedContact['isGroup'] = floGlobals.groups.hasOwnProperty(clickedContact['floID'])
+                clickedContact['isGroup'] = messenger.groups.hasOwnProperty(clickedContact['floID'])
 
                 if (clickedContact['floID'] === myFloID) return
 
@@ -2744,15 +2730,15 @@
             getRef('contacts_container').append(frag)
         }
 
-        async function renderChatList() {
+        async function renderChatList(chatOrder) {
             const frag = document.createDocumentFragment()
             getRef('chat_container').innerHTML = ''
-            for (floID of messenger.getChatOrder().mixed) {
-                const markUnread = floGlobals.marked[floID]?.includes('unread')
+            for (floID of chatOrder) {
+                const markUnread = messenger.marked[floID]?.includes('unread')
                 let type
-                if (floGlobals.chats[floID])
+                if (messenger.chats[floID])
                     type = 'chat'
-                else if (floGlobals.groups[floID])
+                else if (messenger.groups[floID])
                     type = 'group'
                 frag.append(render.contactCard(floID, { type, markUnread }))
             }
@@ -2927,7 +2913,7 @@
                 backgroundColor = contact.getAttribute('background-color')
 
             activeChat['floID'] = floID
-            activeChat['isGroup'] = floGlobals.groups[floID] ? true : false
+            activeChat['isGroup'] = messenger.groups[floID] ? true : false
             getRef("chat_dp").setAttribute('style', `color: ${textColor}; background-color: ${backgroundColor};`)
             getRef("receiver_name").textContent = getContactName(floID);
             if (activeChat.isGroup) {
@@ -3235,12 +3221,12 @@
                     getRef("chat_dp").innerHTML = `
                         <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
                         `
-                    getRef("last_interaction_time").textContent = `Created ${getFormatedTime(floGlobals.groups[floID].created)}`;
+                    getRef("last_interaction_time").textContent = `Created ${getFormatedTime(messenger.groups[floID].created)}`;
                     getRef("chat_type").textContent = `Group FLO ID`;
 
                     getRef('group_members_list').innerHTML = ''
-                    floGlobals.groups[floID].members.forEach(member => {
-                        let isAdmin = floGlobals.groups[floID].admin === member ? true : false
+                    messenger.groups[floID].members.forEach(member => {
+                        let isAdmin = messenger.groups[floID].admin === member ? true : false
                         frag.append(render.contactCard(member, { type: 'contact', contactOnly: true, isAdmin }))
                     })
                     getRef('group_members_list').append(frag)
@@ -3250,9 +3236,9 @@
 
                     getRef('delete_chat_button').classList.add('hide-completely')
 
-                    getRef("group_description").value = floGlobals.groups[floID].description === '' ? 'Add group description' : floGlobals.groups[floID].description;
+                    getRef("group_description").value = messenger.groups[floID].description === '' ? 'Add group description' : messenger.groups[floID].description;
 
-                    if (floGlobals.groups[activeChat['floID']].admin === myFloID) {
+                    if (messenger.groups[activeChat['floID']].admin === myFloID) {
                         getRef("chat_name").disabled = false
                         getRef('group_description').disabled = false
                         getRef('edit_group_button').classList.remove('hide-completely')
