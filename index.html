@@ -22,40 +22,41 @@
     <script src="scripts/messenger.js"></script>
     <script id="onLoadStartUp">
         function onLoadStartUp() {
-            
+
             document.body.classList.remove('hide-completely')
             isPinSet = false;
-            
+
             floDapps.setCustomPrivKeyInput(signIn)
             showPage('loading_page')
             getRef('emoji_picker').shadowRoot.append(style);
-            
+
             //clear Rendered Elements
             let elementsToReset = ['inbox_mail_container', 'sent_mail_container', 'contacts_container', 'chat_container', 'messages_container',
-                 'receiver_name', 'mail_contact_list'
-                ]
-                //, "backup_info"
+                'receiver_name', 'mail_contact_list'
+            ]
+            //, "backup_info"
             elementsToReset.forEach(e => clearElement(getRef(e)))
-            
-            
-            chatMutationObserver.observe(getRef('messages_container'), {childList: true, subtree: true})
+
+            chatMutationObserver.observe(getRef('messages_container'), {
+                childList: true,
+                subtree: true
+            })
             //invoke the startup functions
             floDapps.launchStartUp().then(result => {
                 console.log(result)
-                if(!isPinSet){
-                    showFrame(2)
-                }
+                // if (!isPinSet) {
+                //     showFrame(2)
+                // }
 
                 getRef("greet_tag").textContent = myFloID
 
                 getRef('accent_color_selector').colors = selectedColors
 
-                if(localStorage.getItem(`accent-color${myFloID}`)){
+                if (localStorage.getItem(`accent-color${myFloID}`)) {
                     const color = localStorage.getItem(`accent-color${myFloID}`)
                     getRef('accent_color_selector').selectedColor = color
                     document.body.style.setProperty('--accent-color', color);
-                }
-                else{
+                } else {
                     getRef('accent_color_selector').selectedColor = '#3D5AFE'
                 }
 
@@ -72,10 +73,8 @@
                 //init messenger
                 messenger.init().then(result => {
                     console.log(result);
-                    if(isPinSet){
-                        loadPage()
-                    }
-                }).catch(error => notify(error, "error"));
+                    loadPage();
+                }).catch(error => notify(error, "error"))
             }).catch(error => notify(error, "error"))
         }
     </script>
