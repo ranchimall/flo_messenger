@@ -32,16 +32,16 @@
     const _loaded = {};
     Object.defineProperties(messenger, {
         chats: {
-            get: _loaded.chats
+            get: () => _loaded.chats
         },
         groups: {
-            get: _loaded.groups
+            get: () => _loaded.groups
         },
         blocked: {
-            get: _loaded.blocked
+            get: () => _loaded.blocked
         },
         marked: {
-            get: _loaded.marked
+            get: () => _loaded.marked
         }
     });
 
@@ -49,11 +49,11 @@
     messenger.conn = {};
     Object.defineProperties(messenger.conn, {
         direct: {
-            get: directConnID
+            get: () => directConnID
         },
         group: {
-            get: Object.assign({}, groupConnID),
-            value: g_id => groupConnID[g_id]
+            get: () => Object.assign({}, groupConnID),
+            // value: g_id => groupConnID[g_id]
         }
     });
 
@@ -117,7 +117,6 @@
     }
 
     function requestGroupInbox(groupID) {
-        console.debug(UI);
         if (groupConnID[groupID]) { //close existing request connection (if any)
             floCloudAPI.closeRequest(groupConnID[groupID]);
             delete groupConnID[groupID];
@@ -143,7 +142,7 @@
                     let k = _loaded.groups[groupID].eKey;
                     if (expiredKeys[groupID]) {
                         var ex = Object.keys(expiredKeys[groupID]).sort()
-                        while (ex.lenght && vc > ex[0]) ex.shift()
+                        while (ex.length && vc > ex[0]) ex.shift()
                         if (ex.length)
                             k = expiredKeys[groupID][ex.shift()]
                     }
@@ -182,7 +181,6 @@
                     if (data.message)
                         data.message = decrypt(data.message);
                     newInbox.messages[vc] = data;
-                    console.log(data)
                     if (data.sender !== myFloID)
                         addMark(data.groupID, "unread")
                     if (!_loaded.appendix[`lastReceived_${groupID}`] ||
@@ -313,7 +311,7 @@
     }
 
     const requestDirectInbox = function() {
-        if (directInboxConn) { //close existing request connection (if any)
+        if (directConnID) { //close existing request connection (if any)
             floCloudAPI.closeRequest(directConnID);
             directConnID = undefined;
         }
@@ -326,7 +324,6 @@
                 newgroups: [],
                 keyrevoke: []
             }
-            console.debug("Check if key is vc", dataSet);
             for (let vc in dataSet) {
                 try {
                     //store the pubKey if not stored already
@@ -403,8 +400,8 @@
                         }
                     }
                 } catch (error) {
-                    if (error !== "blocked-user")
-                        console.log(error);
+                    //if (error !== "blocked-user")
+                    console.log(error);
                 } finally {
                     if (_loaded.appendix.lastReceived < vc)
                         _loaded.appendix.lastReceived = vc;
@@ -620,7 +617,7 @@
                 for (let m in data.messages)
                     if (data.messages[m].message)
                         data.messages[m].message = encrypt(data.messages[m].message)
-                for (let m in data.mail)
+                for (let m in data.mails)
                     data.mails[m].content = encrypt(data.mails[m].content)
                 for (let k in data.gkeys)
                     data.gkeys[k] = encrypt(data.gkeys[k])
@@ -748,6 +745,7 @@
             let groupInfo = _loaded.groups[groupID]
             if (myFloID !== groupInfo.admin)
                 return reject("Access denied: Admin only!")
+            let k = groupInfo.eKey;
             //send groupInfo to new newMem
             groupInfo = JSON.stringify(groupInfo)
             let promises = newMem.map(m => sendRaw(groupInfo, m, "CREATE_GROUP", true));
@@ -759,8 +757,7 @@
                         success.push(newMem[i])
                 else if (results[i].status === "rejected")
                     failed.push(newMem[i])
-                console.log(success.join("|"))
-                let message = encrypt(success.join("|"), groupInfo.eKey)
+                let message = encrypt(success.join("|"), k)
                 sendRaw(message, groupID, "ADD_MEMBERS", false, note)
                     .then(r => resolve(`Members added: ${success}`))
                     .catch(e => reject(e))
@@ -846,11 +843,13 @@
                     _loaded.blocked = new Set(Object.keys(data.blocked));
                     //call UI render functions
                     UI.chats(getChatOrder());
-                    UI.mails(data.mail);
+                    UI.mails(data.mails);
                     UI.marked(data.marked);
                     //request data from cloud
                     requestDirectInbox();
-                    data.groups.map(g => requestGroupInbox(g))
+                    for (let g in data.groups)
+                        if (data.groups[g].disabled !== true)
+                            requestGroupInbox(g);
                     resolve("Messenger initiated");
                 }).catch(error => reject(error));
             })
