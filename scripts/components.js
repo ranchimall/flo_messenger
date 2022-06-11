@@ -1,3 +1,4 @@
+/*jshint esversion: 6 */
 //Button
 const smButton = document.createElement('template')
 smButton.innerHTML = `
@@ -9,149 +10,133 @@ smButton.innerHTML = `
             box-sizing: border-box;
 }       
 :host{
-    display: -webkit-inline-box;
-    display: -ms-inline-flexbox;
     display: inline-flex;
+    width: auto;
     --padding: 0.6rem 1.2rem;
     --border-radius: 0.3rem;
-    --background: rgba(var(--text-color), 0.1);
-}
-:host([disable]) .button{
-    cursor: not-allowed;
-    opacity: 0.6;
-    background: rgba(var(--text-color), 0.3) !important;
-    color: rgba(var(--foreground-color), 0.6);
+    --background: rgba(var(--text-color, (17,17,17)), 0.1);
 }
 :host([variant='primary']) .button{
-    background: var(--accent-color);
-    color: rgba(var(--foreground-color), 1);
+    background: var(--accent-color,teal);
+    color: rgba(var(--background-color, (255,255,255)), 1);
 }
 :host([variant='outlined']) .button{
-    -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset;
-            box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset;
+            box-shadow: 0 0 0 1px rgba(var(--text-color, (17,17,17)), 0.2) inset;
     background: transparent; 
-    color: var(--accent-color);
+    color: var(--accent-color,teal);
 }
 :host([variant='no-outline']) .button{
-    background: rgba(var(--foreground-color), 1); 
-    color: var(--accent-color);
+    background: inherit; 
+    color: var(--accent-color,teal);
 }
-:host(.small) .button{
-    padding: 0.4rem 0.8rem;
-}
-:host(.round) .button{
-    border-radius: 10rem;
+:host([disabled]){
+    pointer-events: none;
+    cursor: not-allowed;
 }
 .button {
     position: relative;
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
     width: 100%;
     padding: var(--padding);
     cursor: pointer;
-    -webkit-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
             user-select: none;
     border-radius: var(--border-radius); 
-    -webkit-box-pack: center; 
-        -ms-flex-pack: center; 
             justify-content: center;
-    -webkit-transition: -webkit-box-shadow 0.3s;
-    transition: -webkit-box-shadow 0.3s;
-    -o-transition: box-shadow 0.3s;
-    transition: box-shadow 0.3s;
-    transition: box-shadow 0.3s, -webkit-box-shadow 0.3s;
-    text-transform: capitalize;
+    transition: box-shadow 0.3s, background-color 0.3s;
     font-family: inherit;
     font-size: 0.9rem;
     font-weight: 500;
-    background: var(--background); 
+    background-color: var(--background); 
     -webkit-tap-highlight-color: transparent;
     outline: none;
     overflow: hidden;
     border: none;
     color: inherit;
+    align-items: center;
 }
-:host(:not([disable])) .button:focus-visible{
-    -webkit-box-shadow: 0 0 0 0.1rem var(--accent-color);
-            box-shadow: 0 0 0 0.1rem var(--accent-color);
-}
-:host([variant='outlined']) .button:focus-visible{
-    -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0 0 0.1rem var(--accent-color);
-            box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0 0 0.1rem var(--accent-color);
+:host([disabled]) .button{
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 0.6;
+    color: rgba(var(--text-color, (17,17,17)), 1);
+    background-color: rgba(var(--text-color, (17,17,17)), 0.3);
 }
 @media (hover: hover){
-    :host(:not([disable])) .button:hover{
+    :host(:not([disabled])) .button:hover,
+    :host(:focus-within:not([disabled])) .button{
         -webkit-box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
-                box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
+        box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
     }
-    :host([variant='outlined']) .button:hover{
-        -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.12);
-                box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.12);
+    :host([variant='outlined']:not([disabled])) .button:hover,
+    :host(:focus-within[variant='outlined']:not([disabled])) .button:hover{
+        -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color, (17,17,17)), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.12);
+                box-shadow: 0 0 0 1px rgba(var(--text-color, (17,17,17)), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.12);
     }
 }
 @media (hover: none){
-    :host(:not([disable])) .button:active{
+    :host(:not([disabled])) .button:active{
         -webkit-box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
                 box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
     }
     :host([variant='outlined']) .button:active{
-        -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
-                box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+        -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color, (17,17,17)), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+                box-shadow: 0 0 0 1px rgba(var(--text-color, (17,17,17)), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
     }
 }
 </style>
-<button part="button" class="button">
+<div part="button" class="button">
     <slot></slot>   
-</button>`;
+</div>`;
 customElements.define('sm-button',
     class extends HTMLElement {
         constructor() {
-            super()
+            super();
             this.attachShadow({
                 mode: 'open'
-            }).append(smButton.content.cloneNode(true))
+            }).append(smButton.content.cloneNode(true));
+        }
+        static get observedAttributes() {
+            return ['disabled'];
         }
 
         get disabled() {
-            return this.isDisabled
+            return this.hasAttribute('disabled');
         }
 
         set disabled(value) {
-            if (value && !this.isDisabled) {
-                this.isDisabled = true
-                this.setAttribute('disable', '')
-                this.button.removeAttribute('tabindex')
-            } else if (!value && this.isDisabled) {
-                this.isDisabled = false
-                this.removeAttribute('disable')
+            if (value) {
+                this.setAttribute('disabled', '');
+            } else {
+                this.removeAttribute('disabled');
             }
         }
+        focusIn() {
+            this.focus();
+        }
 
-        dispatch() {
-            if (this.isDisabled) {
-                this.dispatchEvent(new CustomEvent('disable', {
-                    bubbles: true,
-                    composed: true
-                }))
-            } else {
-                this.dispatchEvent(new CustomEvent('clicked', {
-                    bubbles: true,
-                    composed: true
-                }))
+        handleKeyDown(e) {
+            if (!this.hasAttribute('disabled') && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                this.click();
             }
         }
 
         connectedCallback() {
-            this.isDisabled = false
-            this.button = this.shadowRoot.querySelector('.button')
-            if (this.hasAttribute('disable') && !this.isDisabled)
-                this.isDisabled = true
-            this.addEventListener('click', (e) => {
-                this.dispatch()
-            })
+            if (!this.hasAttribute('disabled')) {
+                this.setAttribute('tabindex', '0');
+            }
+            this.setAttribute('role', 'button');
+            this.addEventListener('keydown', this.handleKeyDown);
+        }
+        attributeChangedCallback(name) {
+            if (name === 'disabled') {
+                if (this.hasAttribute('disabled')) {
+                    this.removeAttribute('tabindex');
+                } else {
+                    this.setAttribute('tabindex', '0');
+                }
+                this.setAttribute('aria-disabled', this.hasAttribute('disabled'));
+            }
         }
     })
 
@@ -192,57 +177,52 @@ input:invalid{
 border: none;
 }
 :host{
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    --border-radius: 0.3rem;
-    --padding: 0.7rem 1rem;
-    --background: rgba(var(--text-color), 0.06);
+    --success-color: #00C853;
+    --danger-color: red;
+    --width: 100%;
+    --icon-gap: 0.5rem;
+    --background: rgba(var(--text-color, (17,17,17)), 0.06);
 }
 .hide{
-   opacity: 0 !important;
-   pointer-events: none !important;
+   display: none !important;
 }
-.hide-completely{
-    display: none;
+button{
+    display: flex;
+    border: none;
+    background: none;
+    padding: 0;
+    border-radius: 1rem;
+    min-width: 0;
+    cursor: pointer;
+}
+button:focus{
+    outline: var(--accent-color, teal) solid medium;
 }
 .icon {
-    fill: none;
-    height: 1.6rem;
-    width: 1.6rem;
-    padding: 0.5rem;
-    stroke: rgba(var(--text-color), 0.7);
-    stroke-width: 10;
-    overflow: visible;
-    stroke-linecap: round;
-    border-radius: 1rem;
-    stroke-linejoin: round;
-    cursor: pointer;
-    min-width: 0;
+    height: 1.4rem;
+    width: 1.4rem;
+    fill: rgba(var(--text-color, (17,17,17)), 0.6);
 }
+
 :host(.round) .input{
     border-radius: 10rem;
 }
 .input {
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
     cursor: text;
     min-width: 0;
     text-align: left;
-    -webkit-box-align: center;
-        -ms-flex-align: center;
             align-items: center;
     position: relative;
-    gap: 0.5rem;
-    padding: var(--padding);
-    border-radius: var(--border-radius);
-    -webkit-transition: opacity 0.3s;
-    -o-transition: opacity 0.3s;
-    transition: opacity 0.3s;
+    gap: var(--icon-gap);
+    padding: var(--padding, 0.6rem 0.8rem);
+    border-radius: var(--border-radius,0.3rem);
+    transition: opacity 0.3s, box-shadow 0.2s;
     background: var(--background);
     width: 100%;
     outline: none;
+    min-height: 3.5rem;
 }
 .input.readonly .clear{
     opacity: 0 !important;
@@ -253,106 +233,99 @@ border: none;
     pointer-events: none;
 }
 .input:focus-within:not(.readonly){
-    box-shadow: 0 0 0 0.1rem var(--accent-color) inset !important;
+    box-shadow: 0 0 0 0.1rem var(--accent-color,teal) inset !important;
 }
 .disabled{
     pointer-events: none;
     opacity: 0.6;
 }
 .label {
+    grid-area: 1/1/2/2;
+    font-size: inherit;
     opacity: .7;
     font-weight: 400;
-    font-size: 1rem;
-    position: absolute;
-    top: 0;
-    -webkit-transition: -webkit-transform 0.3s;
     transition: -webkit-transform 0.3s;
-    -o-transition: transform 0.3s;
     transition: transform 0.3s;
-    transition: transform 0.3s, -webkit-transform 0.3s;
-    -webkit-transform-origin: left;
-    -ms-transform-origin: left;
+    transition: transform 0.3s, -webkit-transform 0.3s, color .03;
         transform-origin: left;
     pointer-events: none;
     white-space: nowrap;
     overflow: hidden;
-    -o-text-overflow: ellipsis;
-       text-overflow: ellipsis;
     width: 100%;
     user-select: none;
     will-change: transform;
 }
 .outer-container{
     position: relative;
-    width: 100%;
+    width: var(--width);
 }
 .container{
     width: 100%;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto;
     position: relative;
-    -webkit-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
-    -webkit-box-flex: 1;
-        -ms-flex: 1;
-            flex: 1;
+    align-items: center;
 }    
 input{
-    font-size: 1rem;
+    grid-area: 1/1/2/2;
+    font-size: inherit;
     border: none;
     background: transparent;
     outline: none;
-    color: rgba(var(--text-color), 1);
+    color: inherit;
+    font-family: inherit;
     width: 100%;
+    caret-color: var(--accent-color, teal);
 }
-:host(:not(.outlined)) .animate-label .container input {
+:host([animate]) .input:focus-within .container input,
+.animate-placeholder .container input {
     -webkit-transform: translateY(0.6rem);
             -ms-transform: translateY(0.6rem);
         transform: translateY(0.6rem);
     }
   
-:host(:not(.outlined)) .animate-label .label {
+    :host([animate]) .input:focus-within .label,
+    .animate-placeholder .label {
     -webkit-transform: translateY(-0.7em) scale(0.8);
             -ms-transform: translateY(-0.7em) scale(0.8);
         transform: translateY(-0.7em) scale(0.8);
     opacity: 1;
-    color: var(--accent-color)
+    color: var(--accent-color,teal)
 }
-:host(.outlined) .input {
-    box-shadow: 0 0 0 0.1rem rgba(var(--text-color), 0.4) inset;
-    background: rgba(var(--foreground-color), 1);
+:host([variant="outlined"]) .input {
+    box-shadow: 0 0 0 1px var(--border-color, rgba(var(--text-color, (17,17,17)), 0.3)) inset;
+    background: rgba(var(--background-color, (255,255,255)), 1);
 }
-:host(.outlined) .label {
-    width: max-content;
-    margin-left: -0.5rem;
-    padding: 0 0.5rem;
+.animate-placeholder:focus-within:not(.readonly) .label{
+    color: var(--accent-color,teal)
 }
-:host(.outlined) .animate-label .label {
-    -webkit-transform: translate(0.1rem, -1.5rem) scale(0.8);
-            -ms-transform: translate(0.1rem, -1.5rem) scale(0.8);
-        transform: translate(0.1rem, -1.5rem) scale(0.8);
-    opacity: 1;
-    background: rgba(var(--foreground-color), 1);
-}
-.animate-label:focus-within:not(.readonly) .label{
-    color: var(--accent-color)
-}
-.feedback-text{
-    font-size: 0.9rem;
+.feedback-text:not(:empty){
+    display: flex;
     width: 100%;
-    color: var(--error-color);
-    background: rgba(var(--foreground-color), 1);
-    padding: 0.6rem 1rem;
     text-align: left;
+    font-size: 0.9rem;
+    align-items: center;
+    padding: 0.8rem 0;
+    color: rgba(var(--text-color, (17,17,17)), 0.8);
 }
-.feedback-text:empty{
-    padding: 0;
+.success{
+    color: var(--success-color);
+}
+.error{
+    color: var(--danger-color);
+}
+.status-icon{
+    margin-right: 0.2rem;
+}
+.status-icon--error{
+    fill: var(--danger-color);
+}
+.status-icon--success{
+    fill: var(--success-color);
 }
 @media (any-hover: hover){
     .icon:hover{
-        background: rgba(var(--text-color), 0.1);
+        background: rgba(var(--text-color, (17,17,17)), 0.1);
     }
 }
 </style>
@@ -360,97 +333,150 @@ input{
     <label part="input" class="input">
         <slot name="icon"></slot>
         <div class="container">
-            <input/>
+            <input type="text"/>
             <div part="placeholder" class="label"></div>
+            <button class="clear hide" title="Clear" tabindex="-1">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-11.414L9.172 7.757 7.757 9.172 10.586 12l-2.829 2.828 1.415 1.415L12 13.414l2.828 2.829 1.415-1.415L13.414 12l2.829-2.828-1.415-1.415L12 10.586z"/></svg>
+            </button>
         </div>
-        <svg class="icon clear hide" viewBox="0 0 64 64">
-            <title>clear</title>
-            <line x1="64" y1="0" x2="0" y2="64"/>
-            <line x1="64" y1="64" x2="0" y2="0"/>
-        </svg>
+        <slot name="right"></slot>
     </label>
-    <div class="feedback-text"></div>
+    <p class="feedback-text"></p>
 </div>
 `;
 customElements.define('sm-input',
     class extends HTMLElement {
+
         constructor() {
-            super()
+            super();
             this.attachShadow({
                 mode: 'open'
-            }).append(smInput.content.cloneNode(true))
+            }).append(smInput.content.cloneNode(true));
+
+            this.inputParent = this.shadowRoot.querySelector('.input');
+            this.input = this.shadowRoot.querySelector('input');
+            this.clearBtn = this.shadowRoot.querySelector('.clear');
+            this.label = this.shadowRoot.querySelector('.label');
+            this.feedbackText = this.shadowRoot.querySelector('.feedback-text');
+            this.outerContainer = this.shadowRoot.querySelector('.outer-container');
+            this._helperText = '';
+            this._errorText = '';
+            this.isRequired = false;
+            this.validationFunction = undefined;
+            this.reflectedAttributes = ['value', 'required', 'disabled', 'type', 'inputmode', 'readonly', 'min', 'max', 'pattern', 'minlength', 'maxlength', 'step'];
+
+            this.reset = this.reset.bind(this);
+            this.clear = this.clear.bind(this);
+            this.focusIn = this.focusIn.bind(this);
+            this.focusOut = this.focusOut.bind(this);
+            this.fireEvent = this.fireEvent.bind(this);
+            this.checkInput = this.checkInput.bind(this);
+            this.vibrate = this.vibrate.bind(this);
         }
+
         static get observedAttributes() {
-            return ['placeholder']
+            return ['value', 'placeholder', 'required', 'disabled', 'type', 'inputmode', 'readonly', 'min', 'max', 'pattern', 'minlength', 'maxlength', 'step', 'helper-text', 'error-text', 'hiderequired'];
         }
 
         get value() {
-            return this.shadowRoot.querySelector('input').value
+            return this.input.value;
         }
 
         set value(val) {
-            this.shadowRoot.querySelector('input').value = val;
-            this.checkInput()
-            this.fireEvent()
+            this.input.value = val;
+            this.checkInput();
+            this.fireEvent();
         }
 
         get placeholder() {
-            return this.getAttribute('placeholder')
+            return this.getAttribute('placeholder');
         }
 
         set placeholder(val) {
-            this.setAttribute('placeholder', val)
+            this.setAttribute('placeholder', val);
         }
 
         get type() {
-            return this.getAttribute('type')
+            return this.getAttribute('type');
         }
 
-        get isValid() {
-            return this.shadowRoot.querySelector('input').checkValidity()
+        set type(val) {
+            this.setAttribute('type', val);
         }
 
         get validity() {
-            return this.shadowRoot.querySelector('input').validity
+            return this.input.validity;
         }
 
+        get disabled() {
+            return this.hasAttribute('disabled');
+        }
         set disabled(value) {
             if (value)
-                this.shadowRoot.querySelector('.input').classList.add('disabled')
+                this.inputParent.classList.add('disabled');
             else
-                this.shadowRoot.querySelector('.input').classList.remove('disabled')
+                this.inputParent.classList.remove('disabled');
+        }
+        get readOnly() {
+            return this.hasAttribute('readonly');
         }
         set readOnly(value) {
             if (value) {
-                this.shadowRoot.querySelector('input').setAttribute('readonly', '')
-                this.shadowRoot.querySelector('.input').classList.add('readonly')
+                this.setAttribute('readonly', '');
             } else {
-                this.shadowRoot.querySelector('input').removeAttribute('readonly')
-                this.shadowRoot.querySelector('.input').classList.remove('readonly')
+                this.removeAttribute('readonly');
             }
         }
-
-        setValidity = (message) => {
-            this.feedbackText.textContent = message
+        set customValidation(val) {
+            this.validationFunction = val;
+        }
+        set errorText(val) {
+            this._errorText = val;
+        }
+        set helperText(val) {
+            this._helperText = val;
+        }
+        get isValid() {
+            if (this.input.value !== '') {
+                const _isValid = this.input.checkValidity();
+                let _customValid = true;
+                if (this.validationFunction) {
+                    _customValid = Boolean(this.validationFunction(this.input.value));
+                }
+                if (_isValid && _customValid) {
+                    this.feedbackText.classList.remove('error');
+                    this.feedbackText.classList.add('success');
+                    this.feedbackText.textContent = '';
+                } else {
+                    if (this._errorText) {
+                        this.feedbackText.classList.add('error');
+                        this.feedbackText.classList.remove('success');
+                        this.feedbackText.innerHTML = `
+                            <svg class="status-icon status-icon--error" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z"/></svg>
+                        ${this._errorText}
+                        `;
+                    }
+                }
+                return (_isValid && _customValid);
+            }
+        }
+        reset() {
+            this.value = '';
+        }
+        clear() {
+            this.value = '';
+            this.input.focus();
         }
 
-        showValidity = () => {
-            this.feedbackText.classList.remove('hide-completely')
-        }
-        
-        hideValidity = () => {
-            this.feedbackText.classList.add('hide-completely')
+        focusIn() {
+            this.input.focus();
         }
 
-        focusIn = () => {
-            this.input.focus()
+        focusOut() {
+            this.input.blur();
         }
 
-        focusOut = () => {
-            this.input.blur()
-        }
-
-        fireEvent = () => {
+        fireEvent() {
             let event = new Event('input', {
                 bubbles: true,
                 cancelable: true,
@@ -459,199 +485,218 @@ customElements.define('sm-input',
             this.dispatchEvent(event);
         }
 
-        checkInput = (e) => {
-            if (!this.hasAttribute('placeholder') || this.getAttribute('placeholder') === '') return;
+        checkInput(e) {
+            if (!this.hasAttribute('readonly')) {
+                if (this.input.value.trim() !== '') {
+                    this.clearBtn.classList.remove('hide');
+                } else {
+                    this.clearBtn.classList.add('hide');
+                }
+            }
+            if (!this.hasAttribute('placeholder') || this.getAttribute('placeholder').trim() === '') return;
             if (this.input.value !== '') {
                 if (this.animate)
-                    this.inputParent.classList.add('animate-label')
+                    this.inputParent.classList.add('animate-placeholder');
                 else
-                    this.label.classList.add('hide')
-                if (!this.readonly)
-                    this.clearBtn.classList.remove('hide')
+                    this.label.classList.add('hide');
             } else {
                 if (this.animate)
-                    this.inputParent.classList.remove('animate-label')
+                    this.inputParent.classList.remove('animate-placeholder');
                 else
-                    this.label.classList.remove('hide')
-                if (!this.readonly)
-                    this.clearBtn.classList.add('hide')
+                    this.label.classList.remove('hide');
+                this.feedbackText.textContent = '';
             }
+        }
+        vibrate() {
+            this.outerContainer.animate([
+                { transform: 'translateX(-1rem)' },
+                { transform: 'translateX(1rem)' },
+                { transform: 'translateX(-0.5rem)' },
+                { transform: 'translateX(0.5rem)' },
+                { transform: 'translateX(0)' },
+            ], {
+                duration: 300,
+                easing: 'ease'
+            });
         }
 
 
         connectedCallback() {
-            this.inputParent = this.shadowRoot.querySelector('.input')
-            this.clearBtn = this.shadowRoot.querySelector('.clear')
-            this.label = this.shadowRoot.querySelector('.label')
-            this.feedbackText = this.shadowRoot.querySelector('.feedback-text')
-            this.valueChanged = false;
-            this.readonly = false
-            this.isNumeric = false
-            this.min
-            this.max
-            this.animate = this.hasAttribute('animate')
-            this.input = this.shadowRoot.querySelector('input')
-            this.shadowRoot.querySelector('.label').textContent = this.getAttribute('placeholder')
-            if (this.hasAttribute('value')) {
-                this.input.value = this.getAttribute('value')
-                this.checkInput()
-            }
-            if (this.hasAttribute('required')) {
-                this.input.setAttribute('required', '')
-            }
-            if (this.hasAttribute('min')) {
-                let minValue = this.getAttribute('min')
-                this.input.setAttribute('min', minValue)
-                this.min = parseInt(minValue)
-            }
-            if (this.hasAttribute('max')) {
-                let maxValue = this.getAttribute('max')
-                this.input.setAttribute('max', maxValue)
-                this.max = parseInt(maxValue)
-            }
-            if (this.hasAttribute('minlength')) {
-                let minValue = this.getAttribute('minlength')
-                this.input.setAttribute('minlength', minValue)
-            }
-            if (this.hasAttribute('maxlength')) {
-                let maxValue = this.getAttribute('maxlength')
-                this.input.setAttribute('maxlength', maxValue)
-            }
-            if (this.hasAttribute('pattern')) {
-                this.input.setAttribute('pattern', this.getAttribute('pattern'))
-            }
-            if (this.hasAttribute('readonly')) {
-                this.input.setAttribute('readonly', '')
-                this.readonly = true
-            }
-            if (this.hasAttribute('disabled')) {
-                this.inputParent.classList.add('disabled')
-            }
-            if (this.hasAttribute('error-text')) {
-                this.feedbackText.textContent = this.getAttribute('error-text')
-            }
-            if (this.hasAttribute('type')) {
-                if (this.getAttribute('type') === 'number') {
-                    this.input.setAttribute('inputmode', 'numeric')
-                    this.input.setAttribute('type', 'number')
-                    this.isNumeric = true
-                } else
-                    this.input.setAttribute('type', this.getAttribute('type'))
-            } else
-                this.input.setAttribute('type', 'text')
-            this.input.addEventListener('input', e => {
-                this.checkInput(e)
-            })
-            this.clearBtn.addEventListener('click', e => {
-                this.value = ''
-            })
+            this.animate = this.hasAttribute('animate');
+            this.setAttribute('role', 'textbox');
+            this.input.addEventListener('input', this.checkInput);
+            this.clearBtn.addEventListener('click', this.clear);
         }
 
         attributeChangedCallback(name, oldValue, newValue) {
             if (oldValue !== newValue) {
+                if (this.reflectedAttributes.includes(name)) {
+                    if (this.hasAttribute(name)) {
+                        this.input.setAttribute(name, this.getAttribute(name) ? this.getAttribute(name) : '');
+                    }
+                    else {
+                        this.input.removeAttribute(name);
+                    }
+                }
                 if (name === 'placeholder') {
-                    this.shadowRoot.querySelector('.label').textContent = newValue;
+                    this.label.textContent = newValue;
                     this.setAttribute('aria-label', newValue);
                 }
+                else if (this.hasAttribute('value')) {
+                    this.checkInput();
+                }
+                else if (name === 'type') {
+                    if (this.hasAttribute('type') && this.getAttribute('type') === 'number') {
+                        this.input.setAttribute('inputmode', 'decimal');
+                    }
+                }
+                else if (name === 'helper-text') {
+                    this._helperText = this.getAttribute('helper-text');
+                }
+                else if (name === 'error-text') {
+                    this._errorText = this.getAttribute('error-text');
+                }
+                else if (name === 'required') {
+                    this.isRequired = this.hasAttribute('required');
+                    if (this.isRequired) {
+                        this.setAttribute('aria-required', 'true');
+                    }
+                    else {
+                        this.setAttribute('aria-required', 'false');
+                    }
+                }
+                else if (name === 'readonly') {
+                    if (this.hasAttribute('readonly')) {
+                        this.inputParent.classList.add('readonly');
+                    } else {
+                        this.inputParent.classList.remove('readonly');
+                    }
+                }
+                else if (name === 'disabled') {
+                    if (this.hasAttribute('disabled')) {
+                        this.inputParent.classList.add('disabled');
+                    }
+                    else {
+                        this.inputParent.classList.remove('disabled');
+                    }
+                }
             }
+        }
+        disconnectedCallback() {
+            this.input.removeEventListener('input', this.checkInput);
+            this.clearBtn.removeEventListener('click', this.clear);
         }
     })
 
 //textarea
 const smTextarea = document.createElement('template')
 smTextarea.innerHTML = `
-<style>
-*,
-*::before,
-*::after { 
-    padding: 0;
-    margin: 0;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-} 
-::-moz-focus-inner{
-    border: none;
-}
-.hide{
-    opacity: 0 !important;
-}
-:host{
-    display: grid;
-    --border-radius: 0.3s;
-    --background: rgba(var(--text-color), 0.06);
-    --padding-right: initial;
-    --padding-left: initial;
-}
-:host(.outlined) .textarea {
-    box-shadow: 0 0 0 0.1rem rgba(var(--text-color), 0.4) inset;
-    background: rgba(var(--foreground-color), 1);
-}
-.textarea{
-    display: grid;
-    position: relative;
-    cursor: text;
-    min-width: 0;
-    text-align: left;
-    overflow: hidden auto;
-    grid-template-columns: 1fr;
-    align-items: stretch;
-    max-height: 8rem;
-    background: var(--background);
-    border-radius: var(--border-radius);
-    padding-left: var(--padding-left);
-    padding-right: var(--padding-right);
-}
-.textarea::after,
-textarea{
-    padding: 0.7rem 1rem;
-    width: 100%;
-    min-width: 1em;
-    font: inherit;
-    color: inherit;
-    resize: none;
-    grid-area: 2/1;
-    justify-self: stretch;
-    background: none;
-    appearance: none;
-    border: none;
-    outline: none;
-    line-height: 1.5;
-    overflow: hidden;
-}
-.textarea::after{
-    content: attr(data-value) ' ';
-    visibility: hidden;
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    hyphens: auto;
-}
-.readonly{
-    pointer-events: none;
-}
-.textarea:focus-within:not(.readonly){
-    box-shadow: 0 0 0 0.1rem var(--accent-color) inset;
-}
-.disabled{
-    pointer-events: none;
-    opacity: 0.6;
-}
-.placeholder{
-    position: absolute;
-    margin: 0.7rem 1rem;
-    opacity: .7;
-    font-weight: 400;
-    font-size: 1rem;
-    line-height: 1.5;
-    pointer-events: none;
-    user-select: none;
-}
-</style>
-<label class="textarea" part="textarea">
-    <span class="placeholder"></span>
-    <textarea rows="1"></textarea>
-</label>
-`;
+    <style>
+    *,
+    *::before,
+    *::after { 
+        padding: 0;
+        margin: 0;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+    } 
+    ::-moz-focus-inner{
+        border: none;
+    }
+    .hide{
+        opacity: 0 !important;
+    }
+    :host{
+        display: grid;
+        --danger-color: red;
+        --border-radius: 0.3rem;
+        --background: rgba(var(--text-color,(17,17,17)), 0.06);
+        --padding: initial;
+        --max-height: 8rem;
+    }
+    :host([variant="outlined"]) .textarea {
+        box-shadow: 0 0 0 0.1rem rgba(var(--text-color,(17,17,17)), 0.4) inset;
+        background: rgba(var(--background-color,(255,255,255)), 1);
+    }
+    .textarea{
+        display: grid;
+        position: relative;
+        cursor: text;
+        min-width: 0;
+        text-align: left;
+        overflow: hidden auto;
+        grid-template-columns: 1fr;
+        align-items: stretch;
+        max-height: var(--max-height);
+        background: var(--background);
+        border-radius: var(--border-radius);
+        padding: var(--padding);
+    }
+    .textarea::after,
+    textarea{
+        padding: 0.7rem 1rem;
+        width: 100%;
+        min-width: 1em;
+        font: inherit;
+        color: inherit;
+        resize: none;
+        grid-area: 2/1;
+        justify-self: stretch;
+        background: none;
+        appearance: none;
+        border: none;
+        outline: none;
+        line-height: 1.5;
+        overflow: hidden;
+    }
+    .textarea::after{
+        content: attr(data-value) ' ';
+        visibility: hidden;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        hyphens: auto;
+    }
+    .readonly{
+        pointer-events: none;
+    }
+    .textarea:focus-within:not(.readonly){
+        box-shadow: 0 0 0 0.1rem var(--accent-color,teal) inset;
+    }
+    .placeholder{
+        position: absolute;
+        margin: 0.7rem 1rem;
+        opacity: .7;
+        font-weight: inherit;
+        font-size: inherit;
+        line-height: 1.5;
+        pointer-events: none;
+        user-select: none;
+    }
+    :host([disabled]) .textarea{
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+    @media (any-hover: hover){
+        ::-webkit-scrollbar{
+            width: 0.5rem;
+            height: 0.5rem;
+        }
+        
+        ::-webkit-scrollbar-thumb{
+            background: rgba(var(--text-color,(17,17,17)), 0.3);
+            border-radius: 1rem;
+            &:hover{
+                background: rgba(var(--text-color,(17,17,17)), 0.5);
+            }
+        }
+    }
+    </style>
+    <label class="textarea" part="textarea">
+        <span class="placeholder"></span>
+        <textarea rows="1"></textarea>
+    </label>
+    `;
 customElements.define('sm-textarea',
     class extends HTMLElement {
         constructor() {
@@ -659,18 +704,44 @@ customElements.define('sm-textarea',
             this.attachShadow({
                 mode: 'open'
             }).append(smTextarea.content.cloneNode(true))
+
             this.textarea = this.shadowRoot.querySelector('textarea')
+            this.textareaBox = this.shadowRoot.querySelector('.textarea')
+            this.placeholder = this.shadowRoot.querySelector('.placeholder')
+            this.reflectedAttributes = ['disabled', 'required', 'readonly', 'rows', 'minlength', 'maxlength']
+
+            this.reset = this.reset.bind(this)
+            this.focusIn = this.focusIn.bind(this)
+            this.fireEvent = this.fireEvent.bind(this)
+            this.checkInput = this.checkInput.bind(this)
+        }
+        static get observedAttributes() {
+            return ['disabled', 'value', 'placeholder', 'required', 'readonly', 'rows', 'minlength', 'maxlength']
         }
         get value() {
             return this.textarea.value
         }
         set value(val) {
-            this.textarea.value = val;
-            this.textareaBox.dataset.value = val
-            this.checkInput()
+            this.setAttribute('value', val)
             this.fireEvent()
         }
-        focusIn = () => {
+        get disabled() {
+            return this.hasAttribute('disabled')
+        }
+        set disabled(val) {
+            if (val) {
+                this.setAttribute('disabled', '')
+            } else {
+                this.removeAttribute('disabled')
+            }
+        }
+        get isValid() {
+            return this.textarea.checkValidity()
+        }
+        reset() {
+            this.setAttribute('value', '')
+        }
+        focusIn() {
             this.textarea.focus()
         }
         fireEvent() {
@@ -681,7 +752,7 @@ customElements.define('sm-textarea',
             });
             this.dispatchEvent(event);
         }
-        checkInput = () => {
+        checkInput() {
             if (!this.hasAttribute('placeholder') || this.getAttribute('placeholder') === '')
                 return;
             if (this.textarea.value !== '') {
@@ -691,234 +762,132 @@ customElements.define('sm-textarea',
             }
         }
         connectedCallback() {
-            this.textareaBox = this.shadowRoot.querySelector('.textarea')
-            this.placeholder = this.shadowRoot.querySelector('.placeholder')
-
-            if(this.hasAttribute('placeholder'))
-                this.placeholder.textContent = this.getAttribute('placeholder')
-
-            if (this.hasAttribute('value')) {
-                this.textarea.value = this.getAttribute('value')
-                this.checkInput()
-            }
-            if (this.hasAttribute('required')) {
-                this.textarea.setAttribute('required', '')
-            }
-            if (this.hasAttribute('readonly')) {
-                this.textarea.setAttribute('readonly', '')
-            }
-            if (this.hasAttribute('rows')) {
-                this.textarea.setAttribute('rows', this.getAttribute('rows'))
-            }
             this.textarea.addEventListener('input', e => {
                 this.textareaBox.dataset.value = this.textarea.value
                 this.checkInput()
             })
         }
+        attributeChangedCallback(name, oldValue, newValue) {
+            if (this.reflectedAttributes.includes(name)) {
+                if (this.hasAttribute(name)) {
+                    this.textarea.setAttribute(name, this.getAttribute(name) ? this.getAttribute(name) : '')
+                }
+                else {
+                    this.textContent.removeAttribute(name)
+                }
+            }
+            else if (name === 'placeholder') {
+                this.placeholder.textContent = this.getAttribute('placeholder')
+            }
+            else if (name === 'value') {
+                this.textarea.value = newValue;
+                this.textareaBox.dataset.value = newValue
+                this.checkInput()
+            }
+        }
     })
+const smForm = document.createElement('template');
+smForm.innerHTML = `
+        <style>
+        *{
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        :host{
+            display: flex;
+            width: 100%;
+        }
+        form{
+            display: grid;
+            gap: var(--gap, 1.5rem);
+            width: 100%;
+        }
+        </style>
+        <form part="form" onsubmit="return false">
+            <slot></slot>
+        </form>
+    `;
 
-//chcekbox
-
-const smCheckbox = document.createElement('template')
-smCheckbox.innerHTML = `
-<style>
-    *{
-        padding: 0;
-        margin: 0;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-    } 
-    :host{
-        display: -webkit-inline-box;
-        display: -ms-inline-flexbox;
-        display: inline-flex;
-        --height: 1.6rem;
-        --width: 1.6rem;
-        --border-radius: 0.2rem;
-        --border-color: rgba(var(--text-color), 0.7);
-    }
-    .checkbox {
-        position: relative;
-        display:-webkit-box;
-        display:-ms-flexbox;
-        display:flex;
-        -webkit-box-align: center;
-            -ms-flex-align: center;
-                align-items: center;
-        cursor: pointer;
-        height: 1.5rem;
-        outline: none;
-        -webkit-tap-highlight-color: transparent;
-    }
-    
-    .checkbox:active .icon,
-    .checkbox:focus-within .icon{
-        box-shadow: 0 0 0 0.3rem var(--accent-color) inset;
-    }
-    
-    .checkbox input {
-        display: none;
-    }
-    
-    .checkbox .checkmark {
-        stroke-dashoffset: -65;
-        stroke-dasharray: 65;
-        -webkit-transition: stroke-dashoffset 0.3s; 
-        -o-transition: stroke-dashoffset 0.3s; 
-        transition: stroke-dashoffset 0.3s;
-    }
-    
-    .checkbox input:checked ~ svg .checkmark {
-        stroke-dashoffset: 0;
-        stroke: rgba(var(--foreground-color), 1);
-    }
-    .checkbox input:checked ~ .icon {
-        stroke-width: 8; 
-        stroke: var(--accent-color);
-        background: var(--accent-color);
-    }
-    .checkbox input:not(:checked) ~ .icon {
-        box-shadow: 0 0 0 0.2rem var(--border-color) inset;
-    }
-    
-    .icon {
-        fill: none;
-        height: var(--height);
-        width: var(--width);
-        padding: 0.2rem;
-        stroke: rgba(var(--text-color), 0.7);
-        stroke-width: 6;
-        overflow: visible;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        -webkit-transition: background 0.3s;
-        -o-transition: background 0.3s;
-        transition: background 0.3s;
-        border-radius: var(--border-radius);
-    }
-    .disabled {
-        opacity: 0.6;
-        pointer-events: none;
-    }
-</style>
-<label class="checkbox" tabindex="0">
-    <input type="checkbox">
-    <svg class="icon" viewBox="0 0 64 64">
-        <title>checkbox</title>
-        <path class="checkmark" d="M50.52,19.56,26,44.08,13.48,31.56" />
-    </svg>
-    <slot></slot>
-</label>`
-customElements.define('sm-checkbox', class extends HTMLElement {
+customElements.define('sm-form', class extends HTMLElement {
     constructor() {
         super()
         this.attachShadow({
             mode: 'open'
-        }).append(smCheckbox.content.cloneNode(true))
+        }).append(smForm.content.cloneNode(true))
 
-        this.checkbox = this.shadowRoot.querySelector('.checkbox');
-        this.input = this.shadowRoot.querySelector('input')
+        this.form = this.shadowRoot.querySelector('form');
+        this.formElements
+        this.requiredElements
+        this.submitButton
+        this.resetButton
+        this.allRequiredValid = false;
 
-        this.isChecked = false
-        this.isDisabled = false
+        this.debounce = this.debounce.bind(this)
+        this._checkValidity = this._checkValidity.bind(this)
+        this.handleKeydown = this.handleKeydown.bind(this)
+        this.reset = this.reset.bind(this)
+        this.elementsChanged = this.elementsChanged.bind(this)
     }
-
-    static get observedAttributes() {
-        return ['disabled', 'checked']
+    debounce(callback, wait) {
+        let timeoutId = null;
+        return (...args) => {
+            window.clearTimeout(timeoutId);
+            timeoutId = window.setTimeout(() => {
+                callback.apply(null, args);
+            }, wait);
+        };
     }
-
-    get disabled() {
-        return this.getAttribute('disabled')
-    }
-
-    set disabled(val) {
-        this.setAttribute('disabled', val)
-    }
-
-    get checked() {
-        return this.isChecked
-    }
-
-    set checked(value) {
-        if (value) {
-            this.setAttribute('checked', '')
+    _checkValidity() {
+        this.allRequiredValid = this.requiredElements.every(elem => elem.isValid)
+        if (!this.submitButton) return;
+        if (this.allRequiredValid) {
+            this.submitButton.disabled = false;
         }
         else {
-            this.removeAttribute('checked')
+            this.submitButton.disabled = true;
         }
     }
-
-    set value(val) {
-        this.val = val
-        this.setAttribute('value', value)
-    }
-
-    get value() {
-        return getAttribute('value')
-    }
-
-    dispatch = () => {
-        this.dispatchEvent(new CustomEvent('change', {
-            bubbles: true,
-            composed: true
-        }))
-    }
-    handleKeyup = e => {
-        if ((e.code === "Enter" || e.code === "Space") && this.isDisabled == false) {
-            if (this.hasAttribute('checked')) {
-                this.input.checked = false
-                this.removeAttribute('checked')
+    handleKeydown(e) {
+        if (e.key === 'Enter' && !e.target.tagName.includes('TEXTAREA')) {
+            if (this.allRequiredValid) {
+                if (this.submitButton) {
+                    this.submitButton.click()
+                }
+                this.dispatchEvent(new CustomEvent('submit', {
+                    bubbles: true,
+                    composed: true,
+                }))
             }
             else {
-                this.input.checked = true
-                this.setAttribute('checked', '')
+                this.requiredElements.find(elem => !elem.isValid).vibrate()
             }
         }
     }
-    handleChange = e => {
-        if (this.input.checked) {
-            this.setAttribute('checked', '')
-        }
-        else {
-            this.removeAttribute('checked')
-        }
+    reset() {
+        this.formElements.forEach(elem => elem.reset())
     }
-    
+    elementsChanged() {
+        this.formElements = [...this.querySelectorAll('sm-input, sm-textarea, sm-checkbox, tags-input, file-input, sm-switch, sm-radio')]
+        this.requiredElements = this.formElements.filter(elem => elem.hasAttribute('required'));
+        this.submitButton = this.querySelector('[variant="primary"], [type="submit"]');
+        this.resetButton = this.querySelector('[type="reset"]');
+        if (this.resetButton) {
+            this.resetButton.addEventListener('click', this.reset);
+        }
+        this._checkValidity()
+    }
     connectedCallback() {
-        this.val = ''
-        this.addEventListener('keyup', this.handleKeyup)
-        this.input.addEventListener('change', this.handleChange)
-    }
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (oldValue !== newValue) {
-            if (name === 'disabled') {
-                if (newValue === 'true') {
-                    this.checkbox.classList.add('disabled')
-                    this.isDisabled = true
-                } else {
-                    this.checkbox.classList.remove('disabled')
-                    this.isDisabled = false
-                }
-            }
-            else if (name === 'checked') {
-                if (this.hasAttribute('checked')) {
-                    this.isChecked = true
-                    this.input.checked = true
-                }
-                else {
-                    this.input.checked = false
-                    this.isChecked = false
-                }
-                this.dispatch()
-            }
-        }
+        const slot = this.shadowRoot.querySelector('slot')
+        slot.addEventListener('slotchange', this.elementsChanged)
+        this.addEventListener('input', this.debounce(this._checkValidity, 100));
+        this.addEventListener('keydown', this.debounce(this.handleKeydown, 100));
     }
     disconnectedCallback() {
-        this.removeEventListener('keyup', this.handleKeyup)
-        this.removeEventListener('change', this.handleChange)
+        this.removeEventListener('input', this.debounce(this._checkValidity, 100));
+        this.removeEventListener('keydown', this.debounce(this.handleKeydown, 100));
     }
 })
-
 //switch
 
 const smSwitch = document.createElement('template')
@@ -948,9 +917,10 @@ smSwitch.innerHTML = `
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
     }
-    :host(:not([disable])) label:focus-visible{
-        -webkit-box-shadow: 0 0 0 0.1rem var(--accent-color);
-            box-shadow: 0 0 0 0.1rem var(--accent-color);
+    :host([disabled]) {
+        cursor: not-allowed;
+        opacity: 0.6;
+        pointer-events: none;
     }
     .switch {
         position: relative;
@@ -980,21 +950,18 @@ smSwitch.innerHTML = `
         -webkit-transition: background 0.3s;
         -o-transition: background 0.3s;
         transition: background 0.3s;
-        background: rgba(var(--text-color), 0.4);
+        background: rgba(var(--text-color,inherit), 0.4);
         -webkit-box-shadow: 0 0.1rem 0.3rem #00000040 inset;
                 box-shadow: 0 0.1rem 0.3rem #00000040 inset;
         border-radius: 1rem;
     }
     
-    .switch:active .button::after,
-    .switch:focus .button::after{
-        opacity: 1
-    }
-    .switch:focus-visible .button::after{
-        opacity: 1
+    label:active .thumb::after,
+    label:focus-within .thumb::after{
+        opacity: 1;
     }
     
-    .button::after{
+    .thumb::after{
         content: '';
         display: -webkit-box;
         display: -ms-flexbox;
@@ -1002,7 +969,7 @@ smSwitch.innerHTML = `
         position: absolute;
         height: 2.6rem;
         width: 2.6rem;
-        background: rgba(var(--text-color), 0.2);
+        background: rgba(var(--text-color,inherit), 0.2);
         border-radius: 2rem;
         opacity: 0;
         -webkit-transition: opacity 0.3s;
@@ -1010,7 +977,7 @@ smSwitch.innerHTML = `
         transition: opacity 0.3s;
     }
     
-    .button {
+    .thumb {
         position: relative;
         display: -webkit-inline-box;
         display: -ms-inline-flexbox;
@@ -1034,18 +1001,14 @@ smSwitch.innerHTML = `
         border: solid 0.3rem white;
     }
     
-    input:checked ~ .button {
+    input:checked ~ .thumb {
         -webkit-transform: translateX(100%);
             -ms-transform: translateX(100%);
                 transform: translateX(100%);
     }
     
     input:checked ~ .track {
-        background: var(--accent-color);
-    }
-    .disabled {
-        opacity: 0.6;
-        pointer-events: none;
+        background: var(--accent-color, teal);
     }
 </style>
 <label tabindex="0">
@@ -1053,8 +1016,9 @@ smSwitch.innerHTML = `
     <div part="switch" class="switch">
         <input type="checkbox">
         <div class="track"></div>
-        <div class="button"></div>
+        <div class="thumb"></div>
     </div>
+    <slot name="right"></slot>
 </label>`
 
 customElements.define('sm-switch', class extends HTMLElement {
@@ -1067,22 +1031,23 @@ customElements.define('sm-switch', class extends HTMLElement {
         this.input = this.shadowRoot.querySelector('input')
         this.isChecked = false
         this.isDisabled = false
+
+        this.dispatch = this.dispatch.bind(this)
+    }
+
+    static get observedAttributes() {
+        return ['disabled', 'checked']
     }
 
     get disabled() {
-        return this.getAttribute('disabled')
+        return this.isDisabled
     }
 
     set disabled(val) {
         if (val) {
-            this.disabled = true
             this.setAttribute('disabled', '')
-            this.switch.classList.add('disabled')
         } else {
-            this.disabled = false
             this.removeAttribute('disabled')
-            this.switch.classList.remove('disabled')
-
         }
     }
 
@@ -1093,29 +1058,32 @@ customElements.define('sm-switch', class extends HTMLElement {
     set checked(value) {
         if (value) {
             this.setAttribute('checked', '')
-            this.isChecked = true
-            this.input.checked = true
         } else {
             this.removeAttribute('checked')
-            this.isChecked = false
-            this.input.checked = false
         }
     }
+    get value() {
+        return this.isChecked
+    }
 
-    dispatch = () => {
+    reset() {
+
+    }
+
+    dispatch() {
         this.dispatchEvent(new CustomEvent('change', {
             bubbles: true,
-            composed: true
+            composed: true,
+            detail: {
+                value: this.isChecked
+            }
         }))
     }
 
     connectedCallback() {
-        if (this.hasAttribute('disabled'))
-            this.switch.classList.add('disabled')
-        if (this.hasAttribute('checked'))
-            this.input.checked = true
-        this.addEventListener('keyup', e => {
-            if ((e.code === "Enter" || e.code === "Space") && !this.isDisabled) {
+        this.addEventListener('keydown', e => {
+            if (e.key === ' ' && !this.isDisabled) {
+                e.preventDefault()
                 this.input.click()
             }
         })
@@ -1127,6 +1095,29 @@ customElements.define('sm-switch', class extends HTMLElement {
             this.dispatch()
         })
     }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue !== newValue) {
+            if (name === 'disabled') {
+                if (this.hasAttribute('disabled')) {
+                    this.disabled = true
+                }
+                else {
+                    this.disabled = false
+                }
+            }
+            else if (name === 'checked') {
+                if (this.hasAttribute('checked')) {
+                    this.isChecked = true
+                    this.input.checked = true
+                }
+                else {
+                    this.isChecked = false
+                    this.input.checked = false
+                }
+            }
+        }
+    }
+
 })
 
 // select
@@ -1139,24 +1130,15 @@ smSelect.innerHTML = `
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
 } 
-.icon {
-    fill: none;
-    height: 0.8rem;
-    width: 0.8rem;
-    stroke: rgba(var(--text-color), 0.7);
-    stroke-width: 6;
-    overflow: visible;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}      
 :host{
-    display: -webkit-inline-box;
-    display: -ms-inline-flexbox;
-    display: inline-flex;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    --min-width: 100%;
 }
-.hide{
-    opacity: 0;
-    pointer-events: none;
+:host([disabled]) .select{
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 .select{
     position: relative;
@@ -1165,17 +1147,25 @@ smSelect.innerHTML = `
     display: flex;
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-            flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
     cursor: pointer;
     width: 100%;
     -webkit-tap-highlight-color: transparent;
 }
-.option-text{
+.icon {
+    height: 1.2rem;
+    width: 1.2rem;
+    margin-left: 0.5rem;
+    fill: rgba(var(--text-color, (17,17,17)), 0.7);
+}      
+.selected-option-text{
+    font-size: inherit;
     overflow: hidden;
     -o-text-overflow: ellipsis;
        text-overflow: ellipsis;
     white-space: nowrap;
+    font-weight: 500;
 }
 .selection{
     border-radius: 0.3rem;
@@ -1184,20 +1174,17 @@ smSelect.innerHTML = `
     -ms-grid-columns: 1fr auto;
     grid-template-columns: 1fr auto;
         grid-template-areas: 'heading heading' '. .';
-    padding: 0.4rem 1rem;
-    background: rgba(var(--text-color), 0.06);
-    border: solid 1px rgba(var(--text-color), 0.2);
+    padding: var(--padding,0.6rem 0.8rem);
+    background: rgba(var(--text-color,(17,17,17)), 0.06);
     -webkit-box-align: center;
         -ms-flex-align: center;
             align-items: center;
     outline: none;
+    z-index: 2;
 }
 .selection:focus{
-    -webkit-box-shadow: 0 0 0 0.1rem var(--accent-color);
-            box-shadow: 0 0 0 0.1rem var(--accent-color) 
-}
-.icon{
-    margin-left: 1rem;
+    -webkit-box-shadow: 0 0 0 0.1rem var(--accent-color, teal);
+            box-shadow: 0 0 0 0.1rem var(--accent-color, teal) 
 }
 :host([align-select="left"]) .options{
     left: 0;
@@ -1207,7 +1194,8 @@ smSelect.innerHTML = `
 }
 .options{
     top: 100%;
-    margin-top: 0.5rem; 
+    padding: var(--options-padding, 0.3rem);
+    margin-top: 0.2rem; 
     overflow: hidden auto;
     position: absolute;
     grid-area: options;
@@ -1218,14 +1206,12 @@ smSelect.innerHTML = `
     -webkit-box-direction: normal;
         -ms-flex-direction: column;
             flex-direction: column;
-    min-width: 100%;
-    background: rgba(var(--foreground-color), 1);
-    -webkit-transition: opacity 0.3s, top 0.3s;
-    -o-transition: opacity 0.3s, top 0.3s;
-    transition: opacity 0.3s, top 0.3s;
-    border: solid 1px rgba(var(--text-color), 0.2);
-    border-radius: 0.3rem;
-    z-index: 2;
+    min-width: var(--min-width);
+    max-height: var(--max-height, auto);
+    background: rgba(var(--foreground-color,(255,255,255)), 1);
+    border: solid 1px rgba(var(--text-color,(17,17,17)), 0.2);
+    border-radius: var(--border-radius, 0.5rem);
+    z-index: 1;
     -webkit-box-shadow: 0.4rem 0.8rem 1.2rem #00000030;
             box-shadow: 0.4rem 0.8rem 1.2rem #00000030;
 }
@@ -1234,13 +1220,28 @@ smSelect.innerHTML = `
         -ms-transform: rotate(180deg);
             transform: rotate(180deg)
 }
+.hide{
+    display: none;
+}
+@media (any-hover: hover){
+    ::-webkit-scrollbar{
+        width: 0.5rem;
+        height: 0.5rem;
+    }
+    
+    ::-webkit-scrollbar-thumb{
+        background: rgba(var(--text-color,(17,17,17)), 0.3);
+        border-radius: 1rem;
+        &:hover{
+            background: rgba(var(--text-color,(17,17,17)), 0.5);
+        }
+    }
+}
 </style>
-<div class="select" >
-    <div class="selection" tabindex="0">
-        <div class="option-text"></div>
-        <svg class="icon toggle" viewBox="0 0 64 64">
-            <polyline points="63.65 15.99 32 47.66 0.35 15.99"/>
-        </svg>
+<div class="select">
+    <div class="selection">
+        <div class="selected-option-text"></div>
+        <svg class="icon toggle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 13.172l4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222z"/></svg>
     </div>
     <div part="options" class="options hide">
         <slot></slot> 
@@ -1252,128 +1253,211 @@ customElements.define('sm-select', class extends HTMLElement {
         this.attachShadow({
             mode: 'open'
         }).append(smSelect.content.cloneNode(true))
+
+        this.focusIn = this.focusIn.bind(this)
+        this.reset = this.reset.bind(this)
+        this.open = this.open.bind(this)
+        this.collapse = this.collapse.bind(this)
+        this.toggle = this.toggle.bind(this)
+        this.handleOptionsNavigation = this.handleOptionsNavigation.bind(this)
+        this.handleOptionSelection = this.handleOptionSelection.bind(this)
+        this.handleKeydown = this.handleKeydown.bind(this)
+        this.handleClickOutside = this.handleClickOutside.bind(this)
+
+        this.availableOptions
+        this.previousOption
+        this.isOpen = false;
+        this.label = ''
+        this.slideDown = [{
+            transform: `translateY(-0.5rem)`,
+            opacity: 0
+        },
+        {
+            transform: `translateY(0)`,
+            opacity: 1
+        }
+        ]
+        this.slideUp = [{
+            transform: `translateY(0)`,
+            opacity: 1
+        },
+        {
+            transform: `translateY(-0.5rem)`,
+            opacity: 0
+        }
+        ]
+        this.animationOptions = {
+            duration: 300,
+            fill: "forwards",
+            easing: 'ease'
+        }
+
+        this.optionList = this.shadowRoot.querySelector('.options')
+        this.chevron = this.shadowRoot.querySelector('.toggle')
+        this.selection = this.shadowRoot.querySelector('.selection')
+        this.selectedOptionText = this.shadowRoot.querySelector('.selected-option-text')
     }
     static get observedAttributes() {
-        return ['value']
+        return ['disabled', 'label']
     }
     get value() {
         return this.getAttribute('value')
     }
     set value(val) {
-        this.setAttribute('value', val)
+        const selectedOption = this.availableOptions.find(option => option.getAttribute('value') === val)
+        if (selectedOption) {
+            this.setAttribute('value', val)
+            this.selectedOptionText.textContent = `${this.label}${selectedOption.textContent}`;
+            if (this.previousOption) {
+                this.previousOption.classList.remove('check-selected')
+            }
+            selectedOption.classList.add('check-selected')
+            this.previousOption = selectedOption
+        } else {
+            console.warn(`There is no option with ${val} as value`)
+        }
     }
 
-    collapse() {
-        this.optionList.animate(this.slideUp, this.animationOptions)
-        this.optionList.classList.add('hide')
-        this.chevron.classList.remove('rotate')
-        this.open = false
+    reset(fire = true) {
+        if (this.availableOptions[0] && this.previousOption !== this.availableOptions[0]) {
+            const firstElement = this.availableOptions[0];
+            if (this.previousOption) {
+                this.previousOption.classList.remove('check-selected')
+            }
+            firstElement.classList.add('check-selected')
+            this.value = firstElement.getAttribute('value')
+            this.selectedOptionText.textContent = `${this.label}${firstElement.textContent}`
+            this.previousOption = firstElement;
+            if (fire) {
+                this.fireEvent()
+            }
+        }
     }
-    connectedCallback() {
-        this.availableOptions
-        this.optionList = this.shadowRoot.querySelector('.options')
-        this.chevron = this.shadowRoot.querySelector('.toggle')
-        let slot = this.shadowRoot.querySelector('.options slot'),
-            selection = this.shadowRoot.querySelector('.selection'),
-            previousOption
-        this.open = false;
-        this.slideDown = [{
-                    transform: `translateY(-0.5rem)`
-                },
-                {
-                    transform: `translateY(0)`
-                }
-            ],
-            this.slideUp = [{
-                    transform: `translateY(0)`
-                },
-                {
-                    transform: `translateY(-0.5rem)`
-                }
-            ],
-            this.animationOptions = {
-                duration: 300,
-                fill: "forwards",
-                easing: 'ease'
+
+    focusIn() {
+        this.selection.focus()
+    }
+
+    open() {
+        this.optionList.classList.remove('hide')
+        this.optionList.animate(this.slideDown, this.animationOptions)
+        this.chevron.classList.add('rotate')
+        this.isOpen = true
+    }
+    collapse() {
+        this.chevron.classList.remove('rotate')
+        this.optionList.animate(this.slideUp, this.animationOptions)
+            .onfinish = () => {
+                this.optionList.classList.add('hide')
+                this.isOpen = false
             }
-        selection.addEventListener('click', e => {
-            if (!this.open) {
-                this.optionList.classList.remove('hide')
-                this.optionList.animate(this.slideDown, this.animationOptions)
-                this.chevron.classList.add('rotate')
-                this.open = true
+    }
+    toggle() {
+        if (!this.isOpen && !this.hasAttribute('disabled')) {
+            this.open()
+        } else {
+            this.collapse()
+        }
+    }
+
+    fireEvent() {
+        this.dispatchEvent(new CustomEvent('change', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                value: this.value
+            }
+        }))
+    }
+
+    handleOptionsNavigation(e) {
+        if (e.key === 'ArrowUp') {
+            e.preventDefault()
+            if (document.activeElement.previousElementSibling) {
+                document.activeElement.previousElementSibling.focus()
             } else {
-                this.collapse()
+                this.availableOptions[this.availableOptions.length - 1].focus()
             }
-        })
-        selection.addEventListener('keydown', e => {
-            if (e.code === 'ArrowDown' || e.code === 'ArrowRight') {
-                e.preventDefault()
+        }
+        else if (e.key === 'ArrowDown') {
+            e.preventDefault()
+            if (document.activeElement.nextElementSibling) {
+                document.activeElement.nextElementSibling.focus()
+            } else {
                 this.availableOptions[0].focus()
             }
-            if (e.code === 'Enter' || e.code === 'Space')
-                if (!this.open) {
-                    this.optionList.classList.remove('hide')
-                    this.optionList.animate(this.slideDown, this.animationOptions)
-                    this.chevron.classList.add('rotate')
-                    this.open = true
-                } else {
-                    this.collapse()
-                }
-        })
-        this.optionList.addEventListener('keydown', e => {
-            if (e.code === 'ArrowUp' || e.code === 'ArrowRight') {
+        }
+    }
+    handleOptionSelection(e) {
+        if (this.previousOption !== document.activeElement) {
+            this.value = document.activeElement.getAttribute('value')
+            this.fireEvent()
+        }
+    }
+    handleClick(e) {
+        if (e.target === this) {
+            this.toggle()
+        }
+        else {
+            this.handleOptionSelection()
+            this.collapse()
+        }
+    }
+    handleKeydown(e) {
+        if (e.target === this) {
+            if (this.isOpen && e.key === 'ArrowDown') {
                 e.preventDefault()
-                if (document.activeElement.previousElementSibling) {
-                    document.activeElement.previousElementSibling.focus()
-                }
+                this.availableOptions[0].focus()
+                this.handleOptionSelection(e)
             }
-            if (e.code === 'ArrowDown' || e.code === 'ArrowLeft') {
+            else if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault()
-                if (document.activeElement.nextElementSibling)
-                    document.activeElement.nextElementSibling.focus()
+                this.toggle()
             }
-        })
-        this.addEventListener('optionSelected', e => {
-            if (previousOption !== e.target) {
-                this.setAttribute('value', e.detail.value)
-                this.shadowRoot.querySelector('.option-text').textContent = e.detail.text;
-                this.dispatchEvent(new CustomEvent('change', {
-                    bubbles: true,
-                    composed: true,
-                    detail: {
-                        value: e.detail.value
-                    }
-                }))
-                if (previousOption) {
-                    previousOption.classList.remove('check-selected')
-                }
-                previousOption = e.target;
-            }
-            if (!e.detail.switching)
+        }
+        else {
+            this.handleOptionsNavigation(e)
+            this.handleOptionSelection(e)
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
                 this.collapse()
-
-            e.target.classList.add('check-selected')
-        })
+            }
+        }
+    }
+    handleClickOutside(e) {
+        if (this.isOpen && !this.contains(e.target)) {
+            this.collapse()
+        }
+    }
+    connectedCallback() {
+        this.setAttribute('role', 'listbox')
+        if (!this.hasAttribute('disabled')) {
+            this.selection.setAttribute('tabindex', '0')
+        }
+        let slot = this.shadowRoot.querySelector('slot')
         slot.addEventListener('slotchange', e => {
             this.availableOptions = slot.assignedElements()
-            if (this.availableOptions[0]) {
-                let firstElement = this.availableOptions[0];
-                previousOption = firstElement;
-                firstElement.classList.add('check-selected')
-                this.setAttribute('value', firstElement.getAttribute('value'))
-                this.shadowRoot.querySelector('.option-text').textContent = firstElement.textContent
-                this.availableOptions.forEach((element, index) => {
-                    element.setAttribute('data-rank', index + 1);
-                    element.setAttribute('tabindex', "0");
-                })
-            }
+            this.reset(false)
         });
-        document.addEventListener('mousedown', e => {
-            if (!this.contains(e.target) && this.open) {
-                this.collapse()
+        this.addEventListener('click', this.handleClick)
+        this.addEventListener('keydown', this.handleKeydown)
+        document.addEventListener('mousedown', this.handleClickOutside)
+    }
+    disconnectedCallback() {
+        this.removeEventListener('click', this.toggle)
+        this.removeEventListener('keydown', this.handleKeydown)
+        document.removeEventListener('mousedown', this.handleClickOutside)
+    }
+    attributeChangedCallback(name) {
+        if (name === "disabled") {
+            if (this.hasAttribute('disabled')) {
+                this.selection.removeAttribute('tabindex')
+            } else {
+                this.selection.setAttribute('tabindex', '0')
             }
-        })
+        } else if (name === 'label') {
+            this.label = this.hasAttribute('label') ? `${this.getAttribute('label')} ` : ''
+        }
     }
 })
 
@@ -1393,54 +1477,48 @@ smOption.innerHTML = `
     display: flex;
 }
 .option{
-    min-width: 100%;
-    padding: 0.8rem 1.2rem;
-    cursor: pointer;
-    overflow-wrap: break-word;
-    outline: none;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
+    display: grid;
     -webkit-box-align: center;
         -ms-flex-align: center;
             align-items: center;
+    min-width: max-content;
+    width: 100%;
+    gap: 0.5rem;
+    grid-template-columns: max-content minmax(0, 1fr);
+    padding: var(--padding, 0.6rem 1rem);
+    cursor: pointer;
+    white-space: nowrap;
+    outline: none;
+    user-select: none;
+    border-radius: var(--border-radius, 0.3rem);
 }
 :host(:focus){
     outline: none;
-    background: rgba(var(--text-color), 0.1);
+    background: rgba(var(--text-color,(17,17,17)), 0.1);
+}
+.icon {
+    opacity: 0;
+    height: 1.2rem;
+    width: 1.2rem;
+    fill: rgba(var(--text-color,(17,17,17)), 0.8);
 }
 :host(:focus) .option .icon{
     opacity: 0.4
 }
 :host(.check-selected) .icon{
-    opacity: 1 !important
-}
-.icon {
-    margin-right: 0.8rem;
-    fill: none;
-    height: 0.8rem;
-    width: 0.8rem;
-    stroke: rgba(var(--text-color), 0.7);
-    stroke-width: 10;
-    overflow: visible;
-    stroke-linecap: round;
-    border-radius: 1rem;
-    stroke-linejoin: round;
-    opacity: 0;
+    opacity: 1
 }
 @media (hover: hover){
     .option:hover{
-        background: rgba(var(--text-color), 0.1);
+        background: rgba(var(--text-color,(17,17,17)), 0.1);
     }
-    .option:hover .icon{
+    :host(:not(.check-selected):hover) .icon{
         opacity: 0.4
     }
 }
 </style>
 <div class="option">
-    <svg class="icon" viewBox="0 0 64 64">
-        <polyline points="0.35 31.82 21.45 52.98 63.65 10.66"/>
-    </svg>
+    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"/></svg>
     <slot></slot> 
 </div>`;
 customElements.define('sm-option', class extends HTMLElement {
@@ -1451,375 +1529,32 @@ customElements.define('sm-option', class extends HTMLElement {
         }).append(smOption.content.cloneNode(true))
     }
 
-    sendDetails(switching) {
-        let optionSelected = new CustomEvent('optionSelected', {
-            bubbles: true,
-            composed: true,
-            detail: {
-                text: this.textContent,
-                value: this.getAttribute('value'),
-                switching: switching
-            }
-        })
-        this.dispatchEvent(optionSelected)
-    }
-
     connectedCallback() {
-        let validKey = [
-            'ArrowUp',
-            'ArrowDown',
-            'ArrowLeft',
-            'ArrowRight'
-        ]
-        this.addEventListener('click', e => {
-            this.sendDetails()
-        })
-        this.addEventListener('keyup', e => {
-            if (e.code === 'Enter' || e.code === 'Space') {
-                e.preventDefault()
-                this.sendDetails(false)
-            }
-            if (validKey.includes(e.code)) {
-                e.preventDefault()
-                this.sendDetails(true)
-            }
-        })
-        if (this.hasAttribute('default')) {
-            setTimeout(() => {
-                this.sendDetails()
-            }, 0);
-        }
-    }
-})
-
-// select
-const smStripSelect = document.createElement('template')
-smStripSelect.innerHTML = `
-<style>     
-*{
-    padding: 0;
-    margin: 0;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-}    
-:host{
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-}
-.icon {
-    position: absolute;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    fill: none;
-    height: 2.6rem;
-    width: 2.6rem;
-    padding: 0.9rem;
-    stroke: rgba(var(--text-color), 0.7);
-    stroke-width: 10;
-    overflow: visible;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    cursor: pointer;
-    min-width: 0;
-    z-index: 1;
-    background: rgba(var(--foreground-color), 1);
-    -webkit-tap-highlight-color: transparent;
-    -webkit-transition: opacity 0.3s;
-    -o-transition: opacity 0.3s;
-    transition: opacity 0.3s; 
-}
-.hide{
-    pointer-events: none;
-    opacity: 0;
-}
-.select-container{
-    position: relative;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    width: 100%;
-    -webkit-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
-}
-.select{
-    position: relative;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    gap: 0.5rem;
-    max-width: 100%;
-    overflow: auto hidden;
-}
-.previous-item{
-    left: 0;
-}
-.next-item{
-    right: 0;
-}
-.left,.right{
-    position: absolute;
-    width: 1rem;
-    height: 100%; 
-    -webkit-transition: opacity 0.3s; 
-    -o-transition: opacity 0.3s; 
-    transition: opacity 0.3s;
-    z-index: 1;
-}
-.left{
-    background: -webkit-gradient(linear, right top, left top, from(transparent), to(rgba(var(--foreground-color), 1)));
-    background: -o-linear-gradient(right, transparent, rgba(var(--foreground-color), 1));
-    background: linear-gradient(to left, transparent, rgba(var(--foreground-color), 1))
-}
-.right{
-    right: 0;
-    background: -webkit-gradient(linear, left top, right top, from(transparent), to(rgba(var(--foreground-color), 1)));
-    background: -o-linear-gradient(left, transparent, rgba(var(--foreground-color), 1));
-    background: linear-gradient(to right, transparent, rgba(var(--foreground-color), 1))
-}
-slot::slotted(.active){
-    border-radius: 2rem;
-    opacity: 1;
-    background-color: rgba(var(--text-color), .6);  
-    color: rgba(var(--foreground-color), 1);
-}
-@media (hover: none){
-    ::-webkit-scrollbar-track {
-        -webkit-box-shadow: none !important;
-        background-color: transparent !important;
-    }
-    ::-webkit-scrollbar {
-        height: 0;
-        background-color: transparent;
-    }
-    .icon{
-        display: none;
-    }
-    .left,.right{
-        display: block;
-    }
-}
-@media (hover: hover){
-    .select{
-        overflow: hidden;
-    }
-    .left,.right{
-        display: none;
-    }
-}
-</style>
-<div class="select-container">
-    <div class="left hide"></div>
-    <svg class="icon previous-item hide" viewBox="4 0 64 64">
-        <title>Previous</title>
-        <polyline points="48.01 0.35 16.35 32 48.01 63.65"/>
-    </svg>
-    <div class="select">
-        <slot></slot> 
-    </div>
-    <svg class="icon next-item hide" viewBox="-6 0 64 64">
-        <title>Next</title>
-        <polyline points="15.99 0.35 47.65 32 15.99 63.65"/>
-    </svg>
-    <div class="right hide"></div>
-</div>`;
-customElements.define('sm-strip-select', class extends HTMLElement {
-    constructor() {
-        super()
-        this.attachShadow({
-            mode: 'open'
-        }).append(smStripSelect.content.cloneNode(true))
-    }
-    static get observedAttributes() {
-        return ['value']
-    }
-    get value() {
-        return this.getAttribute('value')
-    }
-    set value(val) {
-        this.setAttribute('value', val)
-    }
-    scrollLeft = () => {
-        this.select.scrollBy({
-            top: 0,
-            left: -this.scrollDistance,
-            behavior: 'smooth'
-        })
-    }
-
-    scrollRight = () => {
-        this.select.scrollBy({
-            top: 0,
-            left: this.scrollDistance,
-            behavior: 'smooth'
-        })
-    }
-    connectedCallback() {
-        let previousOption,
-            slot = this.shadowRoot.querySelector('slot');
-        this.selectContainer = this.shadowRoot.querySelector('.select-container')
-        this.select = this.shadowRoot.querySelector('.select')
-        this.nextArrow = this.shadowRoot.querySelector('.next-item')
-        this.previousArrow = this.shadowRoot.querySelector('.previous-item')
-        this.nextGradient = this.shadowRoot.querySelector('.right')
-        this.previousGradient = this.shadowRoot.querySelector('.left')
-        this.selectOptions
-        this.scrollDistance = this.selectContainer.getBoundingClientRect().width
-        const firstElementObserver = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting) {
-                this.previousArrow.classList.add('hide')
-                this.previousGradient.classList.add('hide')
-            } else {
-                this.previousArrow.classList.remove('hide')
-                this.previousGradient.classList.remove('hide')
-            }
-        }, {
-            root: this.selectContainer,
-            threshold: 0.95
-        })
-        const lastElementObserver = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting) {
-                this.nextArrow.classList.add('hide')
-                this.nextGradient.classList.add('hide')
-            } else {
-                this.nextArrow.classList.remove('hide')
-                this.nextGradient.classList.remove('hide')
-            }
-        }, {
-            root: this.selectContainer,
-            threshold: 0.95
-        })
-
-        const selectObserver = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting) {
-                this.scrollDistance = this.selectContainer.getBoundingClientRect().width
-            }
-        })
-
-        selectObserver.observe(this.selectContainer)
-        this.addEventListener('optionSelected', e => {
-            if (previousOption === e.target) return;
-            if (previousOption)
-                previousOption.classList.remove('active')
-            e.target.classList.add('active')
-            e.target.scrollIntoView({
-                behavior: 'smooth',
-                inline: 'center',
-                block: 'nearest'
-            })
-            this.setAttribute('value', e.detail.value)
-            this.dispatchEvent(new CustomEvent('change', {
-                bubbles: true,
-                composed: true
-            }))
-            previousOption = e.target;
-        })
-        slot.addEventListener('slotchange', e => {
-            this.selectOptions = slot.assignedElements()
-            firstElementObserver.observe(this.selectOptions[0])
-            lastElementObserver.observe(this.selectOptions[this.selectOptions.length - 1])
-            if (this.selectOptions[0]) {
-                let firstElement = this.selectOptions[0];
-                this.setAttribute('value', firstElement.getAttribute('value'))
-                firstElement.classList.add('active')
-                previousOption = firstElement;
-            }
-        });
-        this.nextArrow.addEventListener('click', this.scrollRight)
-        this.previousArrow.addEventListener('click', this.scrollLeft)
-    }
-
-    disconnectedCallback() {
-        this.nextArrow.removeEventListener('click', this.scrollRight)
-        this.previousArrow.removeEventListener('click', this.scrollLeft)
-    }
-})
-
-// option
-const smStripOption = document.createElement('template')
-smStripOption.innerHTML = `
-<style>     
-*{
-    padding: 0;
-    margin: 0;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-}     
-:host{
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-}
-.option{
-    padding: 0.4rem 0.8rem;
-    cursor: pointer;
-    overflow-wrap: break-word;
-    white-space: nowrap;
-    outline: none;
-    border-radius: 2rem;
-    text-transform: capitalize;
-    border: solid 1px rgba(var(--text-color), .3);
-    opacity: 0.9;
-}
-.option:focus{
-    background: rgba(var(--text-color), 0.1);
-}
-
-@media (hover: hover){
-    .option{
-        -webkit-transition: background 0.3s;
-        -o-transition: background 0.3s;
-        transition: background 0.3s;
-    }
-    .option:hover{
-        background: rgba(var(--text-color), 0.1);
-    }
-}
-</style>
-<div class="option" tabindex="0">
-    <slot></slot> 
-</div>`;
-customElements.define('sm-strip-option', class extends HTMLElement {
-    constructor() {
-        super()
-        this.attachShadow({
-            mode: 'open'
-        }).append(smStripOption.content.cloneNode(true))
-    }
-    sendDetails() {
-        let optionSelected = new CustomEvent('optionSelected', {
-            bubbles: true,
-            composed: true,
-            detail: {
-                text: this.textContent,
-                value: this.getAttribute('value')
-            }
-        })
-        this.dispatchEvent(optionSelected)
-    }
-
-    connectedCallback() {
-        this.addEventListener('click', e => {
-            this.sendDetails()
-        })
-        this.addEventListener('keyup', e => {
-            if (e.code === 'Enter' || e.code === 'Space') {
-                e.preventDefault()
-                this.sendDetails(false)
-            }
-        })
-        if (this.hasAttribute('default')) {
-            setTimeout(() => {
-                this.sendDetails()
-            }, 0);
-        }
+        this.setAttribute('role', 'option')
+        this.setAttribute('tabindex', '0')
     }
 })
 
 //popup
-const smPopup = document.createElement('template')
+class Stack {
+    constructor() {
+        this.items = [];
+    }
+    push(element) {
+        this.items.push(element);
+    }
+    pop() {
+        if (this.items.length == 0)
+            return "Underflow";
+        return this.items.pop();
+    }
+    peek() {
+        return this.items[this.items.length - 1];
+    }
+}
+const popupStack = new Stack();
+
+const smPopup = document.createElement('template');
 smPopup.innerHTML = `
 <style>
 *{
@@ -1834,20 +1569,11 @@ smPopup.innerHTML = `
     display: grid;
     z-index: 10;
     --width: 100%;
+    --height: auto;
     --min-width: auto;
-    --body-padding: 1.5rem;
+    --min-height: auto;
+    --backdrop-background: rgba(0, 0, 0, 0.6);
     --border-radius: 0.8rem 0.8rem 0 0;
-}
-::-webkit-scrollbar{
-    width: 0.5rem;
-}
-
-::-webkit-scrollbar-thumb{
-    background: rgba(var(--text-color), 0.3);
-    border-radius: 1rem;
-    &:hover{
-        background: rgba(var(--text-color), 0.5);
-    }
 }
 .popup-container{
     display: -ms-grid;
@@ -1858,16 +1584,24 @@ smPopup.innerHTML = `
     left: 0;
     right: 0;
     place-items: center;
-    background: rgba(0, 0, 0, 0.6);
-    -webkit-transition: opacity 0.3s;
-    -o-transition: opacity 0.3s;
-    transition: opacity 0.3s;
     z-index: 10;
     touch-action: none;
 }
 :host(.stacked) .popup{
     -webkit-transform: scale(0.9) translateY(-2rem) !important;
             transform: scale(0.9) translateY(-2rem) !important;
+}
+.background{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    background: var(--backdrop-background);
+    -webkit-transition: opacity 0.3s;
+    -o-transition: opacity 0.3s;
+    transition: opacity 0.3s;
 }
 .popup{
     display: -webkit-box;
@@ -1884,19 +1618,13 @@ smPopup.innerHTML = `
             align-items: flex-start;
     width: var(--width);
     min-width: var(--min-width);
+    height: var(--height);
+    min-height: var(--min-height);
+    max-height: 90vh;
     border-radius: var(--border-radius);
-    -webkit-transform: scale(1) translateY(100%);
-            transform: scale(1) translateY(100%);
-    -webkit-transition: -webkit-transform 0.3s;
-    transition: -webkit-transform 0.3s;
-    -o-transition: transform 0.3s;
-    transition: transform 0.3s, -webkit-transform 0.3s;
-    transition: transform 0.3s;
-    background: rgba(var(--foreground-color), 1);
+    background: rgba(var(--background-color, (255,255,255)), 1);
     -webkit-box-shadow: 0 -1rem 2rem #00000020;
             box-shadow: 0 -1rem 2rem #00000020;
-    max-height: 90vh;
-    content-visibility: auto;
 }
 .container-header{
     display: -webkit-box;
@@ -1923,26 +1651,22 @@ smPopup.innerHTML = `
         -ms-flex: 1;
             flex: 1;
     width: 100%;
-    padding: var(--body-padding);
+    padding: var(--body-padding, 1.5rem);
     overflow-y: auto;
 }
 .hide{
-    opacity: 0;
-    pointer-events: none;
-    visiblity: none;
+    display:none;
 }
 @media screen and (min-width: 640px){
     :host{
-        --border-radius: 0.4rem;
+        --border-radius: 0.5rem;
     }
     .popup{
         -ms-flex-item-align: center;
             -ms-grid-row-align: center;
             align-self: center;
         border-radius: var(--border-radius);
-        height: auto;
-        -webkit-transform: scale(1) translateY(3rem);
-                transform: scale(1) translateY(3rem);
+        height: var(--height);
         -webkit-box-shadow: 0 3rem 2rem -0.5rem #00000040;
                 box-shadow: 0 3rem 2rem -0.5rem #00000040;
     }
@@ -1958,13 +1682,27 @@ smPopup.innerHTML = `
     .handle{
         height: 0.3rem;
         width: 2rem;
-        background: rgba(var(--text-color), .4);
+        background: rgba(var(--text-color, (17,17,17)), .4);
         border-radius: 1rem;
         margin: 0.5rem 0;
     }
 }
+@media (any-hover: hover){
+    ::-webkit-scrollbar{
+        width: 0.5rem;
+    }
+    
+    ::-webkit-scrollbar-thumb{
+        background: rgba(var(--text-color, (17,17,17)), 0.3);
+        border-radius: 1rem;
+        &:hover{
+            background: rgba(var(--text-color, (17,17,17))), 0.5);
+        }
+    }
+}
 </style>
-<div part="background" class="popup-container hide" role="dialog">
+<div class="popup-container hide" role="dialog">
+    <div part="background" class="background"></div>
     <div part="popup" class="popup">
         <div part="popup-header" class="popup-top">
             <div class="handle"></div>
@@ -1978,831 +1716,676 @@ smPopup.innerHTML = `
 `;
 customElements.define('sm-popup', class extends HTMLElement {
     constructor() {
-        super()
+        super();
         this.attachShadow({
             mode: 'open'
-        }).append(smPopup.content.cloneNode(true))
+        }).append(smPopup.content.cloneNode(true));
 
-        this.allowClosing = false
+        this.allowClosing = false;
+        this.isOpen = false;
+        this.pinned = false;
+        this.offset = 0;
+        this.touchStartY = 0;
+        this.touchEndY = 0;
+        this.touchStartTime = 0;
+        this.touchEndTime = 0;
+        this.touchEndAnimation = undefined;
+        this.focusable
+        this.autoFocus
+        this.mutationObserver
+
+        this.popupContainer = this.shadowRoot.querySelector('.popup-container');
+        this.backdrop = this.shadowRoot.querySelector('.background');
+        this.dialogBox = this.shadowRoot.querySelector('.popup');
+        this.popupBodySlot = this.shadowRoot.querySelector('.popup-body slot');
+        this.popupHeader = this.shadowRoot.querySelector('.popup-top');
+
+        this.resumeScrolling = this.resumeScrolling.bind(this);
+        this.setStateOpen = this.setStateOpen.bind(this);
+        this.show = this.show.bind(this);
+        this.hide = this.hide.bind(this);
+        this.handleTouchStart = this.handleTouchStart.bind(this);
+        this.handleTouchMove = this.handleTouchMove.bind(this);
+        this.handleTouchEnd = this.handleTouchEnd.bind(this);
+        this.detectFocus = this.detectFocus.bind(this);
     }
 
-    resumeScrolling = () => {
+    static get observedAttributes() {
+        return ['open'];
+    }
+
+    get open() {
+        return this.isOpen;
+    }
+
+    animateTo(element, keyframes, options) {
+        const anime = element.animate(keyframes, { ...options, fill: 'both' })
+        anime.finished.then(() => {
+            anime.commitStyles()
+            anime.cancel()
+        })
+        return anime
+    }
+
+    resumeScrolling() {
         const scrollY = document.body.style.top;
         window.scrollTo(0, parseInt(scrollY || '0') * -1);
-        setTimeout(() => {
-            document.body.style.overflow = 'auto';
-            document.body.style.top= 'initial'
-        }, 300);
+        document.body.style.overflow = '';
+        document.body.style.top = 'initial';
     }
 
-    show = (pinned, popupStack) => {
-        if (popupStack)
-            this.popupStack = popupStack
-        if (this.popupStack && !this.hasAttribute('open')) {
-            this.popupStack.push({
+    setStateOpen() {
+        if (!this.isOpen || this.offset) {
+            const animOptions = {
+                duration: 300,
+                easing: 'ease'
+            }
+            const initialAnimation = (window.innerWidth > 640) ? 'scale(1.1)' : `translateY(${this.offset ? `${this.offset}px` : '100%'})`
+            this.animateTo(this.dialogBox, [
+                {
+                    opacity: this.offset ? 1 : 0,
+                    transform: initialAnimation
+                },
+                {
+                    opacity: 1,
+                    transform: 'none'
+                },
+            ], animOptions)
+
+        }
+    }
+
+    show(options = {}) {
+        const { pinned = false } = options;
+        if (!this.isOpen) {
+            const animOptions = {
+                duration: 300,
+                easing: 'ease'
+            }
+            popupStack.push({
                 popup: this,
                 permission: pinned
-            })
-            if (this.popupStack.items.length > 1) {
-                this.popupStack.items[this.popupStack.items.length - 2].popup.classList.add('stacked')
+            });
+            if (popupStack.items.length > 1) {
+                this.animateTo(popupStack.items[popupStack.items.length - 2].popup.shadowRoot.querySelector('.popup'), [
+                    { transform: 'none' },
+                    { transform: (window.innerWidth > 640) ? 'scale(0.95)' : 'translateY(-1.5rem)' },
+                ], animOptions)
             }
+            this.popupContainer.classList.remove('hide');
+            if (!this.offset)
+                this.backdrop.animate([
+                    { opacity: 0 },
+                    { opacity: 1 },
+                ], animOptions)
+            this.setStateOpen()
             this.dispatchEvent(
                 new CustomEvent("popupopened", {
                     bubbles: true,
                     detail: {
                         popup: this,
-                        popupStack: this.popupStack
                     }
                 })
-            )
-            this.setAttribute('open', '')
-            this.pinned = pinned
+            );
+            this.pinned = pinned;
+            this.isOpen = true;
+            document.body.style.overflow = 'hidden';
+            document.body.style.top = `-${window.scrollY}px`;
+            const elementToFocus = this.autoFocus || this.focusable[0];
+            elementToFocus.tagName.includes('SM-') ? elementToFocus.focusIn() : elementToFocus.focus();
+            if (!this.hasAttribute('open'))
+                this.setAttribute('open', '');
         }
-        this.popupContainer.classList.remove('hide')
-        this.popup.style.transform = 'none';
-        document.body.style.overflow = 'hidden';
-        document.body.style.top= `-${window.scrollY}px`
-        return this.popupStack
     }
-    hide = () => {
-        if (window.innerWidth < 640)
-            this.popup.style.transform = 'translateY(100%)';
-        else
-            this.popup.style.transform = 'translateY(3rem)';
-        this.popupContainer.classList.add('hide')
-        this.removeAttribute('open')
-        if (typeof this.popupStack !== 'undefined') {
-            this.popupStack.pop()
-            if (this.popupStack.items.length) {
-                this.popupStack.items[this.popupStack.items.length - 1].popup.classList.remove('stacked')
-            } else {
-                this.resumeScrolling()
-            }
+    hide() {
+        const animOptions = {
+            duration: 150,
+            easing: 'ease'
+        }
+        this.backdrop.animate([
+            { opacity: 1 },
+            { opacity: 0 }
+        ], animOptions)
+        this.animateTo(this.dialogBox, [
+            {
+                opacity: 1,
+                transform: (window.innerWidth > 640) ? 'none' : `translateY(${this.offset ? `${this.offset}px` : '0'})`
+            },
+            {
+                opacity: 0,
+                transform: (window.innerWidth > 640) ? 'scale(1.1)' : 'translateY(100%)'
+            },
+        ], animOptions).finished
+            .finally(() => {
+                this.popupContainer.classList.add('hide');
+                this.dialogBox.style = ''
+                this.removeAttribute('open');
+
+                if (this.forms.length) {
+                    this.forms.forEach(form => form.reset());
+                }
+                this.dispatchEvent(
+                    new CustomEvent("popupclosed", {
+                        bubbles: true,
+                        detail: {
+                            popup: this,
+                        }
+                    })
+                );
+                this.isOpen = false;
+            })
+        popupStack.pop();
+        if (popupStack.items.length) {
+            this.animateTo(popupStack.items[popupStack.items.length - 1].popup.shadowRoot.querySelector('.popup'), [
+                { transform: (window.innerWidth > 640) ? 'scale(0.95)' : 'translateY(-1.5rem)' },
+                { transform: 'none' },
+            ], animOptions)
+
         } else {
-            this.resumeScrolling()
+            this.resumeScrolling();
         }
-
-        if (this.inputFields.length) {
-            setTimeout(() => {
-                this.inputFields.forEach(field => {
-                    if (field.type === 'radio' || field.tagName === 'SM-CHECKBOX')
-                        field.checked = false
-                    if (field.tagName === 'SM-INPUT' || field.tagName === 'TEXTAREA'|| field.tagName === 'SM-TEXTAREA')
-                        field.value = ''
-                })
-            }, 300);
-        }
-        setTimeout(() => {            
-            this.dispatchEvent(
-                new CustomEvent("popupclosed", {
-                    bubbles: true,
-                    detail: {
-                        popup: this,
-                        popupStack: this.popupStack
-                    }
-                })
-            )
-        }, 300);
     }
 
-    handleTouchStart = (e) => {
-        this.touchStartY = e.changedTouches[0].clientY
-        this.popup.style.transition = 'transform 0.1s'
-        this.touchStartTime = e.timeStamp
+    handleTouchStart(e) {
+        this.offset = 0
+        this.popupHeader.addEventListener('touchmove', this.handleTouchMove, { passive: true });
+        this.popupHeader.addEventListener('touchend', this.handleTouchEnd, { passive: true });
+        this.touchStartY = e.changedTouches[0].clientY;
+        this.touchStartTime = e.timeStamp;
     }
 
-    handleTouchMove = (e) => {
+    handleTouchMove(e) {
         if (this.touchStartY < e.changedTouches[0].clientY) {
             this.offset = e.changedTouches[0].clientY - this.touchStartY;
-            this.touchEndAnimataion = window.requestAnimationFrame(() => this.movePopup())
+            this.touchEndAnimation = window.requestAnimationFrame(() => {
+                this.dialogBox.style.transform = `translateY(${this.offset}px)`;
+            });
         }
-        /*else {
-            this.offset = this.touchStartY - e.changedTouches[0].clientY;
-            this.popup.style.transform = `translateY(-${this.offset}px)`
-        }*/
     }
 
-    handleTouchEnd = (e) => {
-        this.touchEndTime = e.timeStamp
-        cancelAnimationFrame(this.touchEndAnimataion)
-        this.touchEndY = e.changedTouches[0].clientY
-        this.popup.style.transition = 'transform 0.3s'
-        this.threshold = this.popup.getBoundingClientRect().height * 0.3
+    handleTouchEnd(e) {
+        this.touchEndTime = e.timeStamp;
+        cancelAnimationFrame(this.touchEndAnimation);
+        this.touchEndY = e.changedTouches[0].clientY;
+        this.threshold = this.dialogBox.getBoundingClientRect().height * 0.3;
         if (this.touchEndTime - this.touchStartTime > 200) {
             if (this.touchEndY - this.touchStartY > this.threshold) {
                 if (this.pinned) {
-                    this.show()
-                    return
+                    this.setStateOpen();
+                    return;
                 } else
-                    this.hide()
+                    this.hide();
             } else {
-                this.show()
+                this.setStateOpen();
             }
         } else {
             if (this.touchEndY > this.touchStartY)
                 if (this.pinned) {
-                    this.show()
-                    return
+                    this.setStateOpen();
+                    return;
                 }
-            else
-                this.hide()
+                else
+                    this.hide();
+        }
+        this.popupHeader.removeEventListener('touchmove', this.handleTouchMove, { passive: true });
+        this.popupHeader.removeEventListener('touchend', this.handleTouchEnd, { passive: true });
+    }
+
+
+    detectFocus(e) {
+        if (e.key === 'Tab') {
+            const lastElement = this.focusable[this.focusable.length - 1];
+            const firstElement = this.focusable[0];
+            if (e.shiftKey && document.activeElement === firstElement) {
+                e.preventDefault();
+                lastElement.tagName.includes('SM-') ? lastElement.focusIn() : lastElement.focus();
+            } else if (!e.shiftKey && document.activeElement === lastElement) {
+                e.preventDefault();
+                firstElement.tagName.includes('SM-') ? firstElement.focusIn() : firstElement.focus();
+            }
         }
     }
 
-    movePopup = () => {
-        this.popup.style.transform = `translateY(${this.offset}px)`
+    updateFocusableList() {
+        this.focusable = this.querySelectorAll('sm-button:not([disabled]), button:not([disabled]), [href], sm-input, input:not([readonly]), sm-select, select, sm-checkbox, sm-textarea, textarea, [tabindex]:not([tabindex="-1"])')
+        this.autoFocus = this.querySelector('[autofocus]')
     }
 
     connectedCallback() {
-        this.pinned = false
-        this.popupStack
-        this.popupContainer = this.shadowRoot.querySelector('.popup-container')
-        this.popup = this.shadowRoot.querySelector('.popup')
-        this.popupBodySlot = this.shadowRoot.querySelector('.popup-body slot')
-        this.offset
-        this.popupHeader = this.shadowRoot.querySelector('.popup-top')
-        this.touchStartY = 0
-        this.touchEndY = 0
-        this.touchStartTime = 0
-        this.touchEndTime = 0
-        this.touchEndAnimataion;
-        this.threshold = this.popup.getBoundingClientRect().height * 0.3
-
-        if (this.hasAttribute('open'))
-            this.show()
+        this.popupBodySlot.addEventListener('slotchange', () => {
+            this.forms = this.querySelectorAll('sm-form');
+            this.updateFocusableList()
+        });
         this.popupContainer.addEventListener('mousedown', e => {
             if (e.target === this.popupContainer && !this.pinned) {
                 if (this.pinned) {
-                    this.show()
-                    return
+                    this.setStateOpen();
                 } else
-                    this.hide()
+                    this.hide();
             }
-        })
+        });
 
-        this.popupBodySlot.addEventListener('slotchange', () => {
-            setTimeout(() => {
-                this.threshold = this.popup.getBoundingClientRect().height * 0.3
-            }, 200);
-            this.inputFields = this.querySelectorAll('sm-input', 'sm-checkbox', 'textarea', 'sm-textarea', 'radio')
-        })
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                if (entry.contentBoxSize) {
+                    // Firefox implements `contentBoxSize` as a single content rect, rather than an array
+                    const contentBoxSize = Array.isArray(entry.contentBoxSize) ? entry.contentBoxSize[0] : entry.contentBoxSize;
+                    this.threshold = contentBoxSize.blockSize.height * 0.3;
+                } else {
+                    this.threshold = entry.contentRect.height * 0.3;
+                }
+            }
+        });
+        resizeObserver.observe(this);
 
-        this.popupHeader.addEventListener('touchstart', (e) => { this.handleTouchStart(e) }, {passive: true})
-        this.popupHeader.addEventListener('touchmove', (e) => {this.handleTouchMove(e)}, {passive: true})
-        this.popupHeader.addEventListener('touchend', (e) => {this.handleTouchEnd(e)}, {passive: true})
+        this.mutationObserver = new MutationObserver(entries => {
+            this.updateFocusableList()
+        })
+        this.mutationObserver.observe(this, { attributes: true, childList: true, subtree: true })
+
+        this.addEventListener('keydown', this.detectFocus);
+        this.popupHeader.addEventListener('touchstart', this.handleTouchStart, { passive: true });
     }
     disconnectedCallback() {
-        this.popupHeader.removeEventListener('touchstart', this.handleTouchStart, {passive: true})
-        this.popupHeader.removeEventListener('touchmove', this.handleTouchMove, {passive: true})
-        this.popupHeader.removeEventListener('touchend', this.handleTouchEnd, {passive: true})
+        this.removeEventListener('keydown', this.detectFocus);
+        resizeObserver.unobserve();
+        this.mutationObserver.disconnect()
+        this.popupHeader.removeEventListener('touchstart', this.handleTouchStart, { passive: true });
     }
-})
-
-//carousel
-
-const smCarousel = document.createElement('template')
-smCarousel.innerHTML = `
-<style>
-*{
-    padding: 0;
-    margin: 0;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-} 
-:host{
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-}
-.icon {
-    position: absolute;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    fill: none;
-    height: 2.6rem;
-    width: 2.6rem;
-    border-radius: 3rem;
-    padding: 0.9rem;
-    stroke: rgba(var(--foreground-color), 0.8);
-    stroke-width: 14;
-    overflow: visible;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    cursor: pointer;
-    min-width: 0;
-    background: rgba(var(--text-color), 1);
-    -webkit-box-shadow: 0 0.2rem 0.2rem #00000020, 
-                0 0.5rem 1rem #00000040;
-            box-shadow: 0 0.2rem 0.2rem #00000020, 
-                0 0.5rem 1rem #00000040; 
-    -webkit-tap-highlight-color: transparent;
-    -webkit-transform: scale(0);
-        -ms-transform: scale(0);
-            transform: scale(0);
-    z-index: 1;
-}
-.hide{
-    pointer-events: none;
-    opacity: 0;
-}
-.expand{
-    -webkit-transform: scale(1);
-        -ms-transform: scale(1);
-            transform: scale(1)
-}
-.previous-item{
-    left: 1rem;
-}
-.next-item{
-    right: 1rem;
-}
-.carousel-container{
-    position: relative;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    width: 100%;
-    -webkit-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
-}
-.carousel{
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    max-width: 100%;
-    width: 100%;
-    overflow: auto hidden;
-    -ms-scroll-snap-type: x mandatory;
-        scroll-snap-type: x mandatory;
-}
-.indicators{
-    display: -ms-grid;
-    display: grid;
-    grid-auto-flow: column;
-    -webkit-box-pack: center;
-        -ms-flex-pack: center;
-            justify-content: center;
-    position: absolute;
-    bottom: -1rem;
-    gap: 0.5rem;
-    width: 100%;
-}
-.dot{
-    position: relative;
-    padding: 0.2rem;
-    background: rgba(var(--text-color), 0.3);
-    border-radius: 1rem;
-    -webkit-transition: 0.2s;
-    -o-transition: 0.2s;
-    transition: 0.2s;
-}
-.dot.active{
-    -webkit-transform: scale(1.5);
-        -ms-transform: scale(1.5);
-            transform: scale(1.5);
-    background: var(--accent-color);
-}
-slot::slotted(*){
-    scroll-snap-align: center;
-}
-:host([align-items="start"]) slot::slotted(*){
-    scroll-snap-align: start;
-}
-:host([align-items="center"]) slot::slotted(*){
-    scroll-snap-align: center;
-}
-:host([align-items="end"]) slot::slotted(*){
-scroll-snap-align: end;
-}
-@media (hover: hover){
-.carousel{
-    overflow: hidden;
-}
-.left,.right{
-    display: none;
-}
-}
-@media (hover: none){
-::-webkit-scrollbar-track {
-    -webkit-box-shadow: none !important;
-    background-color: transparent !important;
-}
-::-webkit-scrollbar {
-    height: 0;
-    background-color: transparent;
-}
-.carousel{
-    overflow: auto none;
-}
-.icon{
-    display: none;
-}
-.left,.right{
-    display: block;
-}
-}
-</style>
-<div class="carousel-container">
-    <svg class="icon previous-item" viewBox="4 0 64 64">
-        <title>Previous</title>
-        <polyline points="48.01 0.35 16.35 32 48.01 63.65"/>
-    </svg>
-    <div part="carousel" class="carousel">
-        <slot></slot>
-    </div>
-    <svg class="icon next-item" viewBox="-6 0 64 64">
-        <title>Next</title>
-        <polyline points="15.99 0.35 47.65 32 15.99 63.65"/>
-    </svg>
-    <div class="indicators"></div>
-</div>
-`;
-
-customElements.define('sm-carousel', class extends HTMLElement {
-    constructor() {
-        super()
-        this.attachShadow({
-            mode: 'open'
-        }).append(smCarousel.content.cloneNode(true))
-    }
-
-    static get observedAttributes() {
-        return ['indicator']
-    }
-
-    scrollLeft = () => {
-        this.carousel.scrollBy({
-            top: 0,
-            left: -this.scrollDistance,
-            behavior: 'smooth'
-        })
-    }
-
-    scrollRight = () => {
-        this.carousel.scrollBy({
-            top: 0,
-            left: this.scrollDistance,
-            behavior: 'smooth'
-        })
-    }
-
-    connectedCallback() {
-        this.carousel = this.shadowRoot.querySelector('.carousel')
-        this.carouselContainer = this.shadowRoot.querySelector('.carousel-container')
-        this.carouselSlot = this.shadowRoot.querySelector('slot')
-        this.nextArrow = this.shadowRoot.querySelector('.next-item')
-        this.previousArrow = this.shadowRoot.querySelector('.previous-item')
-        this.indicatorsContainer = this.shadowRoot.querySelector('.indicators')
-        this.carouselItems
-        this.indicators
-        this.showIndicator = false
-        this.scrollDistance = this.carouselContainer.getBoundingClientRect().width / 3
-        let frag = document.createDocumentFragment();
-        if (this.hasAttribute('indicator'))
-            this.showIndicator = true
-
-
-        let firstVisible = false,
-            lastVisible = false
-        const allElementsObserver = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (this.showIndicator)
-                    if (entry.isIntersecting) {
-                        this.indicators[parseInt(entry.target.attributes.rank.textContent)].classList.add('active')
-                    }
-                else
-                    this.indicators[parseInt(entry.target.attributes.rank.textContent)].classList.remove('active')
-                if (!entry.target.previousElementSibling)
-                    if (entry.isIntersecting) {
-                        this.previousArrow.classList.remove('expand')
-                        firstVisible = true
-                    }
-                else {
-                    this.previousArrow.classList.add('expand')
-                    firstVisible = false
-                }
-                if (!entry.target.nextElementSibling)
-                    if (entry.isIntersecting) {
-                        this.nextArrow.classList.remove('expand')
-                        lastVisible = true
-                    }
-                else {
-                    this.nextArrow.classList.add('expand')
-
-                    lastVisible = false
-                }
-                if (firstVisible && lastVisible)
-                    this.indicatorsContainer.classList.add('hide')
-                else
-                    this.indicatorsContainer.classList.remove('hide')
-            })
-        }, {
-            root: this.carouselContainer,
-            threshold: 0.9
-        })
-
-        const carouselObserver = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting) {
-                this.scrollDistance = this.carouselContainer.getBoundingClientRect().width / 3
+    attributeChangedCallback(name) {
+        if (name === 'open') {
+            if (this.hasAttribute('open')) {
+                this.show();
             }
-        })
-
-        carouselObserver.observe(this.carouselContainer)
-
-        this.carouselSlot.addEventListener('slotchange', e => {
-            this.carouselItems = this.carouselSlot.assignedElements()
-            this.carouselItems.forEach(item => allElementsObserver.observe(item))
-            if (this.showIndicator) {
-                this.indicatorsContainer.innerHTML = ``
-                this.carouselItems.forEach((item, index) => {
-                    let dot = document.createElement('div')
-                    dot.classList.add('dot')
-                    frag.append(dot)
-                    item.setAttribute('rank', index)
-                })
-                this.indicatorsContainer.append(frag)
-                this.indicators = this.indicatorsContainer.children
-            }
-        })
-
-        this.addEventListener('keyup', e => {
-            if (e.code === 'ArrowLeft')
-                this.scrollRight()
-            else
-                this.scrollRight()
-        })
-
-        this.nextArrow.addEventListener('click', this.scrollRight)
-        this.previousArrow.addEventListener('click', this.scrollLeft)
-    }
-
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (name === 'indicator') {
-            if (this.hasAttribute('indicator'))
-                this.showIndicator = true
-            else
-                this.showIndicator = false
         }
     }
-
-    disconnectedCallback() {
-        this.nextArrow.removeEventListener('click', this.scrollRight)
-        this.previousArrow.removeEventListener('click', this.scrollLeft)
-    }
-})
+});
 
 //notifications
 
 const smNotifications = document.createElement('template')
 smNotifications.innerHTML = `
-<style>
-    *{
-        padding: 0;
-        margin: 0;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-    } 
-    :host{
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-    }
-    .hide{
-        opacity: 0 !important;
-        pointer-events: none !important;
-    }
-    .notification-panel{
-        display: -ms-grid;
-        display: grid;
-        width: 100%;
-        position: fixed;
-        top: 0;
-        right: 0;
-        z-index: 100;
-        max-height: 100%;
-        overflow: hidden auto;
-        -ms-scroll-chaining: none;
-            overscroll-behavior: contain;
-        }
-        .no-transformations{
-        -webkit-transform: none;
-            -ms-transform: none;
-                transform: none;
-        opacity: 1;
-    }
-    .notification{
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        opacity: 0;
-        padding: 1rem 1.5rem;
-        margin-bottom: 0.5rem;
-        -webkit-transform: translateY(-1rem);
-            -ms-transform: translateY(-1rem);
-                transform: translateY(-1rem);
-        position: relative;
-        border-radius: 0.3rem;
-        -webkit-box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.1),
-                    0.5rem 1rem 2rem rgba(0, 0, 0, 0.1);
-                box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.1),
-                    0.5rem 1rem 2rem rgba(0, 0, 0, 0.1);
-        background: rgba(var(--foreground-color), 1);
-        -webkit-transition: height 0.3s, opacity 0.3s, -webkit-transform 0.3s;
-        transition: height 0.3s, opacity 0.3s, -webkit-transform 0.3s;
-        -o-transition: height 0.3s, transform 0.3s, opacity 0.3s;
-        transition: height 0.3s, transform 0.3s, opacity 0.3s;
-        transition: height 0.3s, transform 0.3s, opacity 0.3s, -webkit-transform 0.3s;
-        overflow: hidden;
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-        -ms-word-break: break-all;
-        word-break: break-all;
-        word-break: break-word;
-        -ms-hyphens: auto;
-        -webkit-hyphens: auto;
-        hyphens: auto;
-        max-width: 100%;
-        touch-action: none;
-    }
-    h4:first-letter,
-    p:first-letter{
-        text-transform: uppercase;
-    }
-    h4{
-        font-weight: 400;
-    }
-    p{
-        line-height: 1.6;
-        -webkit-box-flex: 1;
-            -ms-flex: 1;
-                flex: 1;
-        color: rgba(var(--text-color), 0.9);
-        overflow-wrap: break-word;
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-        -ms-word-break: break-all;
-        word-break: break-all;
-        word-break: break-word;
-        -ms-hyphens: auto;
-        -webkit-hyphens: auto;
-        hyphens: auto;
-        max-width: 100%;
-    }
-    .notification:last-of-type{
-        margin-bottom: 0;
-    }
-    .icon {
-        fill: none;
-        height: 1.6rem;
-        width: 1.6rem;
-        stroke: rgba(var(--text-color), 0.7);
-        overflow: visible;
-        stroke-linecap: round;
-        border-radius: 1rem;
-        stroke-linejoin: round;
-        cursor: pointer;
-    }
-    .error-icon{
-        stroke: #E53935;
-    }
-    .success-icon{
-        stroke: #00C853;
-    }
-    .close{
-        margin-left: 1rem;
-        padding: 0.5rem;
-        stroke-width: 10;
-    }
-    .notification-icon{
-        height: 1.4rem;
-        width: 1.4rem;
-        margin: 0.3em 1rem 0 0;
-        stroke-width: 6;
-    }
-    @media screen and (min-width: 640px){
-        .notification-panel{
-            max-width: 28rem;
-            width: max-content;
-            -webkit-box-pack: end;
-                -ms-flex-pack: end;
-            justify-content: flex-end;
-        }
-        .notification{
-            -ms-grid-column-align: end;
-                justify-self: end;
-            width: auto;
-            margin-right: 1.5rem;
-            margin-bottom: 1rem;
-            border-bottom: none;
-            border: solid 1px rgba(var(--text-color), 0.2);
-            -webkit-transform: translateX(1rem);
-                -ms-transform: translateX(1rem);
-                    transform: translateX(1rem);
-        }
-    }
-    @media screen and (any-hover: none){
-        .close{
-            display: none
-        }
-    }
-</style>
-<div class="notification-panel">
-</div>
-`
-
+        <style>
+            *{
+                padding: 0;
+                margin: 0;
+                -webkit-box-sizing: border-box;
+                        box-sizing: border-box;
+            } 
+            :host{
+                display: flex;
+                --icon-height: 1.5rem;
+                --icon-width: 1.5rem;
+            }
+            .hide{
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+            .notification-panel{
+                display: grid;
+                width: 100%;
+                gap: 0.5rem;
+                position: fixed;
+                left: 0;
+                top: 0;
+                z-index: 100;
+                max-height: 100%;
+                padding: 1rem;
+                overflow: hidden auto;
+                -ms-scroll-chaining: none;
+                    overscroll-behavior: contain;
+                touch-action: none;
+            }
+            .notification-panel:empty{
+                display:none;
+            }
+            .notification{
+                display: -webkit-box;
+                display: -ms-flexbox;
+                display: flex;
+                position: relative;
+                border-radius: 0.3rem;
+                background: rgba(var(--foreground-color, (255,255,255)), 1);
+                overflow: hidden;
+                overflow-wrap: break-word;
+                word-wrap: break-word;
+                -ms-word-break: break-all;
+                word-break: break-all;
+                word-break: break-word;
+                -ms-hyphens: auto;
+                -webkit-hyphens: auto;
+                hyphens: auto;
+                max-width: 100%;
+                padding: 1rem;
+                align-items: center;
+                box-shadow: 0 0.5rem 1rem 0 rgba(0,0,0,0.14);
+                touch-action: none;
+            }
+            .icon-container:not(:empty){
+                margin-right: 0.5rem;
+                height: var(--icon-height);
+                width: var(--icon-width);
+            }
+            h4:first-letter,
+            p:first-letter{
+                text-transform: uppercase;
+            }
+            h4{
+                font-weight: 400;
+            }
+            p{
+                line-height: 1.6;
+                -webkit-box-flex: 1;
+                    -ms-flex: 1;
+                        flex: 1;
+                color: rgba(var(--text-color, (17,17,17)), 0.9);
+                overflow-wrap: break-word;
+                overflow-wrap: break-word;
+                word-wrap: break-word;
+                -ms-word-break: break-all;
+                word-break: break-all;
+                word-break: break-word;
+                -ms-hyphens: auto;
+                -webkit-hyphens: auto;
+                hyphens: auto;
+                max-width: 100%;
+            }
+            .notification:last-of-type{
+                margin-bottom: 0;
+            }
+            .icon {
+                height: 100%;
+                width: 100%;
+                fill: rgba(var(--text-color, (17,17,17)), 0.7);
+            }
+            .icon--success {
+                fill: var(--green);
+              }
+              .icon--failure,
+              .icon--error {
+                fill: var(--danger-color);
+              }
+            .close{
+                height: 2rem;
+                width: 2rem;
+                border: none;
+                cursor: pointer;
+                margin-left: 1rem;
+                border-radius: 50%;
+                padding: 0.3rem;
+                transition: background-color 0.3s, transform 0.3s;
+                background-color: transparent;
+            }
+            .close:active{
+                transform: scale(0.9);
+            }
+            .action{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.5rem 0.8rem;
+                border-radius: 0.2rem;
+                border: none;
+                background-color: rgba(var(--text-color, (17,17,17)), 0.03);
+                font-family: inherit;
+                font-size: inherit;
+                color: var(--accent-color, teal);
+                font-weight: 500;
+                cursor: pointer;
+            }
+            @media screen and (max-width: 640px){
+                .notification-panel:not(:empty){
+                    padding-bottom: 3rem;
+                }
+            }
+            @media screen and (min-width: 640px){
+                .notification-panel{
+                    max-width: 28rem;
+                    width: max-content;
+                    top: auto;
+                    bottom: 0;
+                }
+                .notification{
+                    width: auto;
+                    border: solid 1px rgba(var(--text-color, (17,17,17)), 0.2);
+                }
+            }
+            @media (any-hover: hover){
+                ::-webkit-scrollbar{
+                    width: 0.5rem;
+                }
+                
+                ::-webkit-scrollbar-thumb{
+                    background: rgba(var(--text-color, (17,17,17)), 0.3);
+                    border-radius: 1rem;
+                    &:hover{
+                        background: rgba(var(--text-color, (17,17,17)), 0.5);
+                    }
+                }
+                .close:hover{
+                    background-color: rgba(var(--text-color, (17,17,17)), 0.1);
+                }
+            }
+        </style>
+        <div class="notification-panel"></div>
+        `;
 customElements.define('sm-notifications', class extends HTMLElement {
     constructor() {
-        super()
+        super();
         this.shadow = this.attachShadow({
             mode: 'open'
         }).append(smNotifications.content.cloneNode(true))
-    }
 
-    handleTouchStart = (e) => {
-        this.notification = e.target.closest('.notification')
-        this.touchStartX = e.changedTouches[0].clientX
-        this.notification.style.transition = 'initial'
-        this.touchStartTime = e.timeStamp
-    }
-
-    handleTouchMove = (e) => {
-        e.preventDefault()
-        if (this.touchStartX < e.changedTouches[0].clientX) {
-            this.offset = e.changedTouches[0].clientX - this.touchStartX;
-            this.touchEndAnimataion = requestAnimationFrame(this.movePopup)
-        } else {
-            this.offset = -(this.touchStartX - e.changedTouches[0].clientX);
-            this.touchEndAnimataion = requestAnimationFrame(this.movePopup)
-        }
-    }
-
-    handleTouchEnd = (e) => {
-        this.notification.style.transition = 'transform 0.3s, opacity 0.3s'
-        this.touchEndTime = e.timeStamp
-        cancelAnimationFrame(this.touchEndAnimataion)
-        this.touchEndX = e.changedTouches[0].clientX
-        if (this.touchEndTime - this.touchStartTime > 200) {
-            if (this.touchEndX - this.touchStartX > this.threshold) {
-                this.removeNotification(this.notification)
-            } else if (this.touchStartX - this.touchEndX > this.threshold) {
-                this.removeNotification(this.notification, true)
-            } else {
-                this.resetPosition()
-            }
-        } else {
-            if (this.touchEndX > this.touchStartX) {
-                this.removeNotification(this.notification)
-            } else {
-                this.removeNotification(this.notification, true)
-            }
-        }
-    }
-
-    movePopup = () => {
-        this.notification.style.transform = `translateX(${this.offset}px)`
-    }
-
-    resetPosition = () => {
-        this.notification.style.transform = `translateX(0)`
-    }
-
-    push = (messageBody, type, pinned) => {
-        let notification = document.createElement('div'),
-            composition = ``
-        notification.classList.add('notification')
-        if (pinned)
-            notification.classList.add('pinned')
-        if (type === 'error') {
-            composition += `
-    <svg class="notification-icon icon error-icon" viewBox="0 0 64 64">
-            <path d="M32,4.73a3.17,3.17,0,0,1,2.76,1.59l13.9,24.09L62.57,54.49a3.19,3.19,0,0,1-2.76,4.78H4.19a3.19,3.19,0,0,1-2.76-4.78L15.34,30.41,29.24,6.32A3.17,3.17,0,0,1,32,4.73m0-1a4.14,4.14,0,0,0-3.62,2.09L14.47,29.91.57,54a4.19,4.19,0,0,0,3.62,6.28H59.81A4.19,4.19,0,0,0,63.43,54L49.53,29.91,35.62,5.82A4.14,4.14,0,0,0,32,3.73Z"/>
-            <line x1="32" y1="24" x2="32" y2="36"/>
-            <line x1="32" y1="46" x2="32" y2="48"/>
-    </svg>`
-        } else if (type === 'success') {
-            composition += `
-        <svg class="notification-icon icon success-icon" viewBox="0 0 64 64">
-            <polyline points="0.35 31.82 21.45 52.98 63.65 10.66"/>
-        </svg>`
-        }
-        composition += `
-                    <p>${messageBody}</p>
-                    <svg class="icon close" viewBox="0 0 64 64">
-                        <title>Close</title>
-                        <line x1="64" y1="0" x2="0" y2="64"/>
-                        <line x1="64" y1="64" x2="0" y2="0"/>
-                    </svg>`
-        notification.innerHTML = composition
-        this.notificationPanel.prepend(notification)
-        if (window.innerWidth > 640) {
-            notification.animate([{
-                    transform: `translateX(1rem)`,
-                    opacity: '0'
-                },
-                {
-                    transform: 'translateX(0)',
-                    opacity: '1'
-                }
-            ], this.animationOptions).onfinish = () => {
-                notification.setAttribute('style', `transform: none;`);
-            }
-        } else {
-            notification.setAttribute('style', `transform: translateY(0); opacity: 1`)
-        }
-        notification.addEventListener('touchstart', this.handleTouchStart)
-        notification.addEventListener('touchmove', this.handleTouchMove)
-        notification.addEventListener('touchend', this.handleTouchEnd)
-    }
-
-    removeNotification = (notification, toLeft) => {
-        if (!this.offset)
-            this.offset = 0;
-
-        if (toLeft)
-            notification.animate([{
-                    transform: `translateX(${this.offset}px)`,
-                    opacity: '1'
-                },
-                {
-                    transform: `translateX(-100%)`,
-                    opacity: '0'
-                }
-            ], this.animationOptions).onfinish = () => {
-                notification.remove()
-            }
-        else {
-            notification.animate([{
-                    transform: `translateX(${this.offset}px)`,
-                    opacity: '1'
-                },
-                {
-                    transform: `translateX(100%)`,
-                    opacity: '0'
-                }
-            ], this.animationOptions).onfinish = () => {
-                notification.remove()
-            }
-        }
-    }
-
-    clearAll = () => {
-        Array.from(this.notificationPanel.children).forEach(child => {
-            this.removeNotification(child)
-        })
-    }
-
-    connectedCallback() {
         this.notificationPanel = this.shadowRoot.querySelector('.notification-panel')
         this.animationOptions = {
             duration: 300,
             fill: "forwards",
-            easing: "ease"
+            easing: "cubic-bezier(0.175, 0.885, 0.32, 1.275)"
         }
-        this.fontSize = Number(window.getComputedStyle(document.body).getPropertyValue('font-size').match(/\d+/)[0])
-        this.notification
-        this.offset
-        this.touchStartX = 0
-        this.touchEndX = 0
-        this.touchStartTime = 0
-        this.touchEndTime = 0
-        this.threshold = this.notificationPanel.getBoundingClientRect().width * 0.3
-        this.touchEndAnimataion;
 
+        this.push = this.push.bind(this)
+        this.createNotification = this.createNotification.bind(this)
+        this.removeNotification = this.removeNotification.bind(this)
+        this.clearAll = this.clearAll.bind(this)
+        this.handlePointerMove = this.handlePointerMove.bind(this)
+
+
+        this.startX = 0;
+        this.currentX = 0;
+        this.endX = 0;
+        this.swipeDistance = 0;
+        this.swipeDirection = '';
+        this.swipeThreshold = 0;
+        this.startTime = 0;
+        this.swipeTime = 0;
+        this.swipeTimeThreshold = 200;
+        this.currentTarget = null;
+
+        this.mediaQuery = window.matchMedia('(min-width: 640px)')
+        this.handleOrientationChange = this.handleOrientationChange.bind(this)
+        this.isLandscape = false
+    }
+
+    randString(length) {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        for (let i = 0; i < length; i++)
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+        return result;
+    }
+
+    createNotification(message, options = {}) {
+        const { pinned = false, icon = '', action } = options;
+        const notification = document.createElement('output')
+        notification.id = this.randString(8)
+        notification.classList.add('notification');
+        let composition = ``;
+        composition += `
+                    <div class="icon-container">${icon}</div>
+                    <p>${message}</p>
+                    `;
+        if (action) {
+            composition += `
+                            <button class="action">${action.label}</button>
+                        `
+        }
+        if (pinned) {
+            notification.classList.add('pinned');
+            composition += `
+                        <button class="close">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></svg>
+                        </button>
+                    `;
+        }
+        notification.innerHTML = composition;
+        return notification;
+    }
+
+    push(message, options = {}) {
+        const notification = this.createNotification(message, options);
+        if (this.isLandscape)
+            this.notificationPanel.append(notification);
+        else
+            this.notificationPanel.prepend(notification);
+        this.notificationPanel.animate(
+            [
+                {
+                    transform: `translateY(${this.isLandscape ? '' : '-'}${notification.clientHeight}px)`,
+                },
+                {
+                    transform: `none`,
+                },
+            ], this.animationOptions
+        )
+        notification.animate([
+            {
+                transform: `translateY(-1rem)`,
+                opacity: '0'
+            },
+            {
+                transform: `none`,
+                opacity: '1'
+            },
+        ], this.animationOptions).onfinish = (e) => {
+            e.target.commitStyles()
+            e.target.cancel()
+        }
+        if (notification.querySelector('.action'))
+            notification.querySelector('.action').addEventListener('click', options.action.callback)
+        return notification.id;
+    }
+
+    removeNotification(notification, direction = 'left') {
+        const sign = direction === 'left' ? '-' : '+';
+        notification.animate([
+            {
+                transform: this.currentX ? `translateX(${this.currentX}px)` : `none`,
+                opacity: '1'
+            },
+            {
+                transform: `translateX(calc(${sign}${Math.abs(this.currentX)}px ${sign} 1rem))`,
+                opacity: '0'
+            }
+        ], this.animationOptions).onfinish = () => {
+            notification.remove();
+        };
+    }
+
+    clearAll() {
+        Array.from(this.notificationPanel.children).forEach(child => {
+            this.removeNotification(child);
+        });
+    }
+
+    handlePointerMove(e) {
+        this.currentX = e.clientX - this.startX;
+        this.currentTarget.style.transform = `translateX(${this.currentX}px)`;
+    }
+
+    handleOrientationChange(e) {
+        this.isLandscape = e.matches
+        if (e.matches) {
+            // landscape
+
+        } else {
+            // portrait
+        }
+    }
+    connectedCallback() {
+
+        this.handleOrientationChange(this.mediaQuery);
+
+        this.mediaQuery.addEventListener('change', this.handleOrientationChange);
+        this.notificationPanel.addEventListener('pointerdown', e => {
+            if (e.target.closest('.notification')) {
+                this.swipeThreshold = this.clientWidth / 2;
+                this.currentTarget = e.target.closest('.notification');
+                this.currentTarget.setPointerCapture(e.pointerId);
+                this.startTime = Date.now();
+                this.startX = e.clientX;
+                this.startY = e.clientY;
+                this.notificationPanel.addEventListener('pointermove', this.handlePointerMove);
+            }
+        });
+        this.notificationPanel.addEventListener('pointerup', e => {
+            this.endX = e.clientX;
+            this.endY = e.clientY;
+            this.swipeDistance = Math.abs(this.endX - this.startX);
+            this.swipeTime = Date.now() - this.startTime;
+            if (this.endX > this.startX) {
+                this.swipeDirection = 'right';
+            } else {
+                this.swipeDirection = 'left';
+            }
+            if (this.swipeTime < this.swipeTimeThreshold) {
+                if (this.swipeDistance > 50)
+                    this.removeNotification(this.currentTarget, this.swipeDirection);
+            } else {
+                if (this.swipeDistance > this.swipeThreshold) {
+                    this.removeNotification(this.currentTarget, this.swipeDirection);
+                } else {
+                    this.currentTarget.animate([
+                        {
+                            transform: `translateX(${this.currentX}px)`,
+                        },
+                        {
+                            transform: `none`,
+                        },
+                    ], this.animationOptions).onfinish = (e) => {
+                        e.target.commitStyles()
+                        e.target.cancel()
+                    }
+                }
+            }
+            this.notificationPanel.removeEventListener('pointermove', this.handlePointerMove)
+            this.notificationPanel.releasePointerCapture(e.pointerId);
+            this.currentX = 0;
+        });
         this.notificationPanel.addEventListener('click', e => {
-            if (e.target.closest('.close'))(
-                this.removeNotification(e.target.closest('.notification'))
-            )
-        })
+            if (e.target.closest('.close')) {
+                this.removeNotification(e.target.closest('.notification'));
+            }
+        });
 
         const observer = new MutationObserver(mutationList => {
             mutationList.forEach(mutation => {
                 if (mutation.type === 'childList') {
-                    if (mutation.addedNodes.length) {
-                        if (!mutation.addedNodes[0].classList.contains('pinned'))
-                            setTimeout(() => {
-                                this.removeNotification(mutation.addedNodes[0])
-                            }, 5000);
-                        if (window.innerWidth > 640)
-                            this.notificationPanel.style.padding = '1.5rem 0 3rem 1.5rem';
-                        else
-                            this.notificationPanel.style.padding = '1rem 1rem 2rem 1rem';
-                    } else if (mutation.removedNodes.length && !this.notificationPanel.children.length) {
-                        this.notificationPanel.style.padding = 0;
+                    if (mutation.addedNodes.length && !mutation.addedNodes[0].classList.contains('pinned')) {
+                        setTimeout(() => {
+                            this.removeNotification(mutation.addedNodes[0]);
+                        }, 5000);
                     }
                 }
-            })
-        })
+            });
+        });
         observer.observe(this.notificationPanel, {
-            attributes: true,
             childList: true,
-            subtree: true
-        })
+        });
     }
-})
-
-
+    disconnectedCallback() {
+        mediaQueryList.removeEventListener('change', handleOrientationChange);
+    }
+});
 
 // sm-menu
 const smMenu = document.createElement('template')
@@ -3096,497 +2679,6 @@ customElements.define('sm-menu-option', class extends HTMLElement {
     }
 })
 
-// tab-header
-
-const smTabHeader = document.createElement('template')
-smTabHeader.innerHTML = `
-<style>
-    *{
-        padding: 0;
-        margin: 0;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-    } 
-    :host{
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-    }
-    .tabs{
-        position: relative;
-        display: -ms-grid;
-        display: grid;
-        width: 100%;
-    }
-    .tab-header{
-        display: -ms-grid;
-        display: grid;
-        grid-auto-flow: column;
-        -webkit-box-pack: start;
-            -ms-flex-pack: start;
-                justify-content: flex-start;
-        gap: 1rem;
-        position: relative;
-        overflow: auto hidden;
-        max-width: 100%;
-        scrollbar-width: 0;
-    }
-    .indicator{
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        height: 0.15rem;
-        border-radius: 1rem 1rem 0 0;  
-        background: var(--accent-color);
-        -webkit-transition: width 0.3s, -webkit-transform 0.3s;
-        transition: width 0.3s, -webkit-transform 0.3s;
-        -o-transition: transform 0.3s, width 0.3s;
-        transition: transform 0.3s, width 0.3s;
-        transition: transform 0.3s, width 0.3s, -webkit-transform 0.3s;
-        pointer-events: none;
-    }
-    :host([variant="tab"]) .indicator{
-        height: 100%;
-        border-radius: 0.3rem;
-    }
-    :host(.round) .indicator{
-        border-radius: 3rem;
-    }
-    :host([variant="tab"]) .tab-header{
-        border-bottom: none; 
-    }
-    .hide-completely{
-        display: none;
-    }
-    :host([variant="tab"]) .tab-header{
-        gap: 0.2rem;
-        display: -ms-inline-grid;
-        display: inline-grid;
-        justify-self: flex-start;
-        border-radius: 0.3rem;
-    }
-    :host([variant="tab"]) slot::slotted(.active){
-        color: rgba(var(--foreground-color), 1);
-    }
-    slot::slotted(.active){
-        color: var(--accent-color);
-        opacity: 1;
-    }
-    @media (hover: none){
-        .tab-header::-webkit-scrollbar-track {
-            -webkit-box-shadow: none !important;
-            background-color: transparent !important;
-        }
-        .tab-header::-webkit-scrollbar {
-            height: 0;
-            background-color: transparent;
-        }
-    }         
-</style>
-<div part="tab-container" class="tabs">
-    <div part="tab-header" class="tab-header">
-        <slot></slot>
-        <div part="indicator" class="indicator"></div>
-    </div>
-</div>
-`;
-
-customElements.define('sm-tab-header', class extends HTMLElement {
-    constructor() {
-        super()
-        this.attachShadow({
-            mode: 'open'
-        }).append(smTabHeader.content.cloneNode(true))
-
-        this.indicator = this.shadowRoot.querySelector('.indicator');
-        this.tabSlot = this.shadowRoot.querySelector('slot');
-        this.tabHeader = this.shadowRoot.querySelector('.tab-header');
-    }
-
-    sendDetails(element) {
-        this.dispatchEvent(
-            new CustomEvent("switchtab", {
-                bubbles: true,
-                detail: {
-                    target: this.target,
-                    rank: parseInt(element.getAttribute('rank'))
-                }
-            })
-        )
-    }
-
-    moveIndiactor(tabDimensions) {
-        //if(this.isTab)
-        this.indicator.setAttribute('style', `width: ${tabDimensions.width}px; transform: translateX(${tabDimensions.left - this.tabHeader.getBoundingClientRect().left + this.tabHeader.scrollLeft}px)`)
-        //else
-        //this.indicator.setAttribute('style', `width: calc(${tabDimensions.width}px - 1.6rem); transform: translateX(calc(${ tabDimensions.left - this.tabHeader.getBoundingClientRect().left + this.tabHeader.scrollLeft}px + 0.8rem)`)
-    }
-
-    connectedCallback() {
-        if (!this.hasAttribute('target') || this.getAttribute('target').value === '') return;
-        this.prevTab
-        this.allTabs
-        this.activeTab
-        this.isTab = false
-        this.target = this.getAttribute('target')
-
-        if (this.hasAttribute('variant') && this.getAttribute('variant') === 'tab') {
-            this.isTab = true
-        }
-
-        this.tabSlot.addEventListener('slotchange', () => {
-            this.tabSlot.assignedElements().forEach((tab, index) => {
-                tab.setAttribute('rank', index)
-            })
-        })
-        this.allTabs = this.tabSlot.assignedElements();
-
-        this.tabSlot.addEventListener('click', e => {
-            if (e.target === this.prevTab || !e.target.closest('sm-tab'))
-                return
-            if (this.prevTab)
-                this.prevTab.classList.remove('active')
-            e.target.classList.add('active')
-
-            e.target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-                inline: 'center'
-            })
-            this.moveIndiactor(e.target.getBoundingClientRect())
-            this.sendDetails(e.target)
-            this.prevTab = e.target;
-            this.activeTab = e.target;
-        })
-        let resizeObserver = new ResizeObserver(entries => {
-            entries.forEach((entry) => {
-                if (this.prevTab) {
-                    let tabDimensions = this.activeTab.getBoundingClientRect();
-                    this.moveIndiactor(tabDimensions)
-                }
-            })
-        })
-        resizeObserver.observe(this)
-        let observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    this.indicator.style.transition = 'none'
-                    if (this.activeTab) {
-                        let tabDimensions = this.activeTab.getBoundingClientRect();
-                        this.moveIndiactor(tabDimensions)
-                    } else {
-                        this.allTabs[0].classList.add('active')
-                        let tabDimensions = this.allTabs[0].getBoundingClientRect();
-                        this.moveIndiactor(tabDimensions)
-                        this.sendDetails(this.allTabs[0])
-                        this.prevTab = this.tabSlot.assignedElements()[0];
-                        this.activeTab = this.prevTab;
-                    }
-                }
-            })
-        }, {
-            threshold: 1.0
-        })
-        observer.observe(this)
-    }
-})
-
-// tab
-const smTab = document.createElement('template')
-smTab.innerHTML = `
-<style>
-    *{
-        padding: 0;
-        margin: 0;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-    } 
-    :host{
-        position: relative;
-        display: -webkit-inline-box;
-        display: -ms-inline-flexbox;
-        display: inline-flex;
-        z-index: 1;
-    }
-    .tab{
-        position: relative;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-            -ms-user-select: none;
-                user-select: none;
-        -webkit-box-pack: center;
-            -ms-flex-pack: center;
-                justify-content: center;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        white-space: nowrap;
-        padding: 0.4rem 0.8rem;
-        font-weight: 500;
-        word-spacing: 0.1rem;
-        text-align: center;
-        -webkit-transition: color 0.3s;
-        -o-transition: color 0.3s;
-        transition: color 0.3s;
-        text-transform: capitalize;
-        height: 100%;
-    }
-    @media (hover: hover){
-        :host(.active) .tab{
-            opacity: 1;
-        }
-        .tab{
-            opacity: 0.7
-        }
-        .tab:hover{
-            opacity: 1
-        }
-    }
-</style>
-<div part="tab" class="tab">
-<slot></slot>
-</div>
-`;
-
-customElements.define('sm-tab', class extends HTMLElement {
-    constructor() {
-        super()
-        this.shadow = this.attachShadow({
-            mode: 'open'
-        }).append(smTab.content.cloneNode(true))
-    }
-})
-
-// tab-panels
-
-const smTabPanels = document.createElement('template')
-smTabPanels.innerHTML = `
-<style>
-*{
-    padding: 0;
-    margin: 0;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-} 
-:host{
-    width: 100%;
-}
-.panel-container{
-    position: relative;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    width: 100%;
-    height: 100%;
-    overflow: hidden auto;
-}
-slot::slotted(.hide-completely){
-    display: none;
-}
-@media (hover: none){
-    .tab-header::-webkit-scrollbar-track {
-        -webkit-box-shadow: none !important;
-        background-color: transparent !important;
-    }
-    .tab-header::-webkit-scrollbar {
-        height: 0;
-        background-color: transparent;
-    }
-}         
-</style>
-<div part="panel-container" class="panel-container">
-    <slot>Nothing to see here.</slot>
-</div>
-`;
-
-customElements.define('sm-tab-panels', class extends HTMLElement {
-    constructor() {
-        super()
-        this.attachShadow({
-            mode: 'open'
-        }).append(smTabPanels.content.cloneNode(true))
-        this.panelSlot = this.shadowRoot.querySelector('slot');
-    }
-    connectedCallback() {
-
-        //animations
-        let flyInLeft = [{
-                    opacity: 0,
-                    transform: 'translateX(-1rem)'
-                },
-                {
-                    opacity: 1,
-                    transform: 'none'
-                }
-            ],
-            flyInRight = [{
-                    opacity: 0,
-                    transform: 'translateX(1rem)'
-                },
-                {
-                    opacity: 1,
-                    transform: 'none'
-                }
-            ],
-            flyOutLeft = [{
-                    opacity: 1,
-                    transform: 'none'
-                },
-                {
-                    opacity: 0,
-                    transform: 'translateX(-1rem)'
-                }
-            ],
-            flyOutRight = [{
-                    opacity: 1,
-                    transform: 'none'
-                },
-                {
-                    opacity: 0,
-                    transform: 'translateX(1rem)'
-                }
-            ],
-            animationOptions = {
-                duration: 300,
-                fill: 'forwards',
-                easing: 'ease'
-            }
-        this.prevPanel
-        this.allPanels
-        this.previousRank
-
-        this.panelSlot.addEventListener('slotchange', () => {
-            this.panelSlot.assignedElements().forEach((panel) => {
-                panel.classList.add('hide-completely')
-            })
-        })
-        this.allPanels = this.panelSlot.assignedElements()
-        this._targetBodyFlyRight = (targetBody) => {
-            targetBody.classList.remove('hide-completely')
-            targetBody.animate(flyInRight, animationOptions)
-        }
-        this._targetBodyFlyLeft = (targetBody) => {
-            targetBody.classList.remove('hide-completely')
-            targetBody.animate(flyInLeft, animationOptions)
-        }
-        document.addEventListener('switchtab', e => {
-            if (e.detail.target !== this.id)
-                return
-
-            if (this.prevPanel) {
-                let targetBody = this.allPanels[e.detail.rank],
-                    currentBody = this.prevPanel;
-                if (this.previousRank < e.detail.rank) {
-                    if (currentBody && !targetBody)
-                        currentBody.animate(flyOutLeft, animationOptions).onfinish = () => {
-                            currentBody.classList.add('hide-completely')
-                        }
-                    else if (targetBody && !currentBody) {
-                        this._targetBodyFlyRight(targetBody)
-                    } else if (currentBody && targetBody) {
-                        currentBody.animate(flyOutLeft, animationOptions).onfinish = () => {
-                            currentBody.classList.add('hide-completely')
-                            this._targetBodyFlyRight(targetBody)
-                        }
-                    }
-                } else {
-                    if (currentBody && !targetBody)
-                        currentBody.animate(flyOutRight, animationOptions).onfinish = () => {
-                            currentBody.classList.add('hide-completely')
-                        }
-                    else if (targetBody && !currentBody) {
-                        this._targetBodyFlyLeft(targetBody)
-                    } else if (currentBody && targetBody) {
-                        currentBody.animate(flyOutRight, animationOptions).onfinish = () => {
-                            currentBody.classList.add('hide-completely')
-                            this._targetBodyFlyLeft(targetBody)
-                        }
-                    }
-                }
-            } else {
-                this.allPanels[e.detail.rank].classList.remove('hide-completely')
-            }
-            this.previousRank = e.detail.rank
-            this.prevPanel = this.allPanels[e.detail.rank];
-        })
-    }
-})
-
-
-const slidingSection = document.createElement('template')
-slidingSection.innerHTML = `
-<style>
-*{
-    margin: 0;
-    padding: 0;
-    box-sizzing: border-box;
-}
-:host{
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    height: 100%;
-    width: 100%;
-}
-.section{
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    max-width: 100%;
-    overflow: hidden auto;
-    -ms-scroll-snap-type: mandatory x;
-        scroll-snap-type: mandatory x;
-}
-
-</style>
-<section class="section">
-    <slot></slot>
-</section>
-`
-
-customElements.define('sm-sliding-section', class extends HTMLElement {
-    constructor() {
-        super()
-        this.attachShadow({
-            mode: 'open'
-        }).append(slidingSection.content.cloneNode(true))
-    }
-    connectedCallback() {
-
-    }
-})
-
-const section = document.createElement('template')
-section.innerHTML = `
-<style>
-*{
-    margin: 0;
-    padding: 0;
-    box-sizzing: border-box;
-}
-:host{
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-}
-.section{
-    min-width: 100%;
-    scroll-snap-align: start;
-}
-</style>
-<section class="section">
-    <slot></slot>
-</section>
-`
-
-customElements.define('sm-section', class extends HTMLElement {
-    constructor() {
-        super()
-        this.attachShadow({
-            mode: 'open'
-        }).append(section.content.cloneNode(true))
-    }
-})
-
 const textField = document.createElement('template')
 textField.innerHTML = `
 <style>
@@ -3660,8 +2752,8 @@ textField.innerHTML = `
 </div>
 `
 
-customElements.define('text-field', class extends HTMLElement{
-    constructor(){
+customElements.define('text-field', class extends HTMLElement {
+    constructor() {
         super()
         this.attachShadow({
             mode: 'open'
@@ -3676,11 +2768,11 @@ customElements.define('text-field', class extends HTMLElement{
         this.isDisabled = false
     }
 
-    static get observedAttributes(){
+    static get observedAttributes() {
         return ['disable']
     }
 
-    get value(){
+    get value() {
         return this.text
     }
     set value(val) {
@@ -3690,7 +2782,7 @@ customElements.define('text-field', class extends HTMLElement{
     }
     set disabled(val) {
         this.isDisabled = val
-        if(this.isDisabled)
+        if (this.isDisabled)
             this.setAttribute('disable', '')
         else
             this.removeAttribute('disable')
@@ -3706,9 +2798,9 @@ customElements.define('text-field', class extends HTMLElement{
         });
         this.dispatchEvent(event);
     }
-    
+
     setEditable = () => {
-        if(this.isTextEditable) return
+        if (this.isTextEditable) return
         this.textContainer.contentEditable = true
         this.textContainer.classList.add('editable')
         this.textContainer.focus()
@@ -3722,11 +2814,11 @@ customElements.define('text-field', class extends HTMLElement{
         }, 100);
         this.isTextEditable = true
     }
-    setNonEditable = () => {   
+    setNonEditable = () => {
         if (!this.isTextEditable) return
         this.textContainer.contentEditable = false
         this.textContainer.classList.remove('editable')
-        
+
         if (this.text !== this.textContainer.textContent.trim()) {
             this.setAttribute('value', this.textContainer.textContent)
             this.text = this.textContainer.textContent.trim()
@@ -3749,17 +2841,17 @@ customElements.define('text-field', class extends HTMLElement{
         }
     }
 
-    connectedCallback(){
+    connectedCallback() {
         this.text
         if (this.hasAttribute('value')) {
             this.text = this.getAttribute('value')
             this.textContainer.textContent = this.text
         }
-        if(this.hasAttribute('disable'))
+        if (this.hasAttribute('disable'))
             this.isDisabled = true
         else
             this.isDisabled = false
-        
+
         this.rotateOut = [
             {
                 transform: 'rotate(0)',
@@ -3818,7 +2910,7 @@ customElements.define('text-field', class extends HTMLElement{
 
 //Color Grid
 const colorGrid = document.createElement('template');
-colorGrid.innerHTML =`
+colorGrid.innerHTML = `
 <style>
     *{
         padding:0;
@@ -3863,79 +2955,79 @@ colorGrid.innerHTML =`
 </div>`;
 
 customElements.define('color-grid',
-class extends HTMLElement {
-    constructor() {
-        super()
-        this.attachShadow({
-            mode: 'open'
-        }).append(colorGrid.content.cloneNode(true))
+    class extends HTMLElement {
+        constructor() {
+            super()
+            this.attachShadow({
+                mode: 'open'
+            }).append(colorGrid.content.cloneNode(true))
 
-        this.colorArray = []
-        this.container = this.shadowRoot.querySelector('.color-tile-container')
-    }
-
-    set colors(arr) {
-        this.colorArray = arr
-        this.renderTiles()
-    }
-
-    set selectedColor(color) {
-        if (this.colorArray.includes(color) && this.container.querySelector(`[data-color="${color}"]`)) {
-            this.container.querySelector(`[data-color="${color}"] input`).checked = true
+            this.colorArray = []
+            this.container = this.shadowRoot.querySelector('.color-tile-container')
         }
-    }
 
-    randString(length) {
-        let result = '';
-        let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        set colors(arr) {
+            this.colorArray = arr
+            this.renderTiles()
+        }
 
-        for (let i = 0; i < length; i++)
-            result += characters.charAt(Math.floor(Math.random() * characters.length));
-        return result;
-    }
+        set selectedColor(color) {
+            if (this.colorArray.includes(color) && this.container.querySelector(`[data-color="${color}"]`)) {
+                this.container.querySelector(`[data-color="${color}"] input`).checked = true
+            }
+        }
 
-    renderTiles() {
-        this.container.innerHTML = ''
-        const frag = document.createDocumentFragment()
-        const groupName = this.randString(6)
-        this.colorArray.forEach(color => {
-            const label = document.createElement('label')
-            label.classList.add('color-tile')
-            label.setAttribute('data-color', color)
-            if(color.includes('--'))
-                label.setAttribute('style', `background-color: var(${color})`)
-            else
-                label.setAttribute('style', `background-color: ${color}`)
-            label.innerHTML = `
+        randString(length) {
+            let result = '';
+            let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+            for (let i = 0; i < length; i++)
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            return result;
+        }
+
+        renderTiles() {
+            this.container.innerHTML = ''
+            const frag = document.createDocumentFragment()
+            const groupName = this.randString(6)
+            this.colorArray.forEach(color => {
+                const label = document.createElement('label')
+                label.classList.add('color-tile')
+                label.setAttribute('data-color', color)
+                if (color.includes('--'))
+                    label.setAttribute('style', `background-color: var(${color})`)
+                else
+                    label.setAttribute('style', `background-color: ${color}`)
+                label.innerHTML = `
                 <input type="radio" name="${groupName}">
                 <div class="border"></div>
                 `
-            frag.append(label)
-        })
-        this.container.append(frag)
-    }
-    
-    handleChange(e) {
-        const clickedTile = e.target.closest('.color-tile')
-        const clickedTileColor = clickedTile.dataset.color
-        const tileSelected = new CustomEvent('colorselected', {
-            bubbles: true,
-            composed: true,
-            detail: {
-                value: clickedTileColor,
-            }
-        })
-        this.dispatchEvent(tileSelected)
-    }
+                frag.append(label)
+            })
+            this.container.append(frag)
+        }
 
-    connectedCallback() {
-        this.container.addEventListener('change', this.handleChange)
-    }
+        handleChange(e) {
+            const clickedTile = e.target.closest('.color-tile')
+            const clickedTileColor = clickedTile.dataset.color
+            const tileSelected = new CustomEvent('colorselected', {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    value: clickedTileColor,
+                }
+            })
+            this.dispatchEvent(tileSelected)
+        }
 
-    disconnectedCallback() {
-        this.container.removeEventListener('change', this.handleChange)
-    }
-})
+        connectedCallback() {
+            this.container.addEventListener('change', this.handleChange)
+        }
+
+        disconnectedCallback() {
+            this.container.removeEventListener('change', this.handleChange)
+        }
+    })
 
 const pinInput = document.createElement('template');
 pinInput.innerHTML = `
@@ -4021,151 +3113,859 @@ pinInput.innerHTML = `
 
 customElements.define('pin-input',
 
-	class extends HTMLElement {
-		constructor() {
-			super()
-			this.attachShadow({
-				mode: 'open'
-			}).append(pinInput.content.cloneNode(true))
+    class extends HTMLElement {
+        constructor() {
+            super()
+            this.attachShadow({
+                mode: 'open'
+            }).append(pinInput.content.cloneNode(true))
 
-			this.pinDigits = 4
+            this.pinDigits = 4
 
-			this.arrayOfInput = [];
-			this.container = this.shadowRoot.querySelector('.pin-container');
-			this.toggleButton = this.shadowRoot.querySelector('button')
-		}
+            this.arrayOfInput = [];
+            this.container = this.shadowRoot.querySelector('.pin-container');
+            this.toggleButton = this.shadowRoot.querySelector('button')
+        }
 
         set value(val) {
-			this.arrayOfInput.forEach((input, index) => input.value = val[index] ? val[index] : '')
-        }
-        
-		get value() {
-			return this.getValue()
-		}
-
-		set pinLength(val) {
-			this.pinDigits = val
-			this.setAttribute('pin-length', val)
-			this.style.setProperty('--pin-length', val)
-			this.render()
+            this.arrayOfInput.forEach((input, index) => input.value = val[index] ? val[index] : '')
         }
 
-        get isValid(){
+        get value() {
+            return this.getValue()
+        }
+
+        set pinLength(val) {
+            this.pinDigits = val
+            this.setAttribute('pin-length', val)
+            this.style.setProperty('--pin-length', val)
+            this.render()
+        }
+
+        get isValid() {
             return this.arrayOfInput.every(input => input.value.trim().length)
         }
-        
+
         clear = () => {
             this.value = ''
         }
-        
+
         focusIn = () => {
             this.arrayOfInput[0].focus();
         }
 
-		getValue = () => {
-			return this.arrayOfInput.reduce((acc, val) => {
-				return acc += val.value
-			}, '')
-		}
+        getValue = () => {
+            return this.arrayOfInput.reduce((acc, val) => {
+                return acc += val.value
+            }, '')
+        }
 
-		render = () => {
-			this.container.innerHTML = ''
-			const frag = document.createDocumentFragment();
+        render = () => {
+            this.container.innerHTML = ''
+            const frag = document.createDocumentFragment();
 
-			for (let i = 0; i < this.pinDigits; i++) {
-				const inputBox = document.createElement('input')
-				inputBox.setAttribute('type', 'password')
-				inputBox.setAttribute('inputmode', 'numeric')
-				inputBox.setAttribute('maxlength', '1')
-				inputBox.setAttribute('required', '')
-				this.arrayOfInput.push(inputBox);
-				frag.append(inputBox);
-			}
-			this.container.append(frag);
-		}
+            for (let i = 0; i < this.pinDigits; i++) {
+                const inputBox = document.createElement('input')
+                inputBox.setAttribute('type', 'password')
+                inputBox.setAttribute('inputmode', 'numeric')
+                inputBox.setAttribute('maxlength', '1')
+                inputBox.setAttribute('required', '')
+                this.arrayOfInput.push(inputBox);
+                frag.append(inputBox);
+            }
+            this.container.append(frag);
+        }
 
-		handleKeydown = (e) => {
+        handleKeydown = (e) => {
             const activeInput = e.target.closest('input')
-			if (/[0-9]/.test(e.key)) {
+            if (/[0-9]/.test(e.key)) {
                 if (activeInput.value.trim().length > 2) {
                     e.preventDefault();
-				}
-				else {
+                }
+                else {
                     if (activeInput.value.trim().length === 1) {
                         activeInput.value = e.key
                     }
-					if (activeInput.nextElementSibling) {
-						setTimeout(() => {
-							activeInput.nextElementSibling.focus();
-						}, 0)
-					}
-				}
-			}
-			else if (e.key === "Backspace") {
-				if(activeInput.previousElementSibling)
-					setTimeout(() => {
-						activeInput.previousElementSibling.focus();
-					}, 0)
-			}
-			else if (e.key.length === 1 && !/[0-9]/.test(e.key)) {
-				e.preventDefault();
-			}
-		}
-		
-		handleInput = () => {			
-			if (this.isValid) {
-				this.fireEvent(this.getValue())
-			}
-		}
+                    if (activeInput.nextElementSibling) {
+                        setTimeout(() => {
+                            activeInput.nextElementSibling.focus();
+                        }, 0)
+                    }
+                }
+            }
+            else if (e.key === "Backspace") {
+                if (activeInput.previousElementSibling)
+                    setTimeout(() => {
+                        activeInput.previousElementSibling.focus();
+                    }, 0)
+            }
+            else if (e.key.length === 1 && !/[0-9]/.test(e.key)) {
+                e.preventDefault();
+            }
+        }
 
-		fireEvent = (value) => {
-			let event = new CustomEvent('pincomplete', {
-				bubbles: true,
-				cancelable: true,
-				composed: true,
-				detail: {
-					value
-				}
-			});
-			this.dispatchEvent(event);
-		}
+        handleInput = () => {
+            if (this.isValid) {
+                this.fireEvent(this.getValue())
+            }
+        }
 
-		toggleVisiblity = () => {
-			if (this.arrayOfInput[0].getAttribute('type') === 'password') {
-				this.toggleButton.innerHTML = `
+        fireEvent = (value) => {
+            let event = new CustomEvent('pincomplete', {
+                bubbles: true,
+                cancelable: true,
+                composed: true,
+                detail: {
+                    value
+                }
+            });
+            this.dispatchEvent(event);
+        }
+
+        toggleVisiblity = () => {
+            if (this.arrayOfInput[0].getAttribute('type') === 'password') {
+                this.toggleButton.innerHTML = `
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M22.05,31.44a10.12,10.12,0,0,0,.1,1.36L33.36,21.59a10.12,10.12,0,0,0-1.36-.1A10,10,0,0,0,22.05,31.44Z"/><path d="M19.11,35.84A13.6,13.6,0,0,1,36.4,18.55l5.28-5.27A31,31,0,0,0,32,11.72c-20.3,0-32,19.72-32,19.72A48.48,48.48,0,0,0,11.27,43.69Z"/><path d="M52.73,19.2l6.14-6.14L54.63,8.81l-7,7h0l-6,6h0L39,24.41h0l-7,7L20.09,43.35,16.4,47h0l-7,7,4.25,4.24,8.71-8.71A31.15,31.15,0,0,0,32,51.16c20.3,0,32-19.72,32-19.72A48.54,48.54,0,0,0,52.73,19.2ZM32,45.07a13.63,13.63,0,0,1-4.4-.74l3-3a10.12,10.12,0,0,0,1.36.1,10,10,0,0,0,10-9.95,10.12,10.12,0,0,0-.1-1.36l3-3A13.6,13.6,0,0,1,32,45.07Z"/></svg>
                     Hide    
                     `
-                    this.arrayOfInput.forEach(input => input.setAttribute('type', 'text'))
-                }
-                else {
-                    this.toggleButton.innerHTML = `
+                this.arrayOfInput.forEach(input => input.setAttribute('type', 'text'))
+            }
+            else {
+                this.toggleButton.innerHTML = `
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="9.95"/><path d="M32,12.28C11.7,12.28,0,32,0,32S11.7,51.72,32,51.72,64,32,64,32,52.3,12.28,32,12.28Zm0,33.35A13.63,13.63,0,1,1,45.63,32,13.64,13.64,0,0,1,32,45.63Z"/></svg>
                     Show
                 `
-				this.arrayOfInput.forEach(input => input.setAttribute('type', 'password'))
-				
-			}
-		}
+                this.arrayOfInput.forEach(input => input.setAttribute('type', 'password'))
 
-		connectedCallback() {
-			if (this.hasAttribute('pin-length')) {
-				const pinLength = parseInt(this.getAttribute('pin-length'))
-				this.pinDigits = pinLength
-				this.style.setProperty('--pin-length', pinLength)
-			}
+            }
+        }
 
-			this.render()
+        connectedCallback() {
+            if (this.hasAttribute('pin-length')) {
+                const pinLength = parseInt(this.getAttribute('pin-length'))
+                this.pinDigits = pinLength
+                this.style.setProperty('--pin-length', pinLength)
+            }
 
-			this.toggleButton.addEventListener('click', this.toggleVisiblity)
-			
-			this.container.addEventListener('input', this.handleInput);
-			this.container.addEventListener('keydown', this.handleKeydown);
-		}
-		disconnectedCallback() {
-			this.toggleButton.removeEventListener('click', this.toggleVisiblity)
+            this.render()
 
-			this.container.removeEventListener('input', this.handleInput);
-			this.container.removeEventListener('keydown', this.handleKeydown);
-		}
-	})
+            this.toggleButton.addEventListener('click', this.toggleVisiblity)
+
+            this.container.addEventListener('input', this.handleInput);
+            this.container.addEventListener('keydown', this.handleKeydown);
+        }
+        disconnectedCallback() {
+            this.toggleButton.removeEventListener('click', this.toggleVisiblity)
+
+            this.container.removeEventListener('input', this.handleInput);
+            this.container.removeEventListener('keydown', this.handleKeydown);
+        }
+    })
+
+const themeToggle = document.createElement('template');
+themeToggle.innerHTML = `
+    <style>
+    *{
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    :host{
+        cursor: pointer;
+        --height: 2.5rem;
+        --width: 2.5rem;
+    }
+    .theme-toggle {
+        display: flex;
+        position: relative;
+        width: 1.2rem;
+        height: 1.2rem;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .theme-toggle::after{
+        content: '';
+        position: absolute;
+        height: var(--height);
+        width: var(--width);
+        top: 50%;
+        left: 50%;
+        opacity: 0;
+        border-radius: 50%;
+        pointer-events: none;
+        transition: transform 0.3s, opacity 0.3s;
+        transform: translate(-50%, -50%) scale(1.2);
+        background-color: rgba(var(--text-color,inherit), 0.12);
+    }
+    :host(:focus-within) .theme-toggle{
+        outline: none;
+    }
+    :host(:focus-within) .theme-toggle::after{
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    .icon {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        fill: rgba(var(--text-color,inherit), 1);
+        transition: transform 0.3s, opacity 0.1s;
+    }
+    
+    .theme-switcher__checkbox {
+        display: none;
+    }
+    :host([checked]) .moon-icon {
+        transform: translateY(50%);
+        opacity: 0;
+    }
+    :host(:not([checked])) .sun-icon {
+        transform: translateY(50%);
+        opacity: 0;
+    }
+    </style>
+    <label class="theme-toggle" title="Change theme" tabindex="0">
+        <slot name="light-mode-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon moon-icon" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><rect fill="none" height="24" width="24"/><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"/></svg>
+        </slot>
+        <slot name="dark-mode-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon sun-icon" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><rect fill="none" height="24" width="24"/><path d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"/></svg>
+        </slot>
+    </label>
+`;
+
+class ThemeToggle extends HTMLElement {
+    constructor() {
+        super();
+
+        this.attachShadow({
+            mode: 'open'
+        }).append(themeToggle.content.cloneNode(true));
+
+        this.isChecked = false;
+        this.hasTheme = 'light';
+
+        this.toggleState = this.toggleState.bind(this);
+        this.fireEvent = this.fireEvent.bind(this);
+        this.handleThemeChange = this.handleThemeChange.bind(this);
+    }
+    static get observedAttributes() {
+        return ['checked'];
+    }
+
+    daylight() {
+        this.hasTheme = 'light';
+        document.body.dataset.theme = 'light';
+        this.setAttribute('aria-checked', 'false');
+    }
+
+    nightlight() {
+        this.hasTheme = 'dark';
+        document.body.dataset.theme = 'dark';
+        this.setAttribute('aria-checked', 'true');
+    }
+
+    toggleState() {
+        this.toggleAttribute('checked');
+        this.fireEvent();
+    }
+    handleKeyDown(e) {
+        if (e.key === ' ') {
+            this.toggleState();
+        }
+    }
+    handleThemeChange(e) {
+        if (e.detail.theme !== this.hasTheme) {
+            if (e.detail.theme === 'dark') {
+                this.setAttribute('checked', '');
+            }
+            else {
+                this.removeAttribute('checked');
+            }
+        }
+    }
+
+    fireEvent() {
+        this.dispatchEvent(
+            new CustomEvent('themechange', {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    theme: this.hasTheme
+                }
+            })
+        );
+    }
+
+    connectedCallback() {
+        this.setAttribute('role', 'switch');
+        this.setAttribute('aria-label', 'theme toggle');
+        if (localStorage.getItem(`${window.location.hostname}-theme`) === "dark") {
+            this.nightlight();
+            this.setAttribute('checked', '');
+        } else if (localStorage.getItem(`${window.location.hostname}-theme`) === "light") {
+            this.daylight();
+            this.removeAttribute('checked');
+        }
+        else {
+            if (window.matchMedia(`(prefers-color-scheme: dark)`).matches) {
+                this.nightlight();
+                this.setAttribute('checked', '');
+            } else {
+                this.daylight();
+                this.removeAttribute('checked');
+            }
+        }
+        this.addEventListener("click", this.toggleState);
+        this.addEventListener("keydown", this.handleKeyDown);
+        document.addEventListener('themechange', this.handleThemeChange);
+    }
+
+    disconnectedCallback() {
+        this.removeEventListener("click", this.toggleState);
+        this.removeEventListener("keydown", this.handleKeyDown);
+        document.removeEventListener('themechange', this.handleThemeChange);
+    }
+
+    attributeChangedCallback(name, oldVal, newVal) {
+        if (name === 'checked') {
+            if (this.hasAttribute('checked')) {
+                this.nightlight();
+                localStorage.setItem(`${window.location.hostname}-theme`, "dark");
+            } else {
+                this.daylight();
+                localStorage.setItem(`${window.location.hostname}-theme`, "light");
+            }
+        }
+    }
+}
+
+window.customElements.define('theme-toggle', ThemeToggle);
+
+const smCopy = document.createElement('template');
+smCopy.innerHTML = `
+<style>     
+*{
+    padding: 0;
+    margin: 0;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+}       
+:host{
+    display: -webkit-box;
+    display: flex;
+    --padding: 0;
+    --button-background-color: rgba(var(--text-color, (17,17,17)), 0.2);
+}
+.copy{
+    display: grid;
+    gap: 0.5rem;
+    padding: var(--padding);
+    align-items: center;
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+:host(:not([clip-text])) .copy-content{
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+:host([clip-text]) .copy-content{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.copy-button{
+    display: inline-flex;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    padding: 0.4rem;
+    background-color: rgba(var(--text-color, (17,17,17)), 0.06);
+    border-radius: var(--button-border-radius, 0.3rem);
+    transition: background-color 0.2s;
+    font-family: inherit;
+    color: inherit;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+}
+.copy-button:active{
+    background-color: var(--button-background-color);
+}
+.icon{
+    height: 1.2rem;
+    width: 1.2rem;
+    fill: rgba(var(--text-color, (17,17,17)), 0.8);
+}
+@media (any-hover: hover){
+    .copy:hover .copy-button{
+        opacity: 1;
+    }
+    .copy-button:hover{
+        background-color: var(--button-background-color);
+    }
+}
+</style>
+<section class="copy">
+    <p class="copy-content"></p>
+    <button part="button" class="copy-button" title="copy">
+        <slot name="copy-icon">
+        COPY
+        </slot>
+    </button>
+</section>
+`;
+customElements.define('sm-copy',
+    class extends HTMLElement {
+        constructor() {
+            super();
+            this.attachShadow({
+                mode: 'open'
+            }).append(smCopy.content.cloneNode(true));
+
+            this.copyContent = this.shadowRoot.querySelector('.copy-content');
+            this.copyButton = this.shadowRoot.querySelector('.copy-button');
+
+            this.copy = this.copy.bind(this);
+        }
+        static get observedAttributes() {
+            return ['value'];
+        }
+        set value(val) {
+            this.setAttribute('value', val);
+        }
+        get value() {
+            return this.getAttribute('value');
+        }
+        fireEvent() {
+            this.dispatchEvent(
+                new CustomEvent('copy', {
+                    composed: true,
+                    bubbles: true,
+                    cancelable: true,
+                })
+            );
+        }
+        copy() {
+            navigator.clipboard.writeText(this.copyContent.textContent)
+                .then(res => this.fireEvent())
+                .catch(err => console.error(err));
+        }
+        connectedCallback() {
+            this.copyButton.addEventListener('click', this.copy);
+        }
+        attributeChangedCallback(name, oldValue, newValue) {
+            if (name === 'value') {
+                this.copyContent.textContent = newValue;
+            }
+        }
+        disconnectedCallback() {
+            this.copyButton.removeEventListener('click', this.copy);
+        }
+    });
+const spinner = document.createElement('template');
+spinner.innerHTML = `
+<style>     
+*{
+    padding: 0;
+    margin: 0;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+}
+.loader {
+    height: var(--size, 1.5rem);
+    width: var(--size, 1.5rem);
+    stroke-width: 8;
+    overflow: visible;
+    stroke: var(--accent-color, teal);
+    fill: none;
+    stroke-dashoffset: 180;
+    stroke-dasharray: 180;
+    animation: load 2s infinite, spin 1s linear infinite;
+}
+@keyframes load {
+    50% {
+        stroke-dashoffset: 0;
+    }
+    100%{
+        stroke-dashoffset: -180;
+    }
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+</style>
+<svg viewBox="0 0 64 64" class="loader"><circle cx="32" cy="32" r="32" /></svg>
+
+`;
+class SpinnerLoader extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({
+            mode: 'open'
+        }).append(spinner.content.cloneNode(true));
+    }
+}
+window.customElements.define('sm-spinner', SpinnerLoader);
+
+const stripSelect = document.createElement('template');
+stripSelect.innerHTML = `
+<style>
+    *{
+        padding: 0;
+        margin: 0;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+    }  
+    :host{
+        padding: 1rem 0;
+    }
+    .hide{
+        display: none !important;
+    }
+    input[type="radio"]{
+        display: none;
+    }
+    .scrolling-container{
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .strip-select{
+        position: relative;
+    }
+    :host([multiline]) .strip-select{
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--gap, 0.5rem);
+        overflow: auto hidden;
+    }
+    :host(:not([multiline])) .strip-select{
+        display: grid;
+        grid-auto-flow: column;
+        gap: var(--gap, 0.5rem);
+        max-width: 100%;   
+        align-items: center;
+        overflow: auto hidden;
+    }
+    .nav-button{
+        display: flex;
+        top: 50%;
+        z-index: 2;
+        border: none;
+        padding: 0.3rem;
+        cursor: pointer;
+        position: absolute;
+        align-items: center;
+        background: rgba(var(--background-color,(255,255,255)), 1);
+        transform: translateY(-50%);
+    }
+    .nav-button--right{
+        right: 0;
+    }
+    .cover{
+        position: absolute;
+        z-index: 1;
+        width: 5rem;
+        height: 100%;
+        pointer-events: none;
+    }
+    .nav-button--right::before{
+        background-color: red;
+    }
+    .icon{
+        height: 1.5rem;
+        width: 1.5rem;
+        fill: rgba(var(--text-color,(17,17,17)), .8);
+    }
+    @media (hover: none){
+        ::-webkit-scrollbar {
+            height: 0;
+        }
+        .nav-button{
+            display: none;
+        }
+        .strip-select{
+            overflow: auto hidden;
+        }
+        .cover{
+            width: 2rem;
+        }
+        .cover--left{
+            background: linear-gradient(90deg, rgba(var(--background-color,(255,255,255)), 1), transparent);
+        }
+        .cover--right{
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(var(--background-color,(255,255,255)), 1));
+        }
+    }
+    @media (hover: hover){
+        ::-webkit-scrollbar-track {
+            background-color: transparent !important;
+        }
+        ::-webkit-scrollbar {
+            height: 0;
+            background-color: transparent;
+        }
+        .strip-select{
+            overflow: hidden;
+        }
+        .cover--left{
+            background: linear-gradient(90deg, rgba(var(--background-color,(255,255,255)), 1) 60%, transparent);
+        }
+        .cover--right{
+            right: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(var(--background-color,(255,255,255)), 1) 40%);
+        }
+    }
+</style>
+<section class="scrolling-container">
+    <div class="cover cover--left hide"></div>
+    <button class="nav-button nav-button--left hide">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10.828 12l4.95 4.95-1.414 1.414L8 12l6.364-6.364 1.414 1.414z"/></svg>
+    </button>
+    <section class="strip-select">
+        <slot></slot>
+    </section>
+    <button class="nav-button nav-button--right hide">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M13.172 12l-4.95-4.95 1.414-1.414L16 12l-6.364 6.364-1.414-1.414z"/></svg>
+    </button>
+    <div class="cover cover--right hide"></div>
+</section>
+
+`;
+customElements.define('strip-select', class extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({
+            mode: 'open'
+        }).append(stripSelect.content.cloneNode(true));
+        this.stripSelect = this.shadowRoot.querySelector('.strip-select');
+        this.slottedOptions = undefined;
+        this._value = undefined;
+        this.scrollDistance = 0;
+        this.assignedElements = [];
+
+        this.scrollLeft = this.scrollLeft.bind(this);
+        this.scrollRight = this.scrollRight.bind(this);
+        this.fireEvent = this.fireEvent.bind(this);
+        this.setSelectedOption = this.setSelectedOption.bind(this);
+    }
+    get value() {
+        return this._value;
+    }
+    set value(val) {
+        this.setSelectedOption(val);
+    }
+    scrollLeft() {
+        this.stripSelect.scrollBy({
+            left: -this.scrollDistance,
+            behavior: 'smooth'
+        });
+    }
+
+    scrollRight() {
+        this.stripSelect.scrollBy({
+            left: this.scrollDistance,
+            behavior: 'smooth'
+        });
+    }
+    setSelectedOption(value) {
+        if (this._value === value) return
+        this._value = value;
+        this.assignedElements.forEach(elem => {
+            if (elem.value === value) {
+                elem.setAttribute('active', '');
+                elem.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+            }
+            else
+                elem.removeAttribute('active')
+        });
+    }
+
+    fireEvent() {
+        this.dispatchEvent(
+            new CustomEvent("change", {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    value: this._value
+                }
+            })
+        );
+    }
+    connectedCallback() {
+        this.setAttribute('role', 'listbox');
+
+        const slot = this.shadowRoot.querySelector('slot');
+        const coverLeft = this.shadowRoot.querySelector('.cover--left');
+        const coverRight = this.shadowRoot.querySelector('.cover--right');
+        const navButtonLeft = this.shadowRoot.querySelector('.nav-button--left');
+        const navButtonRight = this.shadowRoot.querySelector('.nav-button--right');
+        slot.addEventListener('slotchange', e => {
+            this.assignedElements = slot.assignedElements();
+            this.assignedElements.forEach(elem => {
+                if (elem.hasAttribute('selected')) {
+                    elem.setAttribute('active', '');
+                    this._value = elem.value;
+                }
+            });
+            if (!this.hasAttribute('multiline')) {
+                if (this.assignedElements.length > 0) {
+                    firstOptionObserver.observe(this.assignedElements[0]);
+                    lastOptionObserver.observe(this.assignedElements[this.assignedElements.length - 1]);
+                }
+                else {
+                    navButtonLeft.classList.add('hide');
+                    navButtonRight.classList.add('hide');
+                    coverLeft.classList.add('hide');
+                    coverRight.classList.add('hide');
+                    firstOptionObserver.disconnect();
+                    lastOptionObserver.disconnect();
+                }
+            }
+        });
+        const resObs = new ResizeObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.contentBoxSize) {
+                    // Firefox implements `contentBoxSize` as a single content rect, rather than an array
+                    const contentBoxSize = Array.isArray(entry.contentBoxSize) ? entry.contentBoxSize[0] : entry.contentBoxSize;
+
+                    this.scrollDistance = contentBoxSize.inlineSize * 0.6;
+                } else {
+                    this.scrollDistance = entry.contentRect.width * 0.6;
+                }
+            });
+        });
+        resObs.observe(this);
+        this.stripSelect.addEventListener('option-clicked', e => {
+            if (this._value !== e.target.value) {
+                this.setSelectedOption(e.target.value);
+                this.fireEvent();
+            }
+        });
+        const firstOptionObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navButtonLeft.classList.add('hide');
+                    coverLeft.classList.add('hide');
+                }
+                else {
+                    navButtonLeft.classList.remove('hide');
+                    coverLeft.classList.remove('hide');
+                }
+            });
+        },
+            {
+                threshold: 0.9,
+                root: this
+            });
+        const lastOptionObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navButtonRight.classList.add('hide');
+                    coverRight.classList.add('hide');
+                }
+                else {
+                    navButtonRight.classList.remove('hide');
+                    coverRight.classList.remove('hide');
+                }
+            });
+        },
+            {
+                threshold: 0.9,
+                root: this
+            });
+        navButtonLeft.addEventListener('click', this.scrollLeft);
+        navButtonRight.addEventListener('click', this.scrollRight);
+    }
+    disconnectedCallback() {
+        navButtonLeft.removeEventListener('click', this.scrollLeft);
+        navButtonRight.removeEventListener('click', this.scrollRight);
+    }
+});
+
+//Strip option
+const stripOption = document.createElement('template');
+stripOption.innerHTML = `
+<style>
+    *{
+        padding: 0;
+        margin: 0;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+    }  
+    .strip-option{
+        display: flex;
+        flex-shrink: 0;
+        cursor: pointer;
+        white-space: nowrap;
+        padding: var(--padding, 0.4rem 0.6rem);
+        transition: background 0.3s;
+        border-radius: var(--border-radius, 2rem);
+        -webkit-tap-highlight-color: transparent;
+    }
+    :host([active]) .strip-option{
+        color: var(--active-option-color, rgba(var(--background-color,white)));
+        background-color: var(--active-background-color, var(--accent-color,teal));
+    }
+    :host(:focus-within){
+        outline: none;
+    }
+    :host(:focus-within) .strip-option{
+        box-shadow: 0 0 0 0.1rem var(--accent-color,teal) inset;
+    }
+    :host(:hover:not([active])) .strip-option{
+        background-color: rgba(var(--text-color,(17,17,17)), 0.06);
+    }
+</style>
+<label class="strip-option">
+    <slot></slot>
+</label>
+`;
+customElements.define('strip-option', class extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({
+            mode: 'open'
+        }).append(stripOption.content.cloneNode(true));
+        this._value = undefined;
+        this.radioButton = this.shadowRoot.querySelector('input');
+
+        this.fireEvent = this.fireEvent.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
+    }
+    get value() {
+        return this._value;
+    }
+    fireEvent() {
+        this.dispatchEvent(
+            new CustomEvent("option-clicked", {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    value: this._value
+                }
+            })
+        );
+    }
+    handleKeyDown(e) {
+        if (e.key === 'Enter' || e.key === 'Space') {
+            this.fireEvent();
+        }
+    }
+    connectedCallback() {
+        this.setAttribute('role', 'option');
+        this.setAttribute('tabindex', '0');
+        this._value = this.getAttribute('value');
+        this.addEventListener('click', this.fireEvent);
+        this.addEventListener('keydown', this.handleKeyDown);
+    }
+    disconnectedCallback() {
+        this.removeEventListener('click', this.fireEvent);
+        this.removeEventListener('keydown', this.handleKeyDown);
+    }
+});
