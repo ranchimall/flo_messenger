@@ -2930,24 +2930,39 @@ colorGrid.innerHTML = `
         position: relative;
         cursor: pointer;
         display: flex;
-        height: 3rem;
-        width: 3rem;
-        border-radius: 0.5rem;
+        height: 2.5rem;
+        width: 2.5rem;
+        border-radius: 0.3rem;
+        align-items: center;
+        justify-content: center;
     }
     .color-tile input[type="radio"]{
         display: none;
     }
-    .border{
-        position: absolute;
-        z-index: 1;
-        border-radius: 0.5rem;
-        box-shadow: 0 0 0 0.5rem rgba(var(--text-color), 0.8) inset;
-        display: none;
-        height: 100%;
-        width: 100%;
-    }
-    .color-tile input[type="radio"]:checked ~ .border{
+    .checkmark{
         display: flex;
+        position: absolute;
+        top: 0;
+        right: 0;
+        align-items: center;
+        justify-content: center;
+        padding: 0.3rem;
+        border-radius: 0.3rem;
+        background-color: rgba(var(--background-color, (255,255,255)), 0.8);
+        animation: checkmark 0.1s ease;
+    }
+    .icon{
+        height: 1rem;
+        width: 1rem;
+        fill: rgba(var(--text-color, (17,17,17)), 1);
+    }
+    @keyframes checkmark{
+        from{
+            transform: scale(0);
+        }
+        to{
+            transform: scale(1);
+        }
     }
 
 </style>
@@ -2964,6 +2979,8 @@ customElements.define('color-grid',
 
             this.colorArray = []
             this.container = this.shadowRoot.querySelector('.color-tile-container')
+            this.handleChange = this.handleChange.bind(this)
+            this.setCheckMark = this.setCheckMark.bind(this)
         }
 
         set colors(arr) {
@@ -2973,7 +2990,11 @@ customElements.define('color-grid',
 
         set selectedColor(color) {
             if (this.colorArray.includes(color) && this.container.querySelector(`[data-color="${color}"]`)) {
-                this.container.querySelector(`[data-color="${color}"] input`).checked = true
+                const selectedTile = this.container.querySelector(`[data-color="${color}"]`)
+                if (selectedTile) {
+                    selectedTile.querySelector('input').checked = true
+                    this.setCheckMark(selectedTile)
+                }
             }
         }
 
@@ -3000,15 +3021,24 @@ customElements.define('color-grid',
                     label.setAttribute('style', `background-color: ${color}`)
                 label.innerHTML = `
                 <input type="radio" name="${groupName}">
-                <div class="border"></div>
                 `
                 frag.append(label)
             })
             this.container.append(frag)
         }
+        setCheckMark(target) {
+            target.parentNode.querySelectorAll('.checkmark').forEach(checkmark => checkmark.remove())
+            const checkMark = document.createElement('div')
+            checkMark.classList.add('checkmark')
+            checkMark.innerHTML = `
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+            `
+            target.append(checkMark)
+        }
 
         handleChange(e) {
             const clickedTile = e.target.closest('.color-tile')
+            this.setCheckMark(clickedTile)
             const clickedTileColor = clickedTile.dataset.color
             const tileSelected = new CustomEvent('colorselected', {
                 bubbles: true,

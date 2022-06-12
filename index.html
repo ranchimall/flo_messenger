@@ -26,7 +26,6 @@
             showPage('loading')
             floDapps.setAppObjectStores({ userSettings: {} })
             document.body.classList.remove('hide')
-            isPinSet = false;
 
             floDapps.setCustomPrivKeyInput(getSignedIn)
             getRef('emoji_picker').shadowRoot.append(style);
@@ -34,21 +33,8 @@
             floDapps.launchStartUp().then(result => {
                 console.log(result)
                 getRef("greet_tag").value = myFloID
-
-                getRef('accent_color_selector').colors = selectedColors
-
-                if (localStorage.getItem(`accent-color${myFloID}`)) {
-                    const color = localStorage.getItem(`accent-color${myFloID}`)
-                    getRef('accent_color_selector').selectedColor = color
-                    document.body.style.setProperty('--accent-color', color);
-                } else {
-                    getRef('accent_color_selector').selectedColor = '#3D5AFE'
-                }
-
                 //load messages from IDB and render them
                 console.log(`Loading Data! Please Wait...`)
-                //Check for available bg image
-                setBgImage();
                 //Set UI render functions
                 messenger.renderUI.chats = renderChatList;
                 messenger.renderUI.directChat = renderDirectUI;
@@ -58,6 +44,8 @@
                 //init messenger
                 messenger.init().then(result => {
                     console.log(result);
+                    //Check for available bg image
+                    setBgImage();
                     showPage(window.location.hash, { firstLoad: true })
                 }).catch(error => notify(error, "error"))
             }).catch(error => notify(error, "error"))
@@ -481,12 +469,6 @@
                             </div>
                         </div>
                     </section>
-                    <sm-switch id="theme_switcher">
-                        <div slot="left" class="flex flex-direction-column">
-                            <h4>Dark mode</h4>
-                            <p>Toggle dark mode on/off.<br><strong>*Setting applies to this browser only</strong></p>
-                        </div>
-                    </sm-switch>
                     <section>
                         <h4>Set chat and mail background image</h4>
                         <div id="bg_preview_container" class="flex">
@@ -582,10 +564,12 @@
                 </svg>
             </button>
             <h4>Add contact</h4>
-            <sm-button id="add_contact_button" variant="primary" disable>Add</sm-button>
         </header>
-        <sm-input id="add_contact_floID" floId placeholder="FLO address" animate required></sm-input>
-        <sm-input id="add_contact_name" placeholder="Name" animate required></sm-input>
+        <sm-form>
+            <sm-input id="add_contact_floID" floId placeholder="FLO address" animate required></sm-input>
+            <sm-input id="add_contact_name" placeholder="Name" animate required></sm-input>
+            <sm-button id="add_contact_button" variant="primary" disable>Add</sm-button>
+        </sm-form>
     </sm-popup>
     <sm-popup id="compose_mail_popup">
         <header class="popup__header" slot="header">
@@ -598,14 +582,16 @@
                 </svg>
             </button>
             <h4>Compose Mail</h4>
-            <sm-button id="send_mail_button" variant="primary" disable>Send</sm-button>
         </header>
-        <div id="auto_complete_contact" class="flex flex-direction-column">
-            <sm-input id="send_mail_to" placeholder="To" animate required></sm-input>
-            <div id="mail_contact_list" class="hide contact-list"></div>
-        </div>
-        <sm-input id="subject_of_mail" placeholder="Subject" animate></sm-input>
-        <sm-textarea id="mail_content" placeholder="Type a mail" name="" id="" rows="10" required></sm-textarea>
+        <sm-form>
+            <div id="auto_complete_contact" class="flex flex-direction-column">
+                <sm-input id="send_mail_to" placeholder="To" animate required></sm-input>
+                <div id="mail_contact_list" class="hide contact-list"></div>
+            </div>
+            <sm-input id="subject_of_mail" placeholder="Subject" animate></sm-input>
+            <sm-textarea id="mail_content" placeholder="Type a mail" name="" id="" rows="10" required></sm-textarea>
+            <sm-button id="send_mail_button" variant="primary" disable>Send</sm-button>
+        </sm-form>
     </sm-popup>
     <sm-popup id="reply_mail_popup">
         <header class="popup__header" slot="header">
@@ -618,10 +604,12 @@
                 </svg>
             </button>
             <h4>Reply</h4>
-            <sm-button id="reply_mail_button" variant="primary" disable>Send</sm-button>
         </header>
-        <sm-input id="subject_of_reply_mail" placeholder="Subject" animate></sm-input>
-        <sm-textarea id="reply_mail_content" placeholder="Type a mail" id="" rows="10" required></sm-textarea>
+        <sm-form>
+            <sm-input id="subject_of_reply_mail" placeholder="Subject" animate></sm-input>
+            <sm-textarea id="reply_mail_content" placeholder="Type a mail" id="" rows="10" required></sm-textarea>
+            <sm-button id="reply_mail_button" variant="primary" disable>Send</sm-button>
+        </sm-form>
     </sm-popup>
     <!-- Contact popup -->
     <sm-popup id="contact_details_popup">
@@ -1232,6 +1220,36 @@
                 elem.addEventListener('click', () => {
                     closePopup()
                 })
+            })
+            getRef('accent_color_selector').colors = [
+                '--dark-red',
+                '--red',
+                '--kinda-pink',
+                '--purple',
+                '--shady-blue',
+                '--nice-blue',
+                '--maybe-cyan',
+                '--teal',
+                '--mint-green',
+                '--greenish-yellow',
+                '--yellowish-green',
+                '--dark-teal',
+                '--orange',
+                '--tangerine',
+                '--redish-orange',
+            ]
+            if (localStorage.getItem(`accent-color`)) {
+                const color = localStorage.getItem(`accent-color`)
+                getRef('accent_color_selector').selectedColor = color
+                document.body.style.setProperty('--accent-color', `var(${color})`);
+            }
+            else {
+                getRef('accent_color_selector').selectedColor = '--nice-blue'
+            }
+            document.addEventListener('colorselected', e => {
+                const color = e.detail.value
+                localStorage.setItem(`accent-color`, color);
+                document.body.style.setProperty('--accent-color', `var(${color})`);
             })
         });
         function createRipple(event, target) {
@@ -3264,6 +3282,7 @@
         async function setBgImage() {
             try {
                 const image = await compactIDB.readData('userSettings', 'bgImage')
+                console.log(image)
                 if (image) {
                     const url = URL.createObjectURL(image)
                     getRef('chat').style.background = `linear-gradient(rgba(var(--foreground-color), 0.6), rgba(var(--foreground-color), 0.6)), url(${url}) center no-repeat`

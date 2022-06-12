@@ -23,6 +23,21 @@ body {
   --danger-color: rgb(255, 75, 75);
   --green: #1cad59;
   --yellow: rgb(220, 165, 0);
+  --dark-red: #d40e1e;
+  --red: #f50000;
+  --kinda-pink: #e40273;
+  --purple: #462191;
+  --shady-blue: #324de6;
+  --nice-blue: #256eff;
+  --maybe-cyan: #00b0ff;
+  --teal: #00bcd4;
+  --mint-green: #16c79a;
+  --yellowish-green: #66bb6a;
+  --greenish-yellow: #8bc34a;
+  --dark-teal: #11698e;
+  --tangerine: #ff6f00;
+  --orange: #ff9100;
+  --redish-orange: #ff3d00;
   color: rgba(var(--text-color), 1);
   background: rgba(var(--foreground-color), 1);
 }
@@ -40,6 +55,21 @@ body[data-theme=dark] {
   --danger-color: rgb(255, 106, 106);
   --green: #00e676;
   --yellow: rgb(255, 213, 5);
+  --dark-red: #ff5e7e;
+  --red: #ff6098;
+  --kinda-pink: #c44ae6;
+  --purple: #9565f7;
+  --shady-blue: #7084f5;
+  --nice-blue: #86afff;
+  --maybe-cyan: #66cfff;
+  --teal: #6aeeff;
+  --mint-green: #4dffd2;
+  --yellowish-green: #9effa2;
+  --greenish-yellow: #c7fc8b;
+  --dark-teal: #51cbff;
+  --tangerine: #ffac6d;
+  --orange: #ffbe68;
+  --redish-orange: #ff8560;
 }
 body[data-theme=dark] .initial {
   color: rgba(var(--text-color), 1) !important;
