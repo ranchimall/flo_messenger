@@ -30,11 +30,6 @@
 
             floDapps.setCustomPrivKeyInput(getSignedIn)
             getRef('emoji_picker').shadowRoot.append(style);
-
-            chatMutationObserver.observe(getRef('messages_container'), {
-                childList: true,
-                subtree: true
-            })
             //invoke the startup functions
             floDapps.launchStartUp().then(result => {
                 console.log(result)
@@ -297,21 +292,14 @@
                             <div id="receiver_initial" class="initial flex align-center"></div>
                             <h4 id="receiver_name"></h4>
                         </div>
-                        <sm-button id="video_call_button" class="hide" onclick="createOffer()">Call
-                        </sm-button>
                     </header>
-                    <section id="chat_middle" class="flex flex-direction-column">
-                        <div id="chat_first_child"></div>
-                        <h5 id="warn_no_encryption">Messages are not encrypted until receiver replies</h5>
-                        <section id="messages_container" class="flex flex-direction-column">
-                        </section>
-                        <div id="scroll_to_bottom" onclick="scrollToBottom()">
-                            <svg class="icon" viewBox="0 0 64 64">
-                                <title></title>
-                                <polyline points="63.65 15.99 32 47.66 0.35 15.99" />
-                            </svg>
-                        </div>
-                    </section>
+                    <section id="messages_container" class="flex flex-direction-column"></section>
+                    <div id="scroll_to_bottom" onclick="scrollToBottom()">
+                        <svg class="icon" viewBox="0 0 64 64">
+                            <title></title>
+                            <polyline points="63.65 15.99 32 47.66 0.35 15.99" />
+                        </svg>
+                    </div>
                     <footer id="chat_footer" class="grid">
                         <emoji-picker id="emoji_picker" class="hide"></emoji-picker>
                         <div class="flex">
@@ -331,11 +319,14 @@
                 </div>
                 <div id="chat_details_panel" class="hide">
                     <header class="flex align-center">
-                        <svg class="icon" onclick="showChatDetails({show: false})" viewBox="0 0 64 64">
-                            <title>close</title>
-                            <line x1="64" y1="0" x2="0" y2="64" />
-                            <line x1="64" y1="64" x2="0" y2="0" />
-                        </svg>
+                        <button class="icon-only" onclick="showChatDetails({show: false})">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0V0z" fill="none" />
+                                <path
+                                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                            </svg>
+                        </button>
                     </header>
                     <div id="chat_profile" class="card">
                         <div id="chat_dp" class="initial flex align-center"></div>
@@ -1019,7 +1010,7 @@
                     })
                     isRemovingMember = false
                     break
-                case 'new_chat_popup':
+                case 'new_message_popup':
                     renderContactList(floGlobals.contacts)
                     break
                 case 'group_creation_popup':
@@ -1270,6 +1261,131 @@
                 circle.remove();
             };
         }
+
+
+
+        // class based lazy loading
+        class LazyLoader {
+            constructor(container, elementsToRender, renderFn, options = {}) {
+                const { batchSize = 10, freshRender, bottomFirst = false, hasUhtml = false } = options
+
+                this.elementsToRender = elementsToRender
+                this.arrayOfElements = (typeof elementsToRender === 'function') ? this.elementsToRender() : elementsToRender || []
+                this.renderFn = renderFn
+                this.intersectionObserver
+
+                this.batchSize = batchSize
+                this.freshRender = freshRender
+                this.bottomFirst = bottomFirst
+                this.hasUhtml = hasUhtml
+
+                this.lastScrollTop = 0
+                this.lastScrollHeight = 0
+
+                this.lazyContainer = document.querySelector(container)
+
+                this.update = this.update.bind(this)
+                this.render = this.render.bind(this)
+                this.init = this.init.bind(this)
+                this.clear = this.clear.bind(this)
+            }
+            get elements() {
+                return this.arrayOfElements
+            }
+            init() {
+                this.intersectionObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            observer.disconnect()
+                            this.render({ lazyLoad: true })
+                        }
+                    })
+                }, {
+                    threshold: 0.3
+                })
+                this.mutationObserver = new MutationObserver(mutationList => {
+                    mutationList.forEach(mutation => {
+                        if (mutation.type === 'childList') {
+                            if (mutation.addedNodes.length) {
+                                if (this.bottomFirst) {
+                                    if (this.lazyContainer.firstElementChild)
+                                        this.intersectionObserver.observe(this.lazyContainer.firstElementChild)
+                                } else {
+                                    if (this.lazyContainer.lastElementChild)
+                                        this.intersectionObserver.observe(this.lazyContainer.lastElementChild)
+                                }
+                                // scroll anchoring for reverse scrolling
+                                this.lastScrollTop = this.lazyContainer.scrollHeight - this.lastScrollHeight + this.lazyContainer.scrollTop
+                                this.lazyContainer.scrollTo({ top: this.lastScrollTop })
+                                this.lastScrollHeight = this.lazyContainer.scrollHeight
+                            }
+                        }
+                    })
+                })
+                this.mutationObserver.observe(this.lazyContainer, {
+                    childList: true,
+                })
+                this.render()
+            }
+            update(elementsToRender) {
+                this.arrayOfElements = (typeof elementsToRender === 'function') ? this.elementsToRender() : elementsToRender || []
+            }
+            render(options = {}) {
+                let { lazyLoad = false } = options
+                const frag = document.createDocumentFragment();
+                if (lazyLoad) {
+                    this.updateStartIndex = this.updateEndIndex
+                    this.updateEndIndex = this.updateEndIndex + this.batchSize
+                } else {
+                    this.intersectionObserver.disconnect()
+                    if (this.hasUhtml)
+                        renderElem(this.lazyContainer, html``)
+                    else
+                        this.lazyContainer.innerHTML = ``;
+                    this.updateStartIndex = 0
+                    this.updateEndIndex = this.batchSize
+                }
+                this.lastScrollHeight = this.lazyContainer.scrollHeight
+                this.lastScrollTop = this.lazyContainer.scrollTop
+                if (this.bottomFirst) {
+                    if (this.hasUhtml) {
+                        console.log('hasUhtml')
+                        renderElem(this.lazyContainer, html`${this.arrayOfElements.slice(-this.updateEndIndex).reverse().map(this.renderFn)}`)
+                    } else {
+                        this.arrayOfElements.slice(this.updateStartIndex, this.updateEndIndex).forEach(element => {
+                            frag.prepend(this.renderFn(element))
+                        })
+                        this.lazyContainer.prepend(frag)
+                    }
+                } else {
+                    if (this.hasUhtml) {
+                        renderElem(this.lazyContainer, html`${this.arrayOfElements.slice(0, this.updateEndIndex).map(this.renderFn)}`)
+                    } else {
+                        this.arrayOfElements.slice(this.updateStartIndex, this.updateEndIndex).forEach(element => {
+                            frag.appendChild(this.renderFn(element))
+                        })
+                        this.lazyContainer.append(frag)
+                    }
+                }
+                if (!lazyLoad && this.bottomFirst)
+                    this.lazyContainer.scrollTo({
+                        top: this.lazyContainer.scrollHeight,
+                    })
+                // Callback to be called if elements are updated or rendered for first time
+                if (!lazyLoad && this.freshRender)
+                    this.freshRender()
+            }
+            clear() {
+                this.intersectionObserver.disconnect()
+                this.mutationObserver.disconnect()
+                this.lazyContainer.innerHTML = ``;
+            }
+            reset() {
+                this.arrayOfElements = (typeof this.elementsToRender === 'function') ? this.elementsToRender() : this.elementsToRender || []
+                this.render()
+            }
+        }
+
         let isMobileView = false
         const mobileQuery = window.matchMedia('(max-width: 40rem)')
         function handleMobileChange(e) {
@@ -1414,7 +1530,7 @@
                         if (type === 'group' && lastMessage.time === 0)
                             lastMessage.time = messenger.groups[floID].created
                         const amISender = type === 'chat' && lastMessage.category === 'sent' || type === 'group' && lastMessage.sender === myFloID
-                        const lastText = html`<p class="last-message">${amISender ? 'You' : ''} ${lastMessage.message}</p>`
+                        const lastText = html`<p class="last-message">${amISender ? 'You: ' : ''} ${lastMessage.message}</p>`
                         const timeAndOptions = html`
                             <h5 class="time">${relativeTime.from(lastMessage.time)}</h5>
                             <svg class="icon menu" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"> <circle cx="5.59" cy="32" r="5.59"/> <circle cx="58.41" cy="32" r="5.59"/> <circle cx="31.89" cy="32" r="5.59"/> </svg>
@@ -1601,7 +1717,7 @@
 
 
         function renderDirectUI(data) {
-            renderMessages(data.messages, { updateChatCard: true });
+            renderMessages({ updateChatCard: true });
             renderMailList(data.mails)
             //let order = Object.keys(data.messages).map(a => a.split('_')).sort((a, b) => a[0] - b[0]).map(a => a[1])
             if (Object.keys(data.messages).length) {
@@ -1613,7 +1729,7 @@
         }
 
         function renderGroupUI(data) {
-            renderMessages(data.messages, { updateChatCard: true });
+            renderMessages({ updateChatCard: true });
         }
 
         window.addEventListener('focus', e => {
@@ -1682,7 +1798,7 @@
         })
 
         const chatScrollInfo = {};
-        getRef('chat_middle').addEventListener('scroll', debounce(() => {
+        getRef('messages_container').addEventListener('scroll', debounce(() => {
             chatScrollInfo['scrollTop'] = this.scrollTop
             chatScrollInfo['scrollheight'] = this.scrollHeight
             if ((this.scrollHeight > this.clientHeight) && (this.scrollHeight - this.clientHeight - this.scrollTop >= 100)) {
@@ -1818,17 +1934,11 @@
                     isGroup: messenger.groups.hasOwnProperty(clickedContact['floID'])
                 }
                 if (clickedContact['floID'] === myFloID) return
-
-                if (e.target.closest(".selectable")) {
-                    if (isRemovingMember)
-                        selectMemberToRemove(e.target.closest(".selectable"))
-                }
-                else if (e.target.closest(".initial") || e.target.closest(".menu")) {
+                if (e.target.closest(".initial") || e.target.closest(".menu")) {
                     openPopup('contact_details_popup')
-                }
-                else {
+                } else {
                     contact.classList.remove('unread')
-                    if (activeChat['chatCard'] === contact && window.innerWidth > 640) return
+                    if (activeChat['chatCard'] === contact && !isMobileView) return
                     showChatDetails({ show: false, animate: false })
                     document.title = `FLO Messenger`
                     getRef('chat').classList.remove('hide')
@@ -1846,6 +1956,37 @@
                 }
             } else if (e.target.closest('.contact-preview')) {
                 removeSelectedContact(e.target.closest('.contact-preview').getAttribute('flo-id'))
+            }
+        })
+        getRef('contacts_container').addEventListener('click', e => {
+            //detect click on chat cards
+            if (e.target.closest(".contact")) {
+                let contact = e.target.closest(".contact")
+                clickedContact = {
+                    ...clickedContact,
+                    chatCard: contact,
+                    floID: contact.getAttribute("flo-id"),
+                    name: contact.getAttribute("name"),
+                    isGroup: messenger.groups.hasOwnProperty(clickedContact['floID'])
+                }
+                if (clickedContact['floID'] === myFloID) return
+                contact.classList.remove('unread')
+                if (activeChat['chatCard'] === contact && !isMobileView) return
+                showChatDetails({ show: false, animate: false })
+                document.title = `FLO Messenger`
+                getRef('chat').classList.remove('hide')
+                viewConversation(contact)
+                if (activeChat['chatCard'])
+                    activeChat['chatCard'].classList.remove('active')
+                contact.classList.add('active')
+                activeChat['chatCard'] = contact
+                if (activeChatPage.id === 'contacts') {
+                    getRef('chat').classList.remove('hide-on-mobile')
+                    getRef('contacts').classList.add('hide-on-mobile')
+                    activeChatPage = getRef('chat')
+                    getRef('main_navbar').classList.add('hide-on-mobile')
+                }
+                closePopup()
             }
         })
         getRef('contacts_popup').addEventListener('click', e => {
@@ -1972,7 +2113,7 @@
         getRef('emoji_picker').addEventListener('emoji-click', e => {
             const clickedEmoji = e.detail.unicode
             getRef('type_message').value += clickedEmoji
-            if (window.innerWidth > 640) {
+            if (!isMobileView) {
                 setTimeout(() => {
                     getRef('type_message').focusIn()
                 }, 0);
@@ -2024,7 +2165,7 @@
         })
 
         function updateHeight() {
-            if (window.innerWidth < 640) {
+            if (isMobileView) {
                 getRef('chat').style.height = window.innerHeight + 'px'
             }
             else {
@@ -2154,7 +2295,7 @@
         })
 
         function sendMessage() {
-            if (window.innerWidth > 640)
+            if (!isMobileView)
                 getRef('type_message').focusIn()
             let receiver = activeChat['floID']
             let container;
@@ -2244,6 +2385,7 @@
                 let isSelected = selectedGroupMembers.has(floID)
                 contacts.push(render.contactCard(floID, { type: 'contact', isSelected }))
             }
+            console.log(contacts, contactList)
             renderElem(getRef('contacts_container'), html`${contacts}`)
         }
 
@@ -2275,150 +2417,89 @@
             }
             getRef('scroll_to_bottom').classList.remove('new-message')
             setTimeout(() => {
-                getRef('chat_middle').scrollTo({ top: getRef('chat_middle').scrollHeight, behavior: smooth ? 'smooth' : undefined })
+                getRef('messages_container').scrollTo({ top: getRef('messages_container').scrollHeight, behavior: smooth ? 'smooth' : undefined })
             }, smooth ? 300 : 0);
         }
 
-        let startIndex = 0,
-            endIndex = 0
-        function renderMessages(data, options) {
-            let { markUnread = true, updateChatCard = false, reRender = false, lazyLoad = false } = options
-            let messages
-            if (reRender) {
-                activeChat['allMessages'] = Object.values(data)
-                startIndex = activeChat['allMessages'].length > 20 ? activeChat['allMessages'].length - 20 : 0
-                endIndex = activeChat['allMessages'].length
-                messages = activeChat['allMessages']
-                renderedDates.clear()
-            }
-            else if (lazyLoad) {
-                messages = activeChat['allMessages']
-                endIndex = startIndex
-                startIndex = endIndex > 20 ? endIndex - 20 : 0
-                markUnread = false
-            }
-            else {
-                messages = Object.values(data)
-                if (messages.length) {
-                    startIndex = 0
-                    endIndex = messages.length
-                }
-            }
-
-            if (messages && messages.length) {
-                for (let i = startIndex; i < endIndex; i++) {
-                    let { floID, groupID, sender, message, time, category } = messages[i]
-                    //Stops message from rendering in wrong chat window
-                    if (activeChat['floID'] && (activeChat['floID'] === floID || activeChat['floID'] === groupID)) {
-                        // Stops message rendering if message is sent from original user causing duplication
-                        if (updateChatCard && activeChat.isGroup && message && sender === myFloID) {
-                            messenger.removeMark(groupID, 'unread')
-                            return
-                        }
-                        frag.append(render.messageBubble({ ...messages[i], updateChatCard }))
+        let chatLazyLoader
+        async function renderMessages(options) {
+            let { markUnread = true, updateChatCard = false } = options
+            try {
+                if (activeChat.floID) {
+                    let messages = Object.values(await messenger.getChat(activeChat['floID'])).reverse()
+                    if (chatLazyLoader) {
+                        chatLazyLoader.update(messages)
+                    } else {
+                        chatLazyLoader = new LazyLoader('#messages_container', messages, render.messageBubble, {
+                            bottomFirst: true, hasUhtml: true, freshRender: () => {
+                                currentDate = null
+                                lastSender = null
+                            }
+                        });
                     }
-                    const contact = getRef('chats_list').querySelector(`.contact[flo-id='${floID || groupID}']`)
-                    if (markUnread && contact) {
-                        contact.classList.add("unread");
-                        if (contact !== getRef('chats_list').children[0]) {
-                            const cloneContact = contact.cloneNode(true)
-                            contact.remove()
-                            getRef('chats_list').prepend(cloneContact)
-                            animateTo(getRef('chats_list').children[0], [
-                                { transform: 'translateY(1rem)' },
-                                { transform: 'none' },
-                            ],
-                                {
-                                    easing: 'ease',
-                                    duration: 300
-                                }
-                            )
+                    chatLazyLoader.init()
+                    messages.forEach(messageDetails => {
+                        let { floID, groupID, sender, message, time, category } = messageDetails
+                        const contact = getRef('chats_list').querySelector(`.contact[flo-id='${floID || groupID}']`)
+                        if (markUnread && contact) {
+                            contact.classList.add("unread");
+                            if (contact !== getRef('chats_list').children[0]) {
+                                const cloneContact = contact.cloneNode(true)
+                                contact.remove()
+                                getRef('chats_list').prepend(cloneContact)
+                                animateTo(getRef('chats_list').children[0], [
+                                    { transform: 'translateY(1rem)' },
+                                    { transform: 'none' },
+                                ],
+                                    {
+                                        easing: 'ease',
+                                        duration: 300
+                                    }
+                                )
+                            }
                         }
-                    }
-                    if (updateChatCard) {
-                        let chatCard
-                        if (!contact) {
-                            getRef('chats_list').prepend(render.contactCard(floID, { type: 'chat', markUnread: true }))
-                            chatCard = getRef('chats_list').firstElementChild
-                        }
-                        else {
-                            chatCard = contact
-                            let finalMessage
-                            if (floGlobals.contacts[sender])
-                                finalMessage = `${floGlobals.contacts[sender]}: ${message}`
-                            else if (sender === myFloID)
-                                finalMessage = `You: ${message}`
-                            else
-                                finalMessage = message
-                            if (chatCard.querySelector('.last-message'))
-                                chatCard.querySelector('.last-message').textContent = finalMessage
-                            chatCard.querySelector('.time').textContent = relativeTime.from(time)
-                        }
-
-                        if (activeChat.floID === (floID || groupID)) {
-                            if (chatScrollInfo.isScrolledUp)
-                                getRef('scroll_to_bottom').classList.add('new-message')
+                        if (updateChatCard) {
+                            let chatCard
+                            if (!contact) {
+                                getRef('chats_list').prepend(render.contactCard(floID, { type: 'chat', markUnread: true }))
+                                chatCard = getRef('chats_list').firstElementChild
+                            }
                             else {
-                                if (document.hasFocus()) {
-                                    messenger.removeMark((floID || groupID), 'unread')
-                                    setTimeout(() => {
-                                        document.title = 'FLO Messenger'
-                                        activeChat.chatCard.classList.remove('unread')
-                                    }, 1000);
+                                chatCard = contact
+                                let finalMessage
+                                if (floGlobals.contacts[sender])
+                                    finalMessage = `${floGlobals.contacts[sender]}: ${message}`
+                                else if (sender === myFloID)
+                                    finalMessage = `You: ${message}`
+                                else
+                                    finalMessage = message
+                                if (chatCard.querySelector('.last-message'))
+                                    chatCard.querySelector('.last-message').textContent = finalMessage
+                                chatCard.querySelector('.time').textContent = relativeTime.from(time)
+                            }
+
+                            if (activeChat.floID === (floID || groupID)) {
+                                if (chatScrollInfo.isScrolledUp)
+                                    getRef('scroll_to_bottom').classList.add('new-message')
+                                else {
+                                    if (document.hasFocus()) {
+                                        messenger.removeMark((floID || groupID), 'unread')
+                                        setTimeout(() => {
+                                            document.title = 'FLO Messenger'
+                                            activeChat.chatCard.classList.remove('unread')
+                                        }, 1000);
+                                    }
                                 }
                             }
                         }
-                    }
+                    })
                 }
-            }
-
-            if (!lazyLoad && !reRender) {
-                endIndex = messages.length
-                getRef('messages_container').append(frag)
-                if (!chatScrollInfo['isScrolledUp']) {
-                    setTimeout(() => {
-                        scrollToBottom(true)
-                    }, 100);
-                }
-            }
-            if (reRender || lazyLoad) {
-                currentDate = null
-                lastSender = null
-                chatScrollInfo['scrollTop'] = getRef('chat_middle').scrollTop
-                chatScrollInfo['scrollHeight'] = getRef('chat_middle').scrollHeight
-                getRef('messages_container').prepend(frag)
-            }
-            if (reRender) {
-                scrollToBottom()
+            } catch (error) {
+                console.log(error)
             }
         }
 
-        //checks for added elements in chat
-        const chatMutationObserver = new MutationObserver(
-            (mutations, observer) => {
-                for (const mutation of mutations) {
-                    if (mutation.type === 'childList' && mutation.addedNodes.length && getRef('messages_container').firstElementChild) {
-                        chatMessageObserver.observe(getRef('messages_container').firstElementChild)
-                        chatScrollInfo['scrollTop'] += (getRef('chat_middle').scrollHeight - chatScrollInfo['scrollHeight'])
-                        chatScrollInfo['scrollHeight'] = getRef('chat_middle').scrollHeight
-                        getRef('chat_middle').scrollTo({ top: chatScrollInfo['scrollTop'] })
-                    }
-                }
-            }
-        )
-
-        //Lazy loading for chat messages
-        const chatMessageObserver = new IntersectionObserver(
-            (entries, observer) => {
-                if (entries[0].isIntersecting) {
-                    renderMessages('', { lazyLoad: true })
-                    observer.disconnect()
-                }
-            }
-        )
-
         async function viewConversation(contact) {
-            getRef('messages_container').innerHTML = ''
             let floID = clickedContact['floID'],
                 name = contact.getAttribute('name'),
                 textColor = contact.getAttribute('text-color'),
@@ -2432,18 +2513,15 @@
                 getRef("receiver_initial").innerHTML = `
                     <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
                     `
-                getRef('video_call_button').classList.add('hide')
             }
             else {
                 getRef("receiver_initial").textContent = getContactName(floID).charAt(0);
-                // getRef('video_call_button').classList.remove('hide')    
             }
             getRef("receiver_initial").setAttribute('style', `color: ${textColor}; background-color: ${backgroundColor};`)
-            if (floGlobals.pubKeys[floID] || activeChat.isGroup)
-                getRef("warn_no_encryption").classList.add("hide");
-            else
-                getRef("warn_no_encryption").classList.remove("hide");
-            renderMessages(await messenger.getChat(floID), { markUnread: false, reRender: true })
+            renderMessages({ markUnread: false }).then(() => {
+                if (!floGlobals.pubKeys[floID] && !activeChat.isGroup)
+                    getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption">Converstion is not encrypted until receiver replies</strong>`)
+            })
             messenger.removeMark(floID, "unread");
             if (this.scrollHeight <= this.clientHeight) {
                 chatScrollInfo['isScrolledUp'] = false
@@ -2814,7 +2892,7 @@
         async function clearChat() {
             if (await confirmation('Clear chat?', `Are you sure to clear this chat?`, 'No', "Yes")) {
                 messenger.clearChat(clickedContact.floID).then(result => {
-                    getRef('messages_container').innerHTML = ''
+                    renderElem(getRef('messages_container'), html``)
                     closePopup()
                     notify('Chat cleared', 'success')
                 })

@@ -1650,9 +1650,11 @@ sm-button[variant=primary] {
 
 .sent {
   margin-left: auto;
-  color: #efefef;
   background: var(--accent-color);
   border-radius: 0.8rem 0 0.8rem 0.8rem;
+}
+.sent > * {
+  color: #efefef;
 }
 .sent::after {
   content: "";
@@ -1864,7 +1866,7 @@ sm-button[variant=primary] {
   font-size: 2.6rem !important;
 }
 
-#chat_middle {
+#messages_container {
   flex: 1;
   padding: 0 1rem;
 }
@@ -1924,7 +1926,7 @@ sm-button[variant=primary] {
   stroke: rgba(var(--text-color), 0.4);
 }
 
-#chat_middle,
+#messages_container,
 #chats_list,
 #inbox_mail_container,
 #sent_mail_container,
