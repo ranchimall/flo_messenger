@@ -210,7 +210,7 @@
         </div>
     </div>
     <main id="main_page" class="page grid hide">
-        <section id="chat_page" class="inner-page grid">
+        <section id="chat_page" class="inner-page">
             <div id="contacts" class="grid">
                 <header class="grid header">
                     <div class="flex align-center">
@@ -243,8 +243,8 @@
                         </sm-input>
                     </div>
                 </header>
-                <sm-button variant="primary" id="new_message_button" onclick="openPopup('new_message_popup')"
-                    class="fab round">
+                <button id="new_message_button" onclick="openPopup('new_message_popup')"
+                    class="button button--primary fab round">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
@@ -252,7 +252,7 @@
                             d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM5.92 19H5v-.92l9.06-9.06.92.92L5.92 19zM20.71 5.63l-2.34-2.34c-.2-.2-.45-.29-.71-.29s-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41z" />
                     </svg>
                     New chat
-                </sm-button>
+                </button>
                 <div id="chats_list" class="flex observe-empty-state"></div>
                 <div id="new_conversation" class="flex flex-direction-column empty-state">
                     <svg class="icon new-conversation align-center" viewBox="0 0 512 512">
@@ -270,12 +270,13 @@
             <div id="chat" class="grid hide-on-mobile hide">
                 <div id="chat_left">
                     <header id="chat_header" class="grid align-center">
-                        <svg class="icon hide-on-desktop back-button" onclick="goto('chats')"
-                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-                            <title>Go to chat page</title>
-                            <line x1="1" y1="32" x2="64" y2="32" />
-                            <polyline points="29.64 60.97 0.65 32 29.64 3.03" />
-                        </svg>
+                        <button class=" hide-on-desktop back-button" onclick="goto('chats')">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0V0z" fill="none" opacity=".87" />
+                                <path d="M17.51 3.87L15.73 2.1 5.84 12l9.9 9.9 1.77-1.77L9.38 12l8.13-8.13z" />
+                            </svg>
+                        </button>
                         <div class="flex align-center interact" onclick="showChatDetails({show: true})">
                             <div id="receiver_initial" class="initial flex align-center"></div>
                             <h4 id="receiver_name"></h4>
@@ -296,12 +297,8 @@
                                 <path
                                     d="M32,0A32,32,0,1,0,64,32,32,32,0,0,0,32,0ZM43.84,17.51a4.92,4.92,0,1,1-4.92,4.92A4.92,4.92,0,0,1,43.84,17.51Zm-23.62-.06a5,5,0,1,1-5,5A5,5,0,0,1,20.22,17.45ZM32,54.42A19.68,19.68,0,0,1,12.31,34.73H51.69A19.68,19.68,0,0,1,32,54.42Z" />
                             </svg>
-                            <sm-textarea id="type_message" placeholder="Type a message" class="rest"></sm-textarea>
-                            <svg xmlns="http://www.w3.org/2000/svg" id="send_message_button" class="icon"
-                                viewBox="0 0 64 64">
-                                <path
-                                    d="M63.34,31,3.07,4.71A2.19,2.19,0,0,0,.18,7.58L8.94,28.29,42.18,32,8.94,35.71.18,56.42a2.19,2.19,0,0,0,2.89,2.87L63.34,33A1.09,1.09,0,0,0,63.34,31Z" />
-                            </svg>
+                            <sm-textarea id="type_message" placeholder="Type a message" class="w-100"></sm-textarea>
+                            <button id="send_message_button"> Send </button>
                         </div>
                     </footer>
                 </div>
@@ -352,7 +349,7 @@
                 </div>
             </div>
         </section>
-        <section class="inner-page grid hide" id="mail_page">
+        <section class="inner-page hide" id="mail_page">
             <div id="mails" class="grid">
                 <header class="grid header">
                     <div class="flex align-center">
@@ -363,13 +360,13 @@
                         </strip-select>
                     </div>
                 </header>
-                <sm-button variant="primary" id="new_mail_button" class="fab round">
+                <button class="button button--primary fab" id="new_mail_button">
                     <svg class="icon" viewBox="0 0 64 64">
                         <path
                             d="M46.73,14.81l7,7,7.65-7.6A7.15,7.15,0,0,0,61.39,4L60.11,2.77a7.23,7.23,0,0,0-10.19,0L3.87,48.57a5,5,0,0,0-1.39,2.6L.53,61.27a1.74,1.74,0,0,0,2,2l10.15-1.94A5.06,5.06,0,0,0,15.34,60L49.6,25.9" />
                     </svg>
                     New Mail
-                </sm-button>
+                </button>
                 <div>
                     <ul id="inbox_mail_container" class="mail-container flex observe-empty-state"></ul>
                     <div class="empty-state flex flex-direction-column align-center">
@@ -471,13 +468,16 @@
                     </section>
                     <section>
                         <h4>Set chat and mail background image</h4>
-                        <div id="bg_preview_container" class="flex">
-                            <div id="selected_bg_preview" class="bg-preview hide" onclick="setBgImage()">
-                                <img src="" alt="background perview" class="bg-preview__image">
-                            </div>
-                            <div id="default_bg_preview" class="bg-preview bg-preview--selected"
-                                onclick="setDefaultBg()">Default</div>
-                        </div>
+                        <fieldset id="bg_preview_container" class="flex">
+                            <label id="selected_bg_preview" class="bg-preview hide">
+                                <input type="radio" name="bg" value="img">
+                                <img src="" alt="background preview" class="bg-preview__image">
+                            </label>
+                            <label id="default_bg_preview" class="bg-preview bg-preview--selected">
+                                <input type="radio" name="bg" value="default">
+                                Default
+                            </label>
+                        </fieldset>
                         <label class="button select-file">
                             <span id="select_bg_button">Select background</span>
                             <input type="file" id="select_bg_image" accept="image/*" />
@@ -552,6 +552,8 @@
                 </li>
             </ul>
         </nav>
+        <div id="background_overlay"></div>
+        <img id="background_image"></img>
     </main>
     <sm-popup id="add_contact_popup">
         <header class="popup__header" slot="header">
@@ -724,8 +726,8 @@
                     <p>No contacts found.</p>
                 </div>
             </div>
-            <sm-button id="skip_members_button" variant="primary" class="fab round hide"
-                onclick="openPopup('group_creation_popup')"> Skip </sm-button>
+            <button id="skip_members_button" variant="primary" class="hide" onclick="openPopup('group_creation_popup')">
+                Skip </button>
         </div>
         <sm-form class="hide">
             <div class="grid">
@@ -795,12 +797,6 @@
             </header>
             <h4 class="mail-subject"></h4>
             <p class="mail-content"></p>
-        </div>
-    </template>
-    <template id="message_template">
-        <div class="message">
-            <p class="message-body"></p>
-            <time class="time"></time>
         </div>
     </template>
     <script src="scripts/components.js"></script>
@@ -1168,6 +1164,8 @@
                     case 'date-only':
                         return `${month} ${date}, ${year}`;
                         break;
+                    case 'time-only':
+                        return finalHours;
                     default:
                         return `${month} ${date}, ${year} at ${finalHours}`;
                 }
@@ -1285,7 +1283,7 @@
         // class based lazy loading
         class LazyLoader {
             constructor(container, elementsToRender, renderFn, options = {}) {
-                const { batchSize = 10, freshRender, bottomFirst = false, hasUhtml = false } = options
+                const { batchSize = 10, freshRender, bottomFirst = false, hasUhtml = false, domUpdated } = options
 
                 this.elementsToRender = elementsToRender
                 this.arrayOfElements = (typeof elementsToRender === 'function') ? this.elementsToRender() : elementsToRender || []
@@ -1294,9 +1292,11 @@
 
                 this.batchSize = batchSize
                 this.freshRender = freshRender
+                this.domUpdated = domUpdated
                 this.bottomFirst = bottomFirst
                 this.hasUhtml = hasUhtml
 
+                this.shouldLazyLoad = false
                 this.lastScrollTop = 0
                 this.lastScrollHeight = 0
 
@@ -1336,6 +1336,9 @@
                                 this.lastScrollTop = this.lazyContainer.scrollHeight - this.lastScrollHeight + this.lazyContainer.scrollTop
                                 this.lazyContainer.scrollTo({ top: this.lastScrollTop })
                                 this.lastScrollHeight = this.lazyContainer.scrollHeight
+                                // Callback to be called if dom is updated
+                                if (this.shouldLazyLoad && this.domUpdated)
+                                    this.domUpdated()
                             }
                         }
                     })
@@ -1350,6 +1353,7 @@
             }
             render(options = {}) {
                 let { lazyLoad = false } = options
+                this.shouldLazyLoad = lazyLoad
                 const frag = document.createDocumentFragment();
                 if (lazyLoad) {
                     this.updateStartIndex = this.updateEndIndex
@@ -1367,8 +1371,7 @@
                 this.lastScrollTop = this.lazyContainer.scrollTop
                 if (this.bottomFirst) {
                     if (this.hasUhtml) {
-                        console.log('hasUhtml')
-                        renderElem(this.lazyContainer, html`${this.arrayOfElements.slice(-this.updateEndIndex).reverse().map(this.renderFn)}`)
+                        renderElem(this.lazyContainer, html`${this.arrayOfElements.slice(0, this.updateEndIndex).reverse().map(this.renderFn)}`)
                     } else {
                         this.arrayOfElements.slice(this.updateStartIndex, this.updateEndIndex).forEach(element => {
                             frag.prepend(this.renderFn(element))
@@ -1385,6 +1388,7 @@
                         this.lazyContainer.append(frag)
                     }
                 }
+                this.isRendering = false
                 if (!lazyLoad && this.bottomFirst)
                     this.lazyContainer.scrollTo({
                         top: this.lazyContainer.scrollHeight,
@@ -1467,6 +1471,9 @@
             activeChat = {},
             activeMail,
             frag = document.createDocumentFragment()
+
+
+        const renderedDates = new Set()
 
         // render elements 
         const render = {
@@ -1594,34 +1601,19 @@
             },
             messageBubble(msg) {
                 let { admin = false, newMembers = [], rmMembers = [], groupID, name, description, sender, floID, message, time: timestamp, category, unconfirmed = false, updateChatCard = false } = msg
-                let card = getRef('message_template').content.cloneNode(true),
-                    cardContainer = card.querySelector('.message'),
-                    messageContent = cardContainer.children[0],
-                    messageTime = cardContainer.children[1]
-
                 if (activeChat.isGroup) {
                     floID = groupID
                     category = sender === myFloID ? 'sent' : 'received'
                 }
-
                 if (message) {
-                    cardContainer.id = `${floID}_${timestamp}`
-                    if (unconfirmed)
-                        cardContainer.classList.add('unconfirmed')
-
-                    cardContainer.classList.add(category)
-
+                    let senderName = null
                     if (sender) {
-                        if (sender !== myFloID && lastSender !== sender) {
-                            let senderName = html.node`<div class="sender-name" style=${`color:${contactColor(sender)}`}>${getContactName(sender)}</div>`
-                            cardContainer.prepend(senderName)
-                            cardContainer.classList.add('distinct-sender')
-                            messageContent = cardContainer.children[1]
-                            messageTime = cardContainer.children[2]
-                        }
+                        if (sender !== myFloID && lastSender !== sender)
+                            senderName = html.node`<div class="sender-name" style=${`color:${contactColor(sender)}`}>${getContactName(sender)}</div>`
                         lastSender = sender
                     }
-
+                    let messageContent = document.createDocumentFragment()
+                    let isBigEmoji = false
                     if (hasURL(message)) {
                         const chunks = message.split(' ')
                         const chunksLength = chunks.length - 1
@@ -1631,45 +1623,32 @@
                                 const text = chunksLength !== index ? `${chunk} ` : chunk
                                 const anchorTag = html.node`<a href="${href}" target="_blank" rel="noopener">${text}</a>`
                                 messageContent.append(anchorTag)
-                            }
-                            else {
+                            } else {
                                 const text = chunksLength !== index ? `${chunk} ` : chunk
                                 const textNode = document.createTextNode(text)
                                 messageContent.append(textNode)
                             }
                         })
-                    }
-                    else {
+                    } else {
                         let [messageBody, isOnlyEmoji] = isEmoji(message)
-                        if (isOnlyEmoji)
-                            cardContainer.classList.add('big-emoji')
+                        isBigEmoji = isOnlyEmoji
                         messageContent.append(messageBody)
                     }
-                    let time = new Date(timestamp).toString(),
-                        minutes = String(new Date(timestamp).getMinutes()),
-                        hours = new Date(timestamp).getHours(),
-                        year = new Date(timestamp).getFullYear()
-                    minutes = minutes.length === 1 ? `0${minutes}` : minutes
-                    let finalHours = hours - 12 > 0 ? `${hours - 12}:${minutes} pm` : `${hours}:${minutes} am`
 
-                    messageTime.textContent = finalHours
                     if (currentFloID !== floID) {
-                        currentDate = null
                         lastSender = null
                         currentFloID = floID
-                        renderedDates.clear()
                     }
-
-                    if (!renderedDates.has(`${time.slice(4, 10)} ${year}`) && `${time.slice(4, 10)} ${year}` !== currentDate) {
-                        let frag = document.createDocumentFragment()
-                        currentDate = `${time.slice(4, 10)} ${year}`
-                        let dateCard = html.node`<time class="date-card">${new Date().getFullYear() !== year ? `${time.slice(4, 10)} ${year}` : time.slice(4, 10)}</time>`
-                        frag.append(dateCard, card)
-                        renderedDates.set(currentDate, currentDate)
-                        return frag
-                    }
-                    else
-                        return card;
+                    const messageDate = getFormattedTime(timestamp, 'date-only')
+                    renderedDates.add(messageDate)
+                    const className = `message ${category} ${unconfirmed ? 'unconfirmed' : ''} ${senderName ? 'distinct-sender' : ''} ${isBigEmoji ? 'big-emoji' : ''}`
+                    return html.node`
+                        <div class="${className}" id="${`${floID}_${timestamp}`}" data-date="${messageDate}">
+                            ${senderName}
+                            <p class="message-body">${messageContent}</p>
+                            <time class="time">${getFormattedTime(timestamp, 'time-only')}</time>
+                        </div>
+                    `
                 } else if (admin) {
                     if (newMembers.length) {
                         const cards = document.createDocumentFragment()
@@ -1679,8 +1658,7 @@
                             cards.append(eventCard)
                         })
                         return cards
-                    }
-                    else if (rmMembers.length) {
+                    } else if (rmMembers.length) {
                         const cards = document.createDocumentFragment()
                         const { admin } = messenger.groups[groupID]
                         rmMembers.forEach(member => {
@@ -1688,11 +1666,9 @@
                             cards.append(eventCard)
                         })
                         return cards
-                    }
-                    else if (name) {
+                    } else if (name) {
                         return html.node`<p class="group-event-card">Changed group name to '${name}'</p>`
-                    }
-                    else if (description) {
+                    } else if (description) {
                         return html.node`<p class="group-event-card">Changed group description to '${description}'</p>`
                     }
                 }
@@ -1702,7 +1678,6 @@
 
         let currentDate,
             currentFloID,
-            renderedDates = new Map(),
             lastSender
 
         const hasURL = text => /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/.test(text)
@@ -1817,8 +1792,6 @@
 
         const chatScrollInfo = {};
         getRef('messages_container').addEventListener('scroll', debounce(() => {
-            chatScrollInfo['scrollTop'] = this.scrollTop
-            chatScrollInfo['scrollheight'] = this.scrollHeight
             if ((this.scrollHeight > this.clientHeight) && (this.scrollHeight - this.clientHeight - this.scrollTop >= 100)) {
                 chatScrollInfo['isScrolledUp'] = true
                 getRef('scroll_to_bottom').classList.add('no-transformations')
@@ -2449,13 +2422,21 @@
                         chatLazyLoader.update(messages)
                     } else {
                         chatLazyLoader = new LazyLoader('#messages_container', messages, render.messageBubble, {
-                            bottomFirst: true, hasUhtml: true, freshRender: () => {
-                                currentDate = null
-                                lastSender = null
-                            }
+                            bottomFirst: true, domUpdated: debounce(() => {
+                                renderedDates.forEach(date => {
+                                    if (getRef('messages_container').querySelector(`.date-card[data-date="${date}"]`)) {
+                                        getRef('messages_container').querySelector(`.date-card[data-date="${date}"]`).remove()
+                                    }
+                                    const dateCard = html.node`<time class="date-card" data-date="${date}">${date}</time>`
+                                    getRef('messages_container').querySelector(`.message[data-date="${date}"]`).before(dateCard)
+                                    renderedDates.delete(date)
+                                }, 100)
+                            })
                         });
                     }
                     chatLazyLoader.init()
+
+
                     messages.forEach(messageDetails => {
                         let { floID, groupID, sender, message, time, category } = messageDetails
                         const contact = getRef('chats_list').querySelector(`.contact[flo-id='${floID || groupID}']`)
@@ -3270,7 +3251,8 @@
             document.body.style.setProperty('--accent-color', color);
         })
 
-        document.getElementById('select_bg_image').addEventListener('change', function (e) {
+        document.getElementById('select_bg_image').addEventListener('change', async function (e) {
+            await compactIDB.writeData('userSettings', true, 'hasSelectedBg')
             compactIDB.writeData('userSettings', this.files[0], 'bgImage')
                 .then(async res => {
                     setBgImage()
@@ -3279,24 +3261,35 @@
                 .catch(err => console.error(err))
         })
 
+        getRef('bg_preview_container').addEventListener('change', async e => {
+            await compactIDB.writeData('userSettings', e.target.value === 'img', 'hasSelectedBg');
+            [...getRef('bg_preview_container').children].forEach(child => {
+                if (child.firstElementChild.value === e.target.value)
+                    child.classList.add('bg-preview--selected')
+                else
+                    child.classList.remove('bg-preview--selected')
+            })
+            if (e.target.value === 'img') {
+                setBgImage()
+            } else {
+                setDefaultBg()
+            }
+        })
         async function setBgImage() {
             try {
+                const hasSelectedBg = await compactIDB.readData('userSettings', 'hasSelectedBg')
                 const image = await compactIDB.readData('userSettings', 'bgImage')
-                console.log(image)
                 if (image) {
                     const url = URL.createObjectURL(image)
-                    getRef('chat').style.background = `linear-gradient(rgba(var(--foreground-color), 0.6), rgba(var(--foreground-color), 0.6)), url(${url}) center no-repeat`
-                    getRef('mail').style.background = `linear-gradient(rgba(var(--foreground-color), 0.6), rgba(var(--foreground-color), 0.6)), url(${url}) center no-repeat`
-                    getRef('chat_preview').style.background = `linear-gradient(rgba(var(--foreground-color), 0.6), rgba(var(--foreground-color), 0.6)), url(${url}) center no-repeat`
-                    getRef('chat').style.backgroundSize = 'cover'
-                    getRef('mail').style.backgroundSize = 'cover'
-                    getRef('chat_preview').style.backgroundSize = 'cover';
-                    addClass(['#chat', '#mail', '#chat_preview'], 'has-bg-image')
-                    getRef('selected_bg_preview').firstElementChild.src = url
-                    getRef('selected_bg_preview').classList.add('bg-preview--selected')
+                    if (hasSelectedBg) {
+                        getRef('background_image').src = url
+                        addClass(['#chat', '#mail', '#chat_preview'], 'has-bg-image')
+                        getRef('select_bg_button').textContent = 'Change background'
+                        getRef('selected_bg_preview').classList.add('bg-preview--selected')
+                        getRef('default_bg_preview').classList.remove('bg-preview--selected')
+                    }
                     getRef('selected_bg_preview').classList.remove('hide')
-                    getRef('default_bg_preview').classList.remove('bg-preview--selected')
-                    getRef('select_bg_button').textContent = 'Change background'
+                    getRef('selected_bg_preview').querySelector('img').src = url
                 }
             }
             catch (err) {
@@ -3305,13 +3298,12 @@
         }
 
         function setDefaultBg() {
-            getRef('chat').style.background = ``
-            getRef('mail').style.background = ``
-            getRef('chat_preview').style.background = ``
-            removeClass(['#chat', '#mail', '#chat_preview'], 'has-bg-image')
-            getRef('selected_bg_preview').classList.remove('bg-preview--selected')
-            getRef('default_bg_preview').classList.add('bg-preview--selected')
-            notify('Default background applied', 'success')
+            compactIDB.writeData('userSettings', false, 'hasSelectedBg')
+                .then(async res => {
+                    getRef('background_image').src = ''
+                    removeClass(['#chat', '#mail', '#chat_preview'], 'has-bg-image')
+                })
+                .catch(err => console.error(err))
         }
 
     </script>

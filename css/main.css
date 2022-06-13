@@ -40,6 +40,7 @@ body {
   --redish-orange: #ff3d00;
   color: rgba(var(--text-color), 1);
   background: rgba(var(--foreground-color), 1);
+  overflow-y: hidden;
 }
 body #scroll_to_bottom {
   background: rgba(var(--foreground-color), 1);
@@ -218,6 +219,10 @@ details[open] summary {
 }
 details[open] > summary .down-arrow {
   transform: rotate(180deg);
+}
+
+fieldset {
+  border: none;
 }
 
 sm-input,
@@ -557,6 +562,11 @@ ol li::before {
   margin: 1.5rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
   z-index: 2;
+  border-radius: 0.5rem;
+  padding: 0.8rem 1rem;
+}
+.fab .icon {
+  margin-right: 0.5rem;
 }
 
 .page {
@@ -871,14 +881,32 @@ sm-button[variant=primary] {
     transform: scale(1);
   }
 }
+#background_overlay,
+#background_image {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+
+#background_overlay {
+  background-color: red;
+  z-index: -1;
+  background-color: rgba(var(--foreground-color), 0.9);
+  -webkit-backdrop-filter: blur(1rem);
+          backdrop-filter: blur(1rem);
+  transition: background-color 0.3s;
+}
+
+#background_image {
+  z-index: -2;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
 #main_page {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto 1fr;
-  height: 100%;
-  width: 100%;
-  transition: background-color 0.3s;
-  background-color: rgba(var(--foreground-color), 1);
+  grid-template-rows: 1fr auto;
 }
 
 .initial {
@@ -1389,6 +1417,7 @@ sm-button[variant=primary] {
 #contacts {
   position: relative;
   overflow-x: hidden;
+  height: 100%;
 }
 #contacts .scrolling-wrapper {
   height: 100%;
@@ -1426,12 +1455,15 @@ sm-button[variant=primary] {
   position: relative;
   grid-template-rows: -webkit-max-content 1fr;
   grid-template-rows: max-content 1fr;
+  background-color: rgba(var(--background-color), 0.1);
+  margin: 0.5rem 0;
+  border-radius: 0.5rem;
+  height: calc(100% - 1rem);
 }
 
 #contacts,
 #mails,
 #settings_page {
-  height: 100vh;
   overflow-y: hidden;
 }
 #contacts .header,
@@ -1518,7 +1550,8 @@ sm-button[variant=primary] {
 #chat_page,
 #mail_page,
 #settings_page {
-  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
 }
@@ -1575,12 +1608,6 @@ sm-button[variant=primary] {
   min-height: 4rem;
   background-color: rgba(var(--foreground-color), 0.8);
   z-index: 1;
-}
-#chat_details_panel header .icon {
-  height: 2.3rem;
-  width: 2.3rem;
-  padding: 0.7rem;
-  cursor: pointer;
 }
 #chat_details_panel .contact {
   padding: 0.5rem 0;
@@ -1684,7 +1711,7 @@ sm-button[variant=primary] {
   border-radius: 0.8rem 0 0.8rem 0.8rem;
 }
 .sent > * {
-  color: #efefef;
+  color: rgba(var(--background-color), 1);
 }
 .sent::after {
   content: "";
@@ -1781,12 +1808,8 @@ sm-button[variant=primary] {
   height: 100%;
 }
 #chat_header .back-button {
-  height: 2rem;
-  width: 2rem;
-  padding: 0.5rem;
-  stroke-width: 8;
-  margin-right: 0.5rem;
-  stroke: rgba(var(--text-color), 0.8);
+  padding: 0;
+  margin: 0 -0.5rem 0 -1.2rem;
 }
 #chat_header .initial {
   cursor: pointer;
@@ -1858,27 +1881,15 @@ sm-button[variant=primary] {
 }
 
 #send_message_button {
-  position: absolute;
-  right: 1.5rem;
-  transform: scale(0);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 1;
   align-self: center;
-  height: 2.4rem;
-  width: 2.4rem;
-  padding: 0.5rem;
-  cursor: pointer;
-  stroke: none;
-  fill: rgba(var(--text-color), 0.4);
-  margin-left: 1rem;
-  transition: 0.3s;
+  padding: 0.5rem 0.8rem;
+  margin-left: 0.5rem;
+  opacity: 0.5;
+  font-weight: 500;
 }
 #send_message_button.active {
   opacity: 1;
-  fill: var(--accent-color);
-  transform: none;
-  pointer-events: all;
+  color: var(--accent-color);
 }
 
 #type_message {
@@ -2137,7 +2148,11 @@ sm-button[variant=primary] {
   position: absolute;
   height: 100%;
   width: 100%;
-  box-shadow: 0 0 0 0.5rem rgba(var(--text-color), 0.8) inset;
+  border-radius: inherit;
+  box-shadow: 0 0 0 0.5rem var(--accent-color) inset;
+}
+#settings_page .bg-preview input {
+  display: none;
 }
 #settings_page .bg-preview__image {
   -o-object-fit: cover;
@@ -2149,13 +2164,6 @@ sm-button[variant=primary] {
 @media screen and (max-width: 640px) {
   sm-popup {
     --border-radius: 1rem 1rem 0 0;
-  }
-
-  .hide-on-mobile {
-    position: fixed;
-    max-height: 0;
-    opacity: 0;
-    pointer-events: none;
   }
 
   #landing {
@@ -2221,6 +2229,10 @@ sm-button[variant=primary] {
     margin-bottom: 0.5rem;
     background: rgba(var(--foreground-color), 1);
   }
+
+  .hide-on-mobile {
+    display: none !important;
+  }
 }
 @media screen and (min-width: 40rem) {
   .hide-on-desktop {
@@ -2234,10 +2246,6 @@ sm-button[variant=primary] {
   .popup__header {
     grid-column: 1/-1;
     padding: 1rem 1.5rem 0 1.5rem;
-  }
-
-  .fab {
-    position: absolute;
   }
 
   .logo-section {
@@ -2267,7 +2275,6 @@ sm-button[variant=primary] {
     grid-template-columns: min-content 1fr;
     grid-template-rows: 1fr;
     grid-template-areas: "nav .";
-    border-radius: 0.8rem;
     overflow: hidden;
     box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.05), 0 1rem 3rem rgba(0, 0, 0, 0.2);
   }
@@ -2279,7 +2286,7 @@ sm-button[variant=primary] {
     height: calc(100% - 1rem);
     margin: 0.5rem;
     border-radius: 0.5rem;
-    background-color: rgba(37, 110, 255, 0.03);
+    background-color: rgba(var(--background-color), 0.06);
   }
   #main_navbar ul {
     flex-direction: column;
@@ -2322,12 +2329,12 @@ sm-button[variant=primary] {
 
   #chat_page,
 #mail_page {
-    grid-template-columns: 20rem 1fr;
+    display: grid;
+    grid-template-columns: 19rem 1fr;
   }
 
   #settings_page {
     display: grid;
-    height: 100vh;
     grid-template-columns: 14rem 1fr;
   }
   #settings_page sm-button {
@@ -2369,11 +2376,6 @@ sm-button[variant=primary] {
   }
   #landing .title-font {
     font-size: 3rem;
-  }
-
-  #chat_page,
-#mail_page {
-    grid-template-columns: 23rem 1fr;
   }
 
   #chat_details_panel {
