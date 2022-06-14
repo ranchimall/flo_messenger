@@ -234,13 +234,7 @@
                             <line x1="1" y1="32" x2="64" y2="32" />
                             <polyline points="29.64 60.97 0.65 32 29.64 3.03" />
                         </svg>
-                        <sm-input id="search_chats" type="search" placeholder="Search">
-                            <!--                             <svg slot="icon" class="icon" viewBox="0 0 64 64">
-                                <title>Search</title>
-                                <path d="M25.69,1A24.7,24.7,0,0,1,43.15,43.15,24.7,24.7,0,0,1,8.23,8.22,24.53,24.53,0,0,1,25.69,1m0-1A25.7,25.7,0,1,0,43.85,7.51,25.64,25.64,0,0,0,25.69,0Z"/>
-                                <line x1="63.65" y1="63.66" x2="43.36" y2="43.37"/>
-                            </svg> -->
-                        </sm-input>
+                        <sm-input id="search_chats" type="search" placeholder="Search"></sm-input>
                     </div>
                 </header>
                 <button id="new_message_button" onclick="openPopup('new_message_popup')"
@@ -407,7 +401,7 @@
                 </header>
                 <div class="sidebar-item interact active" data-target="profile_panel">Account</div>
                 <div class="sidebar-item interact" data-target="chat_panel">chat</div>
-                <div class="sidebar-item interact" data-target="personalise_panel">personalise</div>
+                <div class="sidebar-item interact" data-target="personalize_panel">personalise</div>
                 <div class="sidebar-item interact" data-target="backup_panel">backup & restore</div>
                 <div class="sidebar-item interact" data-target="about_panel">About</div>
             </aside>
@@ -452,7 +446,7 @@
                         </div>
                     </sm-switch>
                 </div>
-                <div id="personalise_panel" class="panel hide">
+                <div id="personalize_panel" class="panel hide">
                     <section>
                         <h4>Chat preview</h4>
                         <div id="chat_preview">
@@ -481,6 +475,23 @@
                         <label class="button select-file">
                             <span id="select_bg_button">Select background</span>
                             <input type="file" id="select_bg_image" accept="image/*" />
+                        </label>
+                    </section>
+                    <section>
+                        <h4>Backdrop</h4>
+                        <label class="grid gap-0-3">
+                            <span>Dim wallpaper</span>
+                            <div class="flex">
+                                <input type="range" min="0" max="100" id="backdrop_opacity" class="w-100">
+                                <output id="backdrop_opacity_value"></output>
+                            </div>
+                        </label>
+                        <label class="grid gap-0-3">
+                            <span>Blur</span>
+                            <div class="flex">
+                                <input type="range" min="0" max="100" id="backdrop_blur" class="w-100">
+                                <output id="backdrop_blur_value"></output>
+                            </div>
                         </label>
                     </section>
                     <section>
@@ -1557,7 +1568,7 @@
                         const amISender = type === 'chat' && lastMessage.category === 'sent' || type === 'group' && lastMessage.sender === myFloID
                         const lastText = html`<p class="last-message">${amISender ? 'You: ' : ''} ${lastMessage.message}</p>`
                         const timeAndOptions = html`
-                            <h5 class="time">${relativeTime.from(lastMessage.time)}</h5>
+                            <time class="time">${relativeTime.from(lastMessage.time)}</time>
                             <svg class="icon menu" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"> <circle cx="5.59" cy="32" r="5.59"/> <circle cx="58.41" cy="32" r="5.59"/> <circle cx="31.89" cy="32" r="5.59"/> </svg>
                         `;
                         getRef('chats_list').querySelector(`.contact[flo-id="${floID}"]`).append(html.node`${lastText}${timeAndOptions}`)
@@ -2113,6 +2124,9 @@
 
         const style = document.createElement('style');
         style.textContent = `
+            .pad-top{
+                background-color: transparent;
+            }
             .emoji-menu{
                 border-top: solid rgba(var(--text-color), 0.2) 1px;
                 background: rgba(var(--foreground-color), 0.6);
@@ -3291,6 +3305,19 @@
                     getRef('selected_bg_preview').classList.remove('hide')
                     getRef('selected_bg_preview').querySelector('img').src = url
                 }
+                const [bgOpacity, bgBlur] = await Promise.all([compactIDB.readData('userSettings', 'bgOpacity'), compactIDB.readData('userSettings', 'bgBlur')])
+                if (bgOpacity) {
+                    getRef('backdrop_opacity').value = bgOpacity * 100
+                    getRef('backdrop_opacity_value').value = `${bgOpacity * 100}%`
+                    getRef('background_overlay').style.setProperty('--opacity', bgOpacity)
+                }
+                if (bgBlur) {
+                    getRef('backdrop_blur').value = bgBlur * 100
+                    getRef('backdrop_blur_value').value = `${bgBlur * 100}%`
+                    getRef('background_image').style.setProperty('--blur', `${bgBlur}rem`)
+                    getRef('background_image').style.setProperty('--scale', bgBlur)
+
+                }
             }
             catch (err) {
                 console.error(err)
@@ -3305,6 +3332,24 @@
                 })
                 .catch(err => console.error(err))
         }
+
+        getRef('backdrop_opacity').addEventListener('input', e => {
+            const opacity = e.target.value
+            getRef('backdrop_opacity_value').value = `${opacity}%`
+            const validOpacity = parseFloat((opacity * 0.01).toFixed(2))
+            getRef('background_overlay').style.setProperty('--opacity', validOpacity)
+            compactIDB.writeData('userSettings', validOpacity, 'bgOpacity')
+                .catch(err => console.error(err))
+        })
+        getRef('backdrop_blur').addEventListener('input', e => {
+            const blur = e.target.value
+            getRef('backdrop_blur_value').value = `${blur}%`
+            const validBlur = parseFloat((blur * 0.01).toFixed(2))
+            getRef('background_image').style.setProperty('--blur', `${validBlur}rem`)
+            getRef('background_image').style.setProperty('--scale', validBlur)
+            compactIDB.writeData('userSettings', validBlur, 'bgBlur')
+                .catch(err => console.error(err))
+        })
 
     </script>
 </body>
