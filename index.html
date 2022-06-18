@@ -407,12 +407,13 @@
             </aside>
             <div id="settings_panel" class=" hide-on-mobile">
                 <header id="settings_header" class="flex align-center hide-on-desktop">
-                    <svg id="back_settings" onclick='hidePanel()' xmlns="http://www.w3.org/2000/svg" class="icon back"
-                        viewBox="0 0 64 64">
-                        <title>Go back</title>
-                        <line x1="1" y1="32" x2="64" y2="32" />
-                        <polyline points="29.64 60.97 0.65 32 29.64 3.03" />
-                    </svg>
+                    <button id="back_settings" onclick='hidePanel()'>
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                            width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0V0z" fill="none" />
+                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                        </svg>
+                    </button>
                     <h4 id="settings_title"></h4>
                 </header>
                 <div id="profile_panel" class="panel">
@@ -461,6 +462,13 @@
                         </div>
                     </section>
                     <section>
+                        <h4>Toggle dark theme</h4>
+                        <div class="flex align-center space-between">
+                            <p>Only applied to this browser</p>
+                            <theme-toggle></theme-toggle>
+                        </div>
+                    </section>
+                    <section>
                         <h4>Set chat and mail background image</h4>
                         <fieldset id="bg_preview_container" class="flex">
                             <label id="selected_bg_preview" class="bg-preview hide">
@@ -481,14 +489,14 @@
                         <h4>Backdrop</h4>
                         <label class="grid gap-0-3">
                             <span>Dim wallpaper</span>
-                            <div class="flex">
+                            <div class="flex gap-0-5">
                                 <input type="range" min="0" max="100" id="backdrop_opacity" class="w-100">
                                 <output id="backdrop_opacity_value"></output>
                             </div>
                         </label>
                         <label class="grid gap-0-3">
                             <span>Blur</span>
-                            <div class="flex">
+                            <div class="flex gap-0-3">
                                 <input type="range" min="0" max="100" id="backdrop_blur" class="w-100">
                                 <output id="backdrop_blur_value"></output>
                             </div>
@@ -1149,16 +1157,13 @@
             }
         }
 
-        function getFormattedTime(time, format) {
+        function getFormattedTime(timestamp, format) {
             try {
-                if (String(time).indexOf('_'))
-                    time = String(time).split('_')[0]
-                const intTime = parseInt(time)
-                if (String(intTime).length < 13)
-                    time *= 1000
-                let [day, month, date, year] = new Date(intTime).toString().split(' '),
-                    minutes = new Date(intTime).getMinutes(),
-                    hours = new Date(intTime).getHours(),
+                if (String(timestamp).length < 13)
+                    timestamp *= 1000
+                let [day, month, date, year] = new Date(timestamp).toString().split(' '),
+                    minutes = new Date(timestamp).getMinutes(),
+                    hours = new Date(timestamp).getHours(),
                     currentTime = new Date().toString().split(' ')
 
                 minutes = minutes < 10 ? `0${minutes}` : minutes
@@ -1177,12 +1182,14 @@
                         break;
                     case 'time-only':
                         return finalHours;
+                    case 'relative':
+                        return relativeTime.from(timestamp)
                     default:
                         return `${month} ${date}, ${year} at ${finalHours}`;
                 }
             } catch (e) {
                 console.error(e);
-                return time;
+                return timestamp;
             }
         }
         // implement event delegation
@@ -1371,12 +1378,12 @@
                     this.updateEndIndex = this.updateEndIndex + this.batchSize
                 } else {
                     this.intersectionObserver.disconnect()
+                    this.updateStartIndex = 0
+                    this.updateEndIndex = this.batchSize
                     if (this.hasUhtml)
                         renderElem(this.lazyContainer, html``)
                     else
                         this.lazyContainer.innerHTML = ``;
-                    this.updateStartIndex = 0
-                    this.updateEndIndex = this.batchSize
                 }
                 this.lastScrollHeight = this.lazyContainer.scrollHeight
                 this.lastScrollTop = this.lazyContainer.scrollTop
@@ -1484,7 +1491,7 @@
             frag = document.createDocumentFragment()
 
 
-        const renderedDates = new Set()
+        let renderedDates = {}
 
         // render elements 
         const render = {
@@ -1507,7 +1514,7 @@
                     <li class="${`mail-card interact ${markUnread ? 'unread' : ''}`}" name="${ref}" background-color="${contactColor(floID)}">
                         <div class="initial flex align-center" style=${`background-color: ${contactColor(floID)}`}>${contact.charAt(0)}</div>
                         <h5 class="sender">${contact}</h5>
-                        <time class="date">${relativeTime.from(timestamp)}</time>
+                        <time class="date">${getFormattedTime(timestamp, 'relative')}</time>
                         <h4 class="subject text-overflow">${subject}</h4>
                         <p class="description">${mailSummery}</p>
                     </li>
@@ -1568,7 +1575,7 @@
                         const amISender = type === 'chat' && lastMessage.category === 'sent' || type === 'group' && lastMessage.sender === myFloID
                         const lastText = html`<p class="last-message">${amISender ? 'You: ' : ''} ${lastMessage.message}</p>`
                         const timeAndOptions = html`
-                            <time class="time">${relativeTime.from(lastMessage.time)}</time>
+                            <time class="time">${getFormattedTime(lastMessage.time, 'relative')}</time>
                             <svg class="icon menu" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"> <circle cx="5.59" cy="32" r="5.59"/> <circle cx="58.41" cy="32" r="5.59"/> <circle cx="31.89" cy="32" r="5.59"/> </svg>
                         `;
                         getRef('chats_list').querySelector(`.contact[flo-id="${floID}"]`).append(html.node`${lastText}${timeAndOptions}`)
@@ -1651,7 +1658,12 @@
                         currentFloID = floID
                     }
                     const messageDate = getFormattedTime(timestamp, 'date-only')
-                    renderedDates.add(messageDate)
+                    if (!renderedDates.hasOwnProperty(messageDate) || renderedDates[messageDate].timestamp > timestamp) {
+                        renderedDates[messageDate] = {
+                            timestamp,
+                            isRendered: false
+                        }
+                    }
                     const className = `message ${category} ${unconfirmed ? 'unconfirmed' : ''} ${senderName ? 'distinct-sender' : ''} ${isBigEmoji ? 'big-emoji' : ''}`
                     return html.node`
                         <div class="${className}" id="${`${floID}_${timestamp}`}" data-date="${messageDate}">
@@ -1721,9 +1733,8 @@
 
 
         function renderDirectUI(data) {
-            renderMessages({ updateChatCard: true });
-            renderMailList(data.mails)
-            //let order = Object.keys(data.messages).map(a => a.split('_')).sort((a, b) => a[0] - b[0]).map(a => a[1])
+            updateMessageUI(data.messages)
+            // renderMessages({ updateChatCard: true });
             if (Object.keys(data.messages).length) {
                 document.title = `New message(s)`
             }
@@ -1733,7 +1744,77 @@
         }
 
         function renderGroupUI(data) {
-            renderMessages({ updateChatCard: true });
+            updateMessageUI(data.messages)
+            // renderMessages({ updateChatCard: true });
+
+        }
+
+        function updateMessageUI(messagesData) {
+            for (let messageId in messagesData) {
+                const { category, floID, time, message } = messagesData[messageId]
+                if (activeChat.floID && activeChat.floID === floID)
+                    getRef('messages_container').append(render.messageBubble(messagesData[messageId]))
+                let chatCard = getRef('chats_list').querySelector(`.chat[flo-id="${floID}"], .group[flo-id="${floID}"]`)
+                if (chatCard) {
+                    if (activeChat['chatCard'] !== getRef('chats_list').children[0]) {
+                        const cloneContact = chatCard.cloneNode(true)
+                        chatCard.remove()
+                        activeChat['chatCard'] = cloneContact
+                        getRef('chats_list').prepend(cloneContact)
+                        animateTo(getRef('chats_list').children[0], [
+                            { transform: 'translateY(1rem)' },
+                            { transform: 'none' },
+                        ],
+                            {
+                                easing: 'ease',
+                                duration: 300
+                            }
+                        )
+                        animateTo(getRef('chats_list'), [
+                            { transform: 'translateY(-1rem)' },
+                            { transform: 'none' },
+                        ],
+                            {
+                                easing: 'ease',
+                                duration: 300
+                            }
+                        )
+                    }
+                }
+                else {
+                    messenger.addChat(floID)
+                    getRef('chats_list').prepend(html.node`${render.contactCard(floID, { type: 'chat', prepend: true })}`)
+                    chatCard = getRef('chats_list').children[0]
+                    chatCard.classList.add('active')
+                    activeChat['chatCard'] = getRef('chats_list').children[0]
+                }
+                let finalMessage
+                if (messenger.groups && messenger.groups[floID]) {
+                    if (floGlobals.contacts[floID])
+                        finalMessage = `${floGlobals.contacts[floID]}: ${message}`
+                    else if (floID === myFloID)
+                        finalMessage = `You: ${message}`
+                }
+                else
+                    finalMessage = message
+                if (chatCard.querySelector('.last-message'))
+                    chatCard.querySelector('.last-message').textContent = finalMessage
+                chatCard.querySelector('.time').textContent = getFormattedTime(time, 'relative')
+
+                if (activeChat.floID === (floID || groupID)) {
+                    if (chatScrollInfo.isScrolledUp)
+                        getRef('scroll_to_bottom').classList.add('new-message')
+                    else {
+                        if (document.hasFocus()) {
+                            messenger.removeMark((floID || groupID), 'unread')
+                            setTimeout(() => {
+                                document.title = 'FLO Messenger'
+                                activeChat.chatCard.classList.remove('unread')
+                            }, 1000);
+                        }
+                    }
+                }
+            }
         }
 
         window.addEventListener('focus', e => {
@@ -1964,30 +2045,12 @@
             //detect click on chat cards
             if (e.target.closest(".contact")) {
                 let contact = e.target.closest(".contact")
-                clickedContact = {
-                    ...clickedContact,
-                    chatCard: contact,
-                    floID: contact.getAttribute("flo-id"),
-                    name: contact.getAttribute("name"),
-                    isGroup: messenger.groups.hasOwnProperty(clickedContact['floID'])
+                const floID = contact.getAttribute("flo-id")
+                let chatCard = getRef('chats_list').querySelector(`.chat[flo-id="${floID}"], .group[flo-id="${floID}"]`);
+                if (!chatCard) {
+                    chatCard = getRef('chats_list').prepend(render.contactCard(floID, { type: 'chat' }))
                 }
-                if (clickedContact['floID'] === myFloID) return
-                contact.classList.remove('unread')
-                if (activeChat['chatCard'] === contact && !isMobileView) return
-                showChatDetails({ show: false, animate: false })
-                document.title = `FLO Messenger`
-                getRef('chat').classList.remove('hide')
-                viewConversation(contact)
-                if (activeChat['chatCard'])
-                    activeChat['chatCard'].classList.remove('active')
-                contact.classList.add('active')
-                activeChat['chatCard'] = contact
-                if (activeChatPage.id === 'contacts') {
-                    getRef('chat').classList.remove('hide-on-mobile')
-                    getRef('contacts').classList.add('hide-on-mobile')
-                    activeChatPage = getRef('chat')
-                    getRef('main_navbar').classList.add('hide-on-mobile')
-                }
+                chatCard.click()
                 closePopup()
             }
         })
@@ -2317,43 +2380,19 @@
                 msgObj['floID'] = activeChat.floID
                 msgObj['category'] = 'sent'
             }
-            getRef('messages_container').append(render.messageBubble(msgObj))
-            const contact = getRef('chats_list').querySelector(`.chat[flo-id="${receiver}"], .group[flo-id="${receiver}"]`)
-            if (contact) {
-                if (activeChat['chatCard'] !== getRef('chats_list').children[0]) {
-                    const cloneContact = contact.cloneNode(true)
-                    contact.remove()
-                    activeChat['chatCard'] = cloneContact
-                    getRef('chats_list').prepend(cloneContact)
-                    animateTo(getRef('chats_list').children[0], [
-                        { transform: 'translateY(1rem)' },
-                        { transform: 'none' },
-                    ],
-                        {
-                            easing: 'ease',
-                            duration: 300
-                        }
-                    )
-                }
-            }
-            else {
-                messenger.addChat(receiver)
-                getRef('chats_list').prepend(render.contactCard(receiver, { type: 'chat', prepend: true }))
-                getRef('chats_list').children[0].classList.add('active')
-                activeChat['chatCard'] = getRef('chats_list').children[0]
-            }
+            updateMessageUI({ msgObj })
             scrollToBottom()
             if (activeChat.isGroup)
                 messenger.sendGroupMessage(message, receiver).then(data => {
                     getRef('messages_container').querySelector(`#${receiver}_${time}`).classList.remove('unconfirmed')
                     activeChat.chatCard.querySelector('.last-message').textContent = `You: ${message}`
-                    activeChat.chatCard.querySelector('.time').textContent = relativeTime.from(Date.now())
+                    activeChat.chatCard.querySelector('.time').textContent = getFormattedTime(Date.now(), 'relative')
                 }).catch(error => notify(error, "error"));
             else
                 messenger.sendMessage(message, receiver).then(data => {
                     getRef('messages_container').querySelector(`#${receiver}_${time}`).classList.remove('unconfirmed')
                     activeChat.chatCard.querySelector('.last-message').textContent = `You: ${message}`
-                    activeChat.chatCard.querySelector('.time').textContent = relativeTime.from(Date.now())
+                    activeChat.chatCard.querySelector('.time').textContent = getFormattedTime(Date.now(), 'relative')
                 }).catch(error => notify(error, "error"));
         }
 
@@ -2428,84 +2467,32 @@
 
         let chatLazyLoader
         async function renderMessages(options) {
-            let { markUnread = true, updateChatCard = false } = options
+            let { markUnread = true } = options
             try {
+                let messages = Object.values(await messenger.getChat(activeChat['floID'])).reverse()
                 if (activeChat.floID) {
-                    let messages = Object.values(await messenger.getChat(activeChat['floID'])).reverse()
                     if (chatLazyLoader) {
                         chatLazyLoader.update(messages)
                     } else {
                         chatLazyLoader = new LazyLoader('#messages_container', messages, render.messageBubble, {
-                            bottomFirst: true, domUpdated: debounce(() => {
-                                renderedDates.forEach(date => {
-                                    if (getRef('messages_container').querySelector(`.date-card[data-date="${date}"]`)) {
-                                        getRef('messages_container').querySelector(`.date-card[data-date="${date}"]`).remove()
+                            bottomFirst: true, domUpdated: () => {
+                                for (const date in renderedDates) {
+                                    if (renderedDates[date].isRendered) continue
+                                    let dateCard
+                                    const previousDateCard = getRef('messages_container').querySelector(`.date-card[data-date="${date}"]`)
+                                    if (previousDateCard) {
+                                        dateCard = previousDateCard.cloneNode(true)
+                                        previousDateCard.remove()
+                                    } else {
+                                        dateCard = html.node`<time class="date-card" data-date="${date}">${date}</time>`
                                     }
-                                    const dateCard = html.node`<time class="date-card" data-date="${date}">${date}</time>`
                                     getRef('messages_container').querySelector(`.message[data-date="${date}"]`).before(dateCard)
-                                    renderedDates.delete(date)
-                                }, 100)
-                            })
+                                    renderedDates[date].isRendered = true
+                                }
+                            }
                         });
                     }
                     chatLazyLoader.init()
-
-
-                    messages.forEach(messageDetails => {
-                        let { floID, groupID, sender, message, time, category } = messageDetails
-                        const contact = getRef('chats_list').querySelector(`.contact[flo-id='${floID || groupID}']`)
-                        if (markUnread && contact) {
-                            contact.classList.add("unread");
-                            if (contact !== getRef('chats_list').children[0]) {
-                                const cloneContact = contact.cloneNode(true)
-                                contact.remove()
-                                getRef('chats_list').prepend(cloneContact)
-                                animateTo(getRef('chats_list').children[0], [
-                                    { transform: 'translateY(1rem)' },
-                                    { transform: 'none' },
-                                ],
-                                    {
-                                        easing: 'ease',
-                                        duration: 300
-                                    }
-                                )
-                            }
-                        }
-                        if (updateChatCard) {
-                            let chatCard
-                            if (!contact) {
-                                getRef('chats_list').prepend(render.contactCard(floID, { type: 'chat', markUnread: true }))
-                                chatCard = getRef('chats_list').firstElementChild
-                            }
-                            else {
-                                chatCard = contact
-                                let finalMessage
-                                if (floGlobals.contacts[sender])
-                                    finalMessage = `${floGlobals.contacts[sender]}: ${message}`
-                                else if (sender === myFloID)
-                                    finalMessage = `You: ${message}`
-                                else
-                                    finalMessage = message
-                                if (chatCard.querySelector('.last-message'))
-                                    chatCard.querySelector('.last-message').textContent = finalMessage
-                                chatCard.querySelector('.time').textContent = relativeTime.from(time)
-                            }
-
-                            if (activeChat.floID === (floID || groupID)) {
-                                if (chatScrollInfo.isScrolledUp)
-                                    getRef('scroll_to_bottom').classList.add('new-message')
-                                else {
-                                    if (document.hasFocus()) {
-                                        messenger.removeMark((floID || groupID), 'unread')
-                                        setTimeout(() => {
-                                            document.title = 'FLO Messenger'
-                                            activeChat.chatCard.classList.remove('unread')
-                                        }, 1000);
-                                    }
-                                }
-                            }
-                        }
-                    })
                 }
             } catch (error) {
                 console.log(error)
@@ -2513,6 +2500,8 @@
         }
 
         async function viewConversation(contact) {
+            // clear rendered date cards if any 
+            renderedDates = {}
             let floID = clickedContact['floID'],
                 name = contact.getAttribute('name'),
                 textColor = contact.getAttribute('text-color'),

@@ -609,7 +609,6 @@ smTextarea.innerHTML = `
     :host{
         display: grid;
         --danger-color: red;
-        --border-radius: 0.3rem;
         --background: rgba(var(--text-color,(17,17,17)), 0.06);
         --padding: initial;
         --max-height: 8rem;
@@ -629,7 +628,7 @@ smTextarea.innerHTML = `
         align-items: stretch;
         max-height: var(--max-height);
         background: var(--background);
-        border-radius: var(--border-radius);
+        border-radius: var(--border-radius, 0.3rem);
         padding: var(--padding);
     }
     .textarea::after,

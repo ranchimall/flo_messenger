@@ -148,7 +148,7 @@ button:not(:disabled),
 }
 
 .button {
-  background-color: rgba(var(--text-color), 0.06);
+  background-color: rgba(var(--text-color), 0.1);
 }
 .button--primary, .button--danger {
   color: rgba(var(--background-color), 1) !important;
@@ -1420,7 +1420,6 @@ sm-button[variant=primary] {
 #contacts {
   position: relative;
   overflow-x: hidden;
-  height: 100%;
 }
 #contacts .scrolling-wrapper {
   height: 100%;
@@ -1463,6 +1462,7 @@ sm-button[variant=primary] {
 #contacts,
 #mails,
 #settings_page {
+  height: 100%;
   overflow-y: hidden;
 }
 #contacts .header,
@@ -1860,7 +1860,6 @@ sm-button[variant=primary] {
 }
 #chat_footer sm-textarea {
   --padding-right: 3rem;
-  --border-radius: 0.5rem;
 }
 
 #emoji_toggle {
@@ -1893,6 +1892,8 @@ sm-button[variant=primary] {
 
 #type_message {
   margin: 0;
+  --border-radius: 0.5rem;
+  --background: rgba(var(--text-color), 0.1);
 }
 
 .big-emoji {
@@ -2102,17 +2103,11 @@ sm-button[variant=primary] {
   height: 100%;
 }
 #settings_page section {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
   width: min(60ch, 100%);
-}
-#settings_page section sm-button {
-  margin-top: 0.5rem;
-  margin-bottom: 0;
-}
-#settings_page section:not(:last-of-type) {
-  margin-bottom: 1rem;
 }
 #settings_page #sign_out::part(button) {
   color: var(--error-color);
@@ -2224,9 +2219,11 @@ sm-button[variant=primary] {
     position: sticky;
     top: 0;
     z-index: 1;
-    padding: 1rem 1.5rem;
+    padding: 1rem 1.5rem 1rem 0.5rem;
     margin-bottom: 0.5rem;
-    background: rgba(var(--foreground-color), 1);
+    background: linear-gradient(rgba(var(--background-color), 0.8), rgba(var(--background-color), 0));
+    -webkit-backdrop-filter: blur(0.5rem);
+            backdrop-filter: blur(0.5rem);
   }
 
   .hide-on-mobile {
