@@ -477,7 +477,7 @@ ol {
   );
   pointer-events: none;
 }
-.interact {
+.interactive {
   position: relative;
   overflow: hidden;
   cursor: pointer;
@@ -899,20 +899,12 @@ sm-button[variant="primary"] {
     border-radius: 3rem;
   }
 }
-.tick {
-  position: absolute;
-  bottom: -0.2rem;
-  right: -0.2rem;
-  height: 1.2rem;
-  width: 1.2rem;
-  .icon {
-    height: 100%;
-    width: 100%;
-    padding: 0.4rem;
-    stroke-width: 16;
-    border-radius: 1rem;
-    background: rgba(var(--text-color), 1);
-    stroke: rgba(var(--foreground-color), 0.8);
+.selectable-contact {
+  user-select: none;
+  padding: 0.5rem 0;
+  gap: 1rem;
+  input {
+    margin-left: auto;
   }
 }
 #selected_contacts_container {
@@ -928,8 +920,9 @@ sm-button[variant="primary"] {
     cursor: pointer;
     margin-right: 0.5rem;
     background: rgba(var(--text-color), 0.1);
-    padding: 0.4rem 0.5rem;
+    padding: 0 0.2rem;
     border-radius: 2rem;
+    transform-origin: left;
     .initial {
       width: 1.6rem;
       height: 1.6rem;
@@ -938,12 +931,6 @@ sm-button[variant="primary"] {
     .name {
       font-size: 0.9rem;
       color: rgba(var(--text-color), 0.8);
-      margin-left: 0.5rem;
-    }
-    .tick {
-      position: relative;
-      bottom: auto;
-      right: auto;
       margin-left: 0.5rem;
     }
   }
@@ -1917,6 +1904,7 @@ sm-button[variant="primary"] {
     margin-top: 1rem;
     padding: 1rem;
     border-radius: 0.5rem;
+    background-color: rgba(var(--text-color), 0.06);
   }
   #bg_preview_container {
     padding: 1rem 0;
@@ -2183,7 +2171,9 @@ sm-button[variant="primary"] {
       background: rgba(var(--text-color), 0.5);
     }
   }
-  .contact:hover,
+  .interactive:hover {
+    background-color: rgba(var(--text-color), 0.06);
+  }
   .emoji:hover,
   .option:hover {
     cursor: pointer;

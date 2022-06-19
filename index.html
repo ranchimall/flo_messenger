@@ -271,7 +271,7 @@
                                 <path d="M17.51 3.87L15.73 2.1 5.84 12l9.9 9.9 1.77-1.77L9.38 12l8.13-8.13z" />
                             </svg>
                         </button>
-                        <div class="flex align-center interact" onclick="showChatDetails({show: true})">
+                        <div class="flex align-center interactive" onclick="showChatDetails({show: true})">
                             <div id="receiver_initial" class="initial flex align-center"></div>
                             <h4 id="receiver_name"></h4>
                         </div>
@@ -399,11 +399,11 @@
                 <header class="grid header">
                     <h4>Settings</h4>
                 </header>
-                <div class="sidebar-item interact active" data-target="profile_panel">Account</div>
-                <div class="sidebar-item interact" data-target="chat_panel">chat</div>
-                <div class="sidebar-item interact" data-target="personalize_panel">personalise</div>
-                <div class="sidebar-item interact" data-target="backup_panel">backup & restore</div>
-                <div class="sidebar-item interact" data-target="about_panel">About</div>
+                <div class="sidebar-item interactive active" data-target="profile_panel">Account</div>
+                <div class="sidebar-item interactive" data-target="chat_panel">chat</div>
+                <div class="sidebar-item interactive" data-target="personalize_panel">personalise</div>
+                <div class="sidebar-item interactive" data-target="backup_panel">backup & restore</div>
+                <div class="sidebar-item interactive" data-target="about_panel">About</div>
             </aside>
             <div id="settings_panel" class=" hide-on-mobile">
                 <header id="settings_header" class="flex align-center hide-on-desktop">
@@ -687,7 +687,7 @@
         </header>
         <div class="scrolling-wrapper">
             <div id="all_contacts_options">
-                <button id="create_group_option" class="option interact" onclick="openPopup('group_creation_popup')">
+                <button id="create_group_option" class="option interactive" onclick="openPopup('group_creation_popup')">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
@@ -696,7 +696,7 @@
                     </svg>
                     Create new group
                 </button>
-                <button id="add_contact_option" class="option interact" onclick="openPopup('add_contact_popup')">
+                <button id="add_contact_option" class="option interactive" onclick="openPopup('add_contact_popup')">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px"
                         viewBox="0 0 24 24" width="24px" fill="#000000">
                         <g>
@@ -732,7 +732,12 @@
         </header>
         <div>
             <div id="selected_contacts">
-                <h4>Select group members</h4>
+                <div class="flex align-center space-between">
+                    <h4>Select group members</h4>
+                    <button id="skip_members_button" class="button button--primary"
+                        onclick="openPopup('group_creation_popup')">
+                        Skip </button>
+                </div>
                 <div id="selected_contacts_container" class="observe-empty-state"></div>
                 <div class="empty-state">
                     <p class="warning">*Contacts that haven't yet replied to you, can't be added to a
@@ -745,8 +750,6 @@
                     <p>No contacts found.</p>
                 </div>
             </div>
-            <button id="skip_members_button" variant="primary" class="hide" onclick="openPopup('group_creation_popup')">
-                Skip </button>
         </div>
         <sm-form class="hide">
             <div class="grid">
@@ -952,7 +955,7 @@
         }
 
         document.addEventListener('popupopened', async e => {
-            //pushes popup as seprate entry in history
+            //pushes popup as septate entry in history
             history.pushState({ type: 'popup' }, null, null)
             switch (e.target.id) {
                 case 'contact_details_popup':
@@ -1008,9 +1011,6 @@
                         frag.append(render.contactCard(member, { type: 'contact', contactOnly: true }))
                     })
                     getRef('popup_contacts_container').append(frag)
-                    getRef('popup_contacts_container').querySelectorAll('.contact').forEach(cont => {
-                        cont.classList.add('selectable')
-                    })
                     isRemovingMember = false
                     break
                 case 'new_message_popup':
@@ -1021,11 +1021,9 @@
                     const validContacts = []
                     for (floID in floGlobals.contacts) {
                         if (floGlobals.pubKeys.hasOwnProperty(floID)) {
-                            let isSelected = selectedGroupMembers.has(floID)
-                            validContacts.push(render.selectableContact(floID, isSelected))
+                            validContacts.push(render.selectableContact(floID))
                         }
                     }
-                    console.log(validContacts)
                     renderElem(getRef('select_contacts_container'), html`${validContacts}`)
                     break;
             }
@@ -1044,6 +1042,7 @@
                     break;
                 case 'group_creation_popup':
                     floGlobals.isCreatingGroup = false
+                    renderElem(getRef('select_contacts_container'), html``)
                     clearAllMembers()
                     break;
             }
@@ -1204,16 +1203,14 @@
         }
 
         function getContactName(floID) {
-            let name
             if (floGlobals.contacts[floID])
-                name = floGlobals.contacts[floID]
+                return floGlobals.contacts[floID]
             else if (messenger.groups[floID])
-                name = messenger.groups[floID].name
+                return messenger.groups[floID].name
             else if (floID === myFloID)
-                name = 'You'
+                return 'You'
             else
-                name = floID
-            return name
+                return floID
         }
         window.addEventListener('hashchange', e => showPage(window.location.hash))
         window.addEventListener("load", () => {
@@ -1228,8 +1225,8 @@
                 notify('copied', 'success')
             })
             document.addEventListener("pointerdown", (e) => {
-                if (e.target.closest("button:not([disabled]), sm-button:not([disabled]), .interact")) {
-                    createRipple(e, e.target.closest("button, sm-button, .interact"));
+                if (e.target.closest("button:not([disabled]), sm-button:not([disabled]), .interactive")) {
+                    createRipple(e, e.target.closest("button, sm-button, .interactive"));
                 }
             });
             document.querySelectorAll('.popup__header__close, .close-popup-on-click').forEach(elem => {
@@ -1511,7 +1508,7 @@
                 } else
                     contact = floGlobals.contacts[floID] || floID
                 return html`
-                    <li class="${`mail-card interact ${markUnread ? 'unread' : ''}`}" name="${ref}" background-color="${contactColor(floID)}">
+                    <li class="${`mail-card interactive ${markUnread ? 'unread' : ''}`}" name="${ref}" background-color="${contactColor(floID)}">
                         <div class="initial flex align-center" style=${`background-color: ${contactColor(floID)}`}>${contact.charAt(0)}</div>
                         <h5 class="sender">${contact}</h5>
                         <time class="date">${getFormattedTime(timestamp, 'relative')}</time>
@@ -1548,10 +1545,9 @@
                 return card
             },
             contactCard(floID, options = {}) {
-                let { name, type, prepend = false, markUnread = false, contactOnly = false, isAdmin = false, isSelected = false } = options
-                if (!name)
-                    name = getContactName(floID)
-                let color = contactColor(floID)
+                let { type, prepend = false, markUnread = false, contactOnly = false, isAdmin = false } = options
+                const name = getContactName(floID)
+                const color = contactColor(floID)
                 let initial
                 let adminTag
 
@@ -1559,8 +1555,7 @@
                     initial = html`<svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
                     name = messenger.groups[floID].name
                 } else {
-                    name = name !== 'Unknown' ? name : floID
-                    initial = name !== 'Unknown' ? name.charAt(0) : floID.charAt(0)
+                    initial = name.charAt(0)
                 }
                 if (contactOnly || type === 'contact') {
                     if (isAdmin) {
@@ -1586,34 +1581,27 @@
                             activeChat['chatCard'].classList.remove('active')
                     }
                 }
-                const className = `contact ${type !== 'contact' ? type : ''} ${markUnread ? 'unread' : ''} ${isSelected ? 'selected' : ''}`
+                const className = `contact ${type !== 'contact' ? type : ''} ${markUnread ? 'unread' : ''} interactive`
                 return html`
                     <div class="${className}" name=${name} flo-id=${floID} search-tags=${`${name}${floID}`} background-color=${color}>
                         <div class="initial flex align-center" style=${`background-color: ${color}`}>
-                            ${initial} ${isSelected ? html`<div class="tick"><svg class="icon" viewBox="0 0 64 64"> <polyline points="0.35 31.82 21.45 52.98 63.65 10.66"/></svg></div>` : ''}
+                            ${initial}
                         </div>
                         <h4 class="name">${name}</h4>
                         ${adminTag}
                     </div>
                 `
             },
-            selectableContact(floID, isSelected) {
-                if (!name)
-                    name = getContactName(floID)
-
-                let initial
+            selectableContact(floID) {
                 let color = contactColor(floID)
-
-                name = name !== 'Unknown' ? name : floID
-                initial = name !== 'Unknown' ? name.charAt(0) : floID.charAt(0)
-                const className = `flex align-center ${isSelected ? 'selected' : ''}`
+                const name = getContactName(floID)
+                const initial = name.charAt(0)
+                const className = `flex align-center selectable-contact interactive`
                 return html`
-                    <label class="${className}" name=${name} flo-id=${floID} background-color=${color}>
-                        <div class="initial flex align-center" style=${`background-color: ${color}`}>
-                            ${initial} ${isSelected ? html`<div class="tick"><svg class="icon" viewBox="0 0 64 64"> <polyline points="0.35 31.82 21.45 52.98 63.65 10.66"/></svg></div>` : ''}
-                        </div>
+                    <label class="${className}" data-flo-id=${floID} background-color=${color}>
+                        <div class="initial flex align-center" style=${`background-color: ${color}`}> ${initial} </div>
                         <h4 class="name">${name}</h4>
-                        <input type="checkbox"/>
+                        <input type="checkbox" autocomplete="off" value=${floID}/>
                     </label>
                 `
             },
@@ -2037,8 +2025,6 @@
                         getRef('main_navbar').classList.add('hide-on-mobile')
                     }
                 }
-            } else if (e.target.closest('.contact-preview')) {
-                removeSelectedContact(e.target.closest('.contact-preview').getAttribute('flo-id'))
             }
         })
         getRef('contacts_container').addEventListener('click', e => {
@@ -2054,12 +2040,6 @@
                 closePopup()
             }
         })
-        getRef('contacts_popup').addEventListener('click', e => {
-            //detect click on contacts
-            if (e.target.closest(".selectable")) {
-                selectMemberToAdd(e.target.closest(".selectable"))
-            }
-        })
 
         function transformScroll(event) {
             if (!event.deltaY) {
@@ -2072,53 +2052,74 @@
 
         getRef('selected_contacts_container').addEventListener('wheel', transformScroll);
 
-        const selectedGroupMembers = new Set()
-        function selectContact(contact) {
-            if (!selectedGroupMembers.has(clickedContact.floID)) {
-                selectedGroupMembers.add(clickedContact.floID)
-                const clonedInitial = contact.querySelector('.initial').cloneNode(true);
-                const clonedName = contact.querySelector('.name').cloneNode(true);
-                const preview = html.node`<div class="contact-preview" flo-id="${clickedContact.floID}">
-                    ${clonedInitial}
-                    ${clonedName}
+        getRef('select_contacts_container').addEventListener('change', e => {
+            if (e.target.checked)
+                selectContact(e.target.value)
+            else
+                removeSelectedContact(e.target.value)
+        })
+        delegate(getRef('selected_contacts_container'), 'click', '.remove-selected', e => {
+            removeSelectedContact(e.target.closest('.contact-preview').dataset.floId)
+        })
+        const selectedGroupMembers = new Set();
+        function checkSelectedMembers() {
+            if (selectedGroupMembers.size) {
+                getRef('skip_members_button').textContent = 'Next'
+            } else {
+                getRef('skip_members_button').textContent = 'Skip'
+            }
+        }
+        function selectContact(floID) {
+            if (!selectedGroupMembers.has(floID)) {
+                selectedGroupMembers.add(floID)
+                const name = getContactName(floID)
+                const color = contactColor(floID)
+                const preview = html.node`<div class="contact-preview" .dataset="${{ floId: floID }}">
+                    <div class="initial flex align-center" style=${`background-color: ${color}`}>
+                        ${name.charAt(0)}
+                    </div>
+                    <h4 class="name">${name}</h4>
+                    <button class="remove-selected icon-only">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0V0z" fill="none" /> <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
+                    </button>
                 </div>`
-                addCross(preview)
                 getRef('selected_contacts_container').append(preview)
                 preview.scrollIntoView({ behavior: "smooth", inline: "end" });
                 preview.animate(
                     [
-                        { transform: 'scale(0)' },
-                        { transform: 'scale(1)' },
+                        {
+                            transform: 'translateX(-1rem)',
+                            opacity: 0
+                        },
+                        {
+                            transform: 'none',
+                            opacity: 1
+                        },
                     ],
                     {
-                        duration: 300,
+                        duration: 150,
                         easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                         fill: 'forwards'
                     }
                 )
-                addTick(contact)
-            }
-            else {
-                removeSelectedContact(clickedContact.floID)
-            }
-            if (selectedGroupMembers.size) {
-                getRef('skip_members_button').textContent = 'Next'
-            }
-            else {
-                getRef('skip_members_button').textContent = 'Skip'
+                checkSelectedMembers()
             }
         }
 
         function removeSelectedContact(floID) {
             selectedGroupMembers.delete(floID)
-            const relatedContact = getRef('contacts_container').querySelector(`[flo-id="${floID}"]`)
-            const relatedPreview = getRef('selected_contacts_container').querySelector(`[flo-id="${floID}"]`)
-            if (relatedContact)
-                removeTick(relatedContact)
+            const relatedContact = getRef('select_contacts_container').querySelector(`[data-flo-id="${floID}"]`)
+            const relatedPreview = getRef('selected_contacts_container').querySelector(`[data-flo-id="${floID}"]`)
             relatedPreview.animate(
                 [
-                    { transform: 'scale(1)' },
-                    { transform: 'scale(0)' },
+                    {
+                        transform: 'none',
+                        opacity: 1
+                    },
+                    {
+                        transform: 'translateX(-1rem)',
+                        opacity: 0
+                    },
                 ],
                 {
                     duration: 150,
@@ -2128,11 +2129,14 @@
             ).onfinish = () => {
                 relatedPreview.remove()
             }
+            relatedContact.querySelector('input').checked = false
+            checkSelectedMembers()
         }
 
         function clearAllMembers() {
             getRef('selected_contacts_container').innerHTML = ''
             selectedGroupMembers.clear()
+            checkSelectedMembers()
         }
 
         document.getElementById('create_group_button').addEventListener('click', () => {
@@ -2921,10 +2925,7 @@
                 getRef('group_members_list').querySelectorAll('.contact').forEach(contact => {
                     if (contact.classList.contains('selectable')) {
                         contact.classList.remove('selectable')
-                        if (membersToRemove.has(contact.getAttribute('flo-id')))
-                            removeTick(contact)
-                    }
-                    else if (contact.classList.contains('admin')) {
+                    } else if (contact.classList.contains('admin')) {
                         contact.classList.remove('hide')
                     }
                 })
@@ -2956,78 +2957,26 @@
             const floID = contact.getAttribute('flo-id')
             if (membersToRemove.has(floID)) {
                 membersToRemove.delete(floID)
-                removeTick(contact)
-            }
-            else {
+            } else {
                 membersToRemove.add(floID)
-                addTick(contact)
             }
             if (membersToRemove.size) {
                 addClass(['#remove_members_tip', '#init_add_members_button'], 'hide')
                 getRef('remove_members_button').classList.remove('hide')
-            }
-            else {
+            } else {
                 removeClass(['#remove_members_tip', '#init_add_members_button'], 'hide')
                 getRef('remove_members_button').classList.add('hide')
             }
         }
 
         const membersToAdd = new Set()
-        function selectMemberToAdd(contact) {
-            const floID = contact.getAttribute('flo-id')
+        function selectMemberToAdd(floID) {
             if (membersToAdd.has(floID)) {
                 membersToAdd.delete(floID)
-                removeTick(contact)
-            }
-            else {
+            } else {
                 membersToAdd.add(floID)
-                addTick(contact)
             }
-            if (membersToAdd.size) {
-                getRef('add_members_button').disabled = false
-            }
-            else {
-                getRef('add_members_button').disabled = true
-            }
-        }
-
-        function addTick(contact, options = {}) {
-            const { animate = true } = options
-            contact.classList.add('selected')
-            const initial = contact.querySelector('.initial')
-            const tick = html.node`<div class="tick"><svg class="icon" viewBox="0 0 64 64"> <polyline points="0.35 31.82 21.45 52.98 63.65 10.66"/> </svg></div>`;
-            initial.append(tick)
-            if (animate)
-                tick.animate(
-                    [
-                        { transform: 'scale(0)' },
-                        { transform: 'scale(1)' },
-                    ],
-                    {
-                        duration: 300,
-                        fill: 'forwards',
-                        easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-                    }
-                )
-        }
-        function removeTick(contact) {
-            contact.classList.remove('selected')
-            const tick = contact.querySelector('.tick')
-            tick.animate([
-                { transform: 'scale(1)' },
-                { transform: 'scale(0)' },
-            ],
-                {
-                    duration: 150,
-                    fill: 'forwards',
-                }
-            ).onfinish = () => {
-                tick.remove()
-            }
-        }
-        function addCross(contact) {
-            const cross = html.node`<div class="tick"><svg class="icon" viewBox="0 0 64 64"> <title>Remove</title> <line x1="64" y1="0" x2="0" y2="64"/> <line x1="64" y1="64" x2="0" y2="0"/> </svg></div>`;
-            contact.append(cross)
+            getRef('add_members_button').disabled = Boolean(membersToAdd.size)
         }
 
         document.getElementById('add_members_button').addEventListener('click', addGroupMembers)
