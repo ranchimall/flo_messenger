@@ -976,6 +976,9 @@ sm-button[variant="primary"] {
 #warn_no_encryption,
 .date-card,
 .group-event-card {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   padding: 0.4rem 0.6rem;
   font-weight: 500;
   font-size: 0.8rem;

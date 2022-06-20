@@ -1507,7 +1507,7 @@
                 const frag = document.createDocumentFragment();
                 if (lazyLoad) {
                     if (this.bottomFirst) {
-                        this.updateEndIndex = this.updateStartIndex - 1
+                        this.updateEndIndex = this.updateStartIndex
                         this.updateStartIndex = this.updateEndIndex - this.batchSize
                     } else {
                         this.updateStartIndex = this.updateEndIndex
@@ -1526,7 +1526,7 @@
                 }
                 this.lastScrollHeight = this.lazyContainer.scrollHeight
                 this.lastScrollTop = this.lazyContainer.scrollTop
-                this.arrayOfElements.slice(this.updateStartIndex, this.updateEndIndex).forEach((element) => {
+                this.arrayOfElements.slice(this.updateStartIndex, this.updateEndIndex).forEach((element, index) => {
                     frag.append(this.renderFn(element))
                 })
                 if (this.bottomFirst) {
@@ -1534,10 +1534,11 @@
                 } else {
                     this.lazyContainer.append(frag)
                 }
-                if (!lazyLoad && this.bottomFirst)
+                if (!lazyLoad && this.bottomFirst) {
                     this.lazyContainer.scrollTo({
                         top: this.lazyContainer.scrollHeight,
                     })
+                }
                 // Callback to be called if elements are updated or rendered for first time
                 if (!lazyLoad && this.freshRender)
                     this.freshRender()
@@ -2650,7 +2651,7 @@
         async function renderMessages(options) {
             let { markUnread = true } = options
             try {
-                let messages = Object.values(await messenger.getChat(activeChat['floID']))
+                let messages = Object.values(await messenger.getChat(activeChat.floID))
                 if (activeChat.floID) {
                     if (chatLazyLoader) {
                         chatLazyLoader.update(messages)
