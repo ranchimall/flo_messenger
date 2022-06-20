@@ -233,6 +233,10 @@ input[type=range]:active {
   cursor: grab;
 }
 
+sm-copy {
+  font-size: 0.9rem;
+}
+
 sm-input,
 sm-textarea {
   font-size: 0.9rem;
@@ -662,6 +666,10 @@ ol li::before {
   height: 100%;
 }
 
+.inner-page {
+  background-color: rgba(var(--foreground-color), 0.5);
+}
+
 #sign_in,
 #sign_up {
   justify-items: center;
@@ -1023,18 +1031,21 @@ sm-button[variant=primary] {
   overflow: auto hidden;
 }
 #selected_contacts_container:not(:empty) {
-  margin-top: 1.5rem;
+  padding: 0.5rem 0;
+  margin: 0.5rem 0;
+  border-bottom: solid thin rgba(var(--text-color), 0.1);
 }
 #selected_contacts_container .contact-preview {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   cursor: pointer;
-  margin-right: 0.5rem;
+  margin-right: 0.3rem;
   background: rgba(var(--text-color), 0.1);
-  padding: 0 0.2rem;
+  padding-left: 0.2rem;
   border-radius: 2rem;
   transform-origin: left;
+  overflow: hidden;
 }
 #selected_contacts_container .contact-preview .initial {
   width: 1.6rem;
@@ -1047,18 +1058,12 @@ sm-button[variant=primary] {
   margin-left: 0.5rem;
 }
 
-#contact_details_popup {
-  --body-padding: 0 0 1.5rem 0;
-}
 #contact_details_popup .popup-section {
-  margin: 1.5rem;
+  margin: 1.5rem 0;
 }
 #contact_details_popup h5 {
   font-weight: 500;
   opacity: 0.8;
-}
-#contact_details_popup .copy-row h4 {
-  font-weight: 400;
 }
 #contact_details_popup .group-icon {
   padding: 0.2rem !important;
@@ -1079,11 +1084,6 @@ sm-button[variant=primary] {
 #contact_details_popup #contact_name::part(text) {
   font-size: 1.2rem;
   font-weight: 500;
-}
-#contact_details_popup .option .icon {
-  padding: 0;
-  width: 1.2rem;
-  background: none;
 }
 
 #warn_no_encryption,
@@ -1284,22 +1284,6 @@ sm-button[variant=primary] {
 .logo-section {
   display: grid;
   grid-template-columns: auto 1fr;
-}
-
-.option {
-  display: flex;
-  align-items: center;
-  padding: 0.8rem 1.5rem;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-}
-.option .icon {
-  height: 1.4rem;
-  width: 1.4rem;
-  margin-right: 1rem;
-  stroke: rgba(255, 255, 255, 0.8);
 }
 
 #main_navbar {
@@ -1560,34 +1544,7 @@ sm-button[variant=primary] {
 
 #chat_details_panel {
   background: rgba(var(--text-color), 0.04);
-  padding-bottom: 1.5rem;
-}
-#chat_details_panel .card {
-  margin: 0 1rem;
-  padding: 1.5rem 1rem;
-  border-radius: 0.8rem;
-  background: rgba(var(--text-color), 0.04);
-}
-#chat_details_panel .card:not(:last-of-type) {
-  margin-bottom: 1rem;
-}
-#chat_details_panel .card .h4 {
-  font-weight: 400;
-  font-size: 0.9rem;
-  color: rgba(var(--text-color), 0.8);
-  margin-bottom: 0.5rem;
-}
-#chat_details_panel .card > .flex {
-  margin-bottom: 1rem;
-}
-#chat_details_panel .card > .flex .h4 {
-  margin-bottom: 0;
-}
-#chat_details_panel .card .tip {
-  margin-bottom: 0.5rem;
-}
-#chat_details_panel .card .danger:not(:last-of-type) {
-  margin-bottom: 1rem;
+  padding: 0 1.5rem 1.5rem 1.5rem;
 }
 #chat_details_panel header {
   position: -webkit-sticky;
@@ -1635,6 +1592,11 @@ sm-button[variant=primary] {
 #group_members_list {
   max-height: 50vh;
   overflow-y: auto;
+}
+
+#chat,
+#mail {
+  background-color: rgba(var(--foreground-color), 0.3);
 }
 
 #chat {
@@ -1875,7 +1837,7 @@ sm-button[variant=primary] {
   opacity: 0.5;
   font-weight: 500;
 }
-#send_message_button.active {
+#send_message_button:not(:disabled) {
   opacity: 1;
   color: var(--accent-color);
 }
@@ -1884,17 +1846,6 @@ sm-button[variant=primary] {
   margin: 0;
   --border-radius: 0.5rem;
   --background: rgba(var(--text-color), 0.1);
-}
-
-.big-emoji {
-  flex-direction: column;
-}
-.big-emoji .message-body {
-  justify-content: center;
-  font-size: 2.6rem;
-}
-.big-emoji .text-emoji {
-  font-size: 2.6rem !important;
 }
 
 #messages_container {
@@ -2099,6 +2050,9 @@ sm-button[variant=primary] {
   padding: 1rem 1.5rem;
   width: min(60ch, 100%);
 }
+#settings_page section .button {
+  align-self: flex-start;
+}
 #settings_page #sign_out::part(button) {
   color: var(--error-color);
 }
@@ -2144,6 +2098,17 @@ sm-button[variant=primary] {
      object-fit: cover;
   height: 100%;
   width: 100%;
+}
+
+.option {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0.8rem 0;
+  color: var(--accent-color);
+}
+.option .icon {
+  fill: var(--accent-color);
+  margin-right: 1rem;
 }
 
 @media screen and (max-width: 640px) {
@@ -2270,7 +2235,7 @@ sm-button[variant=primary] {
     grid-area: nav;
     border-top: none;
     flex-direction: column;
-    background-color: rgba(var(--background-color), 0.06);
+    background-color: rgba(var(--foreground-color), 0.3);
   }
   #main_navbar ul {
     flex-direction: column;
@@ -2351,6 +2316,7 @@ sm-button[variant=primary] {
 @media only screen and (min-width: 1080px) {
   #chat #messages_container {
     padding: 1rem 4rem;
+    padding-top: 0;
   }
 }
 @media only screen and (min-width: 1280px) {
@@ -2405,8 +2371,7 @@ sm-button[variant=primary] {
     background-color: rgba(var(--text-color), 0.06);
   }
 
-  .emoji:hover,
-.option:hover {
+  .emoji:hover {
     cursor: pointer;
     background: rgba(var(--text-color), 0.06);
   }
@@ -2422,9 +2387,7 @@ sm-button[variant=primary] {
 }
 @media (hover: none) {
   .contact-preview,
-.contact,
-.icon,
-.option {
+.contact {
     -webkit-tap-highlight-color: transparent;
   }
 

@@ -212,6 +212,9 @@ input {
     }
   }
 }
+sm-copy {
+  font-size: 0.9rem;
+}
 
 sm-input,
 sm-textarea {
@@ -615,6 +618,9 @@ ol {
     height: 100%;
   }
 }
+.inner-page {
+  background-color: rgba(var(--foreground-color), 0.5);
+}
 
 #sign_in,
 #sign_up {
@@ -911,18 +917,21 @@ sm-button[variant="primary"] {
   display: flex;
   overflow: auto hidden;
   &:not(:empty) {
-    margin-top: 1.5rem;
+    padding: 0.5rem 0;
+    margin: 0.5rem 0;
+    border-bottom: solid thin rgba(var(--text-color), 0.1);
   }
   .contact-preview {
     display: flex;
     flex-shrink: 0;
     align-items: center;
     cursor: pointer;
-    margin-right: 0.5rem;
+    margin-right: 0.3rem;
     background: rgba(var(--text-color), 0.1);
-    padding: 0 0.2rem;
+    padding-left: 0.2rem;
     border-radius: 2rem;
     transform-origin: left;
+    overflow: hidden;
     .initial {
       width: 1.6rem;
       height: 1.6rem;
@@ -936,18 +945,12 @@ sm-button[variant="primary"] {
   }
 }
 #contact_details_popup {
-  --body-padding: 0 0 1.5rem 0;
   .popup-section {
-    margin: 1.5rem;
+    margin: 1.5rem 0;
   }
   h5 {
     font-weight: 500;
     opacity: 0.8;
-  }
-  .copy-row {
-    h4 {
-      font-weight: 400;
-    }
   }
   .group-icon {
     padding: 0.2rem !important;
@@ -967,13 +970,6 @@ sm-button[variant="primary"] {
     &::part(text) {
       font-size: 1.2rem;
       font-weight: 500;
-    }
-  }
-  .option {
-    .icon {
-      padding: 0;
-      width: 1.2rem;
-      background: none;
     }
   }
 }
@@ -1149,18 +1145,6 @@ sm-button[variant="primary"] {
 .logo-section {
   display: grid;
   grid-template-columns: auto 1fr;
-}
-.option {
-  display: flex;
-  align-items: center;
-  padding: 0.8rem 1.5rem;
-  user-select: none;
-  .icon {
-    height: 1.4rem;
-    width: 1.4rem;
-    margin-right: 1rem;
-    stroke: rgba(255, 255, 255, 0.8);
-  }
 }
 #main_navbar {
   display: flex;
@@ -1394,34 +1378,7 @@ sm-button[variant="primary"] {
 }
 #chat_details_panel {
   background: rgba(var(--text-color), 0.04);
-  padding-bottom: 1.5rem;
-  .card {
-    margin: 0 1rem;
-    padding: 1.5rem 1rem;
-    border-radius: 0.8rem;
-    background: rgba(var(--text-color), 0.04);
-    &:not(:last-of-type) {
-      margin-bottom: 1rem;
-    }
-    .h4 {
-      font-weight: 400;
-      font-size: 0.9rem;
-      color: rgba(var(--text-color), 0.8);
-      margin-bottom: 0.5rem;
-    }
-    & > .flex {
-      margin-bottom: 1rem;
-      .h4 {
-        margin-bottom: 0;
-      }
-    }
-    .tip {
-      margin-bottom: 0.5rem;
-    }
-    .danger:not(:last-of-type) {
-      margin-bottom: 1rem;
-    }
-  }
+  padding: 0 1.5rem 1.5rem 1.5rem;
   header {
     position: sticky;
     top: 0;
@@ -1467,6 +1424,10 @@ sm-button[variant="primary"] {
 #group_members_list {
   max-height: 50vh;
   overflow-y: auto;
+}
+#chat,
+#mail {
+  background-color: rgba(var(--foreground-color), 0.3);
 }
 #chat {
   position: relative;
@@ -1685,7 +1646,7 @@ sm-button[variant="primary"] {
   margin-left: 0.5rem;
   opacity: 0.5;
   font-weight: 500;
-  &.active {
+  &:not(:disabled) {
     opacity: 1;
     color: var(--accent-color);
   }
@@ -1694,16 +1655,6 @@ sm-button[variant="primary"] {
   margin: 0;
   --border-radius: 0.5rem;
   --background: rgba(var(--text-color), 0.1);
-}
-.big-emoji {
-  flex-direction: column;
-  .message-body {
-    justify-content: center;
-    font-size: 2.6rem;
-  }
-  .text-emoji {
-    font-size: 2.6rem !important;
-  }
 }
 #messages_container {
   flex: 1;
@@ -1892,6 +1843,9 @@ sm-button[variant="primary"] {
     gap: 0.5rem;
     padding: 1rem 1.5rem;
     width: min(60ch, 100%);
+    .button {
+      align-self: flex-start;
+    }
   }
   #sign_out::part(button) {
     color: var(--error-color);
@@ -1937,6 +1891,16 @@ sm-button[variant="primary"] {
     object-fit: cover;
     height: 100%;
     width: 100%;
+  }
+}
+.option {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0.8rem 0;
+  color: var(--accent-color);
+  .icon {
+    fill: var(--accent-color);
+    margin-right: 1rem;
   }
 }
 @media screen and (max-width: 640px) {
@@ -2051,7 +2015,7 @@ sm-button[variant="primary"] {
     grid-area: nav;
     border-top: none;
     flex-direction: column;
-    background-color: rgba(var(--background-color), 0.06);
+    background-color: rgba(var(--foreground-color), 0.3);
     ul {
       flex-direction: column;
       gap: 0.5rem;
@@ -2124,6 +2088,7 @@ sm-button[variant="primary"] {
   #chat {
     #messages_container {
       padding: 1rem 4rem;
+      padding-top: 0;
     }
   }
 }
@@ -2174,8 +2139,7 @@ sm-button[variant="primary"] {
   .interactive:hover {
     background-color: rgba(var(--text-color), 0.06);
   }
-  .emoji:hover,
-  .option:hover {
+  .emoji:hover {
     cursor: pointer;
     background: rgba(var(--text-color), 0.06);
   }
@@ -2193,9 +2157,7 @@ sm-button[variant="primary"] {
 }
 @media (hover: none) {
   .contact-preview,
-  .contact,
-  .icon,
-  .option {
+  .contact {
     -webkit-tap-highlight-color: transparent;
   }
   .contact .menu {
