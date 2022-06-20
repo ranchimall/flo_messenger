@@ -1763,9 +1763,6 @@ sm-button[variant=primary] {
   margin-left: -0.5rem;
   margin-right: 0.5rem;
 }
-#chat_header .back-button .icon {
-  margin-right: 0.3rem;
-}
 #chat_header .initial {
   cursor: pointer;
   height: 2.2rem;

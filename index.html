@@ -1434,7 +1434,7 @@
         // class based lazy loading
         class LazyLoader {
             constructor(container, elementsToRender, renderFn, options = {}) {
-                const { batchSize = 10, freshRender, bottomFirst = false, hasUhtml = false, domUpdated } = options
+                const { batchSize = 10, freshRender, bottomFirst = false, domUpdated } = options
 
                 this.elementsToRender = elementsToRender
                 this.arrayOfElements = (typeof elementsToRender === 'function') ? this.elementsToRender() : elementsToRender || []
@@ -1445,7 +1445,6 @@
                 this.freshRender = freshRender
                 this.domUpdated = domUpdated
                 this.bottomFirst = bottomFirst
-                this.hasUhtml = hasUhtml
 
                 this.shouldLazyLoad = false
                 this.lastScrollTop = 0
@@ -1507,39 +1506,35 @@
                 this.shouldLazyLoad = lazyLoad
                 const frag = document.createDocumentFragment();
                 if (lazyLoad) {
-                    this.updateStartIndex = this.updateEndIndex
-                    this.updateEndIndex = this.updateEndIndex + this.batchSize
+                    if (this.bottomFirst) {
+                        this.updateEndIndex = this.updateStartIndex - 1
+                        this.updateStartIndex = this.updateEndIndex - this.batchSize
+                    } else {
+                        this.updateStartIndex = this.updateEndIndex
+                        this.updateEndIndex = this.updateEndIndex + this.batchSize
+                    }
                 } else {
                     this.intersectionObserver.disconnect()
-                    this.updateStartIndex = 0
-                    this.updateEndIndex = this.batchSize
-                    if (this.hasUhtml)
-                        renderElem(this.lazyContainer, html``)
-                    else
-                        this.lazyContainer.innerHTML = ``;
+                    if (this.bottomFirst) {
+                        this.updateStartIndex = this.arrayOfElements.length - this.batchSize - 1
+                        this.updateEndIndex = this.arrayOfElements.length
+                    } else {
+                        this.updateStartIndex = 0
+                        this.updateEndIndex = this.batchSize
+                    }
+                    this.lazyContainer.innerHTML = ``;
                 }
                 this.lastScrollHeight = this.lazyContainer.scrollHeight
                 this.lastScrollTop = this.lazyContainer.scrollTop
+                console.log(this.updateStartIndex, this.updateEndIndex)
+                this.arrayOfElements.slice(this.updateStartIndex, this.updateEndIndex).forEach((element) => {
+                    frag.append(this.renderFn(element))
+                })
                 if (this.bottomFirst) {
-                    if (this.hasUhtml) {
-                        renderElem(this.lazyContainer, html`${this.arrayOfElements.slice(0, this.updateEndIndex).reverse().map(this.renderFn)}`)
-                    } else {
-                        this.arrayOfElements.slice(this.updateStartIndex, this.updateEndIndex).forEach((element, index, arr) => {
-                            frag.prepend(this.renderFn(element, arr[index + 1]))
-                        })
-                        this.lazyContainer.prepend(frag)
-                    }
+                    this.lazyContainer.prepend(frag)
                 } else {
-                    if (this.hasUhtml) {
-                        renderElem(this.lazyContainer, html`${this.arrayOfElements.slice(0, this.updateEndIndex).map(this.renderFn)}`)
-                    } else {
-                        this.arrayOfElements.slice(this.updateStartIndex, this.updateEndIndex).forEach(element => {
-                            frag.appendChild(this.renderFn(element))
-                        })
-                        this.lazyContainer.append(frag)
-                    }
+                    this.lazyContainer.append(frag)
                 }
-                this.isRendering = false
                 if (!lazyLoad && this.bottomFirst)
                     this.lazyContainer.scrollTo({
                         top: this.lazyContainer.scrollHeight,
@@ -1704,6 +1699,7 @@
 
 
         let renderedDates = {}
+        let lastSender = ''
 
         // render elements 
         const render = {
@@ -1819,7 +1815,7 @@
                     </label>
                 `
             },
-            messageBubble(msg, nextElement) {
+            messageBubble(msg) {
                 let { admin = false, newMembers = [], rmMembers = [], groupID, name, description, sender, floID, message, time: timestamp, category, unconfirmed = false, updateChatCard = false } = msg
                 if (activeChat.isGroup) {
                     floID = groupID
@@ -1828,8 +1824,9 @@
                 if (message) {
                     let senderName = null
                     if (sender) {
-                        if (sender !== myFloID && (!nextElement || nextElement.sender !== sender))
+                        if (sender !== myFloID && lastSender !== sender)
                             senderName = html.node`<div class="sender-name" style=${`color:${contactColor(sender)}`}>${getContactName(sender)}</div>`
+                        lastSender = sender
                     }
                     let messageContent = document.createDocumentFragment()
                     let isBigEmoji = false
@@ -2647,7 +2644,7 @@
         async function renderMessages(options) {
             let { markUnread = true } = options
             try {
-                let messages = Object.values(await messenger.getChat(activeChat['floID'])).reverse()
+                let messages = Object.values(await messenger.getChat(activeChat['floID']))
                 if (activeChat.floID) {
                     if (chatLazyLoader) {
                         chatLazyLoader.update(messages)
