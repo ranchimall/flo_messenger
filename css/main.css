@@ -184,6 +184,7 @@ button:not(:disabled),
 .icon-only {
   padding: 0.5rem;
   border-radius: 0.3rem;
+  aspect-ratio: 1/1;
 }
 
 button:disabled {
@@ -946,8 +947,7 @@ sm-button[variant=primary] {
 .group-icon {
   height: 1.6rem;
   width: 1.6rem;
-  fill: white;
-  stroke: none;
+  fill: rgba(var(--text-color), 1);
 }
 
 .contact {
@@ -1066,7 +1066,7 @@ sm-button[variant=primary] {
   opacity: 0.8;
 }
 #contact_details_popup .group-icon {
-  padding: 0.2rem !important;
+  padding: 0.2rem;
   height: 3rem;
   width: 3rem;
 }
@@ -1416,7 +1416,7 @@ sm-button[variant=primary] {
 }
 
 #group_creation_panel .group-icon {
-  background: var(--accent-color);
+  background-color: var(--accent-color);
   justify-self: center;
   height: 8rem;
   width: 8rem;
@@ -1934,10 +1934,6 @@ sm-button[variant=primary] {
   padding-bottom: 6rem;
 }
 
-#contacts_popup {
-  --body-padding: 0;
-}
-
 .mail-container {
   height: 100%;
   flex-direction: column;
@@ -1953,7 +1949,7 @@ sm-button[variant=primary] {
 .has-bg-image .received,
 .has-bg-image .group-event-card,
 .has-bg-image .date-card {
-  background: rgba(var(--foreground-color), 0.8);
+  background: rgba(var(--foreground-color), 1);
 }
 .has-bg-image .received::after {
   border-color: transparent rgba(var(--foreground-color), 0.6) transparent transparent;
@@ -1981,10 +1977,6 @@ sm-button[variant=primary] {
 }
 #mail > .flex sm-button:first-of-type {
   margin-right: 0.5rem;
-}
-
-#compose_mail_popup sm-input {
-  margin-bottom: 1rem;
 }
 
 .sidebar-item {
