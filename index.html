@@ -1469,7 +1469,7 @@
                         }
                     })
                 }, {
-                    threshold: 0.3
+                    root: this.lazyContainer
                 })
                 this.mutationObserver = new MutationObserver(mutationList => {
                     mutationList.forEach(mutation => {
@@ -1516,8 +1516,8 @@
                 } else {
                     this.intersectionObserver.disconnect()
                     if (this.bottomFirst) {
-                        this.updateStartIndex = this.arrayOfElements.length - this.batchSize - 1
                         this.updateEndIndex = this.arrayOfElements.length
+                        this.updateStartIndex = this.updateEndIndex - this.batchSize - 1
                     } else {
                         this.updateStartIndex = 0
                         this.updateEndIndex = this.batchSize
@@ -1851,14 +1851,9 @@
                     // rendering Date card when date changes after a message
                     let dateCard
                     if (!renderedDates.hasOwnProperty(messageDate) || renderedDates[messageDate] > timestamp) {
+                        getRef('messages_container').querySelectorAll(`.date-card[data-date="${messageDate}"]`).forEach(card => card.remove())
+                        dateCard = html.node`<time class="date-card" data-date="${messageDate}">${messageDate}</time>`
                         renderedDates[messageDate] = timestamp
-                        const previousDateCard = getRef('messages_container').querySelector(`.date-card[data-date="${messageDate}"]`)
-                        if (previousDateCard) {
-                            dateCard = previousDateCard.cloneNode(true)
-                            previousDateCard.remove()
-                        } else {
-                            dateCard = html.node`<time class="date-card" data-date="${messageDate}">${messageDate}</time>`
-                        }
                     }
                     const className = `message ${category} ${unconfirmed ? 'unconfirmed' : ''} ${senderName ? 'distinct-sender' : ''}`
                     return html.node`

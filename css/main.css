@@ -947,7 +947,7 @@ sm-button[variant=primary] {
 .group-icon {
   height: 1.6rem;
   width: 1.6rem;
-  fill: rgba(var(--text-color), 1);
+  fill: white;
 }
 
 .contact {
@@ -1089,10 +1089,6 @@ sm-button[variant=primary] {
 #warn_no_encryption,
 .date-card,
 .group-event-card {
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
-  z-index: 1;
   padding: 0.4rem 0.6rem;
   font-weight: 500;
   font-size: 0.8rem;
