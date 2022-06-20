@@ -1293,7 +1293,7 @@ sm-button[variant="primary"] {
 }
 #contacts,
 #mails,
-#settings_page {
+#settings {
   height: 100%;
   overflow-y: hidden;
   .header {
@@ -1359,7 +1359,7 @@ sm-button[variant="primary"] {
 }
 #chat_page,
 #mail_page,
-#settings_page {
+#settings {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -1425,11 +1425,11 @@ sm-button[variant="primary"] {
   max-height: 50vh;
   overflow-y: auto;
 }
-#chat,
+#chat_view,
 #mail {
   background-color: rgba(var(--foreground-color), 0.3);
 }
-#chat {
+#chat_view {
   position: relative;
   grid-template-columns: 1fr;
 }
@@ -1571,11 +1571,14 @@ sm-button[variant="primary"] {
   }
   .back-button {
     padding: 0.5rem;
-    margin-left: -0.7rem;
+    margin-left: -0.5rem;
+    margin-right: 0.5rem;
+    .icon {
+      margin-right: 0.3rem;
+    }
   }
   .initial {
     cursor: pointer;
-    margin-right: 1rem;
     height: 2.2rem;
     width: 2.2rem;
     flex-shrink: 0;
@@ -1786,6 +1789,7 @@ sm-button[variant="primary"] {
   text-transform: capitalize;
   font-weight: 500;
   opacity: 0.9;
+  color: inherit;
   .icon {
     margin-right: 1em;
     width: 1em;
@@ -1804,7 +1808,7 @@ sm-button[variant="primary"] {
     opacity: 1;
   }
 }
-#settings_page {
+#settings {
   #settings_sidebar header {
     padding: 1rem 1.5rem;
   }
@@ -1946,7 +1950,7 @@ sm-button[variant="primary"] {
   #contact_container {
     gap: 0.2rem;
   }
-  #chat {
+  #chat_view {
     .message {
       width: auto;
       max-width: 90%;
@@ -1955,13 +1959,13 @@ sm-button[variant="primary"] {
   #chat_header {
     grid-template-columns: auto 1fr auto;
   }
-  #settings_page {
+  #settings {
     overflow-x: hidden;
     #settings_header {
       position: sticky;
       top: 0;
       z-index: 1;
-      padding: 1rem 1.5rem 1rem 0.5rem;
+      padding: 1rem 1.5rem;
       margin-bottom: 0.5rem;
       background: linear-gradient(
         rgba(var(--background-color), 0.8),
@@ -2045,7 +2049,7 @@ sm-button[variant="primary"] {
   #emoji_picker {
     max-height: 18rem;
   }
-  #chat {
+  #chat_view {
     .message {
       width: auto;
       align-self: flex-start;
@@ -2057,7 +2061,7 @@ sm-button[variant="primary"] {
     display: grid;
     grid-template-columns: 19rem 1fr;
   }
-  #settings_page {
+  #settings {
     display: grid;
     grid-template-columns: 14rem 1fr;
     sm-button {
@@ -2085,7 +2089,7 @@ sm-button[variant="primary"] {
   }
 }
 @media only screen and (min-width: 1080px) {
-  #chat {
+  #chat_view {
     #messages_container {
       padding: 1rem 4rem;
       padding-top: 0;
@@ -2103,7 +2107,7 @@ sm-button[variant="primary"] {
   #chat_details_panel {
     position: relative;
   }
-  #chat {
+  #chat_view {
     &.expand-side-panel {
       grid-template-columns: 1fr 24rem;
       #messages_container {

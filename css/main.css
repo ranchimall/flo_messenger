@@ -1435,13 +1435,13 @@ sm-button[variant=primary] {
 
 #contacts,
 #mails,
-#settings_page {
+#settings {
   height: 100%;
   overflow-y: hidden;
 }
 #contacts .header,
 #mails .header,
-#settings_page .header {
+#settings .header {
   padding: 1rem 1.5rem 1rem 1.5rem;
   position: relative;
   gap: 0.5rem;
@@ -1449,7 +1449,7 @@ sm-button[variant=primary] {
 }
 #contacts .header .expanding-search,
 #mails .header .expanding-search,
-#settings_page .header .expanding-search {
+#settings .header .expanding-search {
   position: absolute;
   width: 100%;
   padding: 0.7rem 1.5rem;
@@ -1461,38 +1461,38 @@ sm-button[variant=primary] {
 }
 #contacts .header .expanding-search.expand,
 #mails .header .expanding-search.expand,
-#settings_page .header .expanding-search.expand {
+#settings .header .expanding-search.expand {
   transform: none;
   opacity: 1;
   pointer-events: all;
 }
 #contacts .header sm-input,
 #mails .header sm-input,
-#settings_page .header sm-input {
+#settings .header sm-input {
   margin: 0;
   width: 100%;
   --padding: 0.5rem 1rem;
 }
 #contacts .header h4,
 #mails .header h4,
-#settings_page .header h4 {
+#settings .header h4 {
   text-transform: capitalize;
   font-weight: 500;
 }
 #contacts .header .icon,
 #mails .header .icon,
-#settings_page .header .icon {
+#settings .header .icon {
   -webkit-tap-highlight-color: transparent;
   margin-right: 1rem;
 }
 #contacts .header .flex h4,
 #mails .header .flex h4,
-#settings_page .header .flex h4 {
+#settings .header .flex h4 {
   flex: 1;
 }
 #contacts .header .flex .icon,
 #mails .header .flex .icon,
-#settings_page .header .flex .icon {
+#settings .header .flex .icon {
   height: 2.2rem;
   width: 2.2rem;
   padding: 0.6rem;
@@ -1501,17 +1501,17 @@ sm-button[variant=primary] {
 }
 #contacts .header .flex sm-menu,
 #mails .header .flex sm-menu,
-#settings_page .header .flex sm-menu {
+#settings .header .flex sm-menu {
   margin-right: -0.7rem;
 }
 #contacts .header sm-button,
 #mails .header sm-button,
-#settings_page .header sm-button {
+#settings .header sm-button {
   margin: 0;
 }
 #contacts .header sm-button .icon,
 #mails .header sm-button .icon,
-#settings_page .header sm-button .icon {
+#settings .header sm-button .icon {
   height: 0.9rem;
   width: 0.9rem;
   align-self: center;
@@ -1522,7 +1522,7 @@ sm-button[variant=primary] {
 
 #chat_page,
 #mail_page,
-#settings_page {
+#settings {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -1594,12 +1594,12 @@ sm-button[variant=primary] {
   overflow-y: auto;
 }
 
-#chat,
+#chat_view,
 #mail {
   background-color: rgba(var(--foreground-color), 0.3);
 }
 
-#chat {
+#chat_view {
   position: relative;
   grid-template-columns: 1fr;
 }
@@ -1760,11 +1760,14 @@ sm-button[variant=primary] {
 }
 #chat_header .back-button {
   padding: 0.5rem;
-  margin-left: -0.7rem;
+  margin-left: -0.5rem;
+  margin-right: 0.5rem;
+}
+#chat_header .back-button .icon {
+  margin-right: 0.3rem;
 }
 #chat_header .initial {
   cursor: pointer;
-  margin-right: 1rem;
   height: 2.2rem;
   width: 2.2rem;
   flex-shrink: 0;
@@ -1991,6 +1994,7 @@ sm-button[variant=primary] {
   text-transform: capitalize;
   font-weight: 500;
   opacity: 0.9;
+  color: inherit;
 }
 .sidebar-item .icon {
   margin-right: 1em;
@@ -2011,67 +2015,67 @@ sm-button[variant=primary] {
   opacity: 1;
 }
 
-#settings_page #settings_sidebar header {
+#settings #settings_sidebar header {
   padding: 1rem 1.5rem;
 }
-#settings_page .flex sm-button {
+#settings .flex sm-button {
   margin: 0;
   margin-left: 1rem;
 }
-#settings_page sm-switch {
+#settings sm-switch {
   padding: 1rem 1.5rem;
   display: flex;
   margin-bottom: 1rem;
   width: min(60ch, 100%);
 }
-#settings_page sm-switch .flex {
+#settings sm-switch .flex {
   margin-right: 1rem;
 }
-#settings_page sm-switch h4 {
+#settings sm-switch h4 {
   margin-bottom: 0.5rem;
 }
-#settings_page sm-button {
+#settings sm-button {
   width: 100%;
 }
-#settings_page #settings_title {
+#settings #settings_title {
   text-transform: capitalize;
 }
-#settings_page #settings_sidebar {
+#settings #settings_sidebar {
   height: 100%;
 }
-#settings_page #settings_panel {
+#settings #settings_panel {
   overflow-y: auto;
   height: 100%;
 }
-#settings_page section {
+#settings section {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
   width: min(60ch, 100%);
 }
-#settings_page section .button {
+#settings section .button {
   align-self: flex-start;
 }
-#settings_page #sign_out::part(button) {
+#settings #sign_out::part(button) {
   color: var(--error-color);
 }
-#settings_page color-grid {
+#settings color-grid {
   margin: 0.5rem 0 1.5rem 0;
   width: min(60ch, 100%);
 }
-#settings_page #chat_preview {
+#settings #chat_preview {
   margin-top: 1rem;
   padding: 1rem;
   border-radius: 0.5rem;
   background-color: rgba(var(--text-color), 0.06);
 }
-#settings_page #bg_preview_container {
+#settings #bg_preview_container {
   padding: 1rem 0;
   gap: 0.5rem;
   flex-wrap: wrap;
 }
-#settings_page .bg-preview {
+#settings .bg-preview {
   position: relative;
   display: grid;
   place-items: center;
@@ -2082,7 +2086,7 @@ sm-button[variant=primary] {
   overflow: hidden;
   background: rgba(var(--text-color), 0.1);
 }
-#settings_page .bg-preview--selected::after {
+#settings .bg-preview--selected::after {
   content: "";
   position: absolute;
   height: 100%;
@@ -2090,10 +2094,10 @@ sm-button[variant=primary] {
   border-radius: inherit;
   box-shadow: 0 0 0 0.5rem var(--accent-color) inset;
 }
-#settings_page .bg-preview input {
+#settings .bg-preview input {
   display: none;
 }
-#settings_page .bg-preview__image {
+#settings .bg-preview__image {
   -o-object-fit: cover;
      object-fit: cover;
   height: 100%;
@@ -2158,7 +2162,7 @@ sm-button[variant=primary] {
     gap: 0.2rem;
   }
 
-  #chat .message {
+  #chat_view .message {
     width: auto;
     max-width: 90%;
   }
@@ -2167,15 +2171,15 @@ sm-button[variant=primary] {
     grid-template-columns: auto 1fr auto;
   }
 
-  #settings_page {
+  #settings {
     overflow-x: hidden;
   }
-  #settings_page #settings_header {
+  #settings #settings_header {
     position: -webkit-sticky;
     position: sticky;
     top: 0;
     z-index: 1;
-    padding: 1rem 1.5rem 1rem 0.5rem;
+    padding: 1rem 1.5rem;
     margin-bottom: 0.5rem;
     background: linear-gradient(rgba(var(--background-color), 0.8), rgba(var(--background-color), 0));
     -webkit-backdrop-filter: blur(0.5rem);
@@ -2270,7 +2274,7 @@ sm-button[variant=primary] {
     max-height: 18rem;
   }
 
-  #chat .message {
+  #chat_view .message {
     width: auto;
     align-self: flex-start;
     max-width: 55ch;
@@ -2282,19 +2286,19 @@ sm-button[variant=primary] {
     grid-template-columns: 19rem 1fr;
   }
 
-  #settings_page {
+  #settings {
     display: grid;
     grid-template-columns: 14rem 1fr;
   }
-  #settings_page sm-button {
+  #settings sm-button {
     width: -webkit-max-content;
     width: -moz-max-content;
     width: max-content;
   }
-  #settings_page .active {
+  #settings .active {
     background: rgba(var(--text-color), 0.1);
   }
-  #settings_page .panel > *:first-of-type {
+  #settings .panel > *:first-of-type {
     margin-top: 0.5rem;
   }
 
@@ -2314,7 +2318,7 @@ sm-button[variant=primary] {
   }
 }
 @media only screen and (min-width: 1080px) {
-  #chat #messages_container {
+  #chat_view #messages_container {
     padding: 1rem 4rem;
     padding-top: 0;
   }
@@ -2332,10 +2336,10 @@ sm-button[variant=primary] {
     position: relative;
   }
 
-  #chat.expand-side-panel {
+  #chat_view.expand-side-panel {
     grid-template-columns: 1fr 24rem;
   }
-  #chat.expand-side-panel #messages_container {
+  #chat_view.expand-side-panel #messages_container {
     padding: 1rem;
   }
 

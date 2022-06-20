@@ -261,7 +261,7 @@
                     <p class="light-text">Tap/click on 'New chat' to add or select a contact.</p>
                 </div>
             </div>
-            <div id="chat" class="grid hide-on-mobile hide">
+            <div id="chat_view" class="grid hide-on-mobile hide">
                 <div id="chat_left">
                     <header id="chat_header" class="grid align-center">
                         <button class=" hide-on-desktop back-button" onclick="goto('chats')">
@@ -270,9 +270,9 @@
                                 <path d="M0 0h24v24H0V0z" fill="none" opacity=".87" />
                                 <path d="M17.51 3.87L15.73 2.1 5.84 12l9.9 9.9 1.77-1.77L9.38 12l8.13-8.13z" />
                             </svg>
+                            <div id="receiver_initial" class="initial flex align-center"></div>
                         </button>
                         <div class="flex align-center interactive" onclick="showChatDetails({show: true})">
-                            <div id="receiver_initial" class="initial flex align-center"></div>
                             <h4 id="receiver_name"></h4>
                         </div>
                     </header>
@@ -416,29 +416,29 @@
                 </div>
             </div>
         </section>
-        <section id="settings_page" class="inner-page hide">
+        <section id="settings" class="inner-page hide">
             <aside id="settings_sidebar">
                 <header class="grid header">
                     <h4>Settings</h4>
                 </header>
-                <div class="sidebar-item interactive active" data-target="profile_panel">Account</div>
-                <div class="sidebar-item interactive" data-target="chat_panel">chat</div>
-                <div class="sidebar-item interactive" data-target="personalize_panel">personalise</div>
-                <div class="sidebar-item interactive" data-target="backup_panel">backup & restore</div>
-                <div class="sidebar-item interactive" data-target="about_panel">About</div>
+                <a class="sidebar-item interactive active" href="#/settings/profile">Account</a>
+                <a class="sidebar-item interactive" href="#/settings/chat">chat</a>
+                <a class="sidebar-item interactive" href="#/settings/personalize">personalize</a>
+                <a class="sidebar-item interactive" href="#/settings/backup">backup & restore</a>
+                <a class="sidebar-item interactive" href="#/settings/about">About</a>
             </aside>
             <div id="settings_panel" class=" hide-on-mobile">
-                <header id="settings_header" class="flex align-center hide-on-desktop">
-                    <button id="back_settings" onclick='hidePanel()'>
+                <header id="settings_header" class="flex  align-center hide-on-desktop">
+                    <a href="#/settings" id="back_settings" class="button icon-only margin-right-0-5">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                             width="24px" fill="#000000">
                             <path d="M0 0h24v24H0V0z" fill="none" />
                             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
                         </svg>
-                    </button>
+                    </a>
                     <h4 id="settings_title"></h4>
                 </header>
-                <div id="profile_panel" class="panel">
+                <div id="profile" class="panel">
                     <section>
                         <h4>My FLO ID</h4>
                         <sm-copy id="greet_tag"></sm-copy>
@@ -482,7 +482,7 @@
                             Sign Out</button>
                     </section>
                 </div>
-                <div id="chat_panel" class="panel hide">
+                <div id="chat" class="panel hide">
                     <sm-switch id="is_enter_send_toggle">
                         <div slot="left" class="flex flex-direction-column">
                             <h4>Send by Enter</h4>
@@ -496,7 +496,7 @@
                         </div>
                     </sm-switch>
                 </div>
-                <div id="personalize_panel" class="panel hide">
+                <div id="personalize" class="panel hide">
                     <section>
                         <h4>Chat preview</h4>
                         <div id="chat_preview">
@@ -562,7 +562,7 @@
                         <color-grid id="accent_color_selector"></color-grid>
                     </section>
                 </div>
-                <div id="backup_panel" class="panel hide">
+                <div id="backup" class="panel hide">
                     <section>
                         <h4>Backup data</h4>
                         <p>Create a backup of contacts, conversations and mails. Which can later be used to restore
@@ -599,7 +599,7 @@
                         </label>
                     </section>
                 </div>
-                <div id="about_panel" class="panel hide">
+                <div id="about" class="panel hide">
                     <section>
                         <p>Created by RanchiMall, a Blockchain incorporated entity</p>
                     </section>
@@ -633,7 +633,7 @@
                     </a>
                 </li>
                 <li>
-                    <a class="nav-item flex align-center" href="#/settings_page" title="Settings">
+                    <a class="nav-item flex align-center" href="#/settings" title="Settings">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                             width="24px" fill="#000000">
                             <path d="M0 0h24v24H0V0z" fill="none" />
@@ -2122,15 +2122,9 @@
         })
 
         document.addEventListener('click', e => {
-            if (e.target.closest('.sidebar-item')) {
-                let target = e.target.closest('.sidebar-item')
-                if (target.dataset.target)
-                    showPanel(target, target.dataset.target)
-            }
             if (e.target.closest('#send_mail_to') || e.target.closest('#mail_contact_list')) {
                 getRef('mail_contact_list').classList.remove('hide')
-            }
-            else {
+            } else {
                 getRef('mail_contact_list').classList.add('hide')
             }
             if (e.target.closest('#new_mail_button')) {
@@ -2213,16 +2207,16 @@
                     if (activeChat['chatCard'] === contact && !isMobileView) return
                     showChatDetails({ show: false, animate: false })
                     document.title = `FLO Messenger`
-                    getRef('chat').classList.remove('hide')
+                    getRef('chat_view').classList.remove('hide')
                     viewConversation(contact)
                     if (activeChat['chatCard'])
                         activeChat['chatCard'].classList.remove('active')
                     contact.classList.add('active')
                     activeChat['chatCard'] = contact
                     if (activeChatPage.id === 'contacts') {
-                        getRef('chat').classList.remove('hide-on-mobile')
+                        getRef('chat_view').classList.remove('hide-on-mobile')
                         getRef('contacts').classList.add('hide-on-mobile')
-                        activeChatPage = getRef('chat')
+                        activeChatPage = getRef('chat_view')
                         getRef('main_navbar').classList.add('hide-on-mobile')
                     }
                 }
@@ -2421,16 +2415,16 @@
 
         function updateHeight() {
             if (isMobileView) {
-                getRef('chat').style.height = window.innerHeight + 'px'
+                getRef('chat_view').style.height = window.innerHeight + 'px'
             }
             else {
-                getRef('chat').style.height = '100vh'
+                getRef('chat_view').style.height = '100vh'
             }
         }
 
         function goto(page) {
             if (page === 'chats') {
-                getRef('chat').classList.add('hide-on-mobile')
+                getRef('chat_view').classList.add('hide-on-mobile')
                 getRef('contacts').classList.remove('hide-on-mobile')
                 activeChatPage = getRef('contacts')
             }
@@ -2799,10 +2793,6 @@
             getRef(`${e.detail.value}_mail_container`).parentNode.classList.remove('hide')
         })
 
-        const allPanels = document.querySelectorAll('.panel'),
-            allSidebarItems = document.querySelectorAll('.sidebar-item')
-
-
         const flyOutLeft = [
             {
                 transform: 'translateX(0)',
@@ -2871,8 +2861,8 @@
             return anime
         }
 
-        function showPanel(item, panel) {
-            getRef('settings_title').textContent = item.textContent
+        function showPanel(subPageId) {
+            getRef('settings_title').textContent = subPageId
             if (window.innerWidth < 720) {
                 animateTo(getRef('settings_sidebar'), flyOutLeft, animOptions).onfinish = () => {
                     animateTo(getRef('settings_panel'), flyInLeft, animOptions)
@@ -2881,21 +2871,21 @@
                     getRef('settings_panel').classList.remove('hide-on-mobile')
                 }
             }
-            else {
-                allSidebarItems.forEach(panel => panel.classList.remove('active'))
-                item.classList.add('active')
-            }
-            allPanels.forEach(panel => panel.classList.add('hide'))
-            getRef(panel).classList.remove('hide')
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'))
+            document.querySelector(`.sidebar-item[href="#/settings/${subPageId}"]`).classList.add('active')
+            document.querySelectorAll('.panel').forEach(panel => panel.classList.add('hide'))
+            getRef(subPageId).classList.remove('hide')
         }
 
         function hidePanel() {
-            animateTo(getRef('settings_panel'), flyOutRight, animOptions).onfinish = () => {
-                getRef('settings_title').textContent = ''
-                getRef('settings_panel').style = ''
-                animateTo(getRef('settings_sidebar'), flyInRight, animOptions)
-                getRef('settings_panel').classList.add('hide-on-mobile')
-                getRef('settings_sidebar').classList.remove('hide-on-mobile')
+            if (isMobileView && !getRef('settings_panel').classList.contains('hide-on-mobile')) {
+                animateTo(getRef('settings_panel'), flyOutRight, animOptions).onfinish = () => {
+                    getRef('settings_title').textContent = ''
+                    getRef('settings_panel').style = ''
+                    animateTo(getRef('settings_sidebar'), flyInRight, animOptions)
+                    getRef('settings_panel').classList.add('hide-on-mobile')
+                    getRef('settings_sidebar').classList.remove('hide-on-mobile')
+                }
             }
         }
 
@@ -3028,7 +3018,7 @@
 
                     getRef('delete_chat_button').classList.remove('hide')
                 }
-                getRef('chat').classList.add('expand-side-panel')
+                getRef('chat_view').classList.add('expand-side-panel')
                 getRef('chat_left').classList.add('hide-on-medium')
                 getRef('chat_details_panel').classList.remove('hide')
                 animateTo(getRef('chat_details_panel'), [
@@ -3195,6 +3185,7 @@
         async function showPage(targetPage, options = {}) {
             const { firstLoad, hashChange } = options
             let pageId
+            let subPageId
             let params = {}
             let searchParams
             if (targetPage === '') {
@@ -3243,6 +3234,11 @@
                     targetPage = 'sign_up'
                     break;
                 case 'settings':
+                    if (subPageId) {
+                        showPanel(subPageId)
+                    } else {
+                        hidePanel()
+                    }
                     break;
                 default:
                     break;
@@ -3419,7 +3415,7 @@
                     const url = URL.createObjectURL(image)
                     if (hasSelectedBg) {
                         getRef('background_image').src = url
-                        addClass(['#chat', '#mail', '#chat_preview'], 'has-bg-image')
+                        addClass(['#chat_view', '#mail', '#chat_preview'], 'has-bg-image')
                         getRef('select_bg_button').textContent = 'Change background'
                         getRef('selected_bg_preview').classList.add('bg-preview--selected')
                         getRef('default_bg_preview').classList.remove('bg-preview--selected')
@@ -3450,7 +3446,7 @@
             compactIDB.writeData('userSettings', false, 'hasSelectedBg')
                 .then(async res => {
                     getRef('background_image').src = ''
-                    removeClass(['#chat', '#mail', '#chat_preview'], 'has-bg-image')
+                    removeClass(['#chat_view', '#mail', '#chat_preview'], 'has-bg-image')
                 })
                 .catch(err => console.error(err))
         }
