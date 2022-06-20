@@ -1526,7 +1526,6 @@
                 }
                 this.lastScrollHeight = this.lazyContainer.scrollHeight
                 this.lastScrollTop = this.lazyContainer.scrollTop
-                console.log(this.updateStartIndex, this.updateEndIndex)
                 this.arrayOfElements.slice(this.updateStartIndex, this.updateEndIndex).forEach((element) => {
                     frag.append(this.renderFn(element))
                 })
@@ -1848,14 +1847,21 @@
                         messageContent.append(isEmoji(message))
                     }
                     const messageDate = getFormattedTime(timestamp, 'date-only')
-                    if (!renderedDates.hasOwnProperty(messageDate) || renderedDates[messageDate].timestamp > timestamp) {
-                        renderedDates[messageDate] = {
-                            timestamp,
-                            isRendered: false
+                    // rendering Date card when date changes after a message
+                    let dateCard
+                    if (!renderedDates.hasOwnProperty(messageDate) || renderedDates[messageDate] > timestamp) {
+                        renderedDates[messageDate] = timestamp
+                        const previousDateCard = getRef('messages_container').querySelector(`.date-card[data-date="${messageDate}"]`)
+                        if (previousDateCard) {
+                            dateCard = previousDateCard.cloneNode(true)
+                            previousDateCard.remove()
+                        } else {
+                            dateCard = html.node`<time class="date-card" data-date="${messageDate}">${messageDate}</time>`
                         }
                     }
                     const className = `message ${category} ${unconfirmed ? 'unconfirmed' : ''} ${senderName ? 'distinct-sender' : ''}`
                     return html.node`
+                        ${dateCard}
                         <div class="${className}" id="${`${floID}_${timestamp}`}" data-date="${messageDate}">
                             ${senderName}
                             <p class="message-body">${messageContent}</p>
@@ -2650,21 +2656,7 @@
                         chatLazyLoader.update(messages)
                     } else {
                         chatLazyLoader = new LazyLoader('#messages_container', messages, render.messageBubble, {
-                            bottomFirst: true, domUpdated: () => {
-                                for (const date in renderedDates) {
-                                    if (renderedDates[date].isRendered) continue
-                                    let dateCard
-                                    const previousDateCard = getRef('messages_container').querySelector(`.date-card[data-date="${date}"]`)
-                                    if (previousDateCard) {
-                                        dateCard = previousDateCard.cloneNode(true)
-                                        previousDateCard.remove()
-                                    } else {
-                                        dateCard = html.node`<time class="date-card" data-date="${date}">${date}</time>`
-                                    }
-                                    getRef('messages_container').querySelector(`.message[data-date="${date}"]`).before(dateCard)
-                                    renderedDates[date].isRendered = true
-                                }
-                            }
+                            bottomFirst: true
                         });
                     }
                     chatLazyLoader.init()
