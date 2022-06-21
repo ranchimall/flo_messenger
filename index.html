@@ -1783,7 +1783,7 @@
                             <time class="time">${getFormattedTime(lastMessage.time, 'relative')}</time>
                             <svg class="icon menu" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"> <circle cx="5.59" cy="32" r="5.59"/> <circle cx="58.41" cy="32" r="5.59"/> <circle cx="31.89" cy="32" r="5.59"/> </svg>
                         `;
-                        getRef('chats_list').querySelector(`.contact[flo-id="${floID}"]`).append(html.node`${lastText}${timeAndOptions}`)
+                        getRef('chats_list').querySelector(`.contact[data-flo-id="${floID}"]`).append(html.node`${lastText}${timeAndOptions}`)
                     }).catch(error => console.error(error))
                     if (prepend) {
                         activeChat['floID'] = floID
@@ -1793,7 +1793,7 @@
                 }
                 const className = `contact ${type !== 'contact' ? type : ''} ${markUnread ? 'unread' : ''} interactive`
                 return html`
-                    <div class="${className}" name=${name} flo-id=${floID} search-tags=${`${name}${floID}`} background-color=${color}>
+                    <div class="${className}" .dataset=${{ name, floId: floID }} search-tags=${`${name}${floID}`} background-color=${color}>
                         <div class="initial flex align-center" style=${`background-color: ${color}`}>
                             ${initial}
                         </div>
@@ -1938,7 +1938,7 @@
                 }
                 let chatCard = getRef('chats_list').querySelector(`.chat[flo-id="${floID}"], .group[flo-id="${groupID}"]`)
                 if (chatCard) {
-                    if (activeChat['chatCard'] !== getRef('chats_list').children[0]) {
+                    if ((floID || groupID) !== getRef('chats_list').children[0].dataset.floId) {
                         const cloneContact = chatCard.cloneNode(true)
                         chatCard.remove()
                         activeChat['chatCard'] = cloneContact
@@ -2063,7 +2063,7 @@
                         getRef('mail_contact_list').lastElementChild.focus()
                 }
                 if (e.code === 'Enter' || e.code === 'Space') {
-                    getRef('send_mail_to').value = document.activeElement.getAttribute('flo-id')
+                    getRef('send_mail_to').value = document.activeElement.dataset.floId
                     getRef('mail_contact_list').classList.add('hide')
                 }
             }
@@ -2085,7 +2085,7 @@
             getRef('mail_contact_list').classList.remove('hide')
             if (this.value.trim !== '') {
                 for (child of getRef('mail_contact_list').children) {
-                    if (child.getAttribute('name').toUpperCase().indexOf(this.value.toUpperCase()) > -1) {
+                    if (child.dataset.name.toUpperCase().indexOf(this.value.toUpperCase()) > -1) {
                         child.classList.remove('hide')
                     }
                     else {
@@ -2133,7 +2133,7 @@
             if (e.target.closest(".send-mail-option")) {
                 let floID;
                 openPopup('compose_mail_popup')
-                floID = e.target.closest(".contact").getAttribute("flo-id");
+                floID = e.target.closest(".contact").dataset.floId;
                 getRef('send_mail_to').value = floID;
                 return false;
             }
@@ -2147,19 +2147,19 @@
         let holdTimeout
         let holdThreshold = 500
 
-        getRef('chat_page').addEventListener('touchstart', e => {
+        getRef('chats_list').addEventListener('touchstart', e => {
             if (e.target.closest('.contact')) {
                 holdTimeout = setTimeout(() => {
                     if (isHapticOn)
                         navigator.vibrate(100)
                     let contact = e.target.closest(".contact")
                     clickedContact['chatCard'] = contact
-                    clickedContact['floID'] = contact.getAttribute("flo-id")
-                    clickedContact['name'] = contact.getAttribute("name")
+                    clickedContact['floID'] = contact.dataset.floId
+                    clickedContact['name'] = contact.dataset.name
                     clickedContact['isGroup'] = messenger.groups.hasOwnProperty(clickedContact['floID'])
                     openPopup('contact_details_popup')
                 }, 500)
-                getRef('chat_page').addEventListener('touchmove', handleTouchMove)
+                getRef('chats_list').addEventListener('touchmove', handleTouchMove)
             }
         })
 
@@ -2169,16 +2169,16 @@
             }
         }
 
-        getRef('chat_page').addEventListener('touchend', e => {
+        getRef('chats_list').addEventListener('touchend', e => {
             if (e.target.closest('.contact')) {
                 clearTimeout(holdTimeout)
-                getRef('chat_page').removeEventListener('touchmove', handleTouchMove)
+                getRef('chats_list').removeEventListener('touchmove', handleTouchMove)
             }
         })
 
         getRef('mail_contact_list').addEventListener('click', e => {
             if (e.target.closest('.contact')) {
-                getRef('send_mail_to').value = e.target.closest('.contact').getAttribute('flo-id')
+                getRef('send_mail_to').value = e.target.closest('.contact').dataset.floId
                 getRef('mail_contact_list').classList.add('hide')
             }
         })
@@ -2186,16 +2186,15 @@
 
         let clickedContact = {}
 
-        getRef('chat_page').addEventListener('click', e => {
+        getRef('chats_list').addEventListener('click', e => {
             //detect click on chat cards
             if (e.target.closest(".contact")) {
                 let contact = e.target.closest(".contact")
                 clickedContact = {
-                    ...clickedContact,
                     chatCard: contact,
-                    floID: contact.getAttribute("flo-id"),
-                    name: contact.getAttribute("name"),
-                    isGroup: messenger.groups.hasOwnProperty(clickedContact['floID'])
+                    floID: contact.dataset.floId,
+                    name: contact.dataset.name,
+                    isGroup: messenger.groups.hasOwnProperty(contact.dataset.floId)
                 }
                 if (clickedContact['floID'] === myFloID) return
                 if (e.target.closest(".initial") || e.target.closest(".menu")) {
@@ -2224,7 +2223,7 @@
             //detect click on chat cards
             if (e.target.closest(".contact")) {
                 let contact = e.target.closest(".contact")
-                const floID = contact.getAttribute("flo-id")
+                const floID = contact.dataset.floId
                 let chatCard = getRef('chats_list').querySelector(`.chat[flo-id="${floID}"], .group[flo-id="${floID}"]`);
                 if (!chatCard) {
                     chatCard = getRef('chats_list').prepend(render.contactCard(floID, { type: 'chat' }))
@@ -2439,7 +2438,7 @@
                 getRef('mail_page_button').setAttribute('data-notifications', '0')
                 getRef('mail').classList.remove('hide')
                 e.target.closest(".mail-card").classList.remove('unread')
-                viewMail(e.target.closest(".mail-card").getAttribute("name"));
+                viewMail(e.target.closest(".mail-card").dataset.name);
                 if (activeMail)
                     activeMail.classList.remove('active')
                 e.target.closest(".mail-card").classList.add('active')
@@ -2666,7 +2665,7 @@
             // clear rendered date cards if any 
             renderedDates = {}
             let floID = clickedContact['floID'],
-                name = contact.getAttribute('name'),
+                name = contact.dataset.name,
                 textColor = contact.getAttribute('text-color'),
                 backgroundColor = contact.getAttribute('background-color')
 
@@ -2710,7 +2709,7 @@
 
         function viewMail(mailRef, newView = true) {
             //stop rerendering if same mail is already open
-            if (mailRef === (activeMail ? activeMail.getAttribute('name') : '')) return
+            if (mailRef === (activeMail ? activeMail.dataset.name : '')) return
             //clear the container
             if (newView)
                 clearElement(getRef("mail_container"))
@@ -2910,20 +2909,20 @@
             }
             if (isGroup) {
                 messenger.changeGroupName(floID, name).then(res => {
-                    updatechatCards({ name, floID, isGroup: true })
+                    updateChatCards({ name, floID, isGroup: true })
                     notify('Changed group name', 'success')
                 })
                     .catch(error => notify(error, "error"));
             } else {
                 messenger.storeContact(floID, name).then(result => {
-                    updatechatCards({ name, floID, isGroup: false })
+                    updateChatCards({ name, floID, isGroup: false })
                     notify('Changed contact name', 'success')
                 })
                     .catch(error => notify(error, "error"));
             }
         }
 
-        function updatechatCards({ name, floID, isGroup = false }) {
+        function updateChatCards({ name, floID, isGroup = false }) {
             if (activeChat.floID && activeChat.floID === clickedContact.floID) {
                 getRef('receiver_name').textContent = name
                 getRef('chat_name').value = name
@@ -2935,12 +2934,12 @@
                     getRef('chat_dp').textContent = name.charAt(0)
                 }
             }
-            document.querySelectorAll(`.contact[flo-id="${floID}"]`).forEach(contact => {
+            document.querySelectorAll(`.contact[data-flo-id="${floID}"]`).forEach(contact => {
                 if (!isGroup) {
                     contact.children[0].textContent = name.charAt(0)
                     contact.children[1].textContent = name
                 }
-                contact.setAttribute('name', name)
+                contact.dataset.name = name
             })
         }
 
@@ -3108,7 +3107,7 @@
 
         const membersToRemove = new Set()
         function selectMemberToRemove(contact) {
-            const floID = contact.getAttribute('flo-id')
+            const floID = contact.dataset.floId
             if (membersToRemove.has(floID)) {
                 membersToRemove.delete(floID)
             } else {
