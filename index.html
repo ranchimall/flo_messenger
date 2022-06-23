@@ -262,107 +262,44 @@
                 </div>
             </div>
             <div id="chat_view" class="grid hide-on-mobile hide">
-                <div id="chat_left">
-                    <header id="chat_header" class="grid align-center">
-                        <button class="hide-on-desktop back-button" onclick="goto('chats')">
-                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                                width="24px" fill="#000000">
-                                <path d="M0 0h24v24H0V0z" fill="none"></path>
-                                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
-                            </svg>
-                        </button>
-                        <div class="flex align-center interactive" onclick="showChatDetails({show: true})">
-                            <div id="receiver_initial" class="initial flex align-center margin-right-0-5"></div>
-                            <h4 id="receiver_name"></h4>
-                        </div>
-                    </header>
-                    <section id="messages_container" class="flex flex-direction-column"></section>
-                    <div id="scroll_to_bottom" onclick="scrollToBottom()">
-                        <svg class="icon" viewBox="0 0 64 64">
-                            <title></title>
-                            <polyline points="63.65 15.99 32 47.66 0.35 15.99" />
+                <header id="chat_header" class="grid align-center">
+                    <button class="hide-on-desktop back-button" onclick="goto('chats')">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                            width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0V0z" fill="none"></path>
+                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
                         </svg>
-                    </div>
-                    <footer id="chat_footer" class="grid">
-                        <emoji-picker id="emoji_picker" class="hide"></emoji-picker>
-                        <div class="flex">
-                            <svg id="emoji_toggle" onclick="toggleEmoji('toggle')" xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 64 64">
-                                <path
-                                    d="M32,0A32,32,0,1,0,64,32,32,32,0,0,0,32,0ZM43.84,17.51a4.92,4.92,0,1,1-4.92,4.92A4.92,4.92,0,0,1,43.84,17.51Zm-23.62-.06a5,5,0,1,1-5,5A5,5,0,0,1,20.22,17.45ZM32,54.42A19.68,19.68,0,0,1,12.31,34.73H51.69A19.68,19.68,0,0,1,32,54.42Z" />
-                            </svg>
-                            <sm-textarea id="type_message" placeholder="Type a message" class="w-100"></sm-textarea>
-                            <button id="send_message_button" disabled> Send </button>
-                        </div>
-                    </footer>
+                    </button>
+                    <button id="chat_details" class="flex align-center interactive"
+                        onclick="openPopup('contact_details_popup')">
+                        <div id="receiver_initial" class="initial flex align-center margin-right-0-5"></div>
+                        <h4 id="receiver_name"></h4>
+                        <svg class="icon margin-left-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
+                            viewBox="0 0 24 24" width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0V0z" fill="none" />
+                            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6-6-6z" />
+                        </svg>
+                    </button>
+                </header>
+                <section id="messages_container" class="flex flex-direction-column"></section>
+                <div id="scroll_to_bottom" onclick="scrollToBottom()">
+                    <svg class="icon" viewBox="0 0 64 64">
+                        <title></title>
+                        <polyline points="63.65 15.99 32 47.66 0.35 15.99" />
+                    </svg>
                 </div>
-                <div id="chat_details_panel" class="hide">
-                    <header class="flex align-center">
-                        <button class="icon-only" onclick="showChatDetails({show: false})">
-                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                                width="24px" fill="#000000">
-                                <path d="M0 0h24v24H0V0z" fill="none" />
-                                <path
-                                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
-                            </svg>
-                        </button>
-                    </header>
-                    <div id="chat_profile" class="card">
-                        <div id="chat_dp" class="initial flex align-center"></div>
-                        <text-field id="chat_name"></text-field>
-                        <p id="last_interaction_time"></p>
+                <footer id="chat_footer" class="grid">
+                    <emoji-picker id="emoji_picker" class="hide"></emoji-picker>
+                    <div class="flex">
+                        <svg id="emoji_toggle" onclick="toggleEmoji('toggle')" xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 64 64">
+                            <path
+                                d="M32,0A32,32,0,1,0,64,32,32,32,0,0,0,32,0ZM43.84,17.51a4.92,4.92,0,1,1-4.92,4.92A4.92,4.92,0,0,1,43.84,17.51Zm-23.62-.06a5,5,0,1,1-5,5A5,5,0,0,1,20.22,17.45ZM32,54.42A19.68,19.68,0,0,1,12.31,34.73H51.69A19.68,19.68,0,0,1,32,54.42Z" />
+                        </svg>
+                        <sm-textarea id="type_message" placeholder="Type a message" class="w-100"></sm-textarea>
+                        <button id="send_message_button" disabled> Send </button>
                     </div>
-                    <div id="chat_flo_id_card" class="card">
-                        <h4 class="h4" id="chat_type"></h4>
-                        <sm-copy id="chat_flo_id"></sm-copy>
-                    </div>
-                    <div id="group_description_card" class="card hide">
-                        <h4 class="h4">Group description</h4>
-                        <text-field id="group_description"></text-field>
-                    </div>
-                    <div id="group_members_card" class="card hide">
-                        <div class="flex align-center">
-                            <h4 class="h4">Group members</h4>
-                            <sm-button id="edit_group_button" class="admin-option hide round small justify-right"
-                                onclick="editGroupMembers()">Edit</sm-button>
-                        </div>
-                        <p id="remove_members_tip" class="tip hide">Select members to remove or add new
-                            members</p>
-                        <div id="member_options" class="flex hide">
-                            <sm-button id="remove_members_button" class="danger hide" onclick="removeGroupMembers()">
-                                Remove selected</sm-button>
-                            <sm-button id="init_add_members_button" onclick="openPopup('contacts_popup')">Add member
-                            </sm-button>
-                        </div>
-                        <div id="group_members_list"></div>
-                    </div>
-                    <div class="card">
-                        <button class="button " onclick="clearChat()">
-                            <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg"
-                                enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
-                                fill="#000000">
-                                <g>
-                                    <rect fill="none" height="24" width="24" />
-                                </g>
-                                <g>
-                                    <g>
-                                        <path
-                                            d="M16,11h-1V3c0-1.1-0.9-2-2-2h-2C9.9,1,9,1.9,9,3v8H8c-2.76,0-5,2.24-5,5v7h18v-7C21,13.24,18.76,11,16,11z M11,3h2v8h-2V3 z M19,21h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H9v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H5 v-5c0-1.65,1.35-3,3-3h8c1.65,0,3,1.35,3,3V21z" />
-                                    </g>
-                                </g>
-                            </svg>
-                            Clear chat
-                        </button>
-                        <button id="delete_chat_button" class="button button--danger" onclick="deleteChat()">
-                            <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
-                                viewBox="0 0 24 24" width="24px" fill="#000000">
-                                <path d="M0 0h24v24H0V0z" fill="none" />
-                                <path
-                                    d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" />
-                            </svg>
-                            Delete chat</button>
-                    </div>
-                </div>
+                </footer>
             </div>
         </section>
         <section class="inner-page hide" id="mail_page">
@@ -724,32 +661,54 @@
                 </svg>
             </button>
         </header>
-        <div class="flex flex-direction-column align-center">
-            <div id="contact_initial" class="initial flex align-center"></div>
-            <text-field id="contact_name"></text-field>
-        </div>
-        <section class="popup-section">
-            <h5>FLO ID</h5>
-            <sm-copy id="contact_flo_id"></sm-copy>
+        <section id="contact_details_section">
+            <div>
+                <div class="flex flex-direction-column align-center">
+                    <div id="contact_initial" class="initial flex align-center"></div>
+                    <text-field id="contact_name"></text-field>
+                    <p id="last_interaction_time"></p>
+                </div>
+                <div class="popup-section">
+                    <h5>FLO ID</h5>
+                    <sm-copy id="contact_flo_id"></sm-copy>
+                </div>
+                <div id="group_description_card" class="card hide">
+                    <h4 class="h4">Group description</h4>
+                    <text-field id="group_description"></text-field>
+                </div>
+                <fieldset id="contact_options"></fieldset>
+            </div>
+            <div id="group_members_card" class="card hide">
+                <div class="flex align-center">
+                    <h4 class="h4">Group members</h4>
+                    <button id="edit_group_button" class="button hide justify-right"
+                        onclick="editGroupMembers()">Edit</button>
+                </div>
+                <p id="remove_members_tip" class="tip hide">Select members to remove or add new
+                    members</p>
+                <div id="member_options" class="flex hide">
+                    <sm-button id="remove_members_button" class="danger hide" onclick="removeGroupMembers()">
+                        Remove selected</sm-button>
+                    <sm-button id="init_add_members_button" onclick="openPopup('contacts_popup')">Add member
+                    </sm-button>
+                </div>
+                <div id="group_members_list"></div>
+            </div>
         </section>
-        <fieldset id="contact_options"></fieldset>
     </sm-popup>
 
     <sm-popup id="new_message_popup">
         <header class="grid popup__header" slot="header">
-            <div class="flex align-center">
-                <button class="popup__header__close justify-self-start">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                        fill="#000000">
-                        <path d="M0 0h24v24H0V0z" fill="none" />
-                        <path
-                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
-                    </svg>
-                </button>
-                <sm-input id="search_contacts" type="search" placeholder="Enter name or FLO ID"> </sm-input>
-            </div>
+            <button class="popup__header__close justify-self-start">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                    fill="#000000">
+                    <path d="M0 0h24v24H0V0z" fill="none" />
+                    <path
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                </svg>
+            </button>
         </header>
-        <div class="scrolling-wrapper">
+        <div class="scrolling-wrapper grid gap-1-5">
             <fieldset id="all_contacts_options">
                 <button id="create_group_option" class="option interactive" onclick="openPopup('group_creation_popup')">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
@@ -774,9 +733,13 @@
                     Add contact
                 </button>
             </fieldset>
-            <div id="contacts_container" class="observe-empty-state"></div>
-            <div class="empty-state">
-                <p>No contacts found.</p>
+            <div class="grid gap-1">
+                <h5>Saved FLO IDs</h5>
+                <sm-input id="search_contacts" type="search" placeholder="Search name or FLO ID"> </sm-input>
+                <div id="contacts_container" class="observe-empty-state"></div>
+                <div class="empty-state">
+                    <p>No contacts found.</p>
+                </div>
             </div>
         </div>
     </sm-popup>
@@ -1009,7 +972,10 @@
             history.pushState({ type: 'popup' }, null, null)
             switch (e.target.id) {
                 case 'contact_details_popup':
+                    if (clickedContact.isGroup)
+                        isAdmin = messenger.groups[clickedContact.floID].admin === myFloID
                     if (clickedContact.chatCard.closest('#chats_list')) {
+                        let isAdmin = false
                         let addAsContact
                         if (!floGlobals.contacts.hasOwnProperty(clickedContact.floID) && !clickedContact.isGroup)
                             addAsContact = html`
@@ -1036,7 +1002,7 @@
                         let deleteChat
                         if (!clickedContact.isGroup) {
                             deleteChat = html`
-                            <button id="delete_chat_option" class="option" onclick="deleteChat()">
+                            <button id="delete_chat_option" class="option option--danger" onclick="deleteChat()">
                                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0V0z" fill="none" /> <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" /> </svg>
                                 Delete this chat
                             </button>
@@ -1045,7 +1011,11 @@
                         renderElem(getRef('contact_options'), html`
                             ${addAsContact}
                             ${markReadUnread}
-                            <button class="option" onclick="clearChat()">
+                            <button class="option option--danger" onclick="blockUser()">
+                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z"/></svg>
+                                Block
+                            </button>
+                            <button class="option option--danger" onclick="clearChat()">
                                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <g> <path d="M16,11h-1V3c0-1.1-0.9-2-2-2h-2C9.9,1,9,1.9,9,3v8H8c-2.76,0-5,2.24-5,5v7h18v-7C21,13.24,18.76,11,16,11z M11,3h2v8h-2V3 z M19,21h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H9v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H5 v-5c0-1.65,1.35-3,3-3h8c1.65,0,3,1.35,3,3V21z" /> </g> </g> </svg>
                                 Clear this chat
                             </button>
@@ -1053,20 +1023,30 @@
                         `)
                     }
                     if (clickedContact.isGroup) {
-                        getRef("contact_initial").innerHTML = `
-                            <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
-                            `
-                        if (messenger.groups[clickedContact['floID']].admin === myFloID)
+                        getRef("contact_initial").innerHTML = ` <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
+                        getRef("last_interaction_time").textContent = `Created ${getFormattedTime(messenger.groups[clickedContact.floID].created)}`;
+                        getRef("group_description").value = messenger.groups[clickedContact.floID].description === '' ? 'Add group description' : messenger.groups[clickedContact.floID].description;
+                        render.groupMembers(clickedContact.floID)
+                        getRef('group_members_card').classList.remove('hide')
+                        getRef('group_description_card').classList.remove('hide')
+                        if (isAdmin) {
                             getRef('contact_name').disabled = false
-                        else
+                            getRef('group_description').disabled = false
+                            getRef('edit_group_button').classList.remove('hide')
+                        } else {
                             getRef('contact_name').disabled = true
-                    }
-                    else {
+                            getRef('group_description').disabled = true
+                            getRef('edit_group_button').classList.add('hide')
+                        }
+                    } else {
                         getRef('contact_name').disabled = false
-                        getRef('contact_initial').textContent = clickedContact['name'].charAt(0)
+                        getRef('contact_initial').textContent = getContactName(clickedContact['floID']).charAt(0)
+                        getRef("last_interaction_time").textContent = ``;
+                        getRef('group_members_card').classList.add('hide')
+                        getRef('group_description_card').classList.add('hide')
                     }
                     getRef('contact_initial').setAttribute('style', `--contact-color: var(${contactColor(clickedContact['floID'])})`)
-                    getRef('contact_name').value = clickedContact['name']
+                    getRef('contact_name').value = getContactName(clickedContact['floID'])
                     getRef('contact_flo_id').value = clickedContact['floID']
                     break;
                 case 'contacts_popup':
@@ -1746,7 +1726,7 @@
                 const className = `flex align-center selectable-contact interactive`
                 return html`
                     <label class="${className}" data-flo-id=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
-                        <div class="initial flex align-center" style=${`background-color: ${color}`}> ${initial} </div>
+                        <div class="initial flex align-center"> ${initial} </div>
                         <h4 class="name">${name}</h4>
                         <input type="checkbox" autocomplete="off" value=${floID}/>
                     </label>
@@ -1867,14 +1847,19 @@
         }
 
         function updateMessageUI(messagesData) {
+            console.log('updateMessageUI', messagesData)
             for (let messageId in messagesData) {
-                const { category, floID, time, message, sender, groupID } = messagesData[messageId]
+                const { category, floID, time, message, sender, groupID, admin, name } = messagesData[messageId]
                 if (activeChat.floID && activeChat.floID === (floID || groupID)) {
                     if (floGlobals.unconfirmedMessages === 0)
                         getRef('messages_container').append(render.messageBubble(messagesData[messageId]))
                 }
-                let chatCard = getRef('chats_list').querySelector(`.chat[flo-id="${floID}"], .group[flo-id="${groupID}"]`)
+                let chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${groupID}"]`)
                 if (chatCard) {
+                    if (admin) {
+                        if (name)
+                            chatCard.querySelector('.name').textContent = name
+                    }
                     if ((floID || groupID) !== getRef('chats_list').children[0].dataset.floId) {
                         const cloneContact = chatCard.cloneNode(true)
                         chatCard.remove()
@@ -1899,8 +1884,7 @@
                             }
                         )
                     }
-                }
-                else {
+                } else {
                     if (floID) {
                         messenger.addChat(floID)
                         getRef('chats_list').prepend(html.node`${render.contactCard(floID, { type: 'chat', prepend: true })}`)
@@ -2139,7 +2123,6 @@
                 } else {
                     contact.classList.remove('unread')
                     if (activeChat['chatCard'] === contact && !isMobileView) return
-                    showChatDetails({ show: false, animate: false })
                     document.title = `FLO Messenger`
                     getRef('chat_view').classList.remove('hide')
                     viewConversation(contact)
@@ -2161,7 +2144,7 @@
             if (e.target.closest(".contact")) {
                 let contact = e.target.closest(".contact")
                 const floID = contact.dataset.floId
-                let chatCard = getRef('chats_list').querySelector(`.chat[flo-id="${floID}"], .group[flo-id="${floID}"]`);
+                let chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${floID}"]`);
                 if (!chatCard) {
                     chatCard = getRef('chats_list').prepend(render.contactCard(floID, { type: 'chat' }))
                 }
@@ -2604,7 +2587,6 @@
 
             activeChat['floID'] = floID
             activeChat['isGroup'] = messenger.groups[floID] ? true : false
-            getRef("chat_dp").setAttribute('style', `--contact-color: var(${contactColor(floID)})`)
             getRef("receiver_name").textContent = getContactName(floID);
             if (activeChat.isGroup) {
                 getRef("receiver_initial").innerHTML = ` <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
@@ -2800,20 +2782,15 @@
             }
         }
 
-        document.addEventListener('contentchanged', e => {
-            if (e.target.closest('#contact_name')) {
-                changeContactName(e.detail.value.trim())
-            }
-            else if (e.target.closest('#group_description')) {
-                messenger.changeGroupDescription(activeChat.floID, e.detail.value.trim())
-                    .then(res => {
-                        notify('Changed group description', 'success')
-                    })
-                    .catch(error => notify(error, "error"));
-            }
-            else if (e.target.closest('#chat_name')) {
-                changeContactName(e.detail.value.trim(), true)
-            }
+        getRef('contact_name').addEventListener('contentchanged', e => {
+            changeContactName(e.detail.value.trim())
+        })
+        getRef('group_description').addEventListener('contentchanged', e => {
+            messenger.changeGroupDescription(activeChat.floID, e.detail.value.trim())
+                .then(res => {
+                    notify('Changed group description', 'success')
+                })
+                .catch(error => notify(error, "error"));
         })
 
         async function changeContactName(name, isChat = false) {
@@ -2852,7 +2829,6 @@
         function updateChatCards({ name, floID, isGroup = false }) {
             if (activeChat.floID && activeChat.floID === clickedContact.floID) {
                 getRef('receiver_name').textContent = name
-                getRef('chat_name').value = name
             }
             if (!isGroup) {
                 getRef('contact_initial').textContent = name.charAt(0)
@@ -2878,82 +2854,6 @@
                 getRef(target).querySelector('sm-input').value = ''
         }
 
-        let isChatDetailsOpen = false
-        function showChatDetails({ show, animate = true }) {
-            if (show) {
-                if (isChatDetailsOpen) return
-                const floID = activeChat.floID
-                isChatDetailsOpen = true
-                getRef("chat_name").value = getContactName(floID);
-                getRef("chat_flo_id").value = floID
-                if (activeChat.isGroup) {
-                    getRef("chat_dp").innerHTML = `
-                        <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>
-                        `
-                    getRef("last_interaction_time").textContent = `Created ${getFormattedTime(messenger.groups[floID].created)}`;
-                    getRef("chat_type").textContent = `Group FLO ID`;
-
-                    render.groupMembers(floID)
-
-                    getRef("group_description_card").classList.remove('hide')
-                    getRef("group_members_card").classList.remove('hide')
-
-                    getRef('delete_chat_button').classList.add('hide')
-
-                    getRef("group_description").value = messenger.groups[floID].description === '' ? 'Add group description' : messenger.groups[floID].description;
-
-                    if (messenger.groups[activeChat['floID']].admin === myFloID) {
-                        getRef("chat_name").disabled = false
-                        getRef('group_description').disabled = false
-                        getRef('edit_group_button').classList.remove('hide')
-                    }
-                    else {
-                        getRef("chat_name").disabled = true
-                        getRef('group_description').disabled = true
-                        getRef('edit_group_button').classList.add('hide')
-                    }
-                }
-                else {
-                    getRef("chat_dp").textContent = getContactName(floID).charAt(0);
-                    getRef("last_interaction_time").textContent = ``;
-
-                    getRef("chat_type").textContent = `FLO ID`;
-
-                    getRef("group_description_card").classList.add('hide')
-                    getRef("group_members_card").classList.add('hide')
-
-                    getRef('delete_chat_button').classList.remove('hide')
-                }
-                getRef('chat_view').classList.add('expand-side-panel')
-                getRef('chat_left').classList.add('hide-on-medium')
-                getRef('chat_details_panel').classList.remove('hide')
-                animateTo(getRef('chat_details_panel'), [
-                    { transform: 'translateX(100%)' },
-                    { transform: 'translateX(0)' },
-                ],
-                    {
-                        duration: animate ? 300 : 0,
-                        easing: 'ease'
-                    })
-            }
-            else if (isChatDetailsOpen) {
-                isChatDetailsOpen = false
-                animateTo(getRef('chat_details_panel'), [
-                    { transform: 'translateX(0)' },
-                    { transform: 'translateX(100%)' },
-                ],
-                    {
-                        duration: animate ? 150 : 0,
-                        easing: 'ease'
-                    }).onfinish = () => {
-                        getRef('chat_view').classList.remove('expand-side-panel')
-                        getRef('chat_left').classList.remove('hide-on-medium')
-                        getRef('chat_details_panel').classList.add('hide')
-                    }
-                editGroupMembers()
-            }
-        }
-
         function addAsContact() {
             openPopup('add_contact_popup')
             getRef('add_contact_floID').value = clickedContact.floID
@@ -2971,6 +2871,19 @@
             closePopup()
         }
 
+        function blockUser() {
+            getConfirmation('Block this FLO ID?', { message: `Are you sure to block this FLO ID?`, confirmText: 'Block', cancelText: 'Cancel' }).then(confirmed => {
+                if (confirmed) {
+                    messenger.blockUser(clickedContact.floID).then(result => {
+                        clickedContact.chatCard.remove()
+                        clickedContact.chatCard = ''
+                        closePopup()
+                        getRef('chat_view').classList.add('hide')
+                        notify('FLo ID blocked', 'success')
+                    })
+                }
+            })
+        }
         function clearChat() {
             getConfirmation('Clear chat?', { message: `Are you sure to clear this chat?`, confirmText: 'Clear', cancelText: 'Cancel' }).then(confirmed => {
                 if (confirmed) {
@@ -3000,7 +2913,6 @@
         let isGroupEditable = false
         let isRemovingMember = false
         function editGroupMembers() {
-            if (!isChatDetailsOpen && !isGroupEditable) return
             if (isGroupEditable) {
                 getRef('group_members_list').querySelectorAll('.contact').forEach(contact => {
                     if (contact.classList.contains('selectable')) {
@@ -3014,8 +2926,7 @@
                 addClass(['#remove_members_tip', '#remove_members_tip', '#member_options'], 'hide')
                 isGroupEditable = false
                 isRemovingMember = false
-            }
-            else {
+            } else {
                 getRef('group_members_list').querySelectorAll('.contact').forEach(contact => {
                     if (contact.classList.contains('admin')) {
                         contact.classList.add('hide')

@@ -957,21 +957,21 @@ sm-button[variant="primary"] {
     height: 3rem;
     width: 3rem;
   }
-  #contact_initial {
-    height: 4.6rem;
-    width: 4.6rem;
-    font-size: 2.4rem;
-    border-radius: 4rem;
-    margin-top: 3rem;
-    margin-bottom: 0.5rem;
-    background-color: var(--contact-color, --accent-color);
-  }
-  #contact_name {
-    margin: 0.6rem 1.5rem;
-    &::part(text) {
-      font-size: 1.2rem;
-      font-weight: 500;
-    }
+}
+#contact_initial {
+  height: 4.6rem;
+  width: 4.6rem;
+  font-size: 2.4rem;
+  border-radius: 4rem;
+  margin-top: 3rem;
+  margin-bottom: 0.5rem;
+  background-color: var(--contact-color, --accent-color);
+}
+#contact_name {
+  margin: 0.6rem 1.5rem;
+  &::part(text) {
+    font-size: 1.2rem;
+    font-weight: 500;
   }
 }
 #warn_no_encryption,
@@ -1274,15 +1274,10 @@ sm-button[variant="primary"] {
       text-align: center;
     }
   }
-  #contacts_container {
-    padding-bottom: 1.5rem;
-    &::before {
-      display: flex;
-      content: "Contacts";
-      font-size: 0.9em;
-      color: rgba(var(--text-color), 0.9);
-      padding: 1rem 1.5rem;
-    }
+}
+#contacts_container {
+  .contact {
+    padding: 0.5rem 0;
   }
 }
 #group_creation_panel {
@@ -1379,62 +1374,11 @@ sm-button[variant="primary"] {
 #chat_page {
   overflow: hidden;
 }
-#chat_left,
-#chat_details_panel {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow-y: auto;
-}
-#chat_details_panel {
-  background: rgba(var(--text-color), 0.04);
-  padding: 0 1.5rem 1.5rem 1.5rem;
-  header {
-    position: sticky;
-    top: 0;
-    padding: 1rem;
-    min-height: 4rem;
-    background-color: rgba(var(--foreground-color), 0.8);
-    z-index: 1;
-  }
+#group_members_list {
+  margin-top: 0.5rem;
   .contact {
     padding: 0.5rem 0;
   }
-  #chat_profile {
-    display: grid;
-    place-items: center;
-    margin-top: 5.5rem;
-    padding-bottom: 1.5rem;
-    .initial {
-      margin-top: -5.5rem;
-      margin-bottom: 1rem;
-      height: 8rem;
-      width: 8rem;
-      border-radius: 50%;
-      font-size: 4rem;
-      .icon {
-        height: 4rem;
-        width: 4rem;
-      }
-    }
-    #chat_name {
-      font-weight: 500;
-      font-size: 1.2rem;
-    }
-    #last_interaction_time {
-      color: rgba(var(--text-color), 0.7);
-      font-size: 0.9rem;
-      margin-top: 0.5rem;
-    }
-  }
-  .copy {
-    font-weight: 400;
-  }
-}
-#group_members_list {
-  max-height: 50vh;
-  overflow-y: auto;
 }
 #chat_view,
 #mail {
@@ -1442,7 +1386,10 @@ sm-button[variant="primary"] {
 }
 #chat_view {
   position: relative;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
 }
 .message {
   position: relative;
@@ -1577,6 +1524,7 @@ sm-button[variant="primary"] {
   padding: 0 1rem;
   min-height: 4rem;
   grid-template-columns: 1fr auto;
+  align-content: center;
   .flex {
     height: 100%;
   }
@@ -1584,11 +1532,18 @@ sm-button[variant="primary"] {
     padding: 0.5rem;
     margin-left: -0.5rem;
   }
+  #chat_details {
+    background-color: rgba(var(--text-color), 0.06);
+    border-radius: 2rem;
+    justify-self: center;
+    padding: 0.3rem;
+  }
   .initial {
     cursor: pointer;
-    height: 2.2rem;
-    width: 2.2rem;
+    height: 1.8rem;
+    width: 1.8rem;
     flex-shrink: 0;
+    font-size: 1rem;
   }
   #receiver_name {
     font-weight: 500;
@@ -1766,9 +1721,6 @@ sm-button[variant="primary"] {
   sm-textarea {
     --background: rgba(var(--foreground-color), 0.6);
   }
-  #chat_details_panel {
-    background: rgba(var(--foreground-color), 0.8);
-  }
 }
 #mail {
   height: 100vh;
@@ -1907,6 +1859,12 @@ sm-button[variant="primary"] {
     fill: var(--accent-color);
     margin-right: 1rem;
   }
+  &--danger {
+    color: var(--danger-color);
+    .icon {
+      fill: var(--danger-color);
+    }
+  }
 }
 @media screen and (max-width: 640px) {
   sm-popup {
@@ -1958,7 +1916,10 @@ sm-button[variant="primary"] {
     }
   }
   #chat_header {
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr;
+    #chat_details {
+      margin-left: -1.7rem;
+    }
   }
   #settings {
     overflow-x: hidden;
@@ -2083,6 +2044,18 @@ sm-button[variant="primary"] {
     display: inline-flex;
     width: auto;
   }
+  #contact_details_popup {
+    --width: 52rem;
+  }
+  #contact_details_section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    & > :first-child {
+      padding-right: 1.5rem;
+      border-right: thin solid rgba(var(--text-color), 0.3);
+    }
+  }
 }
 @media only screen and (max-width: 1280px) {
   .hide-on-medium {
@@ -2103,17 +2076,6 @@ sm-button[variant="primary"] {
     padding: 0 8vw;
     .title-font {
       font-size: 3rem;
-    }
-  }
-  #chat_details_panel {
-    position: relative;
-  }
-  #chat_view {
-    &.expand-side-panel {
-      grid-template-columns: 1fr 24rem;
-      #messages_container {
-        padding: 1rem;
-      }
     }
   }
   #emoji_picker {
