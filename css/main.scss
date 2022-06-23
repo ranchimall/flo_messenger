@@ -968,7 +968,7 @@ sm-button[variant="primary"] {
   background-color: var(--contact-color, --accent-color);
 }
 #contact_name {
-  margin: 0.6rem 1.5rem;
+  margin: 0.5rem 0;
   &::part(text) {
     font-size: 1.2rem;
     font-weight: 500;
@@ -1521,10 +1521,9 @@ sm-button[variant="primary"] {
   }
 }
 #chat_header {
-  padding: 0 1rem;
-  min-height: 4rem;
-  grid-template-columns: 1fr auto;
+  padding: 0.5rem 1rem;
   align-content: center;
+  grid-template-columns: minmax(0, 1fr);
   .flex {
     height: 100%;
   }
@@ -1916,8 +1915,9 @@ sm-button[variant="primary"] {
     }
   }
   #chat_header {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto minmax(0, 1fr);
     #chat_details {
+      width: calc(100% - 2rem);
       margin-left: -1.7rem;
     }
   }
