@@ -70,7 +70,6 @@ body[data-theme="dark"] {
   --orange: #ffbe68;
   --redish-orange: #ff8560;
   .initial {
-    color: rgba(var(--text-color), 1) !important;
     box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.16);
   }
   .message {
@@ -831,16 +830,17 @@ sm-button[variant="primary"] {
   width: 2.8rem;
   height: 2.8rem;
   aspect-ratio: 1/1;
-  color: white;
+  color: rgba(var(--foreground-color), 1);
   box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.06);
   border-radius: 2rem;
   text-transform: uppercase;
   user-select: none;
+  background-color: var(--contact-color, --accent-color);
 }
 .group-icon {
   height: 1.6rem;
   width: 1.6rem;
-  fill: white;
+  fill: rgba(var(--foreground-color), 1);
 }
 .contact {
   position: relative;
@@ -964,6 +964,7 @@ sm-button[variant="primary"] {
     border-radius: 4rem;
     margin-top: 3rem;
     margin-bottom: 0.5rem;
+    background-color: var(--contact-color, --accent-color);
   }
   #contact_name {
     margin: 0.6rem 1.5rem;
@@ -1057,12 +1058,6 @@ sm-button[variant="primary"] {
     white-space: nowrap;
     overflow: hidden;
   }
-  .date {
-    grid-area: date;
-    margin-left: auto;
-    font-weight: 500;
-    white-space: nowrap;
-  }
   .subject {
     grid-area: subject;
     font-size: 1em;
@@ -1079,6 +1074,13 @@ sm-button[variant="primary"] {
     margin-top: 0.2rem;
     color: rgba(var(--text-color), 0.8);
   }
+}
+.date {
+  grid-area: date;
+  margin-left: auto;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  color: rgba(var(--text-color), 0.8);
 }
 @keyframes slide {
   from {
@@ -1097,7 +1099,12 @@ sm-button[variant="primary"] {
   position: relative;
   &:not(:first-of-type) {
     margin-top: 2rem;
-    padding-inline-start: 1rem;
+    padding: 1rem;
+    background-color: rgba(var(--text-color), 0.03);
+    padding-bottom: 2rem;
+    .mail-header {
+      padding-top: 0;
+    }
   }
   &:not(:first-of-type)::before {
     content: "";
@@ -1112,6 +1119,13 @@ sm-button[variant="primary"] {
     align-self: start;
     margin-bottom: 1rem;
     padding: 1.5rem;
+    gap: 1rem;
+  }
+  .initial {
+    background-color: var(--contact-color, --accent-color);
+    margin: 0;
+    height: 2rem;
+    width: 2rem;
   }
   .sender-name {
     font-weight: 500;
@@ -1121,11 +1135,8 @@ sm-button[variant="primary"] {
     font-weight: 400;
     max-width: 90%;
   }
-  .flex:first-of-type {
-    margin-bottom: 1rem;
-  }
   .back {
-    margin: 0 0 0 -0.5rem;
+    margin-left: -0.5rem;
   }
   .mail-subject,
   .mail-content {
@@ -1572,7 +1583,6 @@ sm-button[variant="primary"] {
   .back-button {
     padding: 0.5rem;
     margin-left: -0.5rem;
-    margin-right: 0.5rem;
   }
   .initial {
     cursor: pointer;
