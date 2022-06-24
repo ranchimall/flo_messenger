@@ -222,7 +222,7 @@ button:focus{
     background: var(--background);
     width: 100%;
     outline: none;
-    min-height: 3.5rem;
+    min-height: var(--min-height,3rem);
 }
 .input.readonly .clear{
     opacity: 0 !important;
@@ -2404,22 +2404,20 @@ smMenu.innerHTML = `
     height: 2rem;
     width: 2rem;
     outline: none;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.7rem;
+    -webkit-transition: background 0.3s;
+    -o-transition: background 0.3s;
+    transition: background 0.3s;
+    border-radius: 2rem;
 }
 .icon {
     position: absolute;
     fill: rgba(var(--text-color), 0.7);
-    height: 2.4rem;
-    width: 2.4rem;
-    padding: 0.7rem;
-    stroke: rgba(var(--text-color), 0.7);
-    stroke-width: 6;
-    overflow: visible;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    border-radius: 2rem;
-    -webkit-transition: background 0.3s;
-    -o-transition: background 0.3s;
-    transition: background 0.3s;
+    height: 1.2rem;
+    width: 1.2rem;
 }      
 :host{
     display: -webkit-inline-box;
@@ -2444,7 +2442,7 @@ smMenu.innerHTML = `
     width: 100%;
     -webkit-tap-highlight-color: transparent;
 }
-.menu:focus .icon,
+.menu:focus,
 .focused{
     background: rgba(var(--text-color), 0.1); 
 }
@@ -2502,20 +2500,17 @@ smMenu.innerHTML = `
             transform: none !important;
 }
 @media (hover: hover){
-    .menu:hover .icon{
+    .menu:hover{
         background: rgba(var(--text-color), 0.1); 
     }
 }
 </style>
 <div class="select">
-    <div class="menu" tabindex="0">
-        <svg class="icon" viewBox="0 0 64 64">
-            <title>options</title>
-            <circle cx="32" cy="6" r="5.5"/>
-            <circle cx="32" cy="58" r="5.5"/>
-            <circle cx="32" cy="31.89" r="5.5"/>
-        </svg>
-    </div>
+    <button class="menu">
+       <slot name="icon">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+       </slot>
+    </button>
     <div class="options hide">
         <slot></slot> 
     </div>
@@ -2526,6 +2521,11 @@ customElements.define('sm-menu', class extends HTMLElement {
         this.attachShadow({
             mode: 'open'
         }).append(smMenu.content.cloneNode(true))
+        this.availableOptions
+        this.containerDimensions
+        this.optionList = this.shadowRoot.querySelector('.options')
+        this.menu = this.shadowRoot.querySelector('.menu')
+        this.open = false;
     }
     static get observedAttributes() {
         return ['value']
@@ -2540,8 +2540,8 @@ customElements.define('sm-menu', class extends HTMLElement {
         if (!this.open) {
             this.optionList.classList.remove('hide')
             this.optionList.classList.add('no-transformations')
+            this.menu.classList.add('focused')
             this.open = true
-            this.icon.classList.add('focused')
             this.availableOptions.forEach(option => {
                 option.setAttribute('tabindex', '0')
             })
@@ -2550,30 +2550,24 @@ customElements.define('sm-menu', class extends HTMLElement {
     collapse() {
         if (this.open) {
             this.open = false
-            this.icon.classList.remove('focused')
             this.optionList.classList.add('hide')
             this.optionList.classList.remove('no-transformations')
+            this.menu.classList.remove('focused')
             this.availableOptions.forEach(option => {
                 option.removeAttribute('tabindex')
             })
         }
     }
     connectedCallback() {
-        this.availableOptions
-        this.containerDimensions
-        this.optionList = this.shadowRoot.querySelector('.options')
-        let slot = this.shadowRoot.querySelector('.options slot'),
-            menu = this.shadowRoot.querySelector('.menu')
-        this.icon = this.shadowRoot.querySelector('.icon')
-        this.open = false;
-        menu.addEventListener('click', e => {
+        let slot = this.shadowRoot.querySelector('.options slot')
+        this.menu.addEventListener('click', e => {
             if (!this.open) {
                 this.expand()
             } else {
                 this.collapse()
             }
         })
-        menu.addEventListener('keydown', e => {
+        this.menu.addEventListener('keydown', e => {
             if (e.code === 'ArrowDown' || e.code === 'ArrowRight') {
                 e.preventDefault()
                 this.availableOptions[0].focus()

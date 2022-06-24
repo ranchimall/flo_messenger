@@ -520,6 +520,9 @@ ol {
 .margin-left-0-5 {
   margin-left: 0.5rem;
 }
+.margin-left-auto {
+  margin-left: auto;
+}
 
 .icon-button {
   padding: 0.6rem;
@@ -898,12 +901,6 @@ sm-button[variant="primary"] {
     grid-area: time;
     font-size: 0.8rem;
   }
-  .admin-tag {
-    padding: 0.1rem 0.6rem;
-    font-size: 0.8rem;
-    border: var(--accent-color) thin solid;
-    border-radius: 3rem;
-  }
 }
 .selectable-contact {
   user-select: none;
@@ -911,6 +908,21 @@ sm-button[variant="primary"] {
   gap: 1rem;
   input {
     margin-left: auto;
+  }
+}
+.group-member {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  .initial {
+    margin-right: 1rem;
+  }
+  .admin-tag {
+    margin-left: auto;
+    padding: 0.1rem 0.6rem;
+    font-size: 0.8rem;
+    border-radius: 3rem;
+    background-color: rgba(var(--text-color), 0.1);
   }
 }
 #selected_contacts_container {
@@ -1303,7 +1315,7 @@ sm-button[variant="primary"] {
   height: 100%;
   overflow-y: hidden;
   .header {
-    padding: 1rem 1.5rem 1rem 1.5rem;
+    padding: 1rem 1.5rem;
     position: relative;
     gap: 0.5rem;
     min-height: 4rem;
@@ -1312,39 +1324,17 @@ sm-button[variant="primary"] {
       width: 100%;
       padding: 0.7rem 1.5rem;
       background: rgba(var(--foreground-color), 1);
-      transform: scale(0.9);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s, transform 0.3s;
-      &.expand {
-        transform: none;
-        opacity: 1;
-        pointer-events: all;
-      }
     }
     sm-input {
-      margin: 0;
       width: 100%;
-      --padding: 0.5rem 1rem;
     }
     h4 {
       text-transform: capitalize;
       font-weight: 500;
     }
-    .icon {
-      -webkit-tap-highlight-color: transparent;
-      margin-right: 1rem;
-    }
     .flex {
       h4 {
         flex: 1;
-      }
-      .icon {
-        height: 2.2rem;
-        width: 2.2rem;
-        padding: 0.6rem;
-        margin-left: -0.4rem;
-        cursor: pointer;
       }
       sm-menu {
         margin-right: -0.7rem;
@@ -1361,6 +1351,12 @@ sm-button[variant="primary"] {
         margin-right: 0.5rem;
       }
     }
+  }
+}
+#chat_search_field {
+  .icon-only {
+    margin-left: -0.5rem;
+    margin-right: 0.5rem;
   }
 }
 #chat_page,
@@ -2045,15 +2041,17 @@ sm-button[variant="primary"] {
     width: auto;
   }
   #contact_details_popup {
-    --width: 52rem;
-  }
-  #contact_details_section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    & > :first-child {
-      padding-right: 1.5rem;
-      border-right: thin solid rgba(var(--text-color), 0.3);
+    &.is-group {
+      --width: 52rem;
+      #contact_details_section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        & > :first-child {
+          padding-right: 1.5rem;
+          border-right: thin solid rgba(var(--text-color), 0.3);
+        }
+      }
     }
   }
 }

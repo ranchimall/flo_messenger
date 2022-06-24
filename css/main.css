@@ -555,6 +555,10 @@ ol li::before {
   margin-left: 0.5rem;
 }
 
+.margin-left-auto {
+  margin-left: auto;
+}
+
 .icon-button {
   padding: 0.6rem;
   border-radius: 0.8rem;
@@ -1007,12 +1011,6 @@ sm-button[variant=primary] {
   grid-area: time;
   font-size: 0.8rem;
 }
-.contact .admin-tag {
-  padding: 0.1rem 0.6rem;
-  font-size: 0.8rem;
-  border: var(--accent-color) thin solid;
-  border-radius: 3rem;
-}
 
 .selectable-contact {
   -webkit-user-select: none;
@@ -1024,6 +1022,22 @@ sm-button[variant=primary] {
 }
 .selectable-contact input {
   margin-left: auto;
+}
+
+.group-member {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+.group-member .initial {
+  margin-right: 1rem;
+}
+.group-member .admin-tag {
+  margin-left: auto;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: 3rem;
+  background-color: rgba(var(--text-color), 0.1);
 }
 
 #selected_contacts_container {
@@ -1449,7 +1463,7 @@ sm-button[variant=primary] {
 #contacts .header,
 #mails .header,
 #settings .header {
-  padding: 1rem 1.5rem 1rem 1.5rem;
+  padding: 1rem 1.5rem;
   position: relative;
   gap: 0.5rem;
   min-height: 4rem;
@@ -1461,24 +1475,11 @@ sm-button[variant=primary] {
   width: 100%;
   padding: 0.7rem 1.5rem;
   background: rgba(var(--foreground-color), 1);
-  transform: scale(0.9);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s, transform 0.3s;
-}
-#contacts .header .expanding-search.expand,
-#mails .header .expanding-search.expand,
-#settings .header .expanding-search.expand {
-  transform: none;
-  opacity: 1;
-  pointer-events: all;
 }
 #contacts .header sm-input,
 #mails .header sm-input,
 #settings .header sm-input {
-  margin: 0;
   width: 100%;
-  --padding: 0.5rem 1rem;
 }
 #contacts .header h4,
 #mails .header h4,
@@ -1486,25 +1487,10 @@ sm-button[variant=primary] {
   text-transform: capitalize;
   font-weight: 500;
 }
-#contacts .header .icon,
-#mails .header .icon,
-#settings .header .icon {
-  -webkit-tap-highlight-color: transparent;
-  margin-right: 1rem;
-}
 #contacts .header .flex h4,
 #mails .header .flex h4,
 #settings .header .flex h4 {
   flex: 1;
-}
-#contacts .header .flex .icon,
-#mails .header .flex .icon,
-#settings .header .flex .icon {
-  height: 2.2rem;
-  width: 2.2rem;
-  padding: 0.6rem;
-  margin-left: -0.4rem;
-  cursor: pointer;
 }
 #contacts .header .flex sm-menu,
 #mails .header .flex sm-menu,
@@ -1524,6 +1510,11 @@ sm-button[variant=primary] {
   align-self: center;
   stroke-width: 8;
   margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+#chat_search_field .icon-only {
+  margin-left: -0.5rem;
   margin-right: 0.5rem;
 }
 
@@ -2270,16 +2261,15 @@ sm-button[variant=primary] {
     width: auto;
   }
 
-  #contact_details_popup {
+  #contact_details_popup.is-group {
     --width: 52rem;
   }
-
-  #contact_details_section {
+  #contact_details_popup.is-group #contact_details_section {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
   }
-  #contact_details_section > :first-child {
+  #contact_details_popup.is-group #contact_details_section > :first-child {
     padding-right: 1.5rem;
     border-right: thin solid rgba(var(--text-color), 0.3);
   }

@@ -215,25 +215,28 @@
                 <header class="grid header">
                     <div class="flex align-center">
                         <h4>FLO Messenger</h4>
-                        <svg class="icon" onclick="toggleSearch('chat_search_field')" xmlns="http://www.w3.org/2000/svg"
-                            height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
-                            <path d="M0 0h24v24H0V0z" fill="none" />
-                            <path
-                                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
-                        </svg>
+                        <button class="icon-only" onclick="toggleSearch('chat_search_field')">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0V0z" fill="none" />
+                                <path
+                                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                            </svg>
+                        </button>
                         <sm-menu align-options="right">
                             <sm-menu-option onclick="openPopup('group_creation_popup')">
                                 Create new group
                             </sm-menu-option>
                         </sm-menu>
                     </div>
-                    <div id="chat_search_field" class="expanding-search flex align-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon back"
-                            onclick="toggleSearch('chat_search_field')" viewBox="0 0 64 64">
-                            <title>back-arrow</title>
-                            <line x1="1" y1="32" x2="64" y2="32" />
-                            <polyline points="29.64 60.97 0.65 32 29.64 3.03" />
-                        </svg>
+                    <div id="chat_search_field" class="expanding-search flex align-center hide">
+                        <button class="icon-only" onclick="toggleSearch('chat_search_field')">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0V0z" fill="none"></path>
+                                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+                            </svg>
+                        </button>
                         <sm-input id="search_chats" type="search" placeholder="Search"></sm-input>
                     </div>
                 </header>
@@ -366,6 +369,7 @@
                 </header>
                 <a class="sidebar-item interactive active" href="#/settings/profile">Account</a>
                 <a class="sidebar-item interactive" href="#/settings/chat">chat</a>
+                <a class="sidebar-item interactive" href="#/settings/blocked">Blocked</a>
                 <a class="sidebar-item interactive" href="#/settings/personalize">personalize</a>
                 <a class="sidebar-item interactive" href="#/settings/backup">backup & restore</a>
                 <a class="sidebar-item interactive" href="#/settings/about">About</a>
@@ -438,6 +442,13 @@
                             <p>Turn haptic feedback (vibrations) on/off.</p>
                         </div>
                     </sm-switch>
+                </div>
+                <div id="blocked" class="panel hide">
+                    <h4>Blocked</h4>
+                    <ul id="blocked_list" class="observe-empty-state"></ul>
+                    <div class="empty-state">
+                        <p>No blocked FLO IDs</p>
+                    </div>
                 </div>
                 <div id="personalize" class="panel hide">
                     <section>
@@ -1041,6 +1052,7 @@
                         getRef("last_interaction_time").textContent = `Created ${getFormattedTime(messenger.groups[clickedContact.floID].created)}`;
                         getRef("group_description").value = messenger.groups[clickedContact.floID].description === '' ? 'Add group description' : messenger.groups[clickedContact.floID].description;
                         render.groupMembers(clickedContact.floID)
+                        getRef('contact_details_popup').classList.add('is-group');
                         getRef('group_members_card').classList.remove('hide')
                         getRef('group_description_card').classList.remove('hide')
                         if (isAdmin) {
@@ -1056,6 +1068,7 @@
                         getRef('contact_name').disabled = false
                         getRef('contact_initial').textContent = getContactName(clickedContact['floID']).charAt(0)
                         getRef("last_interaction_time").textContent = ``;
+                        getRef('contact_details_popup').classList.remove('is-group');
                         getRef('group_members_card').classList.add('hide')
                         getRef('group_description_card').classList.add('hide')
                     }
@@ -1114,7 +1127,7 @@
             if (!e.state) return
             switch (e.state.type) {
                 case 'popup':
-                    hidePopup()
+                    closePopup()
                     break;
             }
         })
@@ -1689,21 +1702,16 @@
                 `
             },
             contactCard(floID, options = {}) {
-                let { type, prepend = false, markUnread = false, contactOnly = false, isAdmin = false } = options
+                let { type, prepend = false, markUnread = false } = options
                 let name = getContactName(floID)
                 let initial
-                let adminTag
                 if (type === 'group') {
                     initial = html`<svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
                     name = messenger.groups[floID].name
                 } else {
                     initial = name.charAt(0)
                 }
-                if (contactOnly || type === 'contact') {
-                    if (isAdmin) {
-                        adminTag = html`<p class="admin-tag">Admin</p>`
-                    }
-                } else {
+                if (type !== 'contact') {
                     //render chat card for newly added contact
                     messenger.getChat(floID).then(chat => {
                         let lastMessage = Object.values(chat).reverse().find(({ message }) => message) || { message: '', time: 0 }
@@ -1713,9 +1721,12 @@
                         const lastText = html`<p class="last-message">${amISender ? 'You: ' : ''} ${lastMessage.message}</p>`
                         const timeAndOptions = html`
                             <time class="time">${getFormattedTime(lastMessage.time, 'relative')}</time>
-                            <svg class="icon menu" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"> <circle cx="5.59" cy="32" r="5.59"/> <circle cx="58.41" cy="32" r="5.59"/> <circle cx="31.89" cy="32" r="5.59"/> </svg>
-                        `;
-                        getRef('chats_list').querySelector(`.contact[data-flo-id="${floID}"]`).append(html.node`${lastText}${timeAndOptions}`)
+                            <button class="menu">
+                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                            </button>
+                            `;
+                        if (!getRef('chats_list').querySelector(`.contact[data-flo-id="${floID}"] .last-message`))
+                            getRef('chats_list').querySelector(`.contact[data-flo-id="${floID}"]`).append(html.node`${lastText}${timeAndOptions}`)
                     }).catch(error => console.error(error))
                     if (prepend) {
                         activeChat['floID'] = floID
@@ -1730,16 +1741,14 @@
                             ${initial}
                         </div>
                         <h4 class="name">${name}</h4>
-                        ${adminTag}
                     </div>
                 `
             },
             selectableContact(floID) {
                 const name = getContactName(floID)
                 const initial = name.charAt(0)
-                const className = `flex align-center selectable-contact interactive`
                 return html`
-                    <label class="${className}" data-flo-id=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
+                    <label class="flex align-center selectable-contact interactive" data-flo-id=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
                         <div class="initial flex align-center"> ${initial} </div>
                         <h4 class="name">${name}</h4>
                         <input type="checkbox" autocomplete="off" value=${floID}/>
@@ -1821,11 +1830,36 @@
 
             },
             groupMembers(groupID) {
-                const groupMembersCards = messenger.groups[groupID].members.map(member => {
-                    let isAdmin = messenger.groups[groupID].admin === member ? true : false
-                    return render.contactCard(member, { type: 'contact', contactOnly: true, isAdmin })
+                const groupMembersCards = messenger.groups[groupID].members.map(floID => {
+                    let isAdmin = messenger.groups[groupID].admin === floID ? true : false
+                    let name = getContactName(floID)
+                    let initial = name.charAt(0)
+                    return html`
+                        <div class="group-member interactive" .dataset=${{ floId: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
+                            <div class="initial flex align-center">
+                                ${initial}
+                            </div>
+                            <h4 class="name">${name}</h4>
+                            ${isAdmin ? html`<p class="admin-tag">Group admin</p>` : ''}
+                        </div>
+                    
+                    `
                 })
                 renderElem(getRef('group_members_list'), html`${groupMembersCards}`)
+            },
+            blockedList() {
+                const blockedListCards = [...messenger.blocked].map(floID => {
+                    const name = getContactName(floID)
+                    const initial = name.charAt(0)
+                    return html`
+                    <li class="flex align-center interactive blocked-id" data-flo-id=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
+                        <div class="initial flex align-center"> ${initial} </div>
+                        <h4 class="name">${name}</h4>
+                        <button class="button margin-left-auto unblock">Unblock</button>
+                    </li>
+                `
+                })
+                renderElem(getRef('blocked_list'), html`${blockedListCards}`)
             }
         }
 
@@ -2035,8 +2069,7 @@
             contacts.forEach(child => {
                 if (child.getAttribute('search-tags').toLowerCase().includes(this.value.toLowerCase())) {
                     child.classList.remove('hide')
-                }
-                else {
+                } else {
                     child.classList.add('hide')
                 }
             })
@@ -2542,14 +2575,17 @@
         }
 
         async function renderChatList(chatOrder) {
-            const chats = chatOrder.map(floID => {
-                const markUnread = messenger.marked[floID]?.includes('unread')
-                let type
-                if (messenger.chats[floID])
-                    type = 'chat'
-                else if (messenger.groups[floID])
-                    type = 'group'
-                return render.contactCard(floID, { type, markUnread })
+            const chats = []
+            chatOrder.forEach(floID => {
+                if (!messenger.blocked.has(floID)) {
+                    const markUnread = messenger.marked[floID]?.includes('unread')
+                    let type
+                    if (messenger.chats[floID])
+                        type = 'chat'
+                    else if (messenger.groups[floID])
+                        type = 'group'
+                    chats.push(render.contactCard(floID, { type, markUnread }))
+                }
             })
             renderElem(getRef('chats_list'), html`${chats}`)
         }
@@ -2778,6 +2814,13 @@
                     getRef('settings_panel').classList.remove('hide-on-mobile')
                 }
             }
+
+            switch (subPageId) {
+                case 'blocked':
+                    render.blockedList()
+                    break;
+            }
+
             document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'))
             document.querySelector(`.sidebar-item[href="#/settings/${subPageId}"]`).classList.add('active')
             document.querySelectorAll('.panel').forEach(panel => panel.classList.add('hide'))
@@ -2860,11 +2903,22 @@
         }
 
         function toggleSearch(target) {
-            getRef(target).classList.toggle('expand')
-            if (getRef(target).classList.contains('expand'))
-                getRef(target).children[1].focusIn()
-            else
-                getRef(target).querySelector('sm-input').value = ''
+            const animOptions = {
+                duration: 150,
+                easing: 'ease',
+                fill: 'forwards'
+            }
+            if (getRef(target).classList.contains('hide')) {
+                getRef(target).classList.remove('hide')
+                getRef(target).animate(flyInLeft, animOptions).onfinish = () => {
+                    getRef(target).querySelector('sm-input').focusIn()
+                }
+            } else {
+                getRef(target).animate(flyOutLeft, animOptions).onfinish = () => {
+                    getRef(target).classList.add('hide')
+                    getRef(target).querySelector('sm-input').value = ''
+                }
+            }
         }
 
         function addAsContact() {
@@ -2897,15 +2951,22 @@
                 }
             })
         }
-        function unblockUser() {
+        function unblockUser(floID) {
             getConfirmation('Unblock this FLO ID?', { message: `Are you sure to unblock this FLO ID?`, confirmText: 'Unblock', cancelText: 'Cancel' }).then(confirmed => {
                 if (confirmed) {
-                    messenger.unblockUser(clickedContact.floID).then(result => {
+                    messenger.unblockUser(floID || clickedContact.floID).then(result => {
                         notify('FLo ID unblocked', 'success')
+                        render.blockedList()
+                        renderChatList(messenger.getChatOrder())
                     })
                 }
             })
         }
+        getRef('blocked_list').addEventListener('click', e => {
+            if (e.target.closest('.unblock')) {
+                unblockUser(e.target.closest('.blocked-id').dataset.floId)
+            }
+        })
         function clearChat() {
             getConfirmation('Clear chat?', { message: `Are you sure to clear this chat?`, confirmText: 'Clear', cancelText: 'Cancel' }).then(confirmed => {
                 if (confirmed) {
@@ -2936,27 +2997,14 @@
         let isRemovingMember = false
         function editGroupMembers() {
             if (isGroupEditable) {
-                getRef('group_members_list').querySelectorAll('.contact').forEach(contact => {
-                    if (contact.classList.contains('selectable')) {
-                        contact.classList.remove('selectable')
-                    } else if (contact.classList.contains('admin')) {
-                        contact.classList.remove('hide')
-                    }
-                })
+                // to-do: make group members non editable
                 membersToRemove.clear()
                 getRef('edit_group_button').textContent = 'Edit';
-                addClass(['#remove_members_tip', '#remove_members_tip', '#member_options'], 'hide')
+                addClass(['#remove_members_tip', '#member_options'], 'hide')
                 isGroupEditable = false
                 isRemovingMember = false
             } else {
-                getRef('group_members_list').querySelectorAll('.contact').forEach(contact => {
-                    if (contact.classList.contains('admin')) {
-                        contact.classList.add('hide')
-                    }
-                    else {
-                        contact.classList.add('selectable')
-                    }
-                })
+                // to-do: make group members selectable except for admin
                 getRef('edit_group_button').textContent = 'Done'
                 removeClass(['#remove_members_tip', '#member_options', '#init_add_members_button'], 'hide')
                 getRef('remove_members_button').classList.add('hide')
