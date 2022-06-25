@@ -285,11 +285,14 @@
                     </button>
                 </header>
                 <section id="messages_container" class="flex flex-direction-column"></section>
-                <div id="scroll_to_bottom" onclick="scrollToBottom()">
-                    <svg class="icon" viewBox="0 0 64 64">
-                        <title></title>
-                        <polyline points="63.65 15.99 32 47.66 0.35 15.99" />
-                    </svg>
+                <div id="scroll_to_bottom">
+                    <button onclick="scrollToBottom(true)">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                            width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0V0z" fill="none" />
+                            <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" />
+                        </svg>
+                    </button>
                 </div>
                 <footer id="chat_footer" class="grid">
                     <emoji-picker id="emoji_picker" class="hide"></emoji-picker>
@@ -311,14 +314,13 @@
                     <div class="flex align-center">
                         <h4>Mail</h4>
                         <strip-select id="mail_type_selector">
-                            <strip-option value="inbox" selected onclick="showChildElement('mail_sections', 0)">Inbox
-                            </strip-option>
-                            <strip-option value="sent" onclick="showChildElement('mail_sections', 1)">Sent
-                            </strip-option>
+                            <strip-option value="inbox" selected>Inbox </strip-option>
+                            <strip-option value="sent">Sent </strip-option>
                         </strip-select>
                     </div>
                 </header>
-                <button class="button button--primary fab" id="new_mail_button">
+                <button class="button button--primary fab" id="new_mail_button"
+                    onclick="openPopup('compose_mail_popup')">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
@@ -563,8 +565,7 @@
         <nav id="main_navbar" class="flex hide">
             <ul>
                 <li>
-                    <a class="nav-item flex badge align-center active" data-notifications="0" href="#/chat_page"
-                        title="Chat">
+                    <a class="nav-item flex align-center active" href="#/chat_page" title="Chat">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                             width="24px" fill="#000000">
                             <path d="M0 0h24v24H0V0z" fill="none" />
@@ -575,8 +576,7 @@
                     </a>
                 </li>
                 <li>
-                    <a class="nav-item flex badge align-center" id="mail_page_button" data-notifications="0"
-                        href="#/mail_page" title="Mail">
+                    <a class="nav-item flex align-center" id="mail_page_button" href="#/mail_page" title="Mail">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                             width="24px" fill="#000000">
                             <path d="M0 0h24v24H0V0z" fill="none" />
@@ -1413,10 +1413,6 @@
                                     if (this.lazyContainer.lastElementChild)
                                         this.intersectionObserver.observe(this.lazyContainer.lastElementChild)
                                 }
-                                // scroll anchoring for reverse scrolling
-                                this.lastScrollTop = this.lazyContainer.scrollHeight - this.lastScrollHeight + this.lazyContainer.scrollTop
-                                this.lazyContainer.scrollTo({ top: this.lastScrollTop })
-                                this.lastScrollHeight = this.lazyContainer.scrollHeight
                                 // Callback to be called if dom is updated
                                 if (this.shouldLazyLoad && this.domUpdated)
                                     this.domUpdated()
@@ -1462,6 +1458,10 @@
                 })
                 if (this.bottomFirst) {
                     this.lazyContainer.prepend(frag)
+                    // scroll anchoring for reverse scrolling
+                    this.lastScrollTop += this.lazyContainer.scrollHeight - this.lastScrollHeight
+                    this.lazyContainer.scrollTo({ top: this.lastScrollTop })
+                    this.lastScrollHeight = this.lazyContainer.scrollHeight
                 } else {
                     this.lazyContainer.append(frag)
                 }
@@ -1489,6 +1489,11 @@
         const mobileQuery = window.matchMedia('(max-width: 40rem)')
         function handleMobileChange(e) {
             isMobileView = e.matches
+            if (isMobileView) {
+            } else {
+                getRef('settings_sidebar').style = ''
+                getRef('settings_panel').style = ''
+            }
         }
         mobileQuery.addEventListener('change', handleMobileChange)
         handleMobileChange(mobileQuery)
@@ -1714,19 +1719,23 @@
                 if (type !== 'contact') {
                     //render chat card for newly added contact
                     messenger.getChat(floID).then(chat => {
-                        let lastMessage = Object.values(chat).reverse().find(({ message }) => message) || { message: '', time: 0 }
-                        if (type === 'group' && lastMessage.time === 0)
-                            lastMessage.time = messenger.groups[floID].created
-                        const amISender = type === 'chat' && lastMessage.category === 'sent' || type === 'group' && lastMessage.sender === myFloID
-                        const lastText = html`<p class="last-message">${amISender ? 'You: ' : ''} ${lastMessage.message}</p>`
-                        const timeAndOptions = html`
-                            <time class="time">${getFormattedTime(lastMessage.time, 'relative')}</time>
-                            <button class="menu">
-                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                            </button>
-                            `;
-                        if (!getRef('chats_list').querySelector(`.contact[data-flo-id="${floID}"] .last-message`))
-                            getRef('chats_list').querySelector(`.contact[data-flo-id="${floID}"]`).append(html.node`${lastText}${timeAndOptions}`)
+                        if (!getRef('chats_list').querySelector(`.contact[data-flo-id="${floID}"] .last-message`)) {
+                            let lastMessage = Object.values(chat).reverse().find(({ message }) => message) || { message: '', time: 0 }
+                            if (type === 'group' && lastMessage.time === 0)
+                                lastMessage.time = messenger.groups[floID].created
+                            const amISender = type === 'chat' && lastMessage.category === 'sent' || type === 'group' && lastMessage.sender === myFloID
+                            const lastText = html`<p class="last-message">${amISender ? 'You: ' : type === 'group' ? `${getContactName(lastMessage.sender)}: ` : ''} ${lastMessage.message}</p>`
+                            const timeAndOptions = html`
+                                <time class="time">${getFormattedTime(lastMessage.time, 'relative')}</time>
+                                <div class="span-2">
+                                    ${lastText}
+                                    <button class="menu">
+                                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                                    </button>
+                                </div>
+                                `;
+                            getRef('chats_list').querySelector(`.contact[data-flo-id="${floID}"]`).append(html.node`${timeAndOptions}`)
+                        }
                     }).catch(error => console.error(error))
                     if (prepend) {
                         activeChat['floID'] = floID
@@ -1736,7 +1745,7 @@
                 }
                 const className = `contact ${type !== 'contact' ? type : ''} ${markUnread ? 'unread' : ''} interactive`
                 return html`
-                    <div class="${className}" .dataset=${{ name, floId: floID }} search-tags=${`${name}${floID}`} style=${`--contact-color: var(${contactColor(floID)})`}>
+                    <div class="${className}" .dataset=${{ floId: floID }} search-tags=${`${name}${floID}`} style=${`--contact-color: var(${contactColor(floID)})`}>
                         <div class="initial flex align-center">
                             ${initial}
                         </div>
@@ -1878,6 +1887,54 @@
             })
             return messageBody
         }
+        function addNotificationBadge(elem, text) {
+            const animOptions = {
+                duration: 200,
+                fill: 'forwards',
+                easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+            }
+            if (!getRef(elem).querySelector('.badge')) {
+                const badge = html.node`<span class="badge">${text}</span>`
+                getRef(elem).append(badge)
+                badge.animate([
+                    {
+                        transform: 'scale(0) translateY(0.5rem)'
+                    },
+                    {
+                        transform: 'scale(1) translateY(0)'
+                    },
+                ], animOptions)
+            } else {
+                const badge = getRef(elem).querySelector('.badge');
+                badge.textContent = text;
+                badge.animate([
+                    { transform: 'scale(1)' },
+                    { transform: `scale(1.5)` },
+                    { transform: 'scale(1)' }
+                ], animOptions)
+            }
+        }
+
+        function removeNotificationBadge(elem) {
+            const animOptions = {
+                duration: 200,
+                fill: 'forwards',
+                easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+            }
+            if (getRef(elem).querySelector('.badge')) {
+                const badge = getRef(elem).querySelector('.badge')
+                badge.animate([
+                    {
+                        transform: 'scale(1) translateY(0)'
+                    },
+                    {
+                        transform: 'scale(0) translateY(0.5rem)'
+                    },
+                ], animOptions).onfinish = () => {
+                    badge.remove()
+                }
+            }
+        }
 
 
         function renderDirectUI(data) {
@@ -1895,12 +1952,16 @@
         }
 
         function updateMessageUI(messagesData) {
-            console.log('updateMessageUI', messagesData)
             for (let messageId in messagesData) {
                 const { category, floID, time, message, sender, groupID, admin, name } = messagesData[messageId]
                 if (activeChat.floID && activeChat.floID === (floID || groupID)) {
                     if (floGlobals.unconfirmedMessages === 0)
                         getRef('messages_container').append(render.messageBubble(messagesData[messageId]))
+                    if (chatScrollInfo['isScrolledUp']) {
+
+                    } else {
+                        scrollToBottom()
+                    }
                 }
                 let chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${groupID}"]`)
                 if (chatCard) {
@@ -1969,6 +2030,9 @@
                             }, 1000);
                         }
                     }
+                } else {
+                    console.log(chatCard)
+                    getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${groupID}"]`).classList.add('unread')
                 }
             }
         }
@@ -2039,12 +2103,12 @@
         })
 
         const chatScrollInfo = {};
-        getRef('messages_container').addEventListener('scroll', debounce(() => {
-            if ((this.scrollHeight > this.clientHeight) && (this.scrollHeight - this.clientHeight - this.scrollTop >= 100)) {
+        getRef('messages_container').addEventListener('scroll', debounce((e) => {
+            console.log(this)
+            if ((e.target.scrollHeight > e.target.clientHeight) && (e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop >= 100)) {
                 chatScrollInfo['isScrolledUp'] = true
                 getRef('scroll_to_bottom').classList.add('no-transformations')
-            }
-            else {
+            } else {
                 chatScrollInfo['isScrolledUp'] = false
                 getRef('scroll_to_bottom').classList.remove('no-transformations', 'new-message')
             }
@@ -2093,19 +2157,6 @@
             } else {
                 getRef('mail_contact_list').classList.add('hide')
             }
-            if (e.target.closest('#new_mail_button')) {
-                openPopup('compose_mail_popup')
-            }
-
-            //Detect click on send mail option 
-            if (e.target.closest(".send-mail-option")) {
-                let floID;
-                openPopup('compose_mail_popup')
-                floID = e.target.closest(".contact").dataset.floId;
-                getRef('send_mail_to').value = floID;
-                return false;
-            }
-
             // detect click outside emoji panel and emoji button
             if (isEmojiPickerOpen && (!e.target.closest('#emoji_picker') && !e.target.closest('#emoji_toggle') && !e.target.closest('#type_message'))) {
                 toggleEmoji('hide')
@@ -2376,20 +2427,12 @@
             }
         })
 
-        function updateHeight() {
-            if (isMobileView) {
-                getRef('chat_view').style.height = window.innerHeight + 'px'
-            }
-            else {
-                getRef('chat_view').style.height = '100vh'
-            }
-        }
-
         function goto(page) {
             if (page === 'chats') {
                 getRef('chat_view').classList.add('hide-on-mobile')
                 getRef('contacts').classList.remove('hide-on-mobile')
                 activeChatPage = getRef('contacts')
+                activeChat = {}
             }
             if (page === 'mails') {
                 getRef('mail').classList.add('hide-on-mobile')
@@ -2399,9 +2442,11 @@
             getRef('main_navbar').classList.remove('hide-on-mobile')
         }
 
+        getRef("mail_type_selector").addEventListener('change', function (e) {
+            location.hash = `#/mail_page/${e.target.value}`
+        })
         getRef("mail_sections").addEventListener('click', function (e) {
             if (e.target.closest(".mail-card")) {
-                getRef('mail_page_button').setAttribute('data-notifications', '0')
                 e.target.closest(".mail-card").classList.remove('unread')
                 viewMail(e.target.closest(".mail-card").dataset.name);
                 if (activeMail)
@@ -2520,7 +2565,6 @@
                 msgObj['category'] = 'sent'
             }
             updateMessageUI({ msgObj })
-            scrollToBottom()
             if (activeChat.isGroup) {
                 floGlobals.unconfirmedMessages += 1
                 messenger.sendGroupMessage(message, receiver).then(data => {
@@ -2604,9 +2648,7 @@
                 activeChat.chatCard.classList.remove('unread')
             }
             getRef('scroll_to_bottom').classList.remove('new-message')
-            setTimeout(() => {
-                getRef('messages_container').scrollTo({ top: getRef('messages_container').scrollHeight, behavior: smooth ? 'smooth' : undefined })
-            }, smooth ? 300 : 0);
+            getRef('messages_container').scrollTo({ top: getRef('messages_container').scrollHeight, behavior: smooth ? 'smooth' : undefined })
         }
 
         let chatLazyLoader
@@ -2784,16 +2826,6 @@
             duration: 150,
             easing: 'ease'
         }
-
-        const windowSizeObserver = new ResizeObserver(entries => {
-            updateHeight()
-            if (entries[0].borderBoxSize[0].inlineSize > 640) {
-                getRef('settings_sidebar').style = ''
-                getRef('settings_panel').style = ''
-            }
-        })
-
-        windowSizeObserver.observe(document.body)
 
         function animateTo(element, animation, options) {
             const anime = element.animate(animation, { ...options, fill: 'both' })
@@ -3119,6 +3151,21 @@
                     getRef('generated_flo_id').value = floID
                     getRef('generated_private_key').value = privKey
                     targetPage = 'sign_up'
+                    break;
+                case 'mail_page':
+                    if (subPageId) {
+                        let childIndex
+                        switch (subPageId) {
+                            case 'inbox':
+                                childIndex = 0
+                                break;
+                            case 'sent':
+                                childIndex = 1
+                                break;
+                        }
+                        showChildElement('mail_sections', childIndex)
+                        getRef("mail_type_selector").value = subPageId
+                    }
                     break;
                 case 'settings':
                     if (subPageId) {
