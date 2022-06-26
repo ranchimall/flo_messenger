@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FLO Messenger</title>
     <script id="floGlobals">
-        /* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
+        /* Constants for FLO blockchain operations !!Make sure to add this at beginning!! */
         const floGlobals = {
             blockchain: "FLO",
             application: "messenger",
@@ -428,7 +428,8 @@
                                         d="M17,8l-1.41,1.41L17.17,11H9v2h8.17l-1.58,1.58L17,16l4-4L17,8z M5,5h7V3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h7v-2H5V5z" />
                                 </g>
                             </svg>
-                            Sign Out</button>
+                            Sign Out
+                        </button>
                     </section>
                 </div>
                 <div id="chat" class="panel hide">
@@ -695,13 +696,14 @@
                     <button id="edit_group_button" class="button hide justify-right"
                         onclick="editGroupMembers()">Edit</button>
                 </div>
-                <p id="remove_members_tip" class="tip hide">Select members to remove or add new
+                <p id="group_members_tip" class="tip">Select members to remove or add new
                     members</p>
                 <div id="member_options" class="flex hide">
-                    <sm-button id="remove_members_button" class="danger hide" onclick="removeGroupMembers()">
-                        Remove selected</sm-button>
-                    <sm-button id="init_add_members_button" onclick="openPopup('contacts_popup')">Add member
-                    </sm-button>
+                    <button id="remove_members_button" class="button button--danger hide"
+                        onclick="removeGroupMembers()">
+                        Remove selected</button>
+                    <button id="init_add_members_button" class="button" onclick="openPopup('contacts_popup')">Add member
+                    </button>
                 </div>
                 <div id="group_members_list"></div>
             </div>
@@ -834,8 +836,10 @@
                         d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
                 </svg>
             </button>
-            <h4>Select contact to add</h4>
-            <button id="add_members_button" class="button button--primary" disabled>Add</button>
+            <div class="flex align-center space-between">
+                <h4>Select contacts to add</h4>
+                <button id="add_members_button" class="button button--primary" disabled>Add</button>
+            </div>
         </header>
         <p class="warning">*Contacts that haven't yet replied to you, can't be added to a group. So they won't be
             visible here.</p>
@@ -1055,6 +1059,7 @@
                         getRef('contact_details_popup').classList.add('is-group');
                         getRef('group_members_card').classList.remove('hide')
                         getRef('group_description_card').classList.remove('hide')
+                        getRef('edit_group_button').dataset.groupId = clickedContact.floID;
                         if (isAdmin) {
                             getRef('contact_name').disabled = false
                             getRef('group_description').disabled = false
@@ -1078,8 +1083,9 @@
                     break;
                 case 'contacts_popup':
                     const contacts = []
+                    const groupID = getRef('edit_group_button').dataset.groupId;
                     for (const contact in floGlobals.contacts) {
-                        if (!messenger.groups[activeChat.floID].members.includes(contact) && contact in floGlobals.pubKeys) {
+                        if (!messenger.groups[groupID].members.includes(contact) && contact in floGlobals.pubKeys) {
                             contacts.push(render.selectableContact(contact))
                         }
                     }
@@ -1107,6 +1113,7 @@
                 case 'contact_details_popup':
                     clickedContact['name'] = getRef('contact_name').value.trim()
                     getRef('contact_name').revert()
+                    editGroupMembers()
                     break;
                 case 'contacts_popup':
                     renderElem(getRef('popup_contacts_container'), html``)
@@ -1360,6 +1367,219 @@
             };
         }
 
+        const pagesData = {
+            params: {},
+            openedPages: new Set(),
+        }
+        async function showPage(targetPage, options = {}) {
+            const { firstLoad, hashChange } = options
+            let pageId
+            let subPageId
+            let params = {}
+            let searchParams
+            if (targetPage === '') {
+                if (typeof myFloID === "undefined") {
+                    pageId = 'sign_in'
+                } else {
+                    pageId = 'chat_page'
+                }
+            } else {
+                if (targetPage.includes('/')) {
+                    if (targetPage.includes('?')) {
+                        const splitAddress = targetPage.split('?')
+                        searchParams = splitAddress.pop()
+                        const pages = splitAddress.pop().split('/')
+                        pageId = pages[1]
+                        subPageId = pages[2]
+                    } else {
+                        const pages = targetPage.split('/')
+                        pageId = pages[1]
+                        subPageId = pages[2]
+                    }
+                } else {
+                    pageId = targetPage
+                }
+            }
+            if (typeof myFloID === "undefined" && !(['sign_up', 'sign_in', 'loading', 'landing'].includes(pageId))) return
+            else if (typeof myFloID !== "undefined" && (['sign_up', 'sign_in', 'loading', 'landing'].includes(pageId))) {
+                history.replaceState(null, null, '#/chat_page');
+                pageId = 'chat_page'
+            }
+            if (searchParams) {
+                const urlSearchParams = new URLSearchParams('?' + searchParams);
+                params = Object.fromEntries(urlSearchParams.entries());
+            }
+            switch (pageId) {
+                case 'sign_in':
+                    setTimeout(() => {
+                        getRef('private_key_field').focusIn()
+                    }, 0);
+                    targetPage = 'sign_in'
+                    break;
+                case 'sign_up':
+                    const { floID, privKey } = floCrypto.generateNewID()
+                    getRef('generated_flo_id').value = floID
+                    getRef('generated_private_key').value = privKey
+                    targetPage = 'sign_up'
+                    break;
+                case 'mail_page':
+                    if (subPageId) {
+                        let childIndex
+                        switch (subPageId) {
+                            case 'inbox':
+                                childIndex = 0
+                                break;
+                            case 'sent':
+                                childIndex = 1
+                                break;
+                        }
+                        showChildElement('mail_sections', childIndex)
+                        getRef("mail_type_selector").value = subPageId
+                    }
+                    break;
+                case 'settings':
+                    if (subPageId) {
+                        showPanel(subPageId)
+                    } else {
+                        hidePanel()
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            if (pagesData.lastPage !== pageId) {
+                const animOptions = {
+                    duration: 100,
+                    fill: 'forwards',
+                    easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                }
+                let previousActiveElement = getRef('main_navbar').querySelector('.nav-item--active')
+                const currentActiveElement = document.querySelector(`.nav-item[href="#/${pageId}"]`)
+                if (currentActiveElement) {
+                    getRef('main_page').classList.remove('nav-hidden')
+                    if (getRef('main_navbar').classList.contains('hide')) {
+                        getRef('main_navbar').classList.remove('hide-away', 'hide')
+                        getRef('main_navbar').animate([
+                            {
+                                transform: isMobileView ? `translateY(100%)` : `translateX(-100%)`,
+                                opacity: 0,
+                            },
+                            {
+                                transform: `none`,
+                                opacity: 1,
+                            },
+                        ], { ...animOptions, easing: 'ease-in' })
+                    }
+                    const previousActiveElementIndex = [...getRef('main_navbar').querySelectorAll('.nav-item')].indexOf(previousActiveElement)
+                    const currentActiveElementIndex = [...getRef('main_navbar').querySelectorAll('.nav-item')].indexOf(currentActiveElement)
+                    const isOnTop = previousActiveElementIndex < currentActiveElementIndex
+                    const currentIndicator = createElement('div', { className: 'nav-item__indicator' });
+                    let previousIndicator = getRef('main_navbar').querySelector('.nav-item__indicator')
+                    if (!previousIndicator) {
+                        previousIndicator = currentIndicator.cloneNode(true)
+                        previousActiveElement = currentActiveElement
+                        previousActiveElement.append(previousIndicator)
+                    } else if (currentActiveElementIndex !== previousActiveElementIndex) {
+                        const indicatorDimensions = previousIndicator.getBoundingClientRect()
+                        const currentActiveElementDimensions = currentActiveElement.getBoundingClientRect()
+                        let moveBy
+                        if (isMobileView) {
+                            moveBy = ((currentActiveElementDimensions.width - indicatorDimensions.width) / 2) + indicatorDimensions.width
+                        } else {
+                            moveBy = ((currentActiveElementDimensions.height - indicatorDimensions.height) / 2) + indicatorDimensions.height
+                        }
+                        indicatorObserver.observe(previousIndicator)
+                        previousIndicator.animate([
+                            {
+                                transform: 'none',
+                                opacity: 1,
+                            },
+                            {
+                                transform: `translate${isMobileView ? 'X' : 'Y'}(${isOnTop ? `${moveBy}px` : `-${moveBy}px`})`,
+                                opacity: 0,
+                            },
+                        ], { ...animOptions, easing: 'ease-in' }).onfinish = () => {
+                            previousIndicator.remove()
+                        }
+                        tempData = {
+                            currentActiveElement,
+                            currentIndicator,
+                            isOnTop,
+                            animOptions,
+                            moveBy
+                        }
+                    }
+                    previousActiveElement.classList.remove('nav-item--active');
+                    currentActiveElement.classList.add('nav-item--active')
+                } else {
+                    getRef('main_page').classList.add('nav-hidden')
+                    if (!getRef('main_navbar').classList.contains('hide')) {
+                        getRef('main_navbar').classList.add('hide-away')
+                        getRef('main_navbar').animate([
+                            {
+                                transform: `none`,
+                                opacity: 1,
+                            },
+                            {
+                                transform: isMobileView ? `translateY(100%)` : `translateX(-100%)`,
+                                opacity: 0,
+                            },
+                        ], {
+                            duration: 200,
+                            fill: 'forwards',
+                            easing: 'ease'
+                        }).onfinish = () => {
+                            getRef('main_navbar').classList.add('hide')
+                        }
+                    }
+                }
+                document.querySelectorAll('.page').forEach(page => page.classList.add('hide'))
+                getRef(pageId).closest('.page').classList.remove('hide')
+                document.querySelectorAll('.inner-page').forEach(page => page.classList.add('hide'))
+                getRef(pageId).classList.remove('hide')
+                getRef(pageId).animate([
+                    {
+                        opacity: 0,
+                        transform: 'translateY(1rem)'
+                    },
+                    {
+                        opacity: 1,
+                        transform: 'translateY(0)'
+                    },
+                ],
+                    {
+                        duration: 300,
+                        easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                    }).onfinish = () => {
+                    }
+                pagesData.lastPage = pageId
+            }
+            if (params)
+                pagesData.params = params
+            pagesData.openedPages.add(pageId)
+
+        }
+        const indicatorObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    const { currentActiveElement, currentIndicator, isOnTop, animOptions, moveBy } = tempData
+                    currentActiveElement.append(currentIndicator)
+                    currentIndicator.animate([
+                        {
+                            transform: `translate${isMobileView ? 'X' : 'Y'}(${isOnTop ? `-${moveBy}px` : `${moveBy}px`})`,
+                            opacity: 0,
+                        },
+                        {
+                            transform: 'none',
+                            opacity: 1
+                        },
+                    ], { ...animOptions, easing: 'ease-out' })
+                }
+            })
+        }, {
+            threshold: 1
+        })
 
 
         // class based lazy loading
@@ -1719,16 +1939,27 @@
                 if (type !== 'contact') {
                     //render chat card for newly added contact
                     messenger.getChat(floID).then(chat => {
-                        if (!getRef('chats_list').querySelector(`.contact[data-flo-id="${floID}"] .last-message`)) {
+                        const chatCard = getRef('chats_list').querySelector(`.contact[data-flo-id="${floID}"]`)
+                        if (chatCard && !chatCard.querySelector('.last-message')) {
                             let lastMessage = Object.values(chat).reverse().find(({ message }) => message) || { message: '', time: 0 }
                             if (type === 'group' && lastMessage.time === 0)
                                 lastMessage.time = messenger.groups[floID].created
                             const amISender = type === 'chat' && lastMessage.category === 'sent' || type === 'group' && lastMessage.sender === myFloID
-                            const lastText = html`<p class="last-message">${amISender ? 'You: ' : type === 'group' ? `${getContactName(lastMessage.sender)}: ` : ''} ${lastMessage.message}</p>`
+                            let lastText = ''
+                            if (amISender) {
+                                lastText = `You: ${lastMessage.message}`
+                            } else {
+                                if (type === 'group') {
+                                    if (lastMessage.sender)
+                                        lastText = `${getContactName(lastMessage.sender)}: ${lastMessage.message}`
+                                    else
+                                        lastText = 'Group created'
+                                }
+                            }
                             const timeAndOptions = html`
-                                <time class="time">${getFormattedTime(lastMessage.time, 'relative')}</time>
+                                <time class="time">${lastMessage.time ? getFormattedTime(lastMessage.time, 'relative') : ''}</time>
                                 <div class="span-2">
-                                    ${lastText}
+                                    <p class="last-message">${lastText}</p>
                                     <button class="menu">
                                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                                     </button>
@@ -1838,21 +2069,27 @@
                 }
 
             },
-            groupMembers(groupID) {
-                const groupMembersCards = messenger.groups[groupID].members.map(floID => {
+            groupMembers(groupID, areSelectable = false) {
+                const groupMembersCards = [];
+                messenger.groups[groupID].members.forEach(floID => {
                     let isAdmin = messenger.groups[groupID].admin === floID ? true : false
                     let name = getContactName(floID)
                     let initial = name.charAt(0)
-                    return html`
-                        <div class="group-member interactive" .dataset=${{ floId: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
-                            <div class="initial flex align-center">
-                                ${initial}
+                    if (areSelectable) {
+                        if (!isAdmin)
+                            groupMembersCards.push(render.selectableContact(floID))
+                    } else {
+                        groupMembersCards.push(html`
+                            <div class="group-member interactive" .dataset=${{ floId: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
+                                <div class="initial flex align-center">
+                                    ${initial}
+                                </div>
+                                <h4 class="name">${name}</h4>
+                                ${isAdmin ? html`<p class="admin-tag">Group admin</p>` : ''}
                             </div>
-                            <h4 class="name">${name}</h4>
-                            ${isAdmin ? html`<p class="admin-tag">Group admin</p>` : ''}
-                        </div>
-                    
-                    `
+                        
+                        `)
+                    }
                 })
                 renderElem(getRef('group_members_list'), html`${groupMembersCards}`)
             },
@@ -2000,6 +2237,7 @@
                     } else if (groupID) {
                         getRef('chats_list').prepend(html.node`${render.contactCard(groupID, { type: 'group', prepend: true })}`)
                     }
+                    console.log('new chat', floID, groupID)
                     chatCard = getRef('chats_list').children[0]
                     chatCard.classList.add('active')
                     activeChat['chatCard'] = getRef('chats_list').children[0]
@@ -2244,9 +2482,9 @@
                 const floID = contact.dataset.floId
                 let chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${floID}"]`);
                 if (!chatCard) {
-                    chatCard = getRef('chats_list').prepend(render.contactCard(floID, { type: 'chat' }))
+                    chatCard = getRef('chats_list').prepend(html.node`${render.contactCard(floID, { type: 'chat' })}`)
                 }
-                chatCard.click()
+                getRef('chats_list').firstElementChild.click()
                 closePopup()
             }
         })
@@ -2336,7 +2574,7 @@
             messenger.createGroup(groupName, groupDescription)
                 .then(groupInfo => {
                     floGlobals.isCreatingGroup = false
-                    getRef('chats_list').prepend(render.contactCard(groupInfo.groupID, { type: 'group' }))
+                    getRef('chats_list').prepend(html.node`${render.contactCard(groupInfo.groupID, { type: 'group' })}`)
                     getRef('chats_list').children[0].click()
                     closePopup()
                     notify('Group created', 'success')
@@ -2614,7 +2852,6 @@
                 let isSelected = selectedGroupMembers.has(floID)
                 contacts.push(render.contactCard(floID, { type: 'contact', isSelected }))
             }
-            console.log(contacts, contactList)
             renderElem(getRef('contacts_container'), html`${contacts}`)
         }
 
@@ -3028,36 +3265,42 @@
         let isGroupEditable = false
         let isRemovingMember = false
         function editGroupMembers() {
+            const groupID = getRef('edit_group_button').dataset.groupId
             if (isGroupEditable) {
                 // to-do: make group members non editable
+                render.groupMembers(groupID)
                 membersToRemove.clear()
                 getRef('edit_group_button').textContent = 'Edit';
-                addClass(['#remove_members_tip', '#member_options'], 'hide')
+                addClass(['#group_members_tip', '#member_options'], 'hide')
                 isGroupEditable = false
                 isRemovingMember = false
             } else {
                 // to-do: make group members selectable except for admin
+                render.groupMembers(groupID, true)
                 getRef('edit_group_button').textContent = 'Done'
-                removeClass(['#remove_members_tip', '#member_options', '#init_add_members_button'], 'hide')
+                removeClass(['#group_members_tip', '#member_options', '#init_add_members_button'], 'hide')
                 getRef('remove_members_button').classList.add('hide')
                 isGroupEditable = true
                 isRemovingMember = true
             }
         }
 
+        getRef('group_members_list').addEventListener('change', e => {
+            selectMemberToRemove(e.target.value)
+        })
+
         const membersToRemove = new Set()
-        function selectMemberToRemove(contact) {
-            const floID = contact.dataset.floId
+        function selectMemberToRemove(floID) {
             if (membersToRemove.has(floID)) {
                 membersToRemove.delete(floID)
             } else {
                 membersToRemove.add(floID)
             }
             if (membersToRemove.size) {
-                addClass(['#remove_members_tip', '#init_add_members_button'], 'hide')
+                addClass(['#group_members_tip', '#init_add_members_button'], 'hide')
                 getRef('remove_members_button').classList.remove('hide')
             } else {
-                removeClass(['#remove_members_tip', '#init_add_members_button'], 'hide')
+                removeClass(['#group_members_tip', '#init_add_members_button'], 'hide')
                 getRef('remove_members_button').classList.add('hide')
             }
         }
@@ -3078,238 +3321,27 @@
         document.getElementById('add_members_button').addEventListener('click', addGroupMembers)
 
         function addGroupMembers() {
-            messenger.addGroupMembers(activeChat.floID, [...membersToAdd])
+            const groupID = getRef('edit_group_button').dataset.groupId
+            messenger.addGroupMembers(groupID, [...membersToAdd])
                 .then(res => {
-                    render.groupMembers(activeChat.floID)
+                    render.groupMembers(groupID)
                     closePopup()
                 })
                 .catch(err => console.log(err))
         }
 
         function removeGroupMembers() {
-            messenger.rmGroupMembers(activeChat.floID, [...membersToRemove])
-                .then(res => {
-                    getRef('group_members_list').querySelectorAll('.selected').forEach(contact => {
-                        contact.remove()
-                    })
-                    editGroupMembers()
-                })
-                .catch(err => console.log(err))
-        }
-
-        const pagesData = {
-            params: {},
-            openedPages: new Set(),
-        }
-        async function showPage(targetPage, options = {}) {
-            const { firstLoad, hashChange } = options
-            let pageId
-            let subPageId
-            let params = {}
-            let searchParams
-            if (targetPage === '') {
-                if (typeof myFloID === "undefined") {
-                    pageId = 'sign_in'
-                } else {
-                    pageId = 'chat_page'
-                }
-            } else {
-                if (targetPage.includes('/')) {
-                    if (targetPage.includes('?')) {
-                        const splitAddress = targetPage.split('?')
-                        searchParams = splitAddress.pop()
-                        const pages = splitAddress.pop().split('/')
-                        pageId = pages[1]
-                        subPageId = pages[2]
-                    } else {
-                        const pages = targetPage.split('/')
-                        pageId = pages[1]
-                        subPageId = pages[2]
-                    }
-                } else {
-                    pageId = targetPage
-                }
-            }
-            if (typeof myFloID === "undefined" && !(['sign_up', 'sign_in', 'loading', 'landing'].includes(pageId))) return
-            else if (typeof myFloID !== "undefined" && (['sign_up', 'sign_in', 'loading', 'landing'].includes(pageId))) {
-                history.replaceState(null, null, '#/chat_page');
-                pageId = 'chat_page'
-            }
-            if (searchParams) {
-                const urlSearchParams = new URLSearchParams('?' + searchParams);
-                params = Object.fromEntries(urlSearchParams.entries());
-            }
-            switch (pageId) {
-                case 'sign_in':
-                    setTimeout(() => {
-                        getRef('private_key_field').focusIn()
-                    }, 0);
-                    targetPage = 'sign_in'
-                    break;
-                case 'sign_up':
-                    const { floID, privKey } = floCrypto.generateNewID()
-                    getRef('generated_flo_id').value = floID
-                    getRef('generated_private_key').value = privKey
-                    targetPage = 'sign_up'
-                    break;
-                case 'mail_page':
-                    if (subPageId) {
-                        let childIndex
-                        switch (subPageId) {
-                            case 'inbox':
-                                childIndex = 0
-                                break;
-                            case 'sent':
-                                childIndex = 1
-                                break;
-                        }
-                        showChildElement('mail_sections', childIndex)
-                        getRef("mail_type_selector").value = subPageId
-                    }
-                    break;
-                case 'settings':
-                    if (subPageId) {
-                        showPanel(subPageId)
-                    } else {
-                        hidePanel()
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-            if (pagesData.lastPage !== pageId) {
-                const animOptions = {
-                    duration: 100,
-                    fill: 'forwards',
-                    easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-                }
-                let previousActiveElement = getRef('main_navbar').querySelector('.nav-item--active')
-                const currentActiveElement = document.querySelector(`.nav-item[href="#/${pageId}"]`)
-                if (currentActiveElement) {
-                    getRef('main_page').classList.remove('nav-hidden')
-                    if (getRef('main_navbar').classList.contains('hide')) {
-                        getRef('main_navbar').classList.remove('hide-away', 'hide')
-                        getRef('main_navbar').animate([
-                            {
-                                transform: isMobileView ? `translateY(100%)` : `translateX(-100%)`,
-                                opacity: 0,
-                            },
-                            {
-                                transform: `none`,
-                                opacity: 1,
-                            },
-                        ], { ...animOptions, easing: 'ease-in' })
-                    }
-                    const previousActiveElementIndex = [...getRef('main_navbar').querySelectorAll('.nav-item')].indexOf(previousActiveElement)
-                    const currentActiveElementIndex = [...getRef('main_navbar').querySelectorAll('.nav-item')].indexOf(currentActiveElement)
-                    const isOnTop = previousActiveElementIndex < currentActiveElementIndex
-                    const currentIndicator = createElement('div', { className: 'nav-item__indicator' });
-                    let previousIndicator = getRef('main_navbar').querySelector('.nav-item__indicator')
-                    if (!previousIndicator) {
-                        previousIndicator = currentIndicator.cloneNode(true)
-                        previousActiveElement = currentActiveElement
-                        previousActiveElement.append(previousIndicator)
-                    } else if (currentActiveElementIndex !== previousActiveElementIndex) {
-                        const indicatorDimensions = previousIndicator.getBoundingClientRect()
-                        const currentActiveElementDimensions = currentActiveElement.getBoundingClientRect()
-                        let moveBy
-                        if (isMobileView) {
-                            moveBy = ((currentActiveElementDimensions.width - indicatorDimensions.width) / 2) + indicatorDimensions.width
-                        } else {
-                            moveBy = ((currentActiveElementDimensions.height - indicatorDimensions.height) / 2) + indicatorDimensions.height
-                        }
-                        indicatorObserver.observe(previousIndicator)
-                        previousIndicator.animate([
-                            {
-                                transform: 'none',
-                                opacity: 1,
-                            },
-                            {
-                                transform: `translate${isMobileView ? 'X' : 'Y'}(${isOnTop ? `${moveBy}px` : `-${moveBy}px`})`,
-                                opacity: 0,
-                            },
-                        ], { ...animOptions, easing: 'ease-in' }).onfinish = () => {
-                            previousIndicator.remove()
-                        }
-                        tempData = {
-                            currentActiveElement,
-                            currentIndicator,
-                            isOnTop,
-                            animOptions,
-                            moveBy
-                        }
-                    }
-                    previousActiveElement.classList.remove('nav-item--active');
-                    currentActiveElement.classList.add('nav-item--active')
-                } else {
-                    getRef('main_page').classList.add('nav-hidden')
-                    if (!getRef('main_navbar').classList.contains('hide')) {
-                        getRef('main_navbar').classList.add('hide-away')
-                        getRef('main_navbar').animate([
-                            {
-                                transform: `none`,
-                                opacity: 1,
-                            },
-                            {
-                                transform: isMobileView ? `translateY(100%)` : `translateX(-100%)`,
-                                opacity: 0,
-                            },
-                        ], {
-                            duration: 200,
-                            fill: 'forwards',
-                            easing: 'ease'
-                        }).onfinish = () => {
-                            getRef('main_navbar').classList.add('hide')
-                        }
-                    }
-                }
-                document.querySelectorAll('.page').forEach(page => page.classList.add('hide'))
-                getRef(pageId).closest('.page').classList.remove('hide')
-                document.querySelectorAll('.inner-page').forEach(page => page.classList.add('hide'))
-                getRef(pageId).classList.remove('hide')
-                getRef(pageId).animate([
-                    {
-                        opacity: 0,
-                        transform: 'translateY(1rem)'
-                    },
-                    {
-                        opacity: 1,
-                        transform: 'translateY(0)'
-                    },
-                ],
-                    {
-                        duration: 300,
-                        easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-                    }).onfinish = () => {
-                    }
-                pagesData.lastPage = pageId
-            }
-            if (params)
-                pagesData.params = params
-            pagesData.openedPages.add(pageId)
-
-        }
-        const indicatorObserver = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (!entry.isIntersecting) {
-                    const { currentActiveElement, currentIndicator, isOnTop, animOptions, moveBy } = tempData
-                    currentActiveElement.append(currentIndicator)
-                    currentIndicator.animate([
-                        {
-                            transform: `translate${isMobileView ? 'X' : 'Y'}(${isOnTop ? `-${moveBy}px` : `${moveBy}px`})`,
-                            opacity: 0,
-                        },
-                        {
-                            transform: 'none',
-                            opacity: 1
-                        },
-                    ], { ...animOptions, easing: 'ease-out' })
+            getConfirmation('Remove group members', { message: `Are you sure to remove these members from this group?`, confirmText: 'Remove', cancelText: 'No' }).then(confirmed => {
+                if (confirmed) {
+                    const groupID = getRef('edit_group_button').dataset.groupId
+                    messenger.rmGroupMembers(groupID, [...membersToRemove])
+                        .then(res => {
+                            editGroupMembers()
+                        })
+                        .catch(err => console.log(err))
                 }
             })
-        }, {
-            threshold: 1
-        })
+        }
 
         document.addEventListener('colorselected', e => {
             const color = e.detail.value
