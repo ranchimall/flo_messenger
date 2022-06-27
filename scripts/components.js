@@ -182,6 +182,7 @@ border: none;
     --danger-color: red;
     --width: 100%;
     --icon-gap: 0.5rem;
+    --min-height: 3.5rem;
     --background: rgba(var(--text-color, (17,17,17)), 0.06);
 }
 .hide{
@@ -200,8 +201,8 @@ button:focus{
     outline: var(--accent-color, teal) solid medium;
 }
 .icon {
-    height: 1.4rem;
-    width: 1.4rem;
+    height: 1.2rem;
+    width: 1.2rem;
     fill: rgba(var(--text-color, (17,17,17)), 0.6);
 }
 
@@ -222,7 +223,7 @@ button:focus{
     background: var(--background);
     width: 100%;
     outline: none;
-    min-height: var(--min-height,3rem);
+    min-height: var(--min-height);
 }
 .input.readonly .clear{
     opacity: 0 !important;

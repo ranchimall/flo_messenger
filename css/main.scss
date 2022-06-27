@@ -904,10 +904,14 @@ sm-button[variant="primary"] {
     font-size: 0.8rem;
   }
 }
+.selectable-contact,
+.group-member,
+.blocked-id {
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
 .selectable-contact {
   user-select: none;
-  padding: 0.5rem 0;
-  gap: 1rem;
   input {
     margin-left: auto;
   }
@@ -915,10 +919,6 @@ sm-button[variant="primary"] {
 .group-member {
   display: flex;
   align-items: center;
-  padding: 0.5rem 0;
-  .initial {
-    margin-right: 1rem;
-  }
   .admin-tag {
     margin-left: auto;
     padding: 0.1rem 0.6rem;
@@ -1250,8 +1250,6 @@ sm-button[variant="primary"] {
 }
 #auto_complete_contact {
   position: relative;
-  justify-content: flex-start;
-  padding-bottom: 0;
 }
 #mail_contact_list {
   max-height: 40vh;
@@ -1356,6 +1354,9 @@ sm-button[variant="primary"] {
     margin-left: -0.5rem;
     margin-right: 0.5rem;
   }
+}
+#search_chats {
+  --min-height: 3rem;
 }
 #chat_page,
 #mail_page,
@@ -1525,7 +1526,7 @@ sm-button[variant="primary"] {
     padding: 0.5rem;
     margin-left: -0.5rem;
   }
-  #chat_details {
+  #chat_details_button {
     background-color: rgba(var(--text-color), 0.06);
     border-radius: 2rem;
     justify-self: center;
@@ -1909,7 +1910,7 @@ sm-button[variant="primary"] {
   }
   #chat_header {
     grid-template-columns: auto minmax(0, 1fr);
-    #chat_details {
+    #chat_details_button {
       max-width: calc(100% - 2rem);
       margin-left: -1.7rem;
     }
