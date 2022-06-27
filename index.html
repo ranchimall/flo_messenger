@@ -2890,19 +2890,22 @@
         }
 
         let chatLazyLoader
-        async function renderMessages(floID) {
-            messenger.getChat(floID).then(chat => {
-                if (chatLazyLoader) {
-                    chatLazyLoader.update(Object.values(chat))
-                } else {
-                    chatLazyLoader = new LazyLoader('#messages_container', Object.values(chat), render.messageBubble, {
-                        bottomFirst: true
-                    });
-                }
-                chatLazyLoader.init()
-                console.log('chat loaded')
-            }).catch(error => {
-                console.log(error)
+        function renderMessages(floID) {
+            return new Promise(async (resolve, reject) => {
+                messenger.getChat(floID).then(chat => {
+                    if (chatLazyLoader) {
+                        chatLazyLoader.update(Object.values(chat))
+                    } else {
+                        chatLazyLoader = new LazyLoader('#messages_container', Object.values(chat), render.messageBubble, {
+                            bottomFirst: true
+                        });
+                    }
+                    chatLazyLoader.init()
+                    resolve()
+                }).catch(error => {
+                    console.log(error)
+                    reject(error)
+                })
             })
         }
 
