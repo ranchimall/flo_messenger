@@ -264,15 +264,15 @@
                     <p class="light-text">Tap/click on 'New chat' to add or select a contact.</p>
                 </div>
             </div>
-            <div id="chat_view" class="grid hide-on-mobile hide">
+            <div id="chat_view" class="grid hide">
                 <header id="chat_header" class="grid align-center">
-                    <button class="hide-on-desktop back-button" onclick="goto('chats')">
+                    <a class="hide-on-desktop button back-button" href="#/chat_page">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                             width="24px" fill="#000000">
                             <path d="M0 0h24v24H0V0z" fill="none"></path>
                             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
                         </svg>
-                    </button>
+                    </a>
                     <button id="chat_details_button" class="flex align-center interactive">
                         <div id="receiver_initial" class="initial flex align-center margin-right-0-5"></div>
                         <h4 id="receiver_name"></h4>
@@ -446,11 +446,13 @@
                     </sm-switch>
                 </div>
                 <div id="blocked" class="panel hide">
-                    <h4>Blocked</h4>
-                    <ul id="blocked_list" class="observe-empty-state"></ul>
-                    <div class="empty-state">
-                        <p>No blocked FLO IDs</p>
-                    </div>
+                    <section>
+                        <h4>Blocked</h4>
+                        <ul id="blocked_list" class="observe-empty-state"></ul>
+                        <div class="empty-state">
+                            <p>No blocked FLO IDs</p>
+                        </div>
+                    </section>
                 </div>
                 <div id="personalize" class="panel hide">
                     <section>
@@ -986,7 +988,7 @@
             history.pushState({ type: 'popup' }, null, null)
             switch (e.target.id) {
                 case 'contact_details_popup':
-                    const floID = floGlobals.uiState.activeFloID;
+                    const floID = floGlobals.activeFloID;
                     const isGroup = messenger.groups.hasOwnProperty(floID);
                     if (isGroup)
                         isAdmin = messenger.groups[floID].admin === myFloID
@@ -1114,7 +1116,7 @@
             switch (e.target.id) {
                 case 'contact_details_popup':
                     getRef('contact_name').revert()
-                    if (messenger.groups.hasOwnProperty(floGlobals.uiState.activeFloID)) {
+                    if (messenger.groups.hasOwnProperty(floGlobals.activeFloID)) {
                         isGroupEditable = true
                         editGroupMembers()
                     }
@@ -1425,6 +1427,18 @@
                     getRef('generated_flo_id').value = floID
                     getRef('generated_private_key').value = privKey
                     targetPage = 'sign_up'
+                    break;
+                case 'chat_page':
+                    if (subPageId) {
+                        getRef('chat_view').classList.remove('hide')
+                        getRef('contacts').classList.add('hide-on-mobile')
+                        getRef('main_navbar').classList.add('hide-on-mobile')
+                    } else {
+                        getRef('chat_view').classList.add('hide')
+                        getRef('contacts').classList.remove('hide-on-mobile')
+                        activeChat = {}
+                        getRef('main_navbar').classList.remove('hide-on-mobile')
+                    }
                     break;
                 case 'mail_page':
                     if (subPageId) {
@@ -1851,7 +1865,6 @@
 
     <script>
         let activePage = {},
-            activeChatPage = getRef('contacts'),
             activeMailPage = getRef('mails'),
             activeChat = {},
             activeMail,
@@ -2346,7 +2359,6 @@
 
         const chatScrollInfo = {};
         getRef('messages_container').addEventListener('scroll', debounce((e) => {
-            console.log(this)
             if ((e.target.scrollHeight > e.target.clientHeight) && (e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop >= 100)) {
                 chatScrollInfo['isScrolledUp'] = true
                 getRef('scroll_to_bottom').classList.add('no-transformations')
@@ -2417,7 +2429,7 @@
                     clickedContact['chatCard'] = contact
                     clickedContact['floID'] = contact.dataset.floId
                     clickedContact['isGroup'] = messenger.groups.hasOwnProperty(clickedContact['floID'])
-                    floGlobals.uiState.activeFloID = clickedContact.floID
+                    floGlobals.activeFloID = clickedContact.floID
                     openPopup('contact_details_popup')
                 }, 500)
                 getRef('chats_list').addEventListener('touchmove', handleTouchMove)
@@ -2438,7 +2450,7 @@
         })
         floGlobals.uiState = {}
         getRef('chat_details_button').addEventListener('click', e => {
-            floGlobals.uiState.activeFloID = activeChat.floID
+            floGlobals.activeFloID = activeChat.floID
             openPopup('contact_details_popup')
         })
 
@@ -2460,24 +2472,16 @@
             }
             if (clickedContact['floID'] === myFloID) return
             if (e.target.closest(".initial") || e.target.closest(".menu")) {
-                floGlobals.uiState.activeFloID = clickedContact.floID
+                floGlobals.activeFloID = clickedContact.floID
                 openPopup('contact_details_popup')
             } else {
                 e.delegateTarget.classList.remove('unread')
                 if (activeChat['chatCard'] === e.delegateTarget && !isMobileView) return
                 document.title = `FLO Messenger`
-                getRef('chat_view').classList.remove('hide')
                 viewConversation(e.delegateTarget)
-                if (activeChat['chatCard'])
-                    activeChat['chatCard'].classList.remove('active')
+                getRef('chats_list').querySelectorAll('.active').forEach(child => child.classList.remove('active'))
                 e.delegateTarget.classList.add('active')
                 activeChat['chatCard'] = e.delegateTarget
-                if (activeChatPage.id === 'contacts') {
-                    getRef('chat_view').classList.remove('hide-on-mobile')
-                    getRef('contacts').classList.add('hide-on-mobile')
-                    activeChatPage = getRef('chat_view')
-                    getRef('main_navbar').classList.add('hide-on-mobile')
-                }
             }
         })
         getRef('contacts_container').addEventListener('click', e => {
@@ -2671,17 +2675,9 @@
         })
 
         function goto(page) {
-            if (page === 'chats') {
-                getRef('chat_view').classList.add('hide-on-mobile')
-                getRef('contacts').classList.remove('hide-on-mobile')
-                activeChatPage = getRef('contacts')
-                activeChat = {}
-            }
-            if (page === 'mails') {
-                getRef('mail').classList.add('hide-on-mobile')
-                getRef('mails').classList.remove('hide-on-mobile')
-                activeMailPage = getRef('mails')
-            }
+            getRef('mail').classList.add('hide-on-mobile')
+            getRef('mails').classList.remove('hide-on-mobile')
+            activeMailPage = getRef('mails')
             getRef('main_navbar').classList.remove('hide-on-mobile')
         }
 
@@ -2894,44 +2890,40 @@
         }
 
         let chatLazyLoader
-        async function renderMessages(options) {
-            let { markUnread = true } = options
-            try {
-                let messages = Object.values(await messenger.getChat(activeChat.floID))
-                if (activeChat.floID) {
-                    if (chatLazyLoader) {
-                        chatLazyLoader.update(messages)
-                    } else {
-                        chatLazyLoader = new LazyLoader('#messages_container', messages, render.messageBubble, {
-                            bottomFirst: true
-                        });
-                    }
-                    chatLazyLoader.init()
+        async function renderMessages(floID) {
+            messenger.getChat(floID).then(chat => {
+                if (chatLazyLoader) {
+                    chatLazyLoader.update(Object.values(chat))
+                } else {
+                    chatLazyLoader = new LazyLoader('#messages_container', Object.values(chat), render.messageBubble, {
+                        bottomFirst: true
+                    });
                 }
-            } catch (error) {
+                chatLazyLoader.init()
+                console.log('chat loaded')
+            }).catch(error => {
                 console.log(error)
-            }
+            })
         }
 
         async function viewConversation(contact) {
             // clear rendered date cards if any 
             renderedDates = {}
-            let floID = clickedContact['floID']
-
-            activeChat['floID'] = floID
-            activeChat['isGroup'] = messenger.groups.hasOwnProperty(floID)
-            getRef("receiver_name").textContent = getContactName(floID);
+            activeChat.floID = clickedContact.floID
+            activeChat['isGroup'] = messenger.groups.hasOwnProperty(clickedContact.floID)
+            getRef("receiver_name").textContent = getContactName(clickedContact.floID);
             if (activeChat.isGroup) {
                 getRef("receiver_initial").innerHTML = ` <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
             } else {
-                getRef("receiver_initial").textContent = getContactName(floID).charAt(0);
+                getRef("receiver_initial").textContent = getContactName(clickedContact.floID).charAt(0);
             }
-            getRef("receiver_initial").setAttribute('style', `--contact-color: var(${contactColor(floID)})`)
-            renderMessages({ markUnread: false }).then(() => {
-                if (!floGlobals.pubKeys[floID] && !activeChat.isGroup)
+            getRef("receiver_initial").setAttribute('style', `--contact-color: var(${contactColor(clickedContact.floID)})`)
+            renderMessages(clickedContact.floID).then(() => {
+                if (!floGlobals.pubKeys[clickedContact.floID] && !activeChat.isGroup)
                     getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption">Converstion is not encrypted until receiver replies</strong>`)
+                location.hash = `#/chat_page/messages`
             })
-            messenger.removeMark(floID, "unread");
+            messenger.removeMark(clickedContact.floID, "unread");
             if (this.scrollHeight <= this.clientHeight) {
                 chatScrollInfo['isScrolledUp'] = false
                 getRef('scroll_to_bottom').classList.remove('no-transformations')
@@ -3124,7 +3116,7 @@
         })
 
         async function changeContactName(name) {
-            const floID = floGlobals.uiState.activeFloID
+            const floID = floGlobals.activeFloID
             const isGroup = messenger.groups.hasOwnProperty(floID)
             if (isGroup) {
                 messenger.changeGroupName(floID, name).then(res => {

@@ -1119,6 +1119,17 @@ sm-button[variant=primary] {
   align-self: center;
   text-align: center;
 }
+#warn_no_encryption + #warn_no_encryption,
+#warn_no_encryption + .date-card,
+#warn_no_encryption + .group-event-card,
+.date-card + #warn_no_encryption,
+.date-card + .date-card,
+.date-card + .group-event-card,
+.group-event-card + #warn_no_encryption,
+.group-event-card + .date-card,
+.group-event-card + .group-event-card {
+  margin-top: 0;
+}
 
 .group-event-card {
   font-size: 0.8rem;

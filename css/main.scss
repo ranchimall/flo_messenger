@@ -1001,6 +1001,9 @@ sm-button[variant="primary"] {
   justify-self: center;
   align-self: center;
   text-align: center;
+  & + & {
+    margin-top: 0;
+  }
 }
 .group-event-card {
   font-size: 0.8rem;
