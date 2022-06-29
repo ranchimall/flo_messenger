@@ -134,7 +134,7 @@
             </section>
         </article>
         <article id="sign_up" class="inner-page page-layout hide">
-            <section class="grid">
+            <section class="grid gap-1-5">
                 <div id="flo_id_warning" class="grid justify-center gap-0-5">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
@@ -156,7 +156,7 @@
                     </div>
                 </div>
                 <sm-button id="sign_up_button" variant="primary">Sign in with these credentials</sm-button>
-                <p style="margin-top: 2rem;">You can use these FLO credentials with FLO Messenger other RanchiMall apps
+                <p>You can use these FLO credentials with FLO Messenger other RanchiMall apps
                     too. </p>
             </section>
         </article>
@@ -252,22 +252,20 @@
                     New chat
                 </button>
                 <div id="chats_list" class="flex observe-empty-state"></div>
-                <div id="new_conversation" class="flex flex-direction-column empty-state">
-                    <svg class="icon new-conversation align-center" viewBox="0 0 512 512">
-                        <title>new conversation</title>
+                <div class="empty-state flex flex-direction-column align-center text-center align-self-center">
+                    <svg class="icon icon--big" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                        width="24px" fill="#000000">
+                        <path d="M0 0h24v24H0z" fill="none" />
                         <path
-                            d="M304.11,403.5H101.42a51,51,0,0,1-51-51v-191L6.87,84.82H424.36a51,51,0,0,1,51,51v86.72" />
-                        <ellipse cx="423.3" cy="342.48" rx="84.7" />
-                        <line x1="423.3" y1="306.34" x2="423.3" y2="379.64" />
-                        <line x1="459.95" y1="342.99" x2="386.65" y2="342.99" />
+                            d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" />
                     </svg>
-                    <h4>Start your first conversation</h4>
-                    <p class="light-text">Tap/click on 'New chat' to add or select a contact.</p>
+                    <h4 class="margin-bottom-0-5">Start your first conversation</h4>
+                    <p>Tap/click on 'New chat' to add or select a contact.</p>
                 </div>
             </div>
             <div id="chat_view" class="grid hide">
                 <header id="chat_header" class="grid align-center">
-                    <a class="hide-on-desktop button back-button" href="#/chat_page">
+                    <a class="hide-on-desktop button icon-only back-button" href="#/chat_page">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                             width="24px" fill="#000000">
                             <path d="M0 0h24v24H0V0z" fill="none"></path>
@@ -330,28 +328,39 @@
                     New Mail
                 </button>
                 <div id="mail_sections">
-                    <div>
+                    <div class="flex h-100">
                         <ul id="inbox_mail_container" class="mail-container flex observe-empty-state"></ul>
-                        <div class="empty-state flex flex-direction-column align-center">
-                            <svg class="icon new-conversation" viewBox="0 0 512 512">
+                        <div class="empty-state flex flex-direction-column align-center text-center align-self-center">
+                            <svg class="icon icon--big" xmlns="http://www.w3.org/2000/svg" height="24px"
+                                viewBox="0 0 24 24" width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0V0z" fill="none" />
                                 <path
-                                    d="M227,26.16,20.5,177.56a49,49,0,0,0-20,39.53V446.35a49,49,0,0,0,49,49h413a49,49,0,0,0,49-49h0V217.09a49,49,0,0,0-20-39.53L285,26.16A49,49,0,0,0,227,26.16Z" />
-                                <path d="M71,250.29l166.31,86.88a39,39,0,0,0,36.22,0L441,249.66" />
+                                    d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5v-3h3.56c.69 1.19 1.97 2 3.45 2s2.75-.81 3.45-2H19v3zm0-5h-4.99c0 1.1-.9 2-2 2s-2-.9-2-2H5V5h14v9z" />
                             </svg>
-                            <h4>All your received mails will appear here.</h4>
-                            <p class="light-text">Tap/click on 'New Mail' button below to compose new mail.</p>
+                            <h4 class="margin-bottom-0-5">All your received mails will appear here.</h4>
+                            <p>Tap/click on 'New Mail' button below to compose new mail.</p>
                         </div>
                     </div>
-                    <div class="hide">
+                    <div class="hide flex h-100">
                         <ul id="sent_mail_container" class="mail-container flex observe-empty-state"></ul>
-                        <div class="empty-state flex flex-direction-column align-center">
-                            <svg class="icon new-conversation" viewBox="0 0 512 512">
-                                <path
-                                    d="M227,26.16,20.5,177.56a49,49,0,0,0-20,39.53V446.35a49,49,0,0,0,49,49h413a49,49,0,0,0,49-49h0V217.09a49,49,0,0,0-20-39.53L285,26.16A49,49,0,0,0,227,26.16Z" />
-                                <path d="M71,250.29l166.31,86.88a39,39,0,0,0,36.22,0L441,249.66" />
+                        <div class="empty-state flex flex-direction-column align-center text-center align-self-center">
+                            <svg class="icon icon--big" xmlns="http://www.w3.org/2000/svg"
+                                enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
+                                fill="#000000">
+                                <g>
+                                    <rect fill="none" height="24" width="24" />
+                                </g>
+                                <g>
+                                    <g>
+                                        <polygon
+                                            points="11,9.83 11,14 13,14 13,9.83 14.59,11.41 16,10 12,6 8,10 9.41,11.41" />
+                                        <path
+                                            d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M19,19H5v-3h3.02 c0.91,1.21,2.35,2,3.98,2s3.06-0.79,3.98-2H19V19z M19,14h-4.18c-0.41,1.16-1.51,2-2.82,2s-2.4-0.84-2.82-2H5V5h14V14z" />
+                                    </g>
+                                </g>
                             </svg>
-                            <h4>All your sent mails will appear here.</h4>
-                            <p class="light-text">Tap/click on 'New Mail' button below to compose new mail.</p>
+                            <h4 class="margin-bottom-0-5">All your sent mails will appear here.</h4>
+                            <p>Tap/click on 'New Mail' button below to compose new mail.</p>
                         </div>
                     </div>
                 </div>
@@ -378,7 +387,7 @@
             </aside>
             <div id="settings_panel" class=" hide-on-mobile">
                 <header id="settings_header" class="flex  align-center hide-on-desktop">
-                    <a href="#/settings" id="back_settings" class="button icon-only margin-right-0-5">
+                    <a href="#/settings" class="button icon-only back-button margin-right-0-5">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                             width="24px" fill="#000000">
                             <path d="M0 0h24v24H0V0z" fill="none" />
@@ -499,10 +508,10 @@
                             <input type="file" id="select_bg_image" accept="image/*" />
                         </label>
                     </section>
-                    <section>
-                        <h4>Backdrop</h4>
+                    <section id="backdrop_options" class="hide">
+                        <h4>App backdrop</h4>
                         <label class="grid gap-0-3">
-                            <span>Dim wallpaper</span>
+                            <span>Wallpaper dimming</span>
                             <div class="flex gap-0-5">
                                 <input type="range" min="0" max="100" id="backdrop_opacity" class="w-100">
                                 <output id="backdrop_opacity_value"></output>
@@ -642,7 +651,9 @@
             </div>
             <sm-input id="subject_of_mail" placeholder="Subject" animate></sm-input>
             <sm-textarea id="mail_content" placeholder="Type a mail" name="" id="" rows="10" required></sm-textarea>
-            <sm-button id="send_mail_button" variant="primary" disabled>Send</sm-button>
+            <div class="multi-state-button">
+                <button id="send_mail_button" class="button button--primary" type="submit" disabled>Send</button>
+            </div>
         </sm-form>
     </sm-popup>
     <sm-popup id="reply_mail_popup">
@@ -753,7 +764,8 @@
                 <sm-input id="search_contacts" type="search" placeholder="Search name or FLO ID"> </sm-input>
                 <div id="contacts_container" class="observe-empty-state"></div>
                 <div class="empty-state">
-                    <p>No contacts found.</p>
+                    <h4 class="margin-bottom-0-5">No contacts found</h4>
+                    <p>Use 'Add contact' to add new FLO ID as a contact.</p>
                 </div>
             </div>
         </div>
@@ -795,7 +807,7 @@
                 </div>
             </div>
             <sm-form class="hide">
-                <button class="button icon-only justify-self-start"
+                <button class="button icon-only back-button justify-self-start"
                     onclick="showChildElement('group_creation_process',0,{entry: slideInRight, exit: slideOutRight})">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
@@ -819,9 +831,11 @@
                 </svg>
                 <sm-input id="group_name_field" placeholder="Group name" animate required></sm-input>
                 <sm-textarea id="group_description_field" placeholder="Group description"></sm-textarea>
-                <sm-button id="create_group_button" variant="primary" type="submit" disabled>
-                    Create
-                </sm-button>
+                <div class="multi-state-button">
+                    <button id="create_group_button" class="button button--primary" type="submit" disabled>
+                        Create
+                    </button>
+                </div>
             </sm-form>
         </div>
     </sm-popup>
@@ -1101,9 +1115,8 @@
                     renderContactList(floGlobals.contacts)
                     break
                 case 'group_creation_popup':
-                    floGlobals.isCreatingGroup = true
                     const validContacts = []
-                    for (floID in floGlobals.contacts) {
+                    for (const floID in floGlobals.contacts) {
                         if (floGlobals.pubKeys.hasOwnProperty(floID)) {
                             validContacts.push(render.selectableContact(floID))
                         }
@@ -1128,7 +1141,7 @@
                     membersToAdd.clear()
                     break;
                 case 'group_creation_popup':
-                    floGlobals.isCreatingGroup = false
+                    showChildElement('group_creation_process', 0)
                     renderElem(getRef('select_contacts_container'), html``)
                     clearAllMembers()
                     break;
@@ -1723,6 +1736,34 @@
             }
         }
 
+        function buttonLoader(id, show) {
+            const button = typeof id === 'string' ? getRef(id) : id;
+            button.disabled = show;
+            const animOptions = {
+                duration: 200,
+                fill: 'forwards',
+                easing: 'ease'
+            }
+            if (show) {
+                button.animate([
+                    {
+                        clipPath: 'circle(100%)',
+                    },
+                    {
+                        clipPath: 'circle(0)',
+                    },
+                ], animOptions).onfinish = e => {
+                    e.target.commitStyles()
+                    e.target.cancel()
+                }
+                button.parentNode.append(createElement('sm-spinner'))
+            } else {
+                button.style = ''
+                const potentialTarget = button.parentNode.querySelector('sm-spinner')
+                if (potentialTarget) potentialTarget.remove();
+            }
+        }
+
         let isMobileView = false
         const mobileQuery = window.matchMedia('(max-width: 40rem)')
         function handleMobileChange(e) {
@@ -1735,6 +1776,7 @@
         }
         mobileQuery.addEventListener('change', handleMobileChange)
         handleMobileChange(mobileQuery)
+
 
         const slideInLeft = [
             {
@@ -1806,6 +1848,8 @@
             }
             const visibleElement = [...getRef(id).children].find(elem => !elem.classList.contains(mobileView ? 'hide-on-mobile' : 'hide'));
             if (visibleElement === getRef(id).children[index]) return;
+            visibleElement.getAnimations().forEach(anim => anim.cancel())
+            getRef(id).children[index].getAnimations().forEach(anim => anim.cancel())
             if (visibleElement) {
                 if (exit) {
                     visibleElement.animate(exit, animOptions).onfinish = () => {
@@ -1991,7 +2035,7 @@
                 }
                 const className = `contact ${type !== 'contact' ? type : ''} ${markUnread ? 'unread' : ''} interactive`
                 return html`
-                    <div class="${className}" .dataset=${{ floId: floID }} search-tags=${`${name}${floID}`} style=${`--contact-color: var(${contactColor(floID)})`}>
+                    <div class="${className}" .dataset=${{ floId: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
                         <div class="initial flex align-center">
                             ${initial}
                         </div>
@@ -2389,7 +2433,7 @@
         getRef('search_chats').addEventListener('input', function (e) {
             const contacts = getRef('chats_list').querySelectorAll('.contact')
             contacts.forEach(child => {
-                if (child.getAttribute('search-tags').toLowerCase().includes(this.value.toLowerCase())) {
+                if (`${child.dataset.name}${child.dataset.floId}`.toLowerCase().includes(this.value.toLowerCase())) {
                     child.classList.remove('hide')
                 } else {
                     child.classList.add('hide')
@@ -2402,7 +2446,7 @@
             for (contact in floGlobals.contacts) {
                 if (contact.toLowerCase().includes(this.value.toLowerCase()) || floGlobals.contacts[contact].toLowerCase().includes(this.value.toLowerCase())) {
                     contacts[contact] = floGlobals.contacts[contact]
-                    if (floGlobals.isCreatingGroup && !(contact in floGlobals.pubKeys))
+                    if (!(contact in floGlobals.pubKeys))
                         delete contacts[contact]
                 }
             }
@@ -2584,9 +2628,9 @@
         document.getElementById('create_group_button').addEventListener('click', () => {
             const groupName = getRef('group_name_field').value.trim()
             const groupDescription = getRef('group_description_field').value.trim()
+            buttonLoader('create_group_button', true)
             messenger.createGroup(groupName, groupDescription)
                 .then(groupInfo => {
-                    floGlobals.isCreatingGroup = false
                     getRef('chats_list').prepend(html.node`${render.contactCard(groupInfo.groupID, { type: 'group' })}`)
                     getRef('chats_list').children[0].click()
                     closePopup()
@@ -2600,6 +2644,7 @@
                     }
                 })
                 .catch(err => console.error(err))
+                .finally(() => buttonLoader('create_group_button', false))
         })
 
         let isEmojiPickerOpen = false
@@ -2988,9 +3033,7 @@
             }).catch(error => notify("Unable to read mail", "error", error))
         }
 
-        getRef('send_mail_button').addEventListener('click', sendMail)
-
-        function sendMail() {
+        getRef('send_mail_button').addEventListener('click', () => {
             let to = getRef('send_mail_to').value.split(",");
             let subject = getRef('subject_of_mail').value;
             let content = getRef('mail_content').value
@@ -3003,15 +3046,17 @@
                     if (!recipients.includes(tmp))
                         recipients.push(tmp);
                 })
+                buttonLoader('send_mail_button', true)
                 messenger.sendMail(subject, content, recipients).then(result => {
                     notify(`Mail(s) sent!`)
                     renderMailList(result)
                     closePopup()
                 }).catch(error => notify("Failed to send mail!", "error", error))
+                    .finally(() => buttonLoader('send_mail_button', false))
             } catch (error) {
                 notify(error, "error")
             }
-        }
+        })
 
         function replyMail() {
             let recipient = getRef('reply_mail_popup').dataset.to;
@@ -3382,19 +3427,22 @@
                         getRef('select_bg_button').textContent = 'Change background'
                         getRef('selected_bg_preview').classList.add('bg-preview--selected')
                         getRef('default_bg_preview').classList.remove('bg-preview--selected')
+                        getRef('backdrop_options').classList.remove('hide')
+                    } else {
+                        getRef('backdrop_options').classList.add('hide')
                     }
                     getRef('selected_bg_preview').classList.remove('hide')
                     getRef('selected_bg_preview').querySelector('img').src = url
                 }
                 const [bgOpacity, bgBlur] = await Promise.all([compactIDB.readData('userSettings', 'bgOpacity'), compactIDB.readData('userSettings', 'bgBlur')])
-                if (bgOpacity) {
+                if (bgOpacity !== undefined) {
                     getRef('backdrop_opacity').value = bgOpacity * 100
-                    getRef('backdrop_opacity_value').value = `${bgOpacity * 100}%`
+                    getRef('backdrop_opacity_value').value = `${parseInt(bgOpacity * 100)}%`
                     getRef('background_overlay').style.setProperty('--opacity', bgOpacity)
                 }
-                if (bgBlur) {
+                if (bgBlur !== undefined) {
                     getRef('backdrop_blur').value = bgBlur * 100
-                    getRef('backdrop_blur_value').value = `${bgBlur * 100}%`
+                    getRef('backdrop_blur_value').value = `${parseInt(bgBlur * 100)}%`
                     getRef('background_image').style.setProperty('--blur', `${bgBlur}rem`)
                     getRef('background_image').style.setProperty('--scale', bgBlur)
 
@@ -3410,6 +3458,7 @@
                 .then(async res => {
                     getRef('background_image').src = ''
                     removeClass(['#chat_view', '#mail', '#chat_preview'], 'has-bg-image')
+                    getRef('backdrop_options').classList.add('hide')
                 })
                 .catch(err => console.error(err))
         }
