@@ -523,6 +523,18 @@ ol {
 .margin-left-auto {
   margin-left: auto;
 }
+.margin-block-1 {
+  margin-block: 1rem;
+}
+.margin-block-1-5 {
+  margin-block: 1.5rem;
+}
+.margin-inline-1 {
+  margin-inline: 1rem;
+}
+.margin-inline-1-5 {
+  margin-inline: 1.5rem;
+}
 
 .icon-button {
   padding: 0.6rem;
@@ -648,11 +660,6 @@ ol {
   h5 {
     color: rgba(var(--text-color), 0.8);
   }
-}
-.card {
-  display: flex;
-  flex-direction: column;
-  margin: 1rem 0;
 }
 .tip {
   font-size: 0.9rem;
@@ -1308,6 +1315,21 @@ sm-button[variant="primary"] {
   position: relative;
   grid-template-rows: max-content 1fr;
 }
+#mail_sections {
+  overflow-y: auto;
+  & > * {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    & > * {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+    }
+  }
+}
 #contacts,
 #mails,
 #settings {
@@ -1368,8 +1390,6 @@ sm-button[variant="primary"] {
   flex-direction: column;
   width: 100%;
   height: 100%;
-}
-#chat_page {
   overflow: hidden;
 }
 #group_members_list {
@@ -2037,10 +2057,6 @@ sm-button[variant="primary"] {
   .mail-card.active {
     background: rgba(var(--text-color), 0.06);
   }
-  .card {
-    display: inline-flex;
-    width: auto;
-  }
   #contact_details_popup {
     &.is-group {
       --width: 52rem;
@@ -2083,10 +2099,6 @@ sm-button[variant="primary"] {
   .contact.active,
   .mail-card.active {
     background: rgba(var(--text-color), 0.06);
-  }
-  .card {
-    display: inline-flex;
-    width: auto;
   }
 }
 @media (hover: hover) {
