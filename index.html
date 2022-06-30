@@ -238,7 +238,7 @@
                                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
                             </svg>
                         </button>
-                        <sm-input id="search_chats" type="search" placeholder="Search"></sm-input>
+                        <sm-input id="search_chats" type="search" placeholder="Search FLO ID or name"></sm-input>
                     </div>
                 </header>
                 <button id="new_message_button" onclick="openPopup('new_message_popup')"
@@ -643,6 +643,7 @@
                 </svg>
             </button>
             <h4>Compose Mail</h4>
+            <p>You can send mail to multiple FLO IDs by entering comma separated IDs </p>
         </header>
         <sm-form>
             <div id="auto_complete_contact" class="flex flex-direction-column">
@@ -1302,7 +1303,11 @@
                     case 'time-only':
                         return finalHours;
                     case 'relative':
-                        return relativeTime.from(timestamp)
+                        // check if timestamp is older than a day
+                        if (Date.now() - new Date(timestamp) < 60 * 60 * 24 * 1000)
+                            return `${finalHours}`;
+                        else
+                            return relativeTime.from(timestamp)
                     default:
                         return `${month} ${date}, ${year} at ${finalHours}`;
                 }
@@ -2018,28 +2023,12 @@
                 }
                 if (type !== 'contact') {
                     //render chat card for newly added contact
-                    messenger.getChat(floID).then(chat => {
+                    getLastMessage(floID).then(lastMessage => {
+                        const { lastText, time } = lastMessage
                         const chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${floID}"]`)
                         if (chatCard && !chatCard.querySelector('.last-message')) {
-                            let lastMessage = Object.values(chat).reverse().find(({ message }) => message) || { message: '', time: 0 }
-                            if (type === 'group' && lastMessage.time === 0)
-                                lastMessage.time = messenger.groups[floID].created
-                            const amISender = type === 'chat' && lastMessage.category === 'sent' || type === 'group' && lastMessage.sender === myFloID
-                            let lastText = ''
-                            if (amISender) {
-                                lastText = `You: ${lastMessage.message}`
-                            } else {
-                                if (type === 'group') {
-                                    if (lastMessage.sender)
-                                        lastText = `${getContactName(lastMessage.sender)}: ${lastMessage.message}`
-                                    else
-                                        lastText = 'Group created'
-                                } else {
-                                    lastText = lastMessage.message
-                                }
-                            }
                             const timeAndOptions = html`
-                                <time class="time">${lastMessage.time ? getFormattedTime(lastMessage.time, 'relative') : ''}</time>
+                                <time class="time">${time ? getFormattedTime(time, 'relative') : ''}</time>
                                 <div class="span-2">
                                     <p class="last-message">${lastText}</p>
                                     <button class="menu">
@@ -2199,6 +2188,41 @@
                     </button>
                 `
             }
+        }
+
+        function getLastMessage(floID) {
+            return new Promise((resolve, reject) => {
+                let type
+                if (messenger.chats[floID])
+                    type = 'chat'
+                else if (messenger.groups[floID])
+                    type = 'group'
+                messenger.getChat(floID).then(chat => {
+                    let lastMessage = Object.values(chat).reverse().find(({ message }) => message) || { message: '', time: 0 }
+                    let { message, time, sender, category } = lastMessage
+                    if (type === 'group' && time === 0)
+                        lastMessage.time = messenger.groups[floID].created
+                    const amISender = type === 'chat' && category === 'sent' || type === 'group' && sender === myFloID
+                    lastMessage.lastMessage = ''
+                    if (messenger.blocked.has(floID)) {
+                        lastMessage.lastText = 'Blocked conversation'
+                    } else {
+                        if (amISender) {
+                            lastMessage.lastText = `You: ${lastMessage.message}`
+                        } else {
+                            if (type === 'group') {
+                                if (sender)
+                                    lastMessage.lastText = `${getContactName(sender)}: ${message}`
+                                else
+                                    lastMessage.lastText = 'Group created'
+                            } else {
+                                lastMessage.lastText = message
+                            }
+                        }
+                    }
+                    resolve(lastMessage)
+                }).catch(error => reject(error))
+            })
         }
 
         const hasURL = text => /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/.test(text)
@@ -2921,17 +2945,14 @@
         }
 
         async function renderChatList(chatOrder) {
-            const chats = []
-            chatOrder.forEach(floID => {
-                if (!messenger.blocked.has(floID)) {
-                    const markUnread = messenger.marked[floID]?.includes('unread')
-                    let type
-                    if (messenger.chats[floID])
-                        type = 'chat'
-                    else if (messenger.groups[floID])
-                        type = 'group'
-                    chats.push(render.contactCard(floID, { type, markUnread }))
-                }
+            const chats = chatOrder.map(floID => {
+                const markUnread = messenger.marked[floID]?.includes('unread')
+                let type
+                if (messenger.chats[floID])
+                    type = 'chat'
+                else if (messenger.groups[floID])
+                    type = 'group'
+                return render.contactCard(floID, { type, markUnread })
             })
             renderElem(getRef('chats_list'), html`${chats}`)
         }
@@ -3254,25 +3275,25 @@
         }
 
         function markAsUnread() {
-            clickedContact.chatCard.classList.add('unread')
-            messenger.addMark(clickedContact.floID, 'unread')
+            getRef('chats_list').querySelector(`.chat[data-flo-id="${floGlobals.activeFloID}"], .group[data-flo-id="${floGlobals.activeFloID}"]`).classList.add('unread')
+            messenger.addMark(floGlobals.activeFloID, 'unread')
             closePopup()
         }
 
         function markAsRead() {
-            clickedContact.chatCard.classList.remove('unread')
-            messenger.removeMark(clickedContact.floID, 'unread')
+            const chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floGlobals.activeFloID}"], .group[data-flo-id="${floGlobals.activeFloID}"]`);
+            chatCard.classList.remove('unread')
+            messenger.removeMark(floGlobals.activeFloID, 'unread')
             closePopup()
         }
 
         function blockUser() {
             getConfirmation('Block this FLO ID?', { message: `Are you sure to block this FLO ID?`, confirmText: 'Block', cancelText: 'Cancel' }).then(confirmed => {
                 if (confirmed) {
-                    messenger.blockUser(clickedContact.floID).then(result => {
-                        clickedContact.chatCard.remove()
-                        clickedContact.chatCard = ''
+                    messenger.blockUser(floGlobals.activeFloID).then(result => {
+                        const chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floGlobals.activeFloID}"], .group[data-flo-id="${floGlobals.activeFloID}"]`);
+                        chatCard.querySelector('.last-message').textContent = 'This user is blocked'
                         closePopup()
-                        getRef('chat_view').classList.add('hide')
                         notify('FLO ID blocked', 'success')
                     })
                 }
@@ -3281,8 +3302,16 @@
         function unblockUser(floID) {
             getConfirmation('Unblock this FLO ID?', { message: `Are you sure to unblock this FLO ID?`, confirmText: 'Unblock', cancelText: 'Cancel' }).then(confirmed => {
                 if (confirmed) {
-                    messenger.unblockUser(floID || clickedContact.floID).then(result => {
+                    messenger.unblockUser(floID || floGlobals.activeFloID).then(result => {
+                        const chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floGlobals.activeFloID}"], .group[data-flo-id="${floGlobals.activeFloID}"]`);
+                        getLastMessage(floGlobals.activeFloID).then(({ lastText }) => {
+                            chatCard.querySelector('.last-message').textContent = lastText
+                        }).catch(error => {
+                            console.log(error)
+                        })
+                        chatCard.querySelector('.last-message').textContent = 'This user is unblocked'
                         notify('FLo ID unblocked', 'success')
+                        closePopup()
                         render.blockedList()
                         renderChatList(messenger.getChatOrder())
                     })
@@ -3297,8 +3326,8 @@
         function clearChat() {
             getConfirmation('Clear chat?', { message: `Are you sure to clear this chat?`, confirmText: 'Clear', cancelText: 'Cancel' }).then(confirmed => {
                 if (confirmed) {
-                    messenger.clearChat(clickedContact.floID).then(result => {
-                        let chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${clickedContact.floID}"], .group[data-flo-id="${clickedContact.floID}"]`)
+                    messenger.clearChat(floGlobals.activeFloID).then(result => {
+                        let chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floGlobals.activeFloID}"], .group[data-flo-id="${floGlobals.activeFloID}"]`)
                         if (chatCard) {
                             chatCard.querySelector('.last-message').textContent = ''
                             chatCard.querySelector('.time').textContent = ''
@@ -3314,9 +3343,9 @@
         function deleteChat() {
             getConfirmation('Delete chat', { message: `Are you sure to delete this chat?`, confirmText: 'Delete', cancelText: 'No' }).then(confirmed => {
                 if (confirmed) {
-                    messenger.rmChat(clickedContact.floID).then(result => {
-                        clickedContact.chatCard.remove()
-                        clickedContact.chatCard = ''
+                    messenger.rmChat(floGlobals.activeFloID).then(result => {
+                        const chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floGlobals.activeFloID}"], .group[data-flo-id="${floGlobals.activeFloID}"]`);
+                        chatCard.remove()
                         closePopup()
                         getRef('chat_view').classList.add('hide')
                         notify('Chat deleted', 'success')
