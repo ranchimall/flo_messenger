@@ -1123,6 +1123,13 @@
                     }
                     renderElem(getRef('select_contacts_container'), html`${validContacts}`)
                     break;
+                case 'compose_mail_popup':
+                    const mailingContacts = []
+                    for (const floID in floGlobals.contacts) {
+                        mailingContacts.push(render.contactOnly(floID))
+                    }
+                    renderElem(getRef('mail_contact_list'), html`${mailingContacts}`)
+                    break;
             }
         })
 
@@ -1144,6 +1151,9 @@
                     showChildElement('group_creation_process', 0)
                     renderElem(getRef('select_contacts_container'), html``)
                     clearAllMembers()
+                    break;
+                case 'compose_mail_popup':
+                    renderElem(getRef('mail_contact_list'), html``)
                     break;
             }
             if (popupStack.items.length === 0) {
@@ -1777,6 +1787,19 @@
         mobileQuery.addEventListener('change', handleMobileChange)
         handleMobileChange(mobileQuery)
 
+        document.addEventListener("visibilitychange", handleVisibilityChange, false);
+        function handleVisibilityChange() {
+            if (document.visibilityState === "hidden") {
+                // code if page is hidden 
+            } else {
+                if (activeChat.floID) {
+                    if (!chatScrollInfo.isScrolledUp) {
+                        scrollToBottom()
+                    }
+                }
+            }
+        }
+
 
         const slideInLeft = [
             {
@@ -1996,7 +2019,7 @@
                 if (type !== 'contact') {
                     //render chat card for newly added contact
                     messenger.getChat(floID).then(chat => {
-                        const chatCard = getRef('chats_list').querySelector(`.contact[data-flo-id="${floID}"]`)
+                        const chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${floID}"]`)
                         if (chatCard && !chatCard.querySelector('.last-message')) {
                             let lastMessage = Object.values(chat).reverse().find(({ message }) => message) || { message: '', time: 0 }
                             if (type === 'group' && lastMessage.time === 0)
@@ -2024,7 +2047,7 @@
                                     </button>
                                 </div>
                                 `;
-                            getRef('chats_list').querySelector(`.contact[data-flo-id="${floID}"]`).append(html.node`${timeAndOptions}`)
+                            getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${floID}"]`).append(html.node`${timeAndOptions}`)
                         }
                     }).catch(error => console.error(error))
                     if (prepend) {
@@ -2165,6 +2188,16 @@
                 `
                 })
                 renderElem(getRef('blocked_list'), html`${blockedListCards}`)
+            },
+            contactOnly(floID) {
+                const name = getContactName(floID)
+                const initial = name.charAt(0)
+                return html`
+                    <button class="contact-list__item interactive" .dataset=${{ floId: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
+                        <div class="initial flex align-center"> ${initial} </div>
+                        <h4 class="name">${name}</h4>
+                    </button>
+                `
             }
         }
 
@@ -2254,6 +2287,7 @@
             updateMessageUI(data.messages)
         }
 
+        floGlobals.unconfirmedMessages = 0
         function updateMessageUI(messagesData) {
             for (let messageId in messagesData) {
                 console.log(messagesData[messageId])
@@ -2274,28 +2308,29 @@
                             chatCard.querySelector('.name').textContent = name
                     }
                     if ((floID || groupID) !== getRef('chats_list').children[0].dataset.floId) {
+                        const animOptions = {
+                            easing: 'ease',
+                            duration: 300,
+                            fill: 'forwards'
+                        }
                         const cloneContact = chatCard.cloneNode(true)
                         chatCard.remove()
+                        getRef('chats_list').animate([
+                            { transform: 'translateY(-2rem)' },
+                            { transform: 'none' },
+                        ], animOptions)
                         activeChat['chatCard'] = cloneContact
                         getRef('chats_list').prepend(cloneContact)
-                        animateTo(getRef('chats_list').children[0], [
-                            { transform: 'translateY(1rem)' },
-                            { transform: 'none' },
-                        ],
+                        cloneContact.animate([
                             {
-                                easing: 'ease',
-                                duration: 300
-                            }
-                        )
-                        animateTo(getRef('chats_list'), [
-                            { transform: 'translateY(-1rem)' },
-                            { transform: 'none' },
-                        ],
+                                transform: 'scale(0.8)',
+                                opacity: 0
+                            },
                             {
-                                easing: 'ease',
-                                duration: 300
-                            }
-                        )
+                                transform: 'none',
+                                opacity: 1
+                            },
+                        ], animOptions)
                     }
                 } else {
                     if (floID) {
@@ -2339,53 +2374,35 @@
                 }
             }
         }
-
-        window.addEventListener('focus', e => {
-            if (activeChat.chatCard) {
-                if (!chatScrollInfo.isScrolledUp) {
-                    scrollToBottom()
+        getRef('search_chats').addEventListener('keyup', e => {
+            if (e.code === 'ArrowDown') {
+                for (child of getRef('chats_list').children) {
+                    if (!child.classList.contains('hide')) {
+                        child.focus()
+                        break
+                    }
+                }
+            }
+            if (e.code === 'Enter' && getRef('contacts_container').firstElementChild) {
+                for (child of getRef('contacts_container').children) {
+                    if (!child.classList.contains('hide')) {
+                        child.click()
+                        break
+                    }
                 }
             }
         })
+        getRef('send_mail_to').addEventListener('keyup', e => {
+            if (e.code === 'ArrowDown' && getRef('mail_contact_list').firstElementChild) {
+                getRef('mail_contact_list').firstElementChild.focus()
+            }
+            if (e.code === 'Enter' && getRef('mail_contact_list').firstElementChild) {
+                getRef('mail_contact_list').firstElementChild.click()
 
-        document.addEventListener('keyup', e => {
-            if (e.target.closest('#send_mail_to')) {
-                if (e.code === 'ArrowDown') {
-                    for (child of getRef('mail_contact_list').children) {
-                        if (!child.classList.contains('hide')) {
-                            child.focus()
-                            break
-                        }
-                    }
-                }
-                if (e.code === 'Enter' && getRef('mail_contact_list').firstElementChild) {
-                    for (child of getRef('mail_contact_list').children) {
-                        if (!child.classList.contains('hide')) {
-                            child.click()
-                            break
-                        }
-                    }
-                }
             }
-            if (e.target.closest('#search_chats')) {
-                if (e.code === 'ArrowDown') {
-                    for (child of getRef('chats_list').children) {
-                        if (!child.classList.contains('hide')) {
-                            child.focus()
-                            break
-                        }
-                    }
-                }
-                if (e.code === 'Enter' && getRef('contacts_container').firstElementChild) {
-                    for (child of getRef('contacts_container').children) {
-                        if (!child.classList.contains('hide')) {
-                            child.click()
-                            break
-                        }
-                    }
-                }
-            }
-            if (e.target.closest('.contact')) {
+        })
+        getRef('auto_complete_contact').addEventListener('keyup', e => {
+            if (e.target.closest('.contact-list__item')) {
                 if (e.code === 'ArrowDown' || e.code === 'ArrowRight') {
                     if (document.activeElement.nextElementSibling)
                         document.activeElement.nextElementSibling.focus()
@@ -2404,6 +2421,25 @@
                 }
             }
         })
+        getRef('send_mail_to').addEventListener('input', function () {
+            getRef('mail_contact_list').classList.remove('hide')
+            if (this.value.trim !== '') {
+                [...getRef('mail_contact_list').children].forEach(child => {
+                    if (getContactName(child.dataset.floId).includes(this.value.trim())) {
+                        child.classList.remove('hide')
+                    } else {
+                        child.classList.add('hide')
+                    }
+                })
+            }
+        })
+        getRef('compose_mail_popup').addEventListener('click', e => {
+            if (e.target.closest('#send_mail_to') || e.target.closest('#mail_contact_list')) {
+                getRef('mail_contact_list').classList.remove('hide')
+            } else {
+                getRef('mail_contact_list').classList.add('hide')
+            }
+        })
 
         const chatScrollInfo = {};
         getRef('messages_container').addEventListener('scroll', debounce((e) => {
@@ -2416,24 +2452,10 @@
             }
         }, 100), { passive: true })
 
-        getRef('send_mail_to').addEventListener('input', function () {
-            getRef('mail_contact_list').classList.remove('hide')
-            if (this.value.trim !== '') {
-                for (child of getRef('mail_contact_list').children) {
-                    if (child.dataset.name.toUpperCase().indexOf(this.value.toUpperCase()) > -1) {
-                        child.classList.remove('hide')
-                    }
-                    else {
-                        child.classList.add('hide')
-                    }
-                }
-            }
-        })
-
         getRef('search_chats').addEventListener('input', function (e) {
             const contacts = getRef('chats_list').querySelectorAll('.contact')
             contacts.forEach(child => {
-                if (`${child.dataset.name}${child.dataset.floId}`.toLowerCase().includes(this.value.toLowerCase())) {
+                if (`${getContactName(child.dataset.floId)}${child.dataset.floId}`.toLowerCase().includes(this.value.toLowerCase())) {
                     child.classList.remove('hide')
                 } else {
                     child.classList.add('hide')
@@ -2452,13 +2474,7 @@
             }
             renderContactList(contacts)
         })
-
         document.addEventListener('click', e => {
-            if (e.target.closest('#send_mail_to') || e.target.closest('#mail_contact_list')) {
-                getRef('mail_contact_list').classList.remove('hide')
-            } else {
-                getRef('mail_contact_list').classList.add('hide')
-            }
             // detect click outside emoji panel and emoji button
             if (isEmojiPickerOpen && (!e.target.closest('#emoji_picker') && !e.target.closest('#emoji_toggle') && !e.target.closest('#type_message'))) {
                 toggleEmoji('hide')
@@ -2503,8 +2519,8 @@
         })
 
         getRef('mail_contact_list').addEventListener('click', e => {
-            if (e.target.closest('.contact')) {
-                getRef('send_mail_to').value = e.target.closest('.contact').dataset.floId
+            if (e.target.closest('.contact-list__item')) {
+                getRef('send_mail_to').value = e.target.closest('.contact-list__item').dataset.floId
                 getRef('mail_contact_list').classList.add('hide')
             }
         })
@@ -2834,7 +2850,6 @@
                 notify("Retrive data Unsuccessful!", "error", error);
             })
         })
-        floGlobals.unconfirmedMessages = 0
         function sendMessage() {
             if (!isMobileView)
                 getRef('type_message').focusIn()
@@ -2960,6 +2975,7 @@
 
         floGlobals.typedMessages = {}
         async function viewConversation(floID) {
+            floGlobals.unconfirmedMessages = 0
             // clear rendered date cards if any 
             renderedDates = {}
             // save typed message from previous chat
@@ -3282,6 +3298,11 @@
             getConfirmation('Clear chat?', { message: `Are you sure to clear this chat?`, confirmText: 'Clear', cancelText: 'Cancel' }).then(confirmed => {
                 if (confirmed) {
                     messenger.clearChat(clickedContact.floID).then(result => {
+                        let chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${clickedContact.floID}"], .group[data-flo-id="${clickedContact.floID}"]`)
+                        if (chatCard) {
+                            chatCard.querySelector('.last-message').textContent = ''
+                            chatCard.querySelector('.time').textContent = ''
+                        }
                         renderElem(getRef('messages_container'), html``)
                         closePopup()
                         notify('Chat cleared', 'success')
