@@ -1204,9 +1204,6 @@ sm-button[variant="primary"] {
     font-weight: 400;
     max-width: 90%;
   }
-  .back {
-    margin-left: -0.5rem;
-  }
   .mail-subject,
   .mail-content {
     overflow-wrap: break-word;
@@ -1768,19 +1765,6 @@ sm-button[variant="primary"] {
   .icon {
     margin-right: 1em;
     width: 1em;
-  }
-}
-.back {
-  padding: 0.7rem;
-  height: 2.4rem;
-  width: 2.4rem;
-  margin-left: -0.5rem;
-  cursor: pointer;
-  stroke-width: 8;
-  opacity: 0.8;
-  -webkit-tap-highlight-color: transparent;
-  &:hover {
-    opacity: 1;
   }
 }
 #settings {

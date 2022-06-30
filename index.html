@@ -1409,7 +1409,8 @@
         async function showPage(targetPage, options = {}) {
             const { firstLoad, hashChange } = options
             let pageId
-            let subPageId
+            let subPageId1
+            let subPageId2
             let params = {}
             let searchParams
             if (targetPage === '') {
@@ -1425,11 +1426,13 @@
                         searchParams = splitAddress.pop()
                         const pages = splitAddress.pop().split('/')
                         pageId = pages[1]
-                        subPageId = pages[2]
+                        subPageId1 = pages[2]
+                        subPageId2 = pages[3]
                     } else {
                         const pages = targetPage.split('/')
                         pageId = pages[1]
-                        subPageId = pages[2]
+                        subPageId1 = pages[2]
+                        subPageId2 = pages[3]
                     }
                 } else {
                     pageId = targetPage
@@ -1458,7 +1461,7 @@
                     targetPage = 'sign_up'
                     break;
                 case 'chat_page':
-                    if (subPageId && activeChat.floID) {
+                    if (subPageId1 && activeChat.floID) {
                         getRef('chat_view').classList.remove('hide')
                         getRef('chat_view').classList.remove('hide-on-mobile')
                         getRef('contacts').classList.add('hide-on-mobile')
@@ -1473,9 +1476,9 @@
                     removeNotificationBadge('chat_page_button')
                     break;
                 case 'mail_page':
-                    if (subPageId) {
+                    if (subPageId1) {
                         let childIndex
-                        switch (subPageId) {
+                        switch (subPageId1) {
                             case 'inbox':
                                 childIndex = 0
                                 break;
@@ -1484,13 +1487,25 @@
                                 break;
                         }
                         showChildElement('mail_sections', childIndex)
-                        getRef("mail_type_selector").value = subPageId
+                        getRef("mail_type_selector").value = subPageId1
+                        if (subPageId2 && activeMail) {
+                            getRef('mail').classList.remove('hide')
+                            getRef('mail').classList.remove('hide-on-mobile')
+                            getRef('mails').classList.add('hide-on-mobile')
+                            getRef('main_navbar').classList.add('hide-on-mobile')
+                        } else {
+                            history.replaceState(null, null, `#/mail_page/${subPageId1}`);
+                            getRef('mail').classList.add('hide-on-mobile')
+                            getRef('mails').classList.remove('hide-on-mobile')
+                            activeMail = ''
+                            getRef('main_navbar').classList.remove('hide-on-mobile')
+                        }
                     }
                     removeNotificationBadge('mail_page_button')
                     break;
                 case 'settings':
-                    if (subPageId) {
-                        showPanel(subPageId)
+                    if (subPageId1) {
+                        showPanel(subPageId1)
                     } else {
                         hidePanel()
                     }
@@ -1936,8 +1951,7 @@
     </script>
 
     <script>
-        let activeMailPage = getRef('mails'),
-            activeChat = {},
+        let activeChat = {},
             activeMail,
             frag = document.createDocumentFragment()
 
@@ -1986,17 +2000,18 @@
                     senderName = getContactName(from);
                     floID = from
                 }
+                const backURL = `#/mail_page/${getRef('mail_type_selector').value}`
                 return html.node`
                     <div class="mail">
                         <header class="mail-header flex flex-direction-column">
                             <div class="flex space-between align-center">
                                 <div class="flex align-center">
-                                    <button onclick="goto('mails')" class="back hide-on-desktop">
-                                        <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
+                                    <a href="${backURL}" class="button icon-only back-button hide-on-desktop">
+                                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
                                             <path d="M0 0h24v24H0V0z" fill="none"></path>
                                             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
                                         </svg>
-                                    </button>
+                                    </a>
                                     <div class="initial flex align-center" style=${`--contact-color: var(${contactColor(floID)})`}>${senderName.charAt(0)}</div>
                                 </div>
                                 <time class="date justify-right">${getFormattedTime(timestamp)}</time>
@@ -2756,19 +2771,11 @@
             if (this.checked) {
                 isEnterSend = true
                 localStorage.setItem("isEnterSend", 'true');
-            }
-            else {
+            } else {
                 isEnterSend = false
                 localStorage.setItem("isEnterSend", 'false');
             }
         })
-
-        function goto(page) {
-            getRef('mail').classList.add('hide-on-mobile')
-            getRef('mails').classList.remove('hide-on-mobile')
-            activeMailPage = getRef('mails')
-            getRef('main_navbar').classList.remove('hide-on-mobile')
-        }
 
         getRef("mail_type_selector").addEventListener('change', function (e) {
             location.hash = `#/mail_page/${e.target.value}`
@@ -2781,12 +2788,6 @@
                     activeMail.classList.remove('active')
                 e.target.closest(".mail-card").classList.add('active')
                 activeMail = e.target.closest(".mail-card")
-                if (activeMailPage.id === 'mails') {
-                    getRef('mail').classList.remove('hide-on-mobile')
-                    getRef('mails').classList.add('hide-on-mobile')
-                    activeMailPage = getRef('mail')
-                    getRef('main_navbar').classList.add('hide-on-mobile')
-                }
             }
         })
 
@@ -2808,8 +2809,7 @@
                 if (e.code === "Enter" && e.shiftKey) {
                     e.preventDefault()
                     getRef('type_message').value += '\r\n';
-                }
-                else if (!e.shiftKey && e.code === "Enter" && isEnterSend) {
+                } else if (!e.shiftKey && e.code === "Enter" && isEnterSend) {
                     e.preventDefault()
                     sendMessage()
                 }
@@ -3066,7 +3066,7 @@
                     getRef("show_reply_popup").classList.remove("hide");
                 }
                 messenger.removeMark(mailRef, "unread");
-                getRef('mail').classList.remove('hide')
+                location.hash = `#/mail_page/${getRef("mail_type_selector").value}/mail`
             }).catch(error => notify("Unable to read mail", "error", error))
         }
 
