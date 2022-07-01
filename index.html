@@ -1913,6 +1913,7 @@
         }
         function getSignedIn(passwordType) {
             return new Promise((resolve, reject) => {
+                showPage('landing')
                 if (passwordType === 'PIN/Password') {
                     getRef('private_key_field').removeAttribute('data-private-key');
                     getRef('private_key_field').setAttribute('placeholder', 'PIN');
