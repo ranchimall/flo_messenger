@@ -270,6 +270,7 @@ strip-select {
   padding: 0.3rem;
 }
 strip-option {
+  position: relative;
   font-size: 0.8rem;
   --border-radius: 0.2rem;
   user-select: none;
@@ -325,7 +326,7 @@ ol {
   text-overflow: ellipsis;
 }
 
-.breakable {
+.wrap-around {
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
@@ -1290,13 +1291,14 @@ sm-button[variant="primary"] {
   position: absolute;
   top: 0;
   right: 0;
+  min-width: 2.7ch;
   font-size: 0.8rem;
-  padding: 0.3rem;
+  padding: 0.2rem;
   background: var(--danger-color);
   color: rgba(var(--background-color), 1);
-  aspect-ratio: 1/1;
+  line-height: 1;
   font-weight: 700;
-  border-radius: 0.3rem;
+  border-radius: 1rem;
   margin: 0.3rem;
 }
 #auto_complete_contact {
@@ -1358,6 +1360,15 @@ sm-button[variant="primary"] {
 }
 #mail_sections {
   overflow-y: auto;
+}
+#mail_type_selector {
+  width: fit-content;
+  strip-option {
+    --padding: 0.5rem 1.2rem;
+    .badge {
+      margin: 0rem;
+    }
+  }
 }
 #contacts,
 #mails,
@@ -1596,6 +1607,9 @@ sm-button[variant="primary"] {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .group-icon {
+    padding: 0.1rem;
   }
 }
 #scroll_to_bottom {
@@ -2080,6 +2094,10 @@ sm-button[variant="primary"] {
       padding: 1rem 4rem;
       padding-top: 0;
     }
+  }
+  #chat_page,
+  #mail_page {
+    grid-template-columns: 21rem 1fr;
   }
 }
 @media only screen and (min-width: 1280px) {

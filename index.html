@@ -310,7 +310,7 @@
         <section class="inner-page hide" id="mail_page">
             <div id="mails" class="grid">
                 <header class="grid header">
-                    <div class="flex align-center">
+                    <div class="flex align-center space-between">
                         <h4>Mail</h4>
                         <strip-select id="mail_type_selector">
                             <strip-option value="inbox" selected>Inbox </strip-option>
@@ -696,11 +696,11 @@
                     <p id="last_interaction_time"></p>
                 </div>
                 <div class="popup-section">
-                    <h5>FLO ID</h5>
+                    <h5 id="flo_id_type">FLO ID</h5>
                     <sm-copy id="contact_flo_id"></sm-copy>
                 </div>
                 <div id="group_description_card" class="hide">
-                    <h4 class="h4">Group description</h4>
+                    <h5>Group description</h5>
                     <text-field id="group_description"></text-field>
                 </div>
                 <fieldset id="contact_options"></fieldset>
@@ -1081,6 +1081,7 @@
                         getRef('group_members_card').classList.remove('hide')
                         getRef('group_description_card').classList.remove('hide')
                         getRef('edit_group_button').dataset.groupId = floID;
+                        getRef('flo_id_type').textContent = 'Group FLO ID'
                         if (isAdmin) {
                             getRef('contact_name').disabled = false
                             getRef('group_description').disabled = false
@@ -1091,6 +1092,7 @@
                             getRef('edit_group_button').classList.add('hide')
                         }
                     } else {
+                        getRef('flo_id_type').textContent = 'FLO ID'
                         getRef('contact_name').disabled = false
                         getRef('contact_initial').textContent = getContactName(floID).charAt(0)
                         getRef("last_interaction_time").textContent = ``;
@@ -1403,7 +1405,7 @@
             };
         }
 
-        const pagesData = {
+        const appState = {
             params: {},
             openedPages: new Set(),
         }
@@ -1462,19 +1464,40 @@
                     targetPage = 'sign_up'
                     break;
                 case 'chat_page':
-                    if (subPageId1 && activeChat.floID) {
+                    if (subPageId1 && params.floId) {
+                        getRef('chats_list').querySelectorAll('.active').forEach(child => child.classList.remove('active'))
+                        const targetChatCard = getChatCard(params.floId)
+                        if (targetChatCard) {
+                            targetChatCard.classList.remove('unread')
+                            document.title = `FLO Messenger`
+                            targetChatCard.classList.add('active')
+                        }
+                        await viewConversation(params.floId)
+                        getRef('messages_container').animate([
+                            { opacity: 0 },
+                            { opacity: 1 },
+                        ], {
+                            duration: 150,
+                            fill: 'forwards',
+                            easing: 'ease-out',
+                        })
+
                         getRef('chat_view').classList.remove('hide')
                         getRef('chat_view').classList.remove('hide-on-mobile')
                         getRef('contacts').classList.add('hide-on-mobile')
                         getRef('main_navbar').classList.add('hide-on-mobile')
                     } else {
-                        history.replaceState(null, null, '#/chat_page');
-                        getRef('chat_view').classList.add('hide-on-mobile')
-                        getRef('contacts').classList.remove('hide-on-mobile')
-                        activeChat = {}
-                        getRef('main_navbar').classList.remove('hide-on-mobile')
+                        if (activeChat.floID && !isMobileView) {
+                            history.replaceState(null, null, `#/chat_page/messages?floId=${activeChat.floID}`);
+                        } else {
+                            history.replaceState(null, null, '#/chat_page');
+                            getRef('chat_view').classList.add('hide-on-mobile')
+                            getRef('contacts').classList.remove('hide-on-mobile')
+                            activeChat = {}
+                            getRef('main_navbar').classList.remove('hide-on-mobile')
+                        }
                     }
-                    removeNotificationBadge('chat_page_button')
+                    removeNotificationBadge('#chat_page_button')
                     break;
                 case 'mail_page':
                     if (subPageId1) {
@@ -1502,7 +1525,7 @@
                             getRef('main_navbar').classList.remove('hide-on-mobile')
                         }
                     }
-                    removeNotificationBadge('mail_page_button')
+                    removeNotificationBadge('#mail_page_button')
                     break;
                 case 'settings':
                     if (subPageId1) {
@@ -1515,7 +1538,7 @@
                     break;
             }
 
-            if (pagesData.lastPage !== pageId) {
+            if (appState.lastPage !== pageId) {
                 const animOptions = {
                     duration: 100,
                     fill: 'forwards',
@@ -1620,11 +1643,11 @@
                         easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                     }).onfinish = () => {
                     }
-                pagesData.lastPage = pageId
+                appState.lastPage = pageId
             }
             if (params)
-                pagesData.params = params
-            pagesData.openedPages.add(pageId)
+                appState.params = params
+            appState.openedPages.add(pageId)
 
         }
         const indicatorObserver = new IntersectionObserver(entries => {
@@ -2029,7 +2052,7 @@
                 `
             },
             contactCard(floID, options = {}) {
-                let { type, prepend = false, markUnread = false } = options
+                let { type, prepend = false, markUnread = false, ref } = options
                 let name = getContactName(floID)
                 let initial
                 if (type === 'group') {
@@ -2042,7 +2065,7 @@
                     //render chat card for newly added contact
                     getLastMessage(floID).then(lastMessage => {
                         const { lastText, time } = lastMessage
-                        const chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${floID}"]`)
+                        const chatCard = getChatCard(floID)
                         if (chatCard && !chatCard.querySelector('.last-message')) {
                             const timeAndOptions = html`
                                 <time class="time">${time ? getFormattedTime(time, 'relative') : ''}</time>
@@ -2053,17 +2076,16 @@
                                     </button>
                                 </div>
                                 `;
-                            getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${floID}"]`).append(html.node`${timeAndOptions}`)
+                            chatCard.append(html.node`${timeAndOptions}`)
                         }
                     }).catch(error => console.error(error))
                     if (prepend) {
-                        activeChat['floID'] = floID
-                        if (activeChat['chatCard'])
-                            activeChat['chatCard'].classList.remove('active')
+                        activeChat.floID = floID
+                        getRef('chats_list').querySelectorAll('.active').forEach(child => child.classList.remove('active'))
                     }
                 }
                 const className = `contact ${type !== 'contact' ? type : ''} ${markUnread ? 'unread' : ''} interactive`
-                return html`
+                return html.for(ref, floID)`
                     <div class="${className}" .dataset=${{ floId: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
                         <div class="initial flex align-center">
                             ${initial}
@@ -2093,7 +2115,7 @@
                     let senderName = null
                     if (sender) {
                         if (sender !== myFloID && lastSender !== sender)
-                            senderName = html.node`<div class="sender-name" style=${`color: var(${contactColor(sender)})`}>${getContactName(sender)}</div>`
+                            senderName = html.node`<a href="${`#/chat_page/messages?floId=${sender}`}" class="sender-name" style=${`color: var(${contactColor(sender)})`}>${getContactName(sender)}</a>`
                         lastSender = sender
                     }
                     let messageContent = document.createDocumentFragment()
@@ -2172,7 +2194,7 @@
                                 <div class="initial flex align-center">
                                     ${initial}
                                 </div>
-                                <h4 class="name">${name}</h4>
+                                <h4 class="name wrap-around">${name}</h4>
                                 ${isAdmin ? html`<p class="admin-tag">Group admin</p>` : ''}
                             </div>
                         
@@ -2263,9 +2285,10 @@
                 fill: 'forwards',
                 easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
             }
-            if (!getRef(elem).querySelector('.badge')) {
+            const target = typeof elem === 'string' ? document.querySelector(elem) : elem
+            if (!target.querySelector('.badge')) {
                 const badge = html.node`<span class="badge">${text}</span>`
-                getRef(elem).append(badge)
+                target.append(badge)
                 badge.animate([
                     {
                         transform: 'scale(0) translateY(0.5rem)'
@@ -2275,7 +2298,7 @@
                     },
                 ], animOptions)
             } else {
-                const badge = getRef(elem).querySelector('.badge');
+                const badge = target.querySelector('.badge');
                 badge.textContent = parseInt(badge.textContent) + parseFloat(text);
                 badge.animate([
                     { transform: 'scale(1)' },
@@ -2291,8 +2314,9 @@
                 fill: 'forwards',
                 easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
             }
-            if (getRef(elem).querySelector('.badge')) {
-                const badge = getRef(elem).querySelector('.badge')
+            const target = typeof elem === 'string' ? document.querySelector(elem) : elem
+            if (target.querySelector('.badge')) {
+                const badge = target.querySelector('.badge')
                 badge.animate([
                     {
                         transform: 'scale(1) translateY(0)'
@@ -2308,41 +2332,49 @@
 
 
         function renderDirectUI(data) {
-            if (Object.keys(data.messages).length) {
-                if (pagesData.lastPage !== 'chat_page') {
-                    document.title = `New message(s)`
-                    addNotificationBadge('chat_page_button', Object.keys(data.messages).length)
-                }
+            if (Object.keys(data.messages).length && appState.lastPage !== 'chat_page') {
+                document.title = `New message(s)`
+                addNotificationBadge('#chat_page_button', Object.keys(data.messages).length)
             }
-            if (Object.keys(data.mails).length) {
-                if (pagesData.lastPage !== 'mail_page') {
-                    document.title = `New mail(s)`
-                    addNotificationBadge('mail_page_button', Object.keys(data.mails).length)
-                }
+            if (Object.keys(data.mails).length && appState.lastPage !== 'mail_page') {
+                document.title = `New mail(s)`
+                addNotificationBadge('#mail_page_button', Object.keys(data.mails).length)
             }
             updateMessageUI(data.messages)
             renderMailList(data.mails, true)
         }
 
         function renderGroupUI(data) {
+            if (Object.keys(data.messages).length && appState.lastPage !== 'chat_page') {
+                document.title = `New message(s)`
+                addNotificationBadge('#chat_page_button', Object.keys(data.messages).length)
+            }
             updateMessageUI(data.messages)
         }
 
-        floGlobals.unconfirmedMessages = 0
-        function updateMessageUI(messagesData) {
+        function updateMessageUI(messagesData, sentByMe = false) {
             for (let messageId in messagesData) {
                 console.log(messagesData[messageId])
                 const { category, floID, time, message, sender, groupID, admin, name } = messagesData[messageId]
+                // code to run if a chat is opened
                 if (activeChat && activeChat.floID === (floID || groupID)) {
-                    if (floGlobals.unconfirmedMessages === 0)
+                    if (!sentByMe && sender && sender === myFloID) {
+                        // if message is sent by me, then dont add it to the chat
+                    } else {
                         getRef('messages_container').append(render.messageBubble(messagesData[messageId]))
+                    }
                     if (chatScrollInfo['isScrolledUp']) {
 
                     } else {
                         scrollToBottom()
                     }
+                    // remove encryption badge if it exists
+                    if (!groupID && floGlobals.checkEncryption[activeChat.floID] && floID !== myFloID) {
+                        getRef('warn_no_encryption').remove()
+                        delete floGlobals.checkEncryption[activeChat.floID]
+                    }
                 }
-                let chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${groupID}"]`)
+                let chatCard = getChatCard(floID || groupID)
                 if (chatCard) {
                     if (admin) {
                         if (name)
@@ -2360,7 +2392,6 @@
                             { transform: 'translateY(-2rem)' },
                             { transform: 'none' },
                         ], animOptions)
-                        activeChat['chatCard'] = cloneContact
                         getRef('chats_list').prepend(cloneContact)
                         cloneContact.animate([
                             {
@@ -2376,13 +2407,14 @@
                 } else {
                     if (floID) {
                         messenger.addChat(floID)
-                        getRef('chats_list').prepend(html.node`${render.contactCard(floID, { type: 'chat', prepend: true, markUnread: true })}`)
+                        getRef('chats_list').prepend(html.node`${render.contactCard(floID, { type: 'chat', prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
                     } else if (groupID) {
-                        getRef('chats_list').prepend(html.node`${render.contactCard(groupID, { type: 'group', prepend: true, markUnread: true })}`)
+                        getRef('chats_list').prepend(html.node`${render.contactCard(groupID, { type: 'group', prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
                     }
                     chatCard = getRef('chats_list').children[0]
-                    chatCard.classList.add('active')
-                    activeChat['chatCard'] = getRef('chats_list').children[0]
+                    if (sentByMe) {
+                        chatCard.classList.add('active')
+                    }
                 }
                 let finalMessage
                 if (messenger.groups && messenger.groups[groupID]) {
@@ -2406,12 +2438,12 @@
                             messenger.removeMark((floID || groupID), 'unread')
                             setTimeout(() => {
                                 document.title = 'FLO Messenger'
-                                activeChat.chatCard.classList.remove('unread')
+                                getChatCard(floID || groupID).classList.remove('unread')
                             }, 1000);
                         }
                     }
                 } else {
-                    getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${groupID}"]`).classList.add('unread')
+                    getChatCard(floID || groupID).classList.add('unread')
                 }
             }
         }
@@ -2580,27 +2612,18 @@
                 floGlobals.activeFloID = clickedContact.floID
                 openPopup('contact_details_popup')
             } else {
-                e.delegateTarget.classList.remove('unread')
-                if (activeChat['chatCard'] === e.delegateTarget && !isMobileView) return // check if chat is already active and if not, open it
-                document.title = `FLO Messenger`
-                viewConversation(e.delegateTarget.dataset.floId)
-                getRef('chats_list').querySelectorAll('.active').forEach(child => child.classList.remove('active'))
-                e.delegateTarget.classList.add('active')
-                activeChat['chatCard'] = e.delegateTarget
+                location.hash = `#/chat_page/messages?floId=${clickedContact.floID}`
             }
         })
-        getRef('contacts_container').addEventListener('click', e => {
-            //detect click on chat cards
-            if (e.target.closest(".contact")) {
-                let contact = e.target.closest(".contact")
-                const floID = contact.dataset.floId
-                let chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${floID}"]`);
-                if (!chatCard) {
-                    chatCard = getRef('chats_list').prepend(html.node`${render.contactCard(floID, { type: 'chat' })}`)
-                }
-                getRef('chats_list').firstElementChild.click()
-                closePopup()
+        delegate(getRef('contacts_container'), 'click', '.contact', e => {
+            const floID = e.delegateTarget.dataset.floId
+            let chatCard = getChatCard(floID)
+            if (!chatCard) {
+                getRef('chats_list').prepend(html.node`${render.contactCard(floID, { type: 'chat', ref: getRef('chats_list') })}`);
+                chatCard = getRef('chats_list').firstElementChild
             }
+            chatCard.click()
+            closePopup()
         })
 
         function transformScroll(event) {
@@ -2688,7 +2711,7 @@
             buttonLoader('create_group_button', true)
             messenger.createGroup(groupName, groupDescription)
                 .then(groupInfo => {
-                    getRef('chats_list').prepend(html.node`${render.contactCard(groupInfo.groupID, { type: 'group' })}`)
+                    getRef('chats_list').prepend(html.node`${render.contactCard(groupInfo.groupID, { type: 'group', ref: getRef('chats_list') })}`);
                     getRef('chats_list').children[0].click()
                     closePopup()
                     notify('Group created', 'success')
@@ -2780,14 +2803,16 @@
         })
 
         getRef("mail_type_selector").addEventListener('change', function (e) {
+            removeNotificationBadge(getRef("mail_type_selector").querySelector(`[value="${e.target.value}"]`))
             location.hash = `#/mail_page/${e.target.value}`
         })
         getRef("mail_sections").addEventListener('click', function (e) {
             if (e.target.closest(".mail-card")) {
                 e.target.closest(".mail-card").classList.remove('unread')
                 viewMail(e.target.closest(".mail-card").dataset.name);
-                if (activeMail)
-                    activeMail.classList.remove('active')
+                getRef("mail_sections").querySelectorAll(".mail-card").forEach(card => {
+                    card.classList.remove('active')
+                })
                 e.target.closest(".mail-card").classList.add('active')
                 activeMail = e.target.closest(".mail-card")
             }
@@ -2876,11 +2901,10 @@
                 notify("Retrive data Unsuccessful!", "error", error);
             })
         })
-        function sendMessage() {
+        async function sendMessage() {
             if (!isMobileView)
                 getRef('type_message').focusIn()
-            let receiver = activeChat['floID']
-            let container;
+            let receiver = activeChat.floID
             let message = getRef('type_message').value.trim();
             getRef('type_message').value = ''
             if (message === '') return
@@ -2893,21 +2917,21 @@
                 msgObj['floID'] = activeChat.floID
                 msgObj['category'] = 'sent'
             }
-            updateMessageUI({ msgObj })
-            if (activeChat.isGroup) {
-                floGlobals.unconfirmedMessages += 1
-                messenger.sendGroupMessage(message, receiver).then(data => {
-                    floGlobals.unconfirmedMessages -= 1
+            updateMessageUI({ msgObj }, true)
+            try {
+                if (activeChat.isGroup) {
+                    await messenger.sendGroupMessage(message, receiver)
+                } else
+                    await messenger.sendMessage(message, receiver)
+
+                if (getRef('messages_container').querySelector(`.unconfirmed`))
                     getRef('messages_container').querySelector(`.unconfirmed`).classList.remove('unconfirmed')
-                    activeChat.chatCard.querySelector('.last-message').textContent = `You: ${message}`
-                    activeChat.chatCard.querySelector('.time').textContent = getFormattedTime(Date.now(), 'relative')
-                }).catch(error => notify(error, "error"));
-            } else
-                messenger.sendMessage(message, receiver).then(data => {
-                    getRef('messages_container').querySelector(`.unconfirmed`).classList.remove('unconfirmed')
-                    activeChat.chatCard.querySelector('.last-message').textContent = `You: ${message}`
-                    activeChat.chatCard.querySelector('.time').textContent = getFormattedTime(Date.now(), 'relative')
-                }).catch(error => notify(error, "error"));
+                const chatCard = getChatCard(activeChat.floID)
+                chatCard.querySelector('.last-message').textContent = `You: ${message}`
+                chatCard.querySelector('.time').textContent = getFormattedTime(Date.now(), 'relative')
+            } catch (err) {
+                notify(err, "error")
+            }
         }
 
         function removeElement(element) {
@@ -2931,9 +2955,15 @@
                 return
             }
             messenger.storeContact(floID, name).then(result => {
-                renderContactList()
                 closePopup()
                 notify(`Added Contact: ${floID}`)
+                const chatCard = getChatCard(floID)
+                if (chatCard)
+                    chatCard.querySelector('.name').textContent = name
+                if (popupStack.peek().popup.id === 'contact_details_popup') {
+                    getRef('contact_name').value = name
+                    getRef('add_as_contact_option').remove()
+                }
             }).catch(error => notify(error, "error"));
         }
 
@@ -2941,7 +2971,7 @@
             const contacts = []
             for (floID in contactList) {
                 let isSelected = selectedGroupMembers.has(floID)
-                contacts.push(render.contactCard(floID, { type: 'contact', isSelected }))
+                contacts.push(render.contactCard(floID, { type: 'contact', isSelected, ref: getRef('contacts_container') }))
             }
             renderElem(getRef('contacts_container'), html`${contacts}`)
         }
@@ -2954,7 +2984,7 @@
                     type = 'chat'
                 else if (messenger.groups[floID])
                     type = 'group'
-                return render.contactCard(floID, { type, markUnread })
+                return render.contactCard(floID, { type, markUnread, ref: getRef('chats_list') })
             })
             renderElem(getRef('chats_list'), html`${chats}`)
         }
@@ -2968,9 +2998,10 @@
         }
 
         function scrollToBottom(smooth = false) {
-            if (activeChat.chatCard) {
+            if (activeChat.floID) {
                 messenger.removeMark(activeChat.floID, 'unread')
-                activeChat.chatCard.classList.remove('unread')
+                if (getChatCard(activeChat.floID))
+                    getChatCard(activeChat.floID).classList.remove('unread')
             }
             getRef('scroll_to_bottom').classList.remove('new-message')
             getRef('messages_container').scrollTo({ top: getRef('messages_container').scrollHeight, behavior: smooth ? 'smooth' : undefined })
@@ -2997,48 +3028,65 @@
         }
 
         floGlobals.typedMessages = {}
-        async function viewConversation(floID) {
-            floGlobals.unconfirmedMessages = 0
-            // clear rendered date cards if any 
-            renderedDates = {}
-            // save typed message from previous chat
-            if (getRef('type_message').value.trim() !== '') {
-                floGlobals.typedMessages[activeChat.floID] = getRef('type_message').value
-            } else {
-                delete floGlobals.typedMessages[activeChat.floID]
-            }
-            // restore typed message if any
-            getRef('type_message').value = floGlobals.typedMessages[floID] || ''
-            activeChat.floID = floID
-            activeChat['isGroup'] = messenger.groups.hasOwnProperty(floID)
-            getRef("receiver_name").textContent = getContactName(floID);
-            if (activeChat.isGroup) {
-                getRef("receiver_initial").innerHTML = ` <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
-            } else {
-                getRef("receiver_initial").textContent = getContactName(floID).charAt(0);
-            }
-            getRef("receiver_initial").setAttribute('style', `--contact-color: var(${contactColor(floID)})`)
-            renderMessages(floID).then(() => {
-                if (!floGlobals.pubKeys[floID] && !activeChat.isGroup)
-                    getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption">Converstion is not encrypted until receiver replies</strong>`)
-                location.hash = `#/chat_page/messages`
+        floGlobals.checkEncryption = {}
+        function viewConversation(floID) {
+            return new Promise((resolve, reject) => {
+                // clear rendered date cards if any 
+                renderedDates = {}
+                // save typed message from previous chat
+                if (getRef('type_message').value.trim() !== '') {
+                    floGlobals.typedMessages[activeChat.floID] = getRef('type_message').value
+                } else {
+                    delete floGlobals.typedMessages[activeChat.floID]
+                }
+                // restore typed message if any
+                getRef('type_message').value = floGlobals.typedMessages[floID] || ''
+                activeChat.floID = floID
+                activeChat.isGroup = messenger.groups.hasOwnProperty(floID)
+                getRef("receiver_name").textContent = getContactName(floID);
+                if (activeChat.isGroup) {
+                    getRef("receiver_initial").innerHTML = ` <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
+                } else {
+                    getRef("receiver_initial").textContent = getContactName(floID).charAt(0);
+                }
+                getRef("receiver_initial").setAttribute('style', `--contact-color: var(${contactColor(floID)})`)
+                messenger.removeMark(floID, "unread");
+                if (this.scrollHeight <= this.clientHeight) {
+                    chatScrollInfo['isScrolledUp'] = false
+                    getRef('scroll_to_bottom').classList.remove('no-transformations')
+                }
+                renderMessages(floID).then(() => {
+                    if (!floGlobals.pubKeys[floID] && !activeChat.isGroup) {
+                        getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption">Converstion is not encrypted until receiver replies</strong>`)
+                        floGlobals.checkEncryption[floID] = true
+                    }
+                    resolve()
+                })
             })
-            messenger.removeMark(floID, "unread");
-            if (this.scrollHeight <= this.clientHeight) {
-                chatScrollInfo['isScrolledUp'] = false
-                getRef('scroll_to_bottom').classList.remove('no-transformations')
-            }
         }
 
         function renderMailList(mails, markUnread = true) {
             const inboxMails = document.createDocumentFragment()
             const sentMails = document.createDocumentFragment()
+            let inboxCount = 0, sentCount = 0
             for (let m in mails) {
                 let { from, to, prev, ref, subject, time, content } = mails[m]
-                if (from === myFloID)
+                if (from === myFloID) {
                     sentMails.prepend(render.mailCard(to, ref, subject, time, content, markUnread))
-                else if (to.includes(myFloID))
+                    if (markUnread) {
+                        sentCount++
+                    }
+                } else if (to.includes(myFloID)) {
                     inboxMails.prepend(render.mailCard(from, ref, subject, time, content, markUnread))
+                    if (markUnread) {
+                        inboxCount++
+                    }
+                }
+            }
+            if (getRef('mail_type_selector').value === 'inbox' && sentCount) {
+                addNotificationBadge(getRef('mail_type_selector').children[1], sentCount)
+            } else if (getRef('mail_type_selector').value === 'sent' && inboxCount) {
+                addNotificationBadge(getRef('mail_type_selector').children[0], inboxCount)
             }
             getRef('inbox_mail_container').prepend(inboxMails)
             getRef('sent_mail_container').prepend(sentMails)
@@ -3248,7 +3296,6 @@
                     contact.children[0].textContent = name.charAt(0)
                     contact.children[1].textContent = name
                 }
-                contact.dataset.name = name
             })
         }
 
@@ -3271,20 +3318,23 @@
             }
         }
 
+        function getChatCard(floID) {
+            return getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${floID}"]`)
+        }
+
         function addAsContact() {
             openPopup('add_contact_popup')
             getRef('add_contact_floID').value = clickedContact.floID
         }
 
         function markAsUnread() {
-            getRef('chats_list').querySelector(`.chat[data-flo-id="${floGlobals.activeFloID}"], .group[data-flo-id="${floGlobals.activeFloID}"]`).classList.add('unread')
+            getChatCard(floGlobals.activeFloID).classList.add('unread')
             messenger.addMark(floGlobals.activeFloID, 'unread')
             closePopup()
         }
 
         function markAsRead() {
-            const chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floGlobals.activeFloID}"], .group[data-flo-id="${floGlobals.activeFloID}"]`);
-            chatCard.classList.remove('unread')
+            getChatCard(floGlobals.activeFloID).classList.remove('unread')
             messenger.removeMark(floGlobals.activeFloID, 'unread')
             closePopup()
         }
@@ -3293,8 +3343,7 @@
             getConfirmation('Block this FLO ID?', { message: `Are you sure to block this FLO ID?`, confirmText: 'Block', cancelText: 'Cancel' }).then(confirmed => {
                 if (confirmed) {
                     messenger.blockUser(floGlobals.activeFloID).then(result => {
-                        const chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floGlobals.activeFloID}"], .group[data-flo-id="${floGlobals.activeFloID}"]`);
-                        chatCard.querySelector('.last-message').textContent = 'This user is blocked'
+                        getChatCard(floGlobals.activeFloID).querySelector('.last-message').textContent = 'This user is blocked'
                         closePopup()
                         notify('FLO ID blocked', 'success')
                     })
@@ -3305,14 +3354,14 @@
             getConfirmation('Unblock this FLO ID?', { message: `Are you sure to unblock this FLO ID?`, confirmText: 'Unblock', cancelText: 'Cancel' }).then(confirmed => {
                 if (confirmed) {
                     messenger.unblockUser(floID || floGlobals.activeFloID).then(result => {
-                        const chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floGlobals.activeFloID}"], .group[data-flo-id="${floGlobals.activeFloID}"]`);
+                        const chatCard = getChatCard(floID || floGlobals.activeFloID);
                         getLastMessage(floGlobals.activeFloID).then(({ lastText }) => {
                             chatCard.querySelector('.last-message').textContent = lastText
                         }).catch(error => {
                             console.log(error)
                         })
                         chatCard.querySelector('.last-message').textContent = 'This user is unblocked'
-                        notify('FLo ID unblocked', 'success')
+                        notify('FLO ID unblocked', 'success')
                         closePopup()
                         render.blockedList()
                         renderChatList(messenger.getChatOrder())
@@ -3329,7 +3378,7 @@
             getConfirmation('Clear chat?', { message: `Are you sure to clear this chat?`, confirmText: 'Clear', cancelText: 'Cancel' }).then(confirmed => {
                 if (confirmed) {
                     messenger.clearChat(floGlobals.activeFloID).then(result => {
-                        let chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floGlobals.activeFloID}"], .group[data-flo-id="${floGlobals.activeFloID}"]`)
+                        let chatCard = getChatCard(floGlobals.activeFloID);
                         if (chatCard) {
                             chatCard.querySelector('.last-message').textContent = ''
                             chatCard.querySelector('.time').textContent = ''
@@ -3346,8 +3395,7 @@
             getConfirmation('Delete chat', { message: `Are you sure to delete this chat?`, confirmText: 'Delete', cancelText: 'No' }).then(confirmed => {
                 if (confirmed) {
                     messenger.rmChat(floGlobals.activeFloID).then(result => {
-                        const chatCard = getRef('chats_list').querySelector(`.chat[data-flo-id="${floGlobals.activeFloID}"], .group[data-flo-id="${floGlobals.activeFloID}"]`);
-                        chatCard.remove()
+                        getChatCard(floGlobals.activeFloID).remove()
                         closePopup()
                         getRef('chat_view').classList.add('hide')
                         notify('Chat deleted', 'success')
