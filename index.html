@@ -2964,6 +2964,8 @@
                     getRef('contact_name').value = name
                     getRef('add_as_contact_option').remove()
                 }
+                if (activeChat.floID === floID)
+                    getRef('receiver_name').textContent = name
             }).catch(error => notify(error, "error"));
         }
 
