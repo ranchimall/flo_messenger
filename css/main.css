@@ -821,23 +821,19 @@ sm-button[variant=primary] {
   margin-bottom: 0.5rem;
   font-weight: 500;
 }
-#landing .left sm-button {
-  margin: 1.5rem 0 2rem 0;
-  width: -webkit-max-content;
-  width: -moz-max-content;
-  width: max-content;
-}
 #landing .left h3 {
   margin-bottom: 1rem;
   font-weight: 500;
 }
 #landing .left p {
-  margin-top: 1rem;
   font-size: 1.1rem;
   color: rgba(var(--text-color), 0.8);
 }
-#landing .left .flex sm-button:first-of-type {
-  margin-right: 1rem;
+#landing .left .button {
+  padding: 0.8rem 1.5rem;
+}
+#landing .left .flex .button:first-of-type {
+  margin-right: 0.5rem;
 }
 
 .logo-section {
@@ -1790,6 +1786,7 @@ sm-button[variant=primary] {
   padding: 0.5rem 1rem;
   align-content: center;
   grid-template-columns: minmax(0, 1fr);
+  z-index: 1;
 }
 #chat_header .flex {
   height: 100%;
