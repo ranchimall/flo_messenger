@@ -867,4 +867,98 @@
             })
         })
     }
+
+    messenger.loadDataFromBlockchain = function() {
+        return new Promise((resolve, reject) => {
+            let user_floID = floCrypto.toFloID(user.id);
+            if (!user_floID)
+                return reject("Not an valid address");
+            let last_key = `${floGlobals.application}|${user_floID}`;
+            compactIDB.readData("lastTx", last_key, floDapps.root).then(lastTx => {
+                floBlockchainAPI.readData(user_floID, {
+                    ignoreOld: lastTx,
+                    pattern: floGlobals.application,
+                    tx: true //need tx-time and txid for key construction
+                }).then(result => {
+                    for (var i = result.data.length - 1; i >= 0; i--) {
+                        let tx = result.data[i],
+                            content = JSON.parse(tx.data)[floGlobals.application];
+                        if (!(content instanceof Object))
+                            continue;
+                        let key = (content.type ? content.type + "|" : "") + tx.txid.substr(0, 16);
+                        compactIDB.writeData("flodata", {
+                            time: tx.time,
+                            txid: tx.txid,
+                            data: content
+                        }, key);
+                    }
+                    compactIDB.writeData("lastTx", result.totalTxs, last_key, floDapps.root);
+                    resolve(true);
+                }).catch(error => reject(error))
+            }).catch(error => reject(error))
+        })
+    }
+
+    //BTC multisig application
+    const TYPE_BTC_MULTISIG = "btc_multisig";
+    messenger.createMultisig = function(pubKeys, minRequired) {
+        return new Promise(async (resolve, reject) => {
+            let receivers = pubKeys.map(p => floCrypto.getFloID(p));
+            if (receivers.includes(null))
+                return reject("Invalid public key: " + pubKeys[receivers.indexOf(null)]);
+            let privateKey = await floDapps.user.private;
+            let multisig = btcOperator.multiSigAddress(pubKeys, minRequired) //TODO: change to correct function
+            if (typeof multisig !== 'object')
+                return reject("Unable to create multisig address");
+            let content = {
+                type: TYPE_BTC_MULTISIG,
+                address: multisig.address, //TODO: maybe encrypt the address
+                redeemScript: multisig.redeemScript
+            };
+            floBlockchainAPI.writeDataMultiple([privateKey], JSON.stringify({
+                [floGlobals.application]: content
+            }), receivers).then(txid => {
+                console.info(txid);
+                let key = TYPE_BTC_MULTISIG + "|" + tx.txid.substr(0, 16);
+                compactIDB.writeData("flodata", {
+                    time: null, //time will be overwritten when confirmed on blockchain
+                    txid: txid,
+                    data: content
+                }, key);
+                resolve(multisig_addr);
+            }).catch(error => reject(error))
+        })
+    }
+
+    messenger.listMultisig = function() {
+        return new Promise((resolve, reject) => {
+            let options = {
+                lowerKey: `${TYPE_BTC_MULTISIG}|`,
+                upperKey: `${TYPE_BTC_MULTISIG}||`
+            }
+            compactIDB.searchData("flodata", options).then(result => {
+                let multsigs = {};
+                for (let i in result) {
+                    let addr = result[i].address;
+                    let decode = coinjs.script().decodeRedeemScript(result[i].redeemScript);
+                    if (!decode || decode.address !== addr)
+                        console.warn("Invalid redeem-script:", addr);
+                    else if (decode.type !== "multisig__")
+                        console.warn("Redeem-script is not of a multisig:", addr);
+                    else if (!decode.pubKeys.includes(user.public))
+                        console.warn("User is not a part of this multisig:", addr);
+                    else if (decode.pubKeys.length < decode.signaturesRequired)
+                        console.warn("Invalid multisig (required is greater than users):", addr);
+                    else
+                        multsigs[addr] = {
+                            redeemScript: decode.redeemScript,
+                            pubKeys: decode.pubKeys,
+                            minRequired: decode.signaturesRequired
+                        }
+                }
+                resolve(multsigs);
+            }).catch(error => reject(error))
+        })
+    }
+
 })();
