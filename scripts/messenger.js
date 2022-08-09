@@ -1,5 +1,14 @@
-(function () {
+(function() {
     const messenger = window.messenger = {};
+
+    const user = {
+        get id() {
+            return floDapps.user.id
+        },
+        get public() {
+            return floDapps.user.public
+        }
+    }
 
     const expiredKeys = {};
 
@@ -121,7 +130,7 @@
             floCloudAPI.closeRequest(groupConnID[groupID]);
             delete groupConnID[groupID];
         }
-        let callbackFn = function (dataSet, error) {
+        let callbackFn = function(dataSet, error) {
             if (error)
                 return console.error(error)
             console.info(dataSet)
@@ -162,7 +171,7 @@
                             data.rmMembers = dataSet[vc].message.split("|")
                             data.note = dataSet[vc].comment
                             groupInfo.members = groupInfo.members.filter(m => !data.rmMembers.includes(m))
-                            if (data.rmMembers.includes(myFloID)) {
+                            if (data.rmMembers.includes(user.id)) {
                                 disableGroup(groupID);
                                 return;
                             }
@@ -181,7 +190,7 @@
                     if (data.message)
                         data.message = decrypt(data.message);
                     newInbox.messages[vc] = data;
-                    if (data.sender !== myFloID)
+                    if (data.sender !== user.id)
                         addMark(data.groupID, "unread")
                     if (!_loaded.appendix[`lastReceived_${groupID}`] ||
                         _loaded.appendix[`lastReceived_${groupID}`] < vc)
@@ -203,15 +212,15 @@
             UI.group(newInbox);
         }
         floCloudAPI.requestApplicationData(null, {
-            receiverID: groupID,
-            lowerVectorClock: _loaded.appendix[`lastReceived_${groupID}`] + 1,
-            callback: callbackFn
-        }).then(conn_id => groupConnID[groupID] = conn_id)
+                receiverID: groupID,
+                lowerVectorClock: _loaded.appendix[`lastReceived_${groupID}`] + 1,
+                callback: callbackFn
+            }).then(conn_id => groupConnID[groupID] = conn_id)
             .catch(error => console.error(`request-group(${groupID}):`, error))
 
     }
 
-    const initUserDB = function () {
+    const initUserDB = function() {
         return new Promise((resolve, reject) => {
             var obj = {
                 messages: {},
@@ -221,18 +230,20 @@
                 groups: {},
                 gkeys: {},
                 blocked: {},
+                flodata: {},
                 appendix: {},
                 userSettings: {}
             }
-            compactIDB.initDB(`${floGlobals.application}_${myFloID}`, obj).then(result => {
+            let user_db = `${floGlobals.application}_${user.id}`;
+            compactIDB.initDB(user_db, obj).then(result => {
                 console.info(result)
-                compactIDB.setDefaultDB(`${floGlobals.application}_${myFloID}`);
+                compactIDB.setDefaultDB(user_db);
                 resolve("Messenger UserDB Initated Successfully")
             }).catch(error => reject(error));
         })
     }
 
-    messenger.blockUser = function (floID) {
+    messenger.blockUser = function(floID) {
         return new Promise((resolve, reject) => {
             if (_loaded.blocked.has(floID))
                 return resolve("User is already blocked");
@@ -243,7 +254,7 @@
         })
     }
 
-    messenger.unblockUser = function (floID) {
+    messenger.unblockUser = function(floID) {
         return new Promise((resolve, reject) => {
             if (!_loaded.blocked.has(floID))
                 return resolve("User is not blocked");
@@ -254,7 +265,7 @@
         })
     }
 
-    messenger.sendMessage = function (message, receiver) {
+    messenger.sendMessage = function(message, receiver) {
         return new Promise((resolve, reject) => {
             sendRaw(message, receiver, "MESSAGE").then(result => {
                 let vc = result.vectorClock;
@@ -277,7 +288,7 @@
         })
     }
 
-    messenger.sendMail = function (subject, content, recipients, prev = null) {
+    messenger.sendMail = function(subject, content, recipients, prev = null) {
         return new Promise((resolve, reject) => {
             if (!Array.isArray(recipients))
                 recipients = [recipients]
@@ -290,7 +301,7 @@
             let promises = recipients.map(r => sendRaw(JSON.stringify(mail), r, "MAIL"))
             Promise.allSettled(promises).then(results => {
                 mail.time = Date.now();
-                mail.from = myFloID
+                mail.from = user.id
                 mail.to = []
                 results.forEach(r => {
                     if (r.status === "fulfilled")
@@ -310,12 +321,12 @@
         })
     }
 
-    const requestDirectInbox = function () {
+    const requestDirectInbox = function() {
         if (directConnID) { //close existing request connection (if any)
             floCloudAPI.closeRequest(directConnID);
             directConnID = undefined;
         }
-        let callbackFn = function (dataSet, error) {
+        let callbackFn = function(dataSet, error) {
             if (error)
                 return console.error(error)
             let newInbox = {
@@ -331,7 +342,7 @@
                     if (_loaded.blocked.has(dataSet[vc].senderID) && dataSet[vc].type !== "REVOKE_KEY")
                         throw "blocked-user";
                     if (dataSet[vc].message instanceof Object && "secret" in dataSet[vc].message)
-                        dataSet[vc].message = floCrypto.decryptData(dataSet[vc].message, myPrivKey)
+                        dataSet[vc].message = floDapps.user.decrypt(dataSet[vc].message);
                     if (dataSet[vc].type === "MESSAGE") {
                         //process as message
                         let dm = {
@@ -354,7 +365,7 @@
                         let mail = {
                             time: dataSet[vc].time,
                             from: dataSet[vc].senderID,
-                            to: [myFloID],
+                            to: [user.id],
                             subject: data.subject,
                             content: encrypt(data.content),
                             ref: data.ref,
@@ -412,14 +423,14 @@
             UI.direct(newInbox)
         }
         floCloudAPI.requestApplicationData(null, {
-            receiverID: myFloID,
-            lowerVectorClock: _loaded.appendix.lastReceived + 1,
-            callback: callbackFn
-        }).then(conn_id => directConnID = conn_id)
+                receiverID: user.id,
+                lowerVectorClock: _loaded.appendix.lastReceived + 1,
+                callback: callbackFn
+            }).then(conn_id => directConnID = conn_id)
             .catch(error => console.error("request-direct:", error));
     }
 
-    messenger.getMail = function (mailRef) {
+    messenger.getMail = function(mailRef) {
         return new Promise((resolve, reject) => {
             compactIDB.readData("mails", mailRef).then(mail => {
                 mail.content = decrypt(mail.content)
@@ -428,7 +439,7 @@
         });
     }
 
-    const getChatOrder = messenger.getChatOrder = function (separate = false) {
+    const getChatOrder = messenger.getChatOrder = function(separate = false) {
         let result;
         if (separate) {
             result = {};
@@ -444,11 +455,11 @@
         return result;
     }
 
-    messenger.storeContact = function (floID, name) {
+    messenger.storeContact = function(floID, name) {
         return floDapps.storeContact(floID, name)
     }
 
-    const loadDataFromIDB = function (defaultList = true) {
+    const loadDataFromIDB = function(defaultList = true) {
         return new Promise((resolve, reject) => {
             if (defaultList)
                 dataList = ["mails", "marked", "groups", "chats", "blocked", "appendix"]
@@ -464,7 +475,7 @@
                 data.appendix.lastReceived = data.appendix.lastReceived || '0';
                 if (data.appendix.AESKey) {
                     try {
-                        let AESKey = floCrypto.decryptData(data.appendix.AESKey, myPrivKey);
+                        let AESKey = floDapps.user.decrypt(data.appendix.AESKey);
                         data.appendix.AESKey = AESKey;
                         if (dataList.includes("messages"))
                             for (let m in data.messages)
@@ -481,13 +492,14 @@
                                 data.gkeys[k] = decrypt(data.gkeys[k], AESKey);
                         resolve(data)
                     } catch (error) {
+                        console.error(error)
                         reject("Corrupted AES Key");
                     }
                 } else {
                     if (Object.keys(data.mails).length)
                         return reject("AES Key not Found")
                     let AESKey = floCrypto.randString(32, false);
-                    let encryptedKey = floCrypto.encryptData(AESKey, myPubKey);
+                    let encryptedKey = floCrypto.encryptData(AESKey, user.public);
                     compactIDB.addData("appendix", encryptedKey, "AESKey").then(result => {
                         data.appendix.AESKey = AESKey;
                         resolve(data);
@@ -497,19 +509,19 @@
         })
     }
 
-    messenger.addMark = function (key, mark) {
+    messenger.addMark = function(key, mark) {
         if (_loaded.marked.hasOwnProperty(key) && !_loaded.marked[key].includes(mark))
             _loaded.marked[key].push(mark)
         return addMark(key, mark)
     }
 
-    messenger.removeMark = function (key, mark) {
+    messenger.removeMark = function(key, mark) {
         if (_loaded.marked.hasOwnProperty(key))
             _loaded.marked[key] = _loaded.marked[key].filter(v => v !== mark)
         return removeMark(key, mark)
     }
 
-    messenger.addChat = function (chatID) {
+    messenger.addChat = function(chatID) {
         return new Promise((resolve, reject) => {
             compactIDB.addData("chats", 0, chatID)
                 .then(result => resolve("Added chat"))
@@ -517,7 +529,7 @@
         })
     }
 
-    messenger.rmChat = function (chatID) {
+    messenger.rmChat = function(chatID) {
         return new Promise((resolve, reject) => {
             compactIDB.removeData("chats", chatID)
                 .then(result => resolve("Chat removed"))
@@ -525,7 +537,7 @@
         })
     }
 
-    messenger.clearChat = function (chatID) {
+    messenger.clearChat = function(chatID) {
         return new Promise((resolve, reject) => {
             let options = {
                 lowerKey: `${chatID}|`,
@@ -542,7 +554,7 @@
         })
     }
 
-    messenger.getChat = function (chatID) {
+    messenger.getChat = function(chatID) {
         return new Promise((resolve, reject) => {
             let options = {
                 lowerKey: `${chatID}|`,
@@ -557,7 +569,7 @@
         })
     }
 
-    messenger.backupData = function () {
+    messenger.backupData = function() {
         return new Promise((resolve, reject) => {
             loadDataFromIDB(false).then(data => {
                 delete data.appendix.AESKey;
@@ -565,11 +577,11 @@
                 data.pubKeys = floGlobals.pubKeys;
                 data = btoa(unescape(encodeURIComponent(JSON.stringify(data))))
                 let blobData = {
-                    floID: myFloID,
-                    pubKey: myPubKey,
-                    data: encrypt(data, myPrivKey),
+                    floID: user.id,
+                    pubKey: user.public,
+                    data: floDapps.user.encipher(data),
                 }
-                blobData.sign = floCrypto.signData(blobData.data, myPrivKey);
+                blobData.sign = floDapps.sign(blobData.data);
                 resolve(new Blob([JSON.stringify(blobData)], {
                     type: 'application/json'
                 }));
@@ -577,7 +589,7 @@
         })
     }
 
-    const parseBackup = messenger.parseBackup = function (blob) {
+    const parseBackup = messenger.parseBackup = function(blob) {
         return new Promise((resolve, reject) => {
             if (blob instanceof Blob || blob instanceof File) {
                 let reader = new FileReader();
@@ -585,11 +597,11 @@
                     var blobData = JSON.parse(evt.target.result);
                     if (!floCrypto.verifySign(blobData.data, blobData.sign, blobData.pubKey))
                         reject("Corrupted Backup file: Signature verification failed");
-                    else if (myFloID !== blobData.floID || myPubKey !== blobData.pubKey)
+                    else if (user.id !== blobData.floID || user.public !== blobData.pubKey)
                         reject("Invalid Backup file: Incorrect floID");
                     else {
                         try {
-                            let data = decrypt(blobData.data, myPrivKey)
+                            let data = floDapps.user.decipher(blobData.data);
                             try {
                                 data = JSON.parse(decodeURIComponent(escape(atob(data))));
                                 resolve(data)
@@ -607,7 +619,7 @@
         })
     }
 
-    messenger.restoreData = function (arg) {
+    messenger.restoreData = function(arg) {
         return new Promise((resolve, reject) => {
             if (arg instanceof Blob || arg instanceof File)
                 var parseData = parseBackup
@@ -660,7 +672,7 @@
         })
     }
 
-    messenger.clearUserData = function () {
+    messenger.clearUserData = function() {
         return new Promise((resolve, reject) => {
             let promises = [
                 compactIDB.deleteDB(),
@@ -674,18 +686,18 @@
 
     //group feature
 
-    messenger.createGroup = function (groupname, description = '') {
+    messenger.createGroup = function(groupname, description = '') {
         return new Promise((resolve, reject) => {
             if (!groupname) return reject("Invalid Group Name")
             let id = floCrypto.generateNewID();
             let groupInfo = {
                 groupID: id.floID,
                 pubKey: id.pubKey,
-                admin: myFloID,
+                admin: user.id,
                 name: groupname,
                 description: description,
                 created: Date.now(),
-                members: [myFloID]
+                members: [user.id]
             }
             let h = ["groupID", "created", "admin"].map(x => groupInfo[x]).join('|')
             groupInfo.hash = floCrypto.signData(h, id.privKey)
@@ -702,10 +714,10 @@
         })
     }
 
-    messenger.changeGroupName = function (groupID, name) {
+    messenger.changeGroupName = function(groupID, name) {
         return new Promise((resolve, reject) => {
             let groupInfo = _loaded.groups[groupID]
-            if (myFloID !== groupInfo.admin)
+            if (user.id !== groupInfo.admin)
                 return reject("Access denied: Admin only!")
             let message = encrypt(name, groupInfo.eKey)
             sendRaw(message, groupID, "UP_NAME", false)
@@ -714,10 +726,10 @@
         })
     }
 
-    messenger.changeGroupDescription = function (groupID, description) {
+    messenger.changeGroupDescription = function(groupID, description) {
         return new Promise((resolve, reject) => {
             let groupInfo = _loaded.groups[groupID]
-            if (myFloID !== groupInfo.admin)
+            if (user.id !== groupInfo.admin)
                 return reject("Access denied: Admin only!")
             let message = encrypt(description, groupInfo.eKey)
             sendRaw(message, groupID, "UP_DESCRIPTION", false)
@@ -726,7 +738,7 @@
         })
     }
 
-    messenger.addGroupMembers = function (groupID, newMem, note = undefined) {
+    messenger.addGroupMembers = function(groupID, newMem, note = undefined) {
         return new Promise((resolve, reject) => {
             if (!Array.isArray(newMem) && typeof newMem === "string")
                 newMem = [newMem]
@@ -735,7 +747,7 @@
                 imem2 = []
             newMem.forEach(m =>
                 !floCrypto.validateAddr(m) ? imem1.push(m) :
-                    m in floGlobals.pubKeys ? null : imem2.push(m)
+                m in floGlobals.pubKeys ? null : imem2.push(m)
             );
             if (imem1.length)
                 return reject(`Invalid Members(floIDs): ${imem1}`)
@@ -743,7 +755,7 @@
                 return reject(`Invalid Members (pubKey not available): ${imem2}`)
             //send new newMem list to existing members
             let groupInfo = _loaded.groups[groupID]
-            if (myFloID !== groupInfo.admin)
+            if (user.id !== groupInfo.admin)
                 return reject("Access denied: Admin only!")
             let k = groupInfo.eKey;
             //send groupInfo to new newMem
@@ -755,8 +767,8 @@
                 for (let i in results)
                     if (results[i].status === "fulfilled")
                         success.push(newMem[i])
-                    else if (results[i].status === "rejected")
-                        failed.push(newMem[i])
+                else if (results[i].status === "rejected")
+                    failed.push(newMem[i])
                 let message = encrypt(success.join("|"), k)
                 sendRaw(message, groupID, "ADD_MEMBERS", false, note)
                     .then(r => resolve(`Members added: ${success}`))
@@ -765,7 +777,7 @@
         })
     }
 
-    messenger.rmGroupMembers = function (groupID, rmMem, note = undefined) {
+    messenger.rmGroupMembers = function(groupID, rmMem, note = undefined) {
         return new Promise((resolve, reject) => {
             if (!Array.isArray(rmMem) && typeof rmMem === "string")
                 rmMem = [rmMem]
@@ -773,7 +785,7 @@
             let imem = rmMem.filter(m => !groupInfo.members.includes(m))
             if (imem.length)
                 return reject(`Invalid members: ${imem}`)
-            if (myFloID !== groupInfo.admin)
+            if (user.id !== groupInfo.admin)
                 return reject("Access denied: Admin only!")
             let message = encrypt(rmMem.join("|"), groupInfo.eKey)
             let p1 = sendRaw(message, groupID, "RM_MEMBERS", false, note)
@@ -785,10 +797,10 @@
         })
     }
 
-    const revokeKey = messenger.revokeKey = function (groupID) {
+    const revokeKey = messenger.revokeKey = function(groupID) {
         return new Promise((resolve, reject) => {
             let groupInfo = _loaded.groups[groupID]
-            if (myFloID !== groupInfo.admin)
+            if (user.id !== groupInfo.admin)
                 return reject("Access denied: Admin only!")
             let newKey = floCrypto.randString(16, false);
             Promise.all(groupInfo.members.map(m => sendRaw(JSON.stringify({
@@ -800,7 +812,7 @@
         })
     }
 
-    messenger.sendGroupMessage = function (message, groupID) {
+    messenger.sendGroupMessage = function(message, groupID) {
         return new Promise((resolve, reject) => {
             let k = _loaded.groups[groupID].eKey
             message = encrypt(message, k)
@@ -810,7 +822,7 @@
         })
     }
 
-    const disableGroup = messenger.disableGroup = function (groupID) {
+    const disableGroup = messenger.disableGroup = function(groupID) {
         return new Promise((resolve, reject) => {
             if (!_loaded.groups[groupID])
                 return reject("Group not found");
@@ -829,7 +841,7 @@
         })
     }
 
-    messenger.init = function () {
+    messenger.init = function() {
         return new Promise((resolve, reject) => {
             initUserDB().then(result => {
                 console.debug(result);
