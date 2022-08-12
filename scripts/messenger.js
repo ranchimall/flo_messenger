@@ -14,6 +14,7 @@
 
     const UI = {
         group: (d, e) => console.log(d, e),
+        pipeline: (d, e) => console.log(d, e),
         direct: (d, e) => console.log(d, e),
         chats: (c) => console.log(c),
         mails: (m) => console.log(m),
@@ -29,6 +30,9 @@
         },
         groupChat: {
             set: ui_fn => UI.group = ui_fn
+        },
+        pipeline: {
+            set: ui_fn => UI.pipeline = ui_fn
         },
         mails: {
             set: ui_fn => UI.mails = ui_fn
@@ -46,6 +50,9 @@
         groups: {
             get: () => _loaded.groups
         },
+        pipeline: {
+            get: () => _loaded.pipeline
+        },
         blocked: {
             get: () => _loaded.blocked
         },
@@ -54,7 +61,8 @@
         }
     });
 
-    var directConnID, groupConnID = {};
+    var directConnID, groupConnID = {},
+        pipeConnID = {};
     messenger.conn = {};
     Object.defineProperties(messenger.conn, {
         direct: {
@@ -125,101 +133,6 @@
         })
     }
 
-    function requestGroupInbox(groupID) {
-        if (groupConnID[groupID]) { //close existing request connection (if any)
-            floCloudAPI.closeRequest(groupConnID[groupID]);
-            delete groupConnID[groupID];
-        }
-        let callbackFn = function(dataSet, error) {
-            if (error)
-                return console.error(error)
-            console.info(dataSet)
-            let newInbox = {
-                messages: {}
-            }
-            let infoChange = false;
-            for (let vc in dataSet) {
-                if (groupID !== dataSet[vc].receiverID ||
-                    !_loaded.groups[groupID].members.includes(dataSet[vc].senderID))
-                    continue;
-                try {
-                    let data = {
-                        time: dataSet[vc].time,
-                        sender: dataSet[vc].senderID,
-                        groupID: dataSet[vc].receiverID
-                    }
-                    let k = _loaded.groups[groupID].eKey;
-                    if (expiredKeys[groupID]) {
-                        var ex = Object.keys(expiredKeys[groupID]).sort()
-                        while (ex.length && vc > ex[0]) ex.shift()
-                        if (ex.length)
-                            k = expiredKeys[groupID][ex.shift()]
-                    }
-                    dataSet[vc].message = decrypt(dataSet[vc].message, k)
-                    //store the pubKey if not stored already
-                    floDapps.storePubKey(dataSet[vc].senderID, dataSet[vc].pubKey)
-                    if (dataSet[vc].type === "GROUP_MSG")
-                        data.message = encrypt(dataSet[vc].message);
-                    else if (data.sender === _loaded.groups[groupID].admin) {
-                        let groupInfo = _loaded.groups[groupID]
-                        data.admin = true;
-                        if (dataSet[vc].type === "ADD_MEMBERS") {
-                            data.newMembers = dataSet[vc].message.split("|")
-                            data.note = dataSet[vc].comment
-                            groupInfo.members = [...new Set(groupInfo.members.concat(data.newMembers))]
-                        } else if (dataSet[vc].type === "RM_MEMBERS") {
-                            data.rmMembers = dataSet[vc].message.split("|")
-                            data.note = dataSet[vc].comment
-                            groupInfo.members = groupInfo.members.filter(m => !data.rmMembers.includes(m))
-                            if (data.rmMembers.includes(user.id)) {
-                                disableGroup(groupID);
-                                return;
-                            }
-                        } else if (dataSet[vc].type === "UP_DESCRIPTION") {
-                            data.description = dataSet[vc].message
-                            groupInfo.description = data.description
-                        } else if (dataSet[vc].type === "UP_NAME") {
-                            data.name = dataSet[vc].message
-                            groupInfo.name = data.name
-                        }
-                        infoChange = true;
-                    }
-                    compactIDB.addData("messages", {
-                        ...data
-                    }, `${groupID}|${vc}`)
-                    if (data.message)
-                        data.message = decrypt(data.message);
-                    newInbox.messages[vc] = data;
-                    if (data.sender !== user.id)
-                        addMark(data.groupID, "unread")
-                    if (!_loaded.appendix[`lastReceived_${groupID}`] ||
-                        _loaded.appendix[`lastReceived_${groupID}`] < vc)
-                        _loaded.appendix[`lastReceived_${groupID}`] = vc;
-                } catch (error) {
-                    console.log(error)
-                }
-            }
-            compactIDB.writeData("appendix", _loaded.appendix[`lastReceived_${groupID}`],
-                `lastReceived_${groupID}`);
-            if (infoChange) {
-                let newInfo = {
-                    ..._loaded.groups[groupID]
-                }
-                newInfo.eKey = encrypt(newInfo.eKey)
-                compactIDB.writeData("groups", newInfo, groupID)
-            }
-            console.debug(newInbox);
-            UI.group(newInbox);
-        }
-        floCloudAPI.requestApplicationData(null, {
-                receiverID: groupID,
-                lowerVectorClock: _loaded.appendix[`lastReceived_${groupID}`] + 1,
-                callback: callbackFn
-            }).then(conn_id => groupConnID[groupID] = conn_id)
-            .catch(error => console.error(`request-group(${groupID}):`, error))
-
-    }
-
     const initUserDB = function() {
         return new Promise((resolve, reject) => {
             var obj = {
@@ -230,6 +143,7 @@
                 groups: {},
                 gkeys: {},
                 blocked: {},
+                pipeline: {},
                 flodata: {},
                 appendix: {},
                 userSettings: {}
@@ -321,11 +235,96 @@
         })
     }
 
-    const requestDirectInbox = function() {
+    const processData = {};
+    processData.direct = function() {
+        return (unparsed, newInbox) => {
+            //store the pubKey if not stored already
+            floDapps.storePubKey(unparsed.senderID, unparsed.pubKey);
+            if (_loaded.blocked.has(unparsed.senderID) && unparsed.type !== "REVOKE_KEY")
+                throw "blocked-user";
+            if (unparsed.message instanceof Object && "secret" in unparsed.message)
+                unparsed.message = floDapps.user.decrypt(unparsed.message);
+            switch (unparsed.type) {
+                case "MESSAGE": { //process as message
+                    let dm = {
+                        time: unparsed.time,
+                        floID: unparsed.senderID,
+                        category: "received",
+                        message: encrypt(unparsed.message)
+                    }
+                    compactIDB.addData("messages", {
+                        ...dm
+                    }, `${dm.floID}|${vc}`)
+                    _loaded.chats[dm.floID] = parseInt(vc)
+                    compactIDB.writeData("chats", parseInt(vc), dm.floID)
+                    dm.message = unparsed.message;
+                    newInbox.messages[vc] = dm;
+                    addMark(dm.floID, "unread");
+                    break;
+                }
+                case "MAIL": { //process as mail
+                    let data = JSON.parse(unparsed.message);
+                    let mail = {
+                        time: unparsed.time,
+                        from: unparsed.senderID,
+                        to: [unparsed.receiverID],
+                        subject: data.subject,
+                        content: encrypt(data.content),
+                        ref: data.ref,
+                        prev: data.prev
+                    }
+                    compactIDB.addData("mails", {
+                        ...mail
+                    }, mail.ref);
+                    mail.content = data.content;
+                    newInbox.mails[mail.ref] = mail;
+                    addMark(mail.ref, "unread");
+                    break;
+                }
+                case "CREATE_GROUP": { //process create group
+                    let groupInfo = JSON.parse(unparsed.message);
+                    let h = ["groupID", "created", "admin"].map(x => groupInfo[x]).join('|')
+                    if (groupInfo.admin === unparsed.senderID &&
+                        floCrypto.verifySign(h, groupInfo.hash, groupInfo.pubKey) &&
+                        floCrypto.getFloID(groupInfo.pubKey) === groupInfo.groupID) {
+                        let eKey = groupInfo.eKey
+                        groupInfo.eKey = encrypt(eKey)
+                        compactIDB.writeData("groups", {
+                            ...groupInfo
+                        }, groupInfo.groupID)
+                        groupInfo.eKey = eKey
+                        _loaded.groups[groupInfo.groupID] = groupInfo
+                        requestGroupInbox(groupInfo.groupID)
+                        newInbox.newgroups.push(groupInfo.groupID)
+                    }
+                    break;
+                }
+                case "REVOKE_KEY": { //revoke group key
+                    let r = JSON.parse(unparsed.message);
+                    let groupInfo = _loaded.groups[r.groupID]
+                    if (unparsed.senderID === groupInfo.admin) {
+                        if (typeof expiredKeys[r.groupID] !== "object")
+                            expiredKeys[r.groupID] = {}
+                        expiredKeys[r.groupID][vc] = groupInfo.eKey
+                        let eKey = r.newKey
+                        groupInfo.eKey = encrypt(eKey);
+                        compactIDB.writeData("groups", {
+                            ...groupInfo
+                        }, groupInfo.groupID)
+                        groupInfo.eKey = eKey
+                        newInbox.keyrevoke.push(groupInfo.groupID)
+                    }
+                }
+            }
+        }
+    }
+
+    function requestDirectInbox() {
         if (directConnID) { //close existing request connection (if any)
             floCloudAPI.closeRequest(directConnID);
             directConnID = undefined;
         }
+        const parseData = processData.direct();
         let callbackFn = function(dataSet, error) {
             if (error)
                 return console.error(error)
@@ -337,79 +336,7 @@
             }
             for (let vc in dataSet) {
                 try {
-                    //store the pubKey if not stored already
-                    floDapps.storePubKey(dataSet[vc].senderID, dataSet[vc].pubKey);
-                    if (_loaded.blocked.has(dataSet[vc].senderID) && dataSet[vc].type !== "REVOKE_KEY")
-                        throw "blocked-user";
-                    if (dataSet[vc].message instanceof Object && "secret" in dataSet[vc].message)
-                        dataSet[vc].message = floDapps.user.decrypt(dataSet[vc].message);
-                    if (dataSet[vc].type === "MESSAGE") {
-                        //process as message
-                        let dm = {
-                            time: dataSet[vc].time,
-                            floID: dataSet[vc].senderID,
-                            category: "received",
-                            message: encrypt(dataSet[vc].message)
-                        }
-                        compactIDB.addData("messages", {
-                            ...dm
-                        }, `${dm.floID}|${vc}`)
-                        _loaded.chats[dm.floID] = parseInt(vc)
-                        compactIDB.writeData("chats", parseInt(vc), dm.floID)
-                        dm.message = dataSet[vc].message;
-                        newInbox.messages[vc] = dm;
-                        addMark(dm.floID, "unread")
-                    } else if (dataSet[vc].type === "MAIL") {
-                        //process as mail
-                        let data = JSON.parse(dataSet[vc].message);
-                        let mail = {
-                            time: dataSet[vc].time,
-                            from: dataSet[vc].senderID,
-                            to: [user.id],
-                            subject: data.subject,
-                            content: encrypt(data.content),
-                            ref: data.ref,
-                            prev: data.prev
-                        }
-                        compactIDB.addData("mails", {
-                            ...mail
-                        }, mail.ref);
-                        mail.content = data.content;
-                        newInbox.mails[mail.ref] = mail;
-                        addMark(mail.ref, "unread")
-                    } else if (dataSet[vc].type === "CREATE_GROUP") {
-                        //process create group
-                        let groupInfo = JSON.parse(dataSet[vc].message);
-                        let h = ["groupID", "created", "admin"].map(x => groupInfo[x]).join('|')
-                        if (groupInfo.admin === dataSet[vc].senderID &&
-                            floCrypto.verifySign(h, groupInfo.hash, groupInfo.pubKey) &&
-                            floCrypto.getFloID(groupInfo.pubKey) === groupInfo.groupID) {
-                            let eKey = groupInfo.eKey
-                            groupInfo.eKey = encrypt(eKey)
-                            compactIDB.writeData("groups", {
-                                ...groupInfo
-                            }, groupInfo.groupID)
-                            groupInfo.eKey = eKey
-                            _loaded.groups[groupInfo.groupID] = groupInfo
-                            requestGroupInbox(groupInfo.groupID)
-                            newInbox.newgroups.push(groupInfo.groupID)
-                        }
-                    } else if (dataSet[vc].type === "REVOKE_KEY") {
-                        let r = JSON.parse(dataSet[vc].message);
-                        let groupInfo = _loaded.groups[r.groupID]
-                        if (dataSet[vc].senderID === groupInfo.admin) {
-                            if (typeof expiredKeys[r.groupID] !== "object")
-                                expiredKeys[r.groupID] = {}
-                            expiredKeys[r.groupID][vc] = groupInfo.eKey
-                            let eKey = r.newKey
-                            groupInfo.eKey = encrypt(eKey);
-                            compactIDB.writeData("groups", {
-                                ...groupInfo
-                            }, groupInfo.groupID)
-                            groupInfo.eKey = eKey
-                            newInbox.keyrevoke.push(groupInfo.groupID)
-                        }
-                    }
+                    parseData(dataSet[vc], newInbox);
                 } catch (error) {
                     //if (error !== "blocked-user")
                     console.log(error);
@@ -462,9 +389,9 @@
     const loadDataFromIDB = function(defaultList = true) {
         return new Promise((resolve, reject) => {
             if (defaultList)
-                dataList = ["mails", "marked", "groups", "chats", "blocked", "appendix"]
+                dataList = ["mails", "marked", "groups", "pipeline", "chats", "blocked", "appendix"]
             else
-                dataList = ["messages", "mails", "marked", "chats", "groups", "gkeys", "blocked", "appendix"]
+                dataList = ["messages", "mails", "marked", "chats", "groups", "gkeys", "pipeline", "blocked", "appendix"]
             let promises = []
             for (var i = 0; i < dataList.length; i++)
                 promises[i] = compactIDB.readAllData(dataList[i])
@@ -490,6 +417,9 @@
                         if (dataList.includes("gkeys"))
                             for (let k in data.gkeys)
                                 data.gkeys[k] = decrypt(data.gkeys[k], AESKey);
+                        if (dataList.includes("pipeline"))
+                            for (let p in data.pipeline)
+                                data.pipeline[p].eKey = decrypt(data.pipeline[p].eKey, AESKey);
                         resolve(data)
                     } catch (error) {
                         console.error(error)
@@ -635,6 +565,8 @@
                     data.gkeys[k] = encrypt(data.gkeys[k])
                 for (let g in data.groups)
                     data.groups[g].eKey = encrypt(data.groups[g].eKey)
+                for (let p in data.pipeline)
+                    data.pipeline[p].eKey = encrypt(data.pipeline[p].eKey)
                 for (let c in data.chats)
                     if (data.chats[c] <= _loaded.chats[c])
                         delete data.chats[c]
@@ -841,6 +773,119 @@
         })
     }
 
+    processData.group = function(groupID) {
+        return (unparsed, newInbox) => {
+            if (!_loaded.groups[groupID].members.includes(unparsed.senderID))
+                return;
+            //store the pubKey if not stored already
+            floDapps.storePubKey(unparsed.senderID, unparsed.pubKey)
+            let data = {
+                time: unparsed.time,
+                sender: unparsed.senderID,
+                groupID: unparsed.receiverID
+            }
+            let k = _loaded.groups[groupID].eKey;
+            if (expiredKeys[groupID]) {
+                var ex = Object.keys(expiredKeys[groupID]).sort()
+                while (ex.length && vc > ex[0]) ex.shift()
+                if (ex.length)
+                    k = expiredKeys[groupID][ex.shift()]
+            }
+            unparsed.message = decrypt(unparsed.message, k);
+            var infoChange = false;
+            if (unparsed.type === "GROUP_MSG")
+                data.message = encrypt(unparsed.message);
+            else if (data.sender === _loaded.groups[groupID].admin) {
+                let groupInfo = _loaded.groups[groupID]
+                data.admin = true;
+                switch (unparsed.type) {
+                    case "ADD_MEMBERS": {
+                        data.newMembers = unparsed.message.split("|")
+                        data.note = unparsed.comment
+                        groupInfo.members = [...new Set(groupInfo.members.concat(data.newMembers))]
+                        break;
+                    }
+                    case "UP_DESCRIPTION": {
+                        data.description = unparsed.message;
+                        groupInfo.description = data.description;
+                        break;
+                    }
+                    case "RM_MEMBERS": {
+                        data.rmMembers = unparsed.message.split("|")
+                        data.note = unparsed.comment
+                        groupInfo.members = groupInfo.members.filter(m => !data.rmMembers.includes(m))
+                        if (data.rmMembers.includes(user.id)) {
+                            disableGroup(groupID);
+                            return;
+                        }
+                        break;
+                    }
+                    case "UP_NAME": {
+                        data.name = unparsed.message
+                        groupInfo.name = data.name;
+                        break;
+                    }
+                }
+                infoChange = true;
+            }
+            compactIDB.addData("messages", {
+                ...data
+            }, `${groupID}|${vc}`)
+            if (data.message)
+                data.message = decrypt(data.message);
+            newInbox.messages[vc] = data;
+            if (data.sender !== user.id)
+                addMark(data.groupID, "unread");
+            return infoChange;
+        }
+    }
+
+    function requestGroupInbox(groupID) {
+        if (groupConnID[groupID]) { //close existing request connection (if any)
+            floCloudAPI.closeRequest(groupConnID[groupID]);
+            delete groupConnID[groupID];
+        }
+
+        const parseData = processData.group(groupID);
+        let callbackFn = function(dataSet, error) {
+            if (error)
+                return console.error(error)
+            console.info(dataSet)
+            let newInbox = {
+                messages: {}
+            }
+            let infoChange = false;
+            for (let vc in dataSet) {
+                if (groupID !== dataSet[vc].receiverID)
+                    continue;
+                try {
+                    infoChange = parseData(dataSet[vc], newInbox) || infoChange;
+                    if (!_loaded.appendix[`lastReceived_${groupID}`] ||
+                        _loaded.appendix[`lastReceived_${groupID}`] < vc)
+                        _loaded.appendix[`lastReceived_${groupID}`] = vc;
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+            compactIDB.writeData("appendix", _loaded.appendix[`lastReceived_${groupID}`], `lastReceived_${groupID}`);
+            if (infoChange) {
+                let newInfo = Object.assign(_loaded.groups[groupID], {});
+                newInfo.eKey = encrypt(newInfo.eKey)
+                compactIDB.writeData("groups", newInfo, groupID)
+            }
+            console.debug(newInbox);
+            UI.group(newInbox);
+        }
+        floCloudAPI.requestApplicationData(null, {
+                receiverID: groupID,
+                lowerVectorClock: _loaded.appendix[`lastReceived_${groupID}`] + 1,
+                callback: callbackFn
+            }).then(conn_id => groupConnID[groupID] = conn_id)
+            .catch(error => console.error(`request-group(${groupID}):`, error))
+
+    }
+
+    //messenger startups
     messenger.init = function() {
         return new Promise((resolve, reject) => {
             initUserDB().then(result => {
@@ -850,6 +895,7 @@
                     //load data to memory
                     _loaded.appendix = data.appendix;
                     _loaded.groups = data.groups;
+                    _loaded.pipeline = data.pipeline;
                     _loaded.chats = data.chats;
                     _loaded.marked = data.marked;
                     _loaded.blocked = new Set(Object.keys(data.blocked));
@@ -862,6 +908,9 @@
                     for (let g in data.groups)
                         if (data.groups[g].disabled !== true)
                             requestGroupInbox(g);
+                    for (let p in data.pipeline)
+                        if (data.pipeline[p].disabled !== true)
+                            requestPipelineInbox(p, data.pipeline[p].model);
                     resolve("Messenger initiated");
                 }).catch(error => reject(error));
             })
@@ -900,12 +949,13 @@
     }
 
     //BTC multisig application
+    const multsig = messenger.multisig = {}
     const TYPE_BTC_MULTISIG = "btc_multisig";
-    messenger.createMultisig = function(pubKeys, minRequired) {
+    multsig.createAddress = function(pubKeys, minRequired) {
         return new Promise(async (resolve, reject) => {
-            let receivers = pubKeys.map(p => floCrypto.getFloID(p));
-            if (receivers.includes(null))
-                return reject("Invalid public key: " + pubKeys[receivers.indexOf(null)]);
+            let co_owners = pubKeys.map(p => floCrypto.getFloID(p));
+            if (co_owners.includes(null))
+                return reject("Invalid public key: " + pubKeys[co_owners.indexOf(null)]);
             let privateKey = await floDapps.user.private;
             let multisig = btcOperator.multiSigAddress(pubKeys, minRequired) //TODO: change to correct function
             if (typeof multisig !== 'object')
@@ -917,7 +967,7 @@
             };
             floBlockchainAPI.writeDataMultiple([privateKey], JSON.stringify({
                 [floGlobals.application]: content
-            }), receivers).then(txid => {
+            }), co_owners).then(txid => {
                 console.info(txid);
                 let key = TYPE_BTC_MULTISIG + "|" + tx.txid.substr(0, 16);
                 compactIDB.writeData("flodata", {
@@ -930,7 +980,7 @@
         })
     }
 
-    messenger.listMultisig = function() {
+    multsig.listAddress = function() {
         return new Promise((resolve, reject) => {
             let options = {
                 lowerKey: `${TYPE_BTC_MULTISIG}|`,
@@ -959,6 +1009,162 @@
                 resolve(multsigs);
             }).catch(error => reject(error))
         })
+    }
+
+    multsig.createTx = function(address, redeemScript, receivers, amounts) {
+        return new Promise((resolve, reject) => {
+            let decode = coinjs.script().decodeRedeemScript(redeemScript);
+            if (!decode || decode.address !== address || decode.type !== "multisig__")
+                return reject("Invalid redeem-script");
+            else if (!decode.pubKeys.includes(user.public))
+                return reject("User is not a part of this multisig");
+            else if (decode.pubKeys.length < decode.signaturesRequired)
+                return reject("Invalid multisig (required is greater than users)");
+            let co_owners = decode.pubKeys.map(p => floCrypto.getFloID(p));
+            let privateKey = await floDapps.user.private;
+            btcOperator.createMultiSigTx(address, redeemScript, receivers, amounts, null).then(tx => {
+                tx = btcOperator.signTx(tx, privateKey);
+                createPipeline(TYPE_BTC_MULTISIG, co_owners, 32).then(pipeline => {
+                    let message = encrypt(tx, pipeline.eKey);
+                    sendRaw(message, pipeline.id, "TRANSACTION", false)
+                        .then(result => resolve(result))
+                        .catch(error => reject(error))
+                }).catch(error => reject(error))
+            }).catch(error => reject(error))
+        })
+    }
+
+    multisig.signTx = function(pipeID, tx_hex, redeemScript) {
+        return new Promise((resolve, reject) => {
+            let decode = coinjs.script().decodeRedeemScript(redeemScript);
+            if (!decode || decode.type !== "multisig__")
+                return reject("Invalid redeem-script");
+            else if (!decode.pubKeys.includes(user.public))
+                return reject("User is not a part of this multisig");
+            let pipeline = _loaded.pipeline[pipeID],
+                tx = coinjs.transaction().deserialize(tx_hex);;
+            let privateKey = await floDapps.user.private;
+            tx_hex = btcOperator.signTx(tx, privateKey);
+            let message = encrypt(tx_hex, pipeline.eKey);
+            sendRaw(message, pipeline.id, "TRANSACTION", false).then(result => {
+                if (!__Enough_signs_collected(tx)) //TODO
+                    return resolve(tx_hex);
+                __Arranged_signatures_if_needed(tx) //TODO
+                btcOperator.broadcast(tx_hex).then(result => {
+                    let txid = result.txid
+                    sendRaw(encrypt(txid, pipeline.eKey), pipeline.id, "BROADCAST", false)
+                        .then(result => resolve(txid))
+                        .catch(error => reject(error))
+                }).catch(error => reject(error))
+            }).catch(error => reject(error))
+        })
+    }
+
+    //Pipelines
+    const createPipeline = function(model, members, ekeySize = 16) {
+        //validate members
+        let imem1 = [],
+            imem2 = []
+        members.forEach(m =>
+            !floCrypto.validateAddr(m) ? imem1.push(m) :
+            m in floGlobals.pubKeys ? null : imem2.push(m)
+        );
+        if (imem1.length)
+            return reject(`Invalid Members(floIDs): ${imem1}`)
+        else if (imem2.length)
+            return reject(`Invalid Members (pubKey not available): ${imem2}`)
+        //create pipeline info
+        const id = floCrypto.tmpID;
+        let pipeline = {
+            id,
+            model,
+            members
+        }
+        if (ekeySize)
+            pipeline.eKey = floCrypto.randString(ekeySize);
+        //send pipeline info to members
+        let pipelineInfo = JSON.stringify(pipeline);
+        let promises = members.map(m => sendRaw(pipelineInfo, m, "CREATE_PIPELINE", true));
+        Promise.allSettled(promises).then(results => {
+            console.debug(results.filter(r => r.status = "rejected").map(r => r.reason));
+            _loaded.pipeline[pipeline.id] = Object.assign(pipeline, {});
+            if (pipeline.eKey)
+                pipeline.eKey = encrypt(pipeline.eKey);
+            compactIDB.addData("pipeline", pipeline, pipeline.id).then(result => {
+                requestPipelineInbox(pipeline.id, pipeline.model);
+                resolve(_loaded.pipeline[pipeline.id])
+            }).catch(error => reject(error))
+        })
+    }
+
+    function requestPipelineInbox(pipeID, model) {
+        if (pipeConnID[pipeID]) { //close existing request connection (if any)
+            floCloudAPI.closeRequest(pipeConnID[pipeID]);
+            delete pipeConnID[pipeID];
+        }
+
+        let parseData = processData.pipeline[model](pipeID);
+        let callbackFn = function(dataSet, error) {
+            if (error)
+                return console.error(error);
+            console.info(dataSet)
+            let newInbox = {
+                messages: {}
+            }
+            for (let vc in dataSet) {
+                if (pipeID !== dataSet[vc].receiverID)
+                    continue;
+                try {
+                    parseData(dataSet[vc], newInbox);
+                    if (data.sender !== user.id)
+                        addMark(pipeID, "unread")
+                    if (!_loaded.appendix[`lastReceived_${pipeID}`] ||
+                        _loaded.appendix[`lastReceived_${pipeID}`] < vc)
+                        _loaded.appendix[`lastReceived_${pipeID}`] = vc;
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+            compactIDB.writeData("appendix", _loaded.appendix[`lastReceived_${pipeID}`], `lastReceived_${pipeID}`);
+            console.debug(newInbox);
+            UI.pipeline(model, newInbox);
+        }
+
+        floCloudAPI.requestApplicationData(null, {
+                receiverID: pipeID,
+                lowerVectorClock: _loaded.appendix[`lastReceived_${pipeID}`] + 1,
+                callback: callbackFn
+            }).then(conn_id => pipeConnID[pipeID] = conn_id)
+            .catch(error => console.error(`request-pipeline(${pipeID}):`, error))
+    }
+
+    processData.pipeline = {};
+    processData.pipeline[TYPE_BTC_MULTISIG] = function(pipeID) {
+        return (unparsed) => {
+            if (!_loaded.pipeline[pipeID].members.includes(floCrypto.toFloID(unparsed.senderID)))
+                return;
+            let data = {
+                time: unparsed.time,
+                sender: unparsed.senderID,
+                pipeID: unparsed.receiverID
+            }
+            let k = _loaded.pipeline[pipeID].eKey;
+            unparsed.message = decrypt(unparsed.message, k)
+            //store the pubKey if not stored already
+            floDapps.storePubKey(unparsed.senderID, unparsed.pubKey);
+            if (unparsed.type === "TRANSACTION") {
+                data.message = encrypt(unparsed.message);
+            } else if (unparsed.type === "BROADCAST") {
+                data.txid = unparsed.message;
+                //TODO: check if txid is valid (and confirmed?) and close the pipeline connection
+            }
+            compactIDB.addData("messages", {
+                ...data
+            }, `${pipeID}|${vc}`);
+            if (data.message)
+                data.message = decrypt(data.message);
+            newInbox.messages[vc] = data;
+        }
     }
 
 })();
