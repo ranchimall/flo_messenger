@@ -949,9 +949,9 @@
     }
 
     //BTC multisig application
-    const multsig = messenger.multisig = {}
+    const MultiSig = messenger.multisig = {}
     const TYPE_BTC_MULTISIG = "btc_multisig";
-    multsig.createAddress = function(pubKeys, minRequired) {
+    MultiSig.createAddress = function(pubKeys, minRequired) {
         return new Promise(async (resolve, reject) => {
             let co_owners = pubKeys.map(p => floCrypto.getFloID(p));
             if (co_owners.includes(null))
@@ -965,6 +965,8 @@
                 address: multisig.address, //TODO: maybe encrypt the address
                 redeemScript: multisig.redeemScript
             };
+            console.debug(content.address, content.redeemScript);
+            debugger;
             floBlockchainAPI.writeDataMultiple([privateKey], JSON.stringify({
                 [floGlobals.application]: content
             }), co_owners).then(txid => {
@@ -980,7 +982,7 @@
         })
     }
 
-    multsig.listAddress = function() {
+    MultiSig.listAddress = function() {
         return new Promise((resolve, reject) => {
             let options = {
                 lowerKey: `${TYPE_BTC_MULTISIG}|`,
@@ -1011,8 +1013,8 @@
         })
     }
 
-    multsig.createTx = function(address, redeemScript, receivers, amounts) {
-        return new Promise((resolve, reject) => {
+    MultiSig.createTx = function(address, redeemScript, receivers, amounts) {
+        return new Promise(async (resolve, reject) => {
             let decode = coinjs.script().decodeRedeemScript(redeemScript);
             if (!decode || decode.address !== address || decode.type !== "multisig__")
                 return reject("Invalid redeem-script");
@@ -1034,8 +1036,8 @@
         })
     }
 
-    multisig.signTx = function(pipeID, tx_hex, redeemScript) {
-        return new Promise((resolve, reject) => {
+    MultiSig.signTx = function(pipeID, tx_hex, redeemScript) {
+        return new Promise(async (resolve, reject) => {
             let decode = coinjs.script().decodeRedeemScript(redeemScript);
             if (!decode || decode.type !== "multisig__")
                 return reject("Invalid redeem-script");
@@ -1047,11 +1049,12 @@
             tx_hex = btcOperator.signTx(tx, privateKey);
             let message = encrypt(tx_hex, pipeline.eKey);
             sendRaw(message, pipeline.id, "TRANSACTION", false).then(result => {
-                if (!__Enough_signs_collected(tx)) //TODO
+                if (!btcOperator.checkSigned(tx))
                     return resolve(tx_hex);
-                __Arranged_signatures_if_needed(tx) //TODO
+                debugger;
                 btcOperator.broadcast(tx_hex).then(result => {
-                    let txid = result.txid
+                    let txid = result.txid;
+                    console.debug(txid);
                     sendRaw(encrypt(txid, pipeline.eKey), pipeline.id, "BROADCAST", false)
                         .then(result => resolve(txid))
                         .catch(error => reject(error))
