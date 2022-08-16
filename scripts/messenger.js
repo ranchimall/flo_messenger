@@ -191,9 +191,7 @@
                 }
                 _loaded.chats[receiver] = parseInt(vc)
                 compactIDB.writeData("chats", parseInt(vc), receiver)
-                compactIDB.addData("messages", {
-                    ...data
-                }, `${receiver}|${vc}`)
+                compactIDB.addData("messages", Object.assign({}, data), `${receiver}|${vc}`)
                 data.message = message;
                 resolve({
                     [vc]: data
@@ -224,9 +222,7 @@
                 if (mail.to.length === 0)
                     return reject(results)
                 mail.content = encrypt(content)
-                compactIDB.addData("mails", {
-                    ...mail
-                }, mail.ref)
+                compactIDB.addData("mails", Object.assign({}, mail), mail.ref)
                 mail.content = content
                 resolve({
                     [mail.ref]: mail
@@ -253,9 +249,7 @@
                         category: "received",
                         message: encrypt(unparsed.message)
                     }
-                    compactIDB.addData("messages", {
-                        ...dm
-                    }, `${dm.floID}|${vc}`)
+                    compactIDB.addData("messages", Object.assign({}, dm), `${dm.floID}|${vc}`)
                     _loaded.chats[dm.floID] = parseInt(vc)
                     compactIDB.writeData("chats", parseInt(vc), dm.floID)
                     dm.message = unparsed.message;
@@ -274,9 +268,7 @@
                         ref: data.ref,
                         prev: data.prev
                     }
-                    compactIDB.addData("mails", {
-                        ...mail
-                    }, mail.ref);
+                    compactIDB.addData("mails", Object.assign({}, mail), mail.ref);
                     mail.content = data.content;
                     newInbox.mails[mail.ref] = mail;
                     addMark(mail.ref, "unread");
@@ -290,9 +282,7 @@
                         floCrypto.getFloID(groupInfo.pubKey) === groupInfo.groupID) {
                         let eKey = groupInfo.eKey
                         groupInfo.eKey = encrypt(eKey)
-                        compactIDB.writeData("groups", {
-                            ...groupInfo
-                        }, groupInfo.groupID)
+                        compactIDB.writeData("groups", Object.assign({}, groupInfo), groupInfo.groupID)
                         groupInfo.eKey = eKey
                         _loaded.groups[groupInfo.groupID] = groupInfo
                         requestGroupInbox(groupInfo.groupID)
@@ -309,9 +299,7 @@
                         expiredKeys[r.groupID][vc] = groupInfo.eKey
                         let eKey = r.newKey
                         groupInfo.eKey = encrypt(eKey);
-                        compactIDB.writeData("groups", {
-                            ...groupInfo
-                        }, groupInfo.groupID)
+                        compactIDB.writeData("groups", Object.assign({}, groupInfo), groupInfo.groupID)
                         groupInfo.eKey = eKey
                         newInbox.keyrevoke.push(groupInfo.groupID)
                     }
@@ -321,9 +309,7 @@
                     let pipelineInfo = JSON.parse(unparsed.message);
                     let eKey = pipelineInfo.eKey;
                     pipelineInfo.eKey = encrypt(eKey)
-                    compactIDB.addData("pipeline", {
-                        ...pipelineInfo
-                    }, pipelineInfo.id);
+                    compactIDB.addData("pipeline", Object.assign({}, pipelineInfo), pipelineInfo.id);
                     pipelineInfo.eKey = eKey;
                     _loaded.pipeline[pipelineInfo.id] = pipelineInfo
                     requestPipelineInbox(pipelineInfo.id, pipelineInfo.model);
@@ -499,7 +485,7 @@
         })
     }
 
-    messenger.getChat = function(chatID) {
+    const getChat = messenger.getChat = function(chatID) {
         return new Promise((resolve, reject) => {
             let options = {
                 lowerKey: `${chatID}|`,
@@ -773,9 +759,7 @@
         return new Promise((resolve, reject) => {
             if (!_loaded.groups[groupID])
                 return reject("Group not found");
-            let groupInfo = {
-                ..._loaded.groups[groupID]
-            };
+            let groupInfo = Object.assign({}, _loaded.groups[groupID]);
             if (groupInfo.disabled)
                 return resolve("Group already diabled");
             groupInfo.disabled = true;
@@ -818,7 +802,7 @@
                     case "ADD_MEMBERS": {
                         data.newMembers = unparsed.message.split("|")
                         data.note = unparsed.comment
-                        groupInfo.members = [...new Set(groupInfo.members.concat(data.newMembers))]
+                        groupInfo.members = Array.from(new Set(groupInfo.members.concat(data.newMembers)))
                         break;
                     }
                     case "UP_DESCRIPTION": {
@@ -844,9 +828,7 @@
                 }
                 infoChange = true;
             }
-            compactIDB.addData("messages", {
-                ...data
-            }, `${groupID}|${vc}`)
+            compactIDB.addData("messages", Object.assign({}, data), `${groupID}|${vc}`)
             if (data.message)
                 data.message = decrypt(data.message);
             newInbox.messages[vc] = data;
@@ -1155,6 +1137,24 @@
             .catch(error => console.error(`request-pipeline(${pipeID}):`, error))
     }
 
+    const disablePipeline = messenger.disablePipeline = function(pipeID) {
+        console.debug(JSON.stringify(pipeConnID), pipeConnID[pipeID])
+        return new Promise((resolve, reject) => {
+            if (!_loaded.pipeline[pipeID])
+                return reject("Pipeline not found");
+            if (_loaded.pipeline[pipeID].disabled)
+                return resolve("Pipeline already diabled");
+            _loaded.pipeline[pipeID].disabled = true;
+            let pipelineInfo = Object.assign({}, _loaded.pipeline[pipeID]);
+            pipelineInfo.eKey = encrypt(pipelineInfo.eKey)
+            compactIDB.writeData("pipeline", pipelineInfo, pipeID).then(result => {
+                floCloudAPI.closeRequest(pipeConnID[pipeID]);
+                delete pipeConnID[pipeID];
+                resolve("Pipeline diabled");
+            }).catch(error => reject(error))
+        })
+    }
+
     processData.pipeline = {};
     processData.pipeline[TYPE_BTC_MULTISIG] = function(pipeID) {
         return (unparsed, newInbox) => {
@@ -1174,11 +1174,17 @@
                 data.message = encrypt(unparsed.message);
             } else if (unparsed.type === "BROADCAST") {
                 data.txid = unparsed.message;
-                //TODO: check if txid is valid (and confirmed?) and close the pipeline connection
+                //the following check is done on parallel (in background) instead of sync
+                btcOperator.getTx(data.txid).then(tx => {
+                    let tx_hex_final = tx.tx_hex;
+                    getChat(pipeID).then(result => {
+                        let tx_hex_inital = Object.keys(result).sort().map(i => result[i].message).filter(x => x).shift();
+                        if (btcOperator.checkIfSameTx(tx_hex_inital, tx_hex_final))
+                            disablePipeline(pipeID);
+                    }).catch(error => console.error(error))
+                }).catch(error => console.error(error))
             }
-            compactIDB.addData("messages", {
-                ...data
-            }, `${pipeID}|${vc}`);
+            compactIDB.addData("messages", Object.assign({}, data), `${pipeID}|${vc}`);
             if (data.message)
                 data.message = decrypt(data.message);
             newInbox.messages[vc] = data;
