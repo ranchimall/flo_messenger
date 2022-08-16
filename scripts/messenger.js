@@ -244,6 +244,7 @@
                 throw "blocked-user";
             if (unparsed.message instanceof Object && "secret" in unparsed.message)
                 unparsed.message = floDapps.user.decrypt(unparsed.message);
+            let vc = unparsed.vectorClock;
             switch (unparsed.type) {
                 case "MESSAGE": { //process as message
                     let dm = {
@@ -314,6 +315,19 @@
                         groupInfo.eKey = eKey
                         newInbox.keyrevoke.push(groupInfo.groupID)
                     }
+                    break;
+                }
+                case "CREATE_PIPELINE": { //add pipeline
+                    let pipelineInfo = JSON.parse(unparsed.message);
+                    let eKey = pipelineInfo.eKey;
+                    pipelineInfo.eKey = encrypt(eKey)
+                    compactIDB.addData("pipeline", {
+                        ...pipelineInfo
+                    }, pipelineInfo.id);
+                    pipelineInfo.eKey = eKey;
+                    _loaded.pipeline[pipelineInfo.id] = pipelineInfo
+                    requestPipelineInbox(pipelineInfo.id, pipelineInfo.model);
+                    newInbox.pipeline[pipelineInfo.id] = pipelineInfo.model;
                 }
             }
         }
@@ -332,7 +346,8 @@
                 messages: {},
                 mails: {},
                 newgroups: [],
-                keyrevoke: []
+                keyrevoke: [],
+                pipeline: {}
             }
             for (let vc in dataSet) {
                 try {
@@ -784,7 +799,8 @@
                 sender: unparsed.senderID,
                 groupID: unparsed.receiverID
             }
-            let k = _loaded.groups[groupID].eKey;
+            let vc = unparsed.vectorClock,
+                k = _loaded.groups[groupID].eKey;
             if (expiredKeys[groupID]) {
                 var ex = Object.keys(expiredKeys[groupID]).sort()
                 while (ex.length && vc > ex[0]) ex.shift()
@@ -869,7 +885,7 @@
             }
             compactIDB.writeData("appendix", _loaded.appendix[`lastReceived_${groupID}`], `lastReceived_${groupID}`);
             if (infoChange) {
-                let newInfo = Object.assign(_loaded.groups[groupID], {});
+                let newInfo = Object.assign({}, _loaded.groups[groupID]);
                 newInfo.eKey = encrypt(newInfo.eKey)
                 compactIDB.writeData("groups", newInfo, groupID)
             }
@@ -971,7 +987,7 @@
                 [floGlobals.application]: content
             }), co_owners).then(txid => {
                 console.info(txid);
-                let key = TYPE_BTC_MULTISIG + "|" + tx.txid.substr(0, 16);
+                let key = TYPE_BTC_MULTISIG + "|" + txid.substr(0, 16);
                 compactIDB.writeData("flodata", {
                     time: null, //time will be overwritten when confirmed on blockchain
                     txid: txid,
@@ -991,20 +1007,20 @@
             compactIDB.searchData("flodata", options).then(result => {
                 let multsigs = {};
                 for (let i in result) {
-                    let addr = result[i].address;
-                    let decode = coinjs.script().decodeRedeemScript(result[i].redeemScript);
+                    let addr = result[i].data.address;
+                    let decode = coinjs.script().decodeRedeemScript(result[i].data.redeemScript);
                     if (!decode || decode.address !== addr)
                         console.warn("Invalid redeem-script:", addr);
                     else if (decode.type !== "multisig__")
                         console.warn("Redeem-script is not of a multisig:", addr);
-                    else if (!decode.pubKeys.includes(user.public))
+                    else if (!decode.pubkeys.includes(user.public.toLowerCase()) && !decode.pubkeys.includes(user.public.toUpperCase()))
                         console.warn("User is not a part of this multisig:", addr);
-                    else if (decode.pubKeys.length < decode.signaturesRequired)
+                    else if (decode.pubkeys.length < decode.signaturesRequired)
                         console.warn("Invalid multisig (required is greater than users):", addr);
                     else
                         multsigs[addr] = {
-                            redeemScript: decode.redeemScript,
-                            pubKeys: decode.pubKeys,
+                            redeemScript: decode.redeemscript,
+                            pubKeys: decode.pubkeys,
                             minRequired: decode.signaturesRequired
                         }
                 }
@@ -1013,18 +1029,18 @@
         })
     }
 
-    MultiSig.createTx = function(address, redeemScript, receivers, amounts) {
+    MultiSig.createTx = function(address, redeemScript, receivers, amounts, fee = null) {
         return new Promise(async (resolve, reject) => {
             let decode = coinjs.script().decodeRedeemScript(redeemScript);
             if (!decode || decode.address !== address || decode.type !== "multisig__")
                 return reject("Invalid redeem-script");
-            else if (!decode.pubKeys.includes(user.public))
+            else if (!decode.pubkeys.includes(user.public.toLowerCase()) && !decode.pubkeys.includes(user.public.toUpperCase()))
                 return reject("User is not a part of this multisig");
-            else if (decode.pubKeys.length < decode.signaturesRequired)
+            else if (decode.pubkeys.length < decode.signaturesRequired)
                 return reject("Invalid multisig (required is greater than users)");
-            let co_owners = decode.pubKeys.map(p => floCrypto.getFloID(p));
+            let co_owners = decode.pubkeys.map(p => floCrypto.getFloID(p));
             let privateKey = await floDapps.user.private;
-            btcOperator.createMultiSigTx(address, redeemScript, receivers, amounts, null).then(tx => {
+            btcOperator.createMultiSigTx(address, redeemScript, receivers, amounts, fee).then(tx => {
                 tx = btcOperator.signTx(tx, privateKey);
                 createPipeline(TYPE_BTC_MULTISIG, co_owners, 32).then(pipeline => {
                     let message = encrypt(tx, pipeline.eKey);
@@ -1036,13 +1052,8 @@
         })
     }
 
-    MultiSig.signTx = function(pipeID, tx_hex, redeemScript) {
+    MultiSig.signTx = function(pipeID, tx_hex) {
         return new Promise(async (resolve, reject) => {
-            let decode = coinjs.script().decodeRedeemScript(redeemScript);
-            if (!decode || decode.type !== "multisig__")
-                return reject("Invalid redeem-script");
-            else if (!decode.pubKeys.includes(user.public))
-                return reject("User is not a part of this multisig");
             let pipeline = _loaded.pipeline[pipeID],
                 tx = coinjs.transaction().deserialize(tx_hex);;
             let privateKey = await floDapps.user.private;
@@ -1065,38 +1076,41 @@
 
     //Pipelines
     const createPipeline = function(model, members, ekeySize = 16) {
-        //validate members
-        let imem1 = [],
-            imem2 = []
-        members.forEach(m =>
-            !floCrypto.validateAddr(m) ? imem1.push(m) :
-            m in floGlobals.pubKeys ? null : imem2.push(m)
-        );
-        if (imem1.length)
-            return reject(`Invalid Members(floIDs): ${imem1}`)
-        else if (imem2.length)
-            return reject(`Invalid Members (pubKey not available): ${imem2}`)
-        //create pipeline info
-        const id = floCrypto.tmpID;
-        let pipeline = {
-            id,
-            model,
-            members
-        }
-        if (ekeySize)
-            pipeline.eKey = floCrypto.randString(ekeySize);
-        //send pipeline info to members
-        let pipelineInfo = JSON.stringify(pipeline);
-        let promises = members.map(m => sendRaw(pipelineInfo, m, "CREATE_PIPELINE", true));
-        Promise.allSettled(promises).then(results => {
-            console.debug(results.filter(r => r.status = "rejected").map(r => r.reason));
-            _loaded.pipeline[pipeline.id] = Object.assign(pipeline, {});
-            if (pipeline.eKey)
-                pipeline.eKey = encrypt(pipeline.eKey);
-            compactIDB.addData("pipeline", pipeline, pipeline.id).then(result => {
-                requestPipelineInbox(pipeline.id, pipeline.model);
-                resolve(_loaded.pipeline[pipeline.id])
-            }).catch(error => reject(error))
+        return new Promise((resolve, reject) => {
+            //validate members
+            let imem1 = [],
+                imem2 = []
+            members.forEach(m =>
+                !floCrypto.validateAddr(m) ? imem1.push(m) :
+                m in floGlobals.pubKeys ? null :
+                m != user.id ? imem2.push(m) : null
+            );
+            if (imem1.length)
+                return reject(`Invalid Members(floIDs): ${imem1}`);
+            else if (imem2.length)
+                return reject(`Invalid Members (pubKey not available): ${imem2}`);
+            //create pipeline info
+            const id = floCrypto.tmpID;
+            let pipeline = {
+                id,
+                model,
+                members
+            }
+            if (ekeySize)
+                pipeline.eKey = floCrypto.randString(ekeySize);
+            //send pipeline info to members
+            let pipelineInfo = JSON.stringify(pipeline);
+            let promises = members.filter(m => m != user.id).map(m => sendRaw(pipelineInfo, m, "CREATE_PIPELINE", true));
+            Promise.allSettled(promises).then(results => {
+                console.debug(results.filter(r => r.status === "rejected").map(r => r.reason));
+                _loaded.pipeline[pipeline.id] = Object.assign({}, pipeline);
+                if (pipeline.eKey)
+                    pipeline.eKey = encrypt(pipeline.eKey);
+                compactIDB.addData("pipeline", pipeline, pipeline.id).then(result => {
+                    requestPipelineInbox(pipeline.id, pipeline.model);
+                    resolve(_loaded.pipeline[pipeline.id])
+                }).catch(error => reject(error))
+            })
         })
     }
 
@@ -1119,7 +1133,7 @@
                     continue;
                 try {
                     parseData(dataSet[vc], newInbox);
-                    if (data.sender !== user.id)
+                    if (dataSet[vc].senderID !== user.id)
                         addMark(pipeID, "unread")
                     if (!_loaded.appendix[`lastReceived_${pipeID}`] ||
                         _loaded.appendix[`lastReceived_${pipeID}`] < vc)
@@ -1143,7 +1157,7 @@
 
     processData.pipeline = {};
     processData.pipeline[TYPE_BTC_MULTISIG] = function(pipeID) {
-        return (unparsed) => {
+        return (unparsed, newInbox) => {
             if (!_loaded.pipeline[pipeID].members.includes(floCrypto.toFloID(unparsed.senderID)))
                 return;
             let data = {
@@ -1151,7 +1165,8 @@
                 sender: unparsed.senderID,
                 pipeID: unparsed.receiverID
             }
-            let k = _loaded.pipeline[pipeID].eKey;
+            let vc = unparsed.vectorClock,
+                k = _loaded.pipeline[pipeID].eKey;
             unparsed.message = decrypt(unparsed.message, k)
             //store the pubKey if not stored already
             floDapps.storePubKey(unparsed.senderID, unparsed.pubKey);
