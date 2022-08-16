@@ -1034,25 +1034,29 @@
         })
     }
 
-    MultiSig.signTx = function(pipeID, tx_hex) {
-        return new Promise(async (resolve, reject) => {
-            let pipeline = _loaded.pipeline[pipeID],
-                tx = coinjs.transaction().deserialize(tx_hex);;
-            let privateKey = await floDapps.user.private;
-            tx_hex = btcOperator.signTx(tx, privateKey);
-            let message = encrypt(tx_hex, pipeline.eKey);
-            sendRaw(message, pipeline.id, "TRANSACTION", false).then(result => {
-                if (!btcOperator.checkSigned(tx))
-                    return resolve(tx_hex);
-                debugger;
-                btcOperator.broadcast(tx_hex).then(result => {
-                    let txid = result.txid;
-                    console.debug(txid);
-                    sendRaw(encrypt(txid, pipeline.eKey), pipeline.id, "BROADCAST", false)
-                        .then(result => resolve(txid))
-                        .catch(error => reject(error))
+    MultiSig.signTx = function(pipeID) {
+        return new Promise((resolve, reject) => {
+            if (_loaded.pipeline[pipeID].disabled)
+                return reject("Pipeline is already closed");
+            getChat(pipeID).then(async result => {
+                let pipeline = _loaded.pipeline[pipeID],
+                    tx_hex_latest = Object.keys(result).sort().map(i => result[i].message).filter(x => x).pop();
+                let privateKey = await floDapps.user.private;
+                let tx_hex_signed = btcOperator.signTx(tx_hex_latest, privateKey);
+                let message = encrypt(tx_hex_signed, pipeline.eKey);
+                sendRaw(message, pipeline.id, "TRANSACTION", false).then(result => {
+                    if (!btcOperator.checkSigned(tx_hex_signed))
+                        return resolve(tx_hex_signed);
+                    debugger;
+                    btcOperator.broadcast(tx_hex_signed).then(result => {
+                        let txid = result.txid;
+                        console.debug(txid);
+                        sendRaw(encrypt(txid, pipeline.eKey), pipeline.id, "BROADCAST", false)
+                            .then(result => resolve(txid))
+                            .catch(error => reject(error))
+                    }).catch(error => reject(error))
                 }).catch(error => reject(error))
-            }).catch(error => reject(error))
+            }).catch(error => console.error(error))
         })
     }
 
