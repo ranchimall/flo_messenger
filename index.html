@@ -14,6 +14,7 @@
         }
     </script>
     <script src="https://unpkg.com/uhtml@3.0.1/es.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="scripts/lib.js"></script>
     <script src="scripts/floCrypto.js"></script>
     <script src="scripts/btcOperator.js"></script>
@@ -2404,7 +2405,8 @@
                     }
                 } else {
                     if (floID) {
-                        messenger.addChat(floID)
+                        if(!(floID in messenger.chats))
+                            messenger.addChat(floID)
                         getRef('chats_list').prepend(html.node`${render.contactCard(floID, { type: 'chat', prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
                     } else if (groupID) {
                         getRef('chats_list').prepend(html.node`${render.contactCard(groupID, { type: 'group', prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
