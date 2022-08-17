@@ -375,9 +375,12 @@
                 .sort((a, b) => b[0] - a[0]).map(a => a[1]);
             result.group = Object.keys(_loaded.groups).map(a => [parseInt(_loaded.appendix[`lastReceived_${a}`]), a])
                 .sort((a, b) => b[0] - a[0]).map(a => a[1]);
+            result.pipeline = Object.keys(_loaded.pipeline).map(a => [parseInt(_loaded.appendix[`lastReceived_${a}`]), a])
+                .sort((a, b) => b[0] - a[0]).map(a => a[1]);
         } else {
             result = Object.keys(_loaded.chats).map(a => [_loaded.chats[a], a])
                 .concat(Object.keys(_loaded.groups).map(a => [parseInt(_loaded.appendix[`lastReceived_${a}`]), a]))
+                .concat(Object.keys(_loaded.pipeline).map(a => [parseInt(_loaded.appendix[`lastReceived_${a}`]), a]))
                 .sort((a, b) => b[0] - a[0]).map(a => a[1])
         }
         return result;
@@ -909,13 +912,15 @@
                     for (let p in data.pipeline)
                         if (data.pipeline[p].disabled !== true)
                             requestPipelineInbox(p, data.pipeline[p].model);
-                    resolve("Messenger initiated");
+                    loadDataFromBlockchain()
+                        .then(result => resolve("Messenger initiated"))
+                        .catch(error => reject(error))
                 }).catch(error => reject(error));
             })
         })
     }
 
-    messenger.loadDataFromBlockchain = function() {
+    const loadDataFromBlockchain = messenger.loadDataFromBlockchain = function() {
         return new Promise((resolve, reject) => {
             let user_floID = floCrypto.toFloID(user.id);
             if (!user_floID)
@@ -1027,7 +1032,7 @@
                 createPipeline(TYPE_BTC_MULTISIG, co_owners, 32).then(pipeline => {
                     let message = encrypt(tx, pipeline.eKey);
                     sendRaw(message, pipeline.id, "TRANSACTION", false)
-                        .then(result => resolve(result))
+                        .then(result => resolve(pipeline.id))
                         .catch(error => reject(error))
                 }).catch(error => reject(error))
             }).catch(error => reject(error))
@@ -1046,14 +1051,18 @@
                 let message = encrypt(tx_hex_signed, pipeline.eKey);
                 sendRaw(message, pipeline.id, "TRANSACTION", false).then(result => {
                     if (!btcOperator.checkSigned(tx_hex_signed))
-                        return resolve(tx_hex_signed);
+                        return resolve({
+                            tx_hex: tx_hex_signed
+                        });
                     debugger;
                     btcOperator.broadcast(tx_hex_signed).then(result => {
                         let txid = result.txid;
                         console.debug(txid);
                         sendRaw(encrypt(txid, pipeline.eKey), pipeline.id, "BROADCAST", false)
-                            .then(result => resolve(txid))
-                            .catch(error => reject(error))
+                            .then(result => resolve({
+                                tx_hex: tx_hex_signed,
+                                txid: txid
+                            })).catch(error => reject(error))
                     }).catch(error => reject(error))
                 }).catch(error => reject(error))
             }).catch(error => console.error(error))
@@ -1174,6 +1183,7 @@
             unparsed.message = decrypt(unparsed.message, k)
             //store the pubKey if not stored already
             floDapps.storePubKey(unparsed.senderID, unparsed.pubKey);
+            data.type = unparsed.type;
             if (unparsed.type === "TRANSACTION") {
                 data.message = encrypt(unparsed.message);
             } else if (unparsed.type === "BROADCAST") {
