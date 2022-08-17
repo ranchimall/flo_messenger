@@ -1045,7 +1045,7 @@
                 return reject("Pipeline is already closed");
             getChat(pipeID).then(async result => {
                 let pipeline = _loaded.pipeline[pipeID],
-                    tx_hex_latest = Object.keys(result).sort().map(i => result[i].message).filter(x => x).pop();
+                    tx_hex_latest = Object.keys(result).sort().map(i => result[i].tx_hex).filter(x => x).pop();
                 let privateKey = await floDapps.user.private;
                 let tx_hex_signed = btcOperator.signTx(tx_hex_latest, privateKey);
                 let message = encrypt(tx_hex_signed, pipeline.eKey);
@@ -1168,6 +1168,16 @@
         })
     }
 
+    messenger.sendPipelineMessage = function(message, pipeID) {
+        return new Promise((resolve, reject) => {
+            let k = _loaded.pipeline[pipeID].eKey;
+            if (k) message = encrypt(message, k);
+            sendRaw(message, pipeID, "MESSAGE", false)
+                .then(result => resolve(`${pipeID}: ${message}`))
+                .catch(error => reject(error))
+        })
+    }
+
     processData.pipeline = {};
     processData.pipeline[TYPE_BTC_MULTISIG] = function(pipeID) {
         return (unparsed, newInbox) => {
@@ -1184,19 +1194,28 @@
             //store the pubKey if not stored already
             floDapps.storePubKey(unparsed.senderID, unparsed.pubKey);
             data.type = unparsed.type;
-            if (unparsed.type === "TRANSACTION") {
-                data.message = encrypt(unparsed.message);
-            } else if (unparsed.type === "BROADCAST") {
-                data.txid = unparsed.message;
-                //the following check is done on parallel (in background) instead of sync
-                btcOperator.getTx(data.txid).then(tx => {
-                    let tx_hex_final = tx.tx_hex;
-                    getChat(pipeID).then(result => {
-                        let tx_hex_inital = Object.keys(result).sort().map(i => result[i].message).filter(x => x).shift();
-                        if (btcOperator.checkIfSameTx(tx_hex_inital, tx_hex_final))
-                            disablePipeline(pipeID);
+            switch (unparsed.type) {
+                case "TRANSACTION": {
+                    data.tx_hex = unparsed.message;
+                    break;
+                }
+                case "BROADCAST": {
+                    data.txid = unparsed.message;
+                    //the following check is done on parallel (in background) instead of sync
+                    btcOperator.getTx(data.txid).then(tx => {
+                        let tx_hex_final = tx.tx_hex;
+                        getChat(pipeID).then(result => {
+                            let tx_hex_inital = Object.keys(result).sort().map(i => result[i].message).filter(x => x).shift();
+                            if (btcOperator.checkIfSameTx(tx_hex_inital, tx_hex_final))
+                                disablePipeline(pipeID);
+                        }).catch(error => console.error(error))
                     }).catch(error => console.error(error))
-                }).catch(error => console.error(error))
+                    break;
+                }
+                case "MESSAGE": {
+                    data.message = encrypt(unparsed.message);
+                    break;
+                }
             }
             compactIDB.addData("messages", Object.assign({}, data), `${pipeID}|${vc}`);
             if (data.message)
