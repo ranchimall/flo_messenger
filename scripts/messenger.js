@@ -77,7 +77,7 @@
     function sendRaw(message, recipient, type, encrypt = null, comment = undefined) {
         return new Promise((resolve, reject) => {
             if (!floCrypto.validateAddr(recipient))
-                return reject("Invalid Recipient floID");
+                return reject("Invalid Recipient");
 
             if ([true, null].includes(encrypt) && recipient in floGlobals.pubKeys)
                 message = floCrypto.encryptData(message, floGlobals.pubKeys[recipient])
@@ -144,6 +144,10 @@
                 gkeys: {},
                 blocked: {},
                 pipeline: {},
+                request_sent: {},
+                request_received: {},
+                response_sent: {},
+                response_received: {},
                 flodata: {},
                 appendix: {},
                 userSettings: {}
@@ -231,6 +235,79 @@
         })
     }
 
+    function listRequests(obs, options = null) {
+        return new Promise((resolve, reject) => {
+            compactIDB.readAllData(obs).then(result => {
+                if (!options || typeof options !== 'object')
+                    return resolve(result);
+                let filtered = {};
+                for (let k in result) {
+                    let val = result[k];
+                    if (options.type && options.type == val.type) continue;
+                    else if (options.floID && options.floID == val.floID) continue;
+                    else if (typeof options.completed !== 'undefined' && options.completed == !(val.completed))
+                        continue;
+                    filtered[k] = val;
+                }
+                resolve(filtered);
+            }).catch(error => reject(error))
+        })
+    }
+
+    messenger.list_request_sent = (options = null) => listRequests('request_sent', options);
+    messenger.list_request_received = (options = null) => listRequests('request_received', options);
+    messenger.list_response_sent = (options = null) => listRequests('response_sent', options);
+    messenger.list_response_received = (options = null) => listRequests('response_received', options);
+
+    function sendRequest(receiver, type, message, encrypt = null) {
+        return new Promise((resolve, reject) => {
+            sendRaw(message, receiver, "REQUEST", encrypt, type).then(result => {
+                let vc = result.vectorClock;
+                let data = {
+                    floID: receiver,
+                    time: result.time,
+                    message: message,
+                    type: type
+                }
+                compactIDB.addData("request_sent", data, vc);
+                resolve({
+                    [vc]: data
+                });
+            }).catch(error => reject(error))
+        })
+    }
+
+    messenger.request_pubKey = (receiver, message = '') => sendRequest(receiver, "PUBLIC_KEY", message, false);
+
+    function sendResponse(req_id, message, encrypt = null) {
+        return new Promise((resolve, reject) => {
+            compactIDB.readData("request_received", req_id).then(request => {
+                let _message = JSON.stringify({
+                    value: message,
+                    reqID: req_id
+                });
+                sendRaw(_message, request.floID, "RESPONSE", encrypt, request.type).then(result => {
+                    let vc = result.vectorClock;
+                    let data = {
+                        floID: request.floID,
+                        time: result.time,
+                        message: message,
+                        type: request.type,
+                        reqID: req_id
+                    }
+                    compactIDB.addData("response_sent", data, vc);
+                    request.completed = vc;
+                    compactIDB.writeData("request_received", request, req_id);
+                    resolve({
+                        [vc]: data
+                    });
+                }).catch(error => reject(error))
+            }).catch(error => reject(error))
+        })
+    }
+
+    messenger.respond_pubKey = (req_id, message = '') => sendResponse(req_id, message, false);
+
     const processData = {};
     processData.direct = function() {
         return (unparsed, newInbox) => {
@@ -255,6 +332,34 @@
                     dm.message = unparsed.message;
                     newInbox.messages[vc] = dm;
                     addMark(dm.floID, "unread");
+                    break;
+                }
+                case "REQUEST": {
+                    let req = {
+                        floID: unparsed.senderID,
+                        time: unparsed.time,
+                        message: unparsed.message,
+                        type: unparsed.comment
+                    }
+                    compactIDB.addData("request_received", req, vc);
+                    newInbox.requests[vc] = req;
+                    break;
+                }
+                case "RESPONSE": {
+                    let data = JSON.parse(unparsed.message);
+                    let res = {
+                        floID: unparsed.senderID,
+                        time: unparsed.time,
+                        message: data.value,
+                        type: unparsed.comment,
+                        reqID: data.reqID
+                    }
+                    compactIDB.addData("response_received", res, vc);
+                    compactIDB.readData("request_sent", data.reqID).then(req => {
+                        req.completed = vc;
+                        compactIDB.writeData("request_sent", req, data.reqID)
+                    });
+                    newInbox.responses[vc] = res;
                     break;
                 }
                 case "MAIL": { //process as mail
@@ -330,6 +435,8 @@
                 return console.error(error)
             let newInbox = {
                 messages: {},
+                requests: {},
+                responses: {},
                 mails: {},
                 newgroups: [],
                 keyrevoke: [],
