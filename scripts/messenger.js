@@ -79,10 +79,13 @@
             if (!floCrypto.validateAddr(recipient))
                 return reject("Invalid Recipient");
 
-            if ([true, null].includes(encrypt) && recipient in floGlobals.pubKeys)
-                message = floCrypto.encryptData(message, floGlobals.pubKeys[recipient])
-            else if (encrypt === true)
-                return reject("recipient's pubKey not found")
+            if ([true, null].includes(encrypt)) {
+                let r_pubKey = floDapps.user.get_pubKey(recipient);
+                if (r_pubKey)
+                    message = floCrypto.encryptData(message, r_pubKey);
+                else if (encrypt === true)
+                    return reject("recipient's pubKey not found")
+            }
             let options = {
                 receiverID: recipient,
             }
@@ -152,7 +155,7 @@
                 appendix: {},
                 userSettings: {}
             }
-            let user_db = `${floGlobals.application}_${user.id}`;
+            let user_db = `${floGlobals.application}_${floCrypto.toFloID(user.id)}`;
             compactIDB.initDB(user_db, obj).then(result => {
                 console.info(result)
                 compactIDB.setDefaultDB(user_db);
