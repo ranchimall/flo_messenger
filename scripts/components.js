@@ -143,208 +143,208 @@ customElements.define('sm-button',
 //Input
 const smInput = document.createElement('template')
 smInput.innerHTML = `
-<style>
-*{
-    padding: 0;
-    margin: 0;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-} 
-input[type="search"]::-webkit-search-decoration,
-input[type="search"]::-webkit-search-cancel-button,
-input[type="search"]::-webkit-search-results-button,
-input[type="search"]::-webkit-search-results-decoration { display: none; }
-input[type=number] {
--moz-appearance:textfield;
-}
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    margin: 0; 
-}
-input::-ms-reveal,
-input::-ms-clear {
-  display: none;
-}
-input:invalid{
-    outline: none;
-    -webkit-box-shadow: none;
-            box-shadow: none;
-}
-::-moz-focus-inner{
-border: none;
-}
-:host{
-    display: flex;
-    --success-color: #00C853;
-    --danger-color: red;
-    --width: 100%;
-    --icon-gap: 0.5rem;
-    --min-height: 3.5rem;
-    --background: rgba(var(--text-color, (17,17,17)), 0.06);
-}
-.hide{
-   display: none !important;
-}
-button{
-    display: flex;
-    border: none;
-    background: none;
-    padding: 0;
-    border-radius: 1rem;
-    min-width: 0;
-    cursor: pointer;
-}
-button:focus{
-    outline: var(--accent-color, teal) solid medium;
-}
-.icon {
-    height: 1.2rem;
-    width: 1.2rem;
-    fill: rgba(var(--text-color, (17,17,17)), 0.6);
-}
-
-:host(.round) .input{
-    border-radius: 10rem;
-}
-.input {
-    display: flex;
-    cursor: text;
-    min-width: 0;
-    text-align: left;
-            align-items: center;
-    position: relative;
-    gap: var(--icon-gap);
-    padding: var(--padding, 0.6rem 0.8rem);
-    border-radius: var(--border-radius,0.3rem);
-    transition: opacity 0.3s, box-shadow 0.2s;
-    background: var(--background);
-    width: 100%;
-    outline: none;
-    min-height: var(--min-height);
-}
-.input.readonly .clear{
-    opacity: 0 !important;
-    margin-right: -2rem;
-    pointer-events: none !important;
-}
-.readonly{
-    pointer-events: none;
-}
-.input:focus-within:not(.readonly){
-    box-shadow: 0 0 0 0.1rem var(--accent-color,teal) inset !important;
-}
-.disabled{
-    pointer-events: none;
-    opacity: 0.6;
-}
-.label {
-    grid-area: 1/1/2/2;
-    font-size: inherit;
-    opacity: .7;
-    font-weight: 400;
-    transition: -webkit-transform 0.3s;
-    transition: transform 0.3s;
-    transition: transform 0.3s, -webkit-transform 0.3s, color .03;
-        transform-origin: left;
-    pointer-events: none;
-    white-space: nowrap;
-    overflow: hidden;
-    width: 100%;
-    user-select: none;
-    will-change: transform;
-}
-.outer-container{
-    position: relative;
-    width: var(--width);
-}
-.container{
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    position: relative;
-    align-items: center;
-}    
-input{
-    grid-area: 1/1/2/2;
-    font-size: inherit;
-    border: none;
-    background: transparent;
-    outline: none;
-    color: inherit;
-    font-family: inherit;
-    width: 100%;
-    caret-color: var(--accent-color, teal);
-}
-:host([animate]) .input:focus-within .container input,
-.animate-placeholder .container input {
-    -webkit-transform: translateY(0.6rem);
-            -ms-transform: translateY(0.6rem);
-        transform: translateY(0.6rem);
+    <style>
+    *{
+        padding: 0;
+        margin: 0;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+    } 
+    input[type="search"]::-webkit-search-decoration,
+    input[type="search"]::-webkit-search-cancel-button,
+    input[type="search"]::-webkit-search-results-button,
+    input[type="search"]::-webkit-search-results-decoration { display: none; }
+    input[type=number] {
+    -moz-appearance:textfield;
     }
-  
-    :host([animate]) .input:focus-within .label,
-    .animate-placeholder .label {
-    -webkit-transform: translateY(-0.7em) scale(0.8);
-            -ms-transform: translateY(-0.7em) scale(0.8);
-        transform: translateY(-0.7em) scale(0.8);
-    opacity: 1;
-    color: var(--accent-color,teal)
-}
-:host([variant="outlined"]) .input {
-    box-shadow: 0 0 0 1px var(--border-color, rgba(var(--text-color, (17,17,17)), 0.3)) inset;
-    background: rgba(var(--background-color, (255,255,255)), 1);
-}
-.animate-placeholder:focus-within:not(.readonly) .label{
-    color: var(--accent-color,teal)
-}
-.feedback-text:not(:empty){
-    display: flex;
-    width: 100%;
-    text-align: left;
-    font-size: 0.9rem;
-    align-items: center;
-    padding: 0.8rem 0;
-    color: rgba(var(--text-color, (17,17,17)), 0.8);
-}
-.success{
-    color: var(--success-color);
-}
-.error{
-    color: var(--danger-color);
-}
-.status-icon{
-    margin-right: 0.2rem;
-}
-.status-icon--error{
-    fill: var(--danger-color);
-}
-.status-icon--success{
-    fill: var(--success-color);
-}
-@media (any-hover: hover){
-    .icon:hover{
-        background: rgba(var(--text-color, (17,17,17)), 0.1);
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        margin: 0; 
     }
-}
-</style>
-<div class="outer-container">
-    <label part="input" class="input">
-        <slot name="icon"></slot>
-        <div class="container">
-            <input type="text"/>
-            <div part="placeholder" class="label"></div>
-            <button class="clear hide" title="Clear" tabindex="-1">
-                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-11.414L9.172 7.757 7.757 9.172 10.586 12l-2.829 2.828 1.415 1.415L12 13.414l2.828 2.829 1.415-1.415L13.414 12l2.829-2.828-1.415-1.415L12 10.586z"/></svg>
-            </button>
-        </div>
-        <slot name="right"></slot>
-    </label>
-    <p class="feedback-text"></p>
-</div>
-`;
+    input::-ms-reveal,
+    input::-ms-clear {
+      display: none;
+    }
+    input:invalid{
+        outline: none;
+        -webkit-box-shadow: none;
+                box-shadow: none;
+    }
+    ::-moz-focus-inner{
+    border: none;
+    }
+    :host{
+        display: flex;
+        --success-color: #00C853;
+        --danger-color: red;
+        --width: 100%;
+        --icon-gap: 0.5rem;
+        --min-height: 3.2rem;
+        --background: rgba(var(--text-color, (17,17,17)), 0.06);
+    }
+    .hide{
+       display: none !important;
+    }
+    button{
+        display: flex;
+        border: none;
+        background: none;
+        padding: 0;
+        border-radius: 1rem;
+        min-width: 0;
+        cursor: pointer;
+    }
+    button:focus{
+        outline: var(--accent-color, teal) solid medium;
+    }
+    .icon {
+        height: 1.2rem;
+        width: 1.2rem;
+        fill: rgba(var(--text-color, (17,17,17)), 0.6);
+    }
+    
+    :host(.round) .input{
+        border-radius: 10rem;
+    }
+    .input {
+        display: flex;
+        cursor: text;
+        min-width: 0;
+        text-align: left;
+                align-items: center;
+        position: relative;
+        gap: var(--icon-gap);
+        padding: var(--padding, 0.6rem 0.8rem);
+        border-radius: var(--border-radius,0.3rem);
+        transition: opacity 0.3s, box-shadow 0.2s;
+        background: var(--background);
+        width: 100%;
+        outline: none;
+        min-height: var(--min-height);
+    }
+    .input.readonly .clear{
+        opacity: 0 !important;
+        margin-right: -2rem;
+        pointer-events: none !important;
+    }
+    .readonly{
+        pointer-events: none;
+    }
+    .input:focus-within:not(.readonly){
+        box-shadow: 0 0 0 0.1rem var(--accent-color,teal) inset !important;
+    }
+    .disabled{
+        pointer-events: none;
+        opacity: 0.6;
+    }
+    .label {
+        grid-area: 1/1/2/2;
+        font-size: inherit;
+        opacity: .7;
+        font-weight: 400;
+        transition: -webkit-transform 0.3s;
+        transition: transform 0.3s;
+        transition: transform 0.3s, -webkit-transform 0.3s, color .03;
+            transform-origin: left;
+        pointer-events: none;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 100%;
+        user-select: none;
+        will-change: transform;
+    }
+    .outer-container{
+        position: relative;
+        width: var(--width);
+    }
+    .container{
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        position: relative;
+        align-items: center;
+    }    
+    input{
+        grid-area: 1/1/2/2;
+        font-size: inherit;
+        border: none;
+        background: transparent;
+        outline: none;
+        color: inherit;
+        font-family: inherit;
+        width: 100%;
+        caret-color: var(--accent-color, teal);
+    }
+    :host([animate]) .input:focus-within .container input,
+    .animate-placeholder .container input {
+        -webkit-transform: translateY(0.6rem);
+                -ms-transform: translateY(0.6rem);
+            transform: translateY(0.6rem);
+        }
+      
+        :host([animate]) .input:focus-within .label,
+        .animate-placeholder .label {
+        -webkit-transform: translateY(-0.7em) scale(0.8);
+                -ms-transform: translateY(-0.7em) scale(0.8);
+            transform: translateY(-0.7em) scale(0.8);
+        opacity: 1;
+        color: var(--accent-color,teal)
+    }
+    :host([variant="outlined"]) .input {
+        box-shadow: 0 0 0 1px var(--border-color, rgba(var(--text-color, (17,17,17)), 0.3)) inset;
+        background: rgba(var(--background-color, (255,255,255)), 1);
+    }
+    .animate-placeholder:focus-within:not(.readonly) .label{
+        color: var(--accent-color,teal)
+    }
+    .feedback-text:not(:empty){
+        display: flex;
+        width: 100%;
+        text-align: left;
+        font-size: 0.9rem;
+        align-items: center;
+        padding: 0.8rem 0;
+        color: rgba(var(--text-color, (17,17,17)), 0.8);
+    }
+    .success{
+        color: var(--success-color);
+    }
+    .error{
+        color: var(--danger-color);
+    }
+    .status-icon{
+        margin-right: 0.2rem;
+    }
+    .status-icon--error{
+        fill: var(--danger-color);
+    }
+    .status-icon--success{
+        fill: var(--success-color);
+    }
+    @media (any-hover: hover){
+        .icon:hover{
+            background: rgba(var(--text-color, (17,17,17)), 0.1);
+        }
+    }
+    </style>
+    <div class="outer-container">
+        <label part="input" class="input">
+            <slot name="icon"></slot>
+            <div class="container">
+                <input type="text"/>
+                <div part="placeholder" class="label"></div>
+                <button class="clear hide" title="Clear" tabindex="-1">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-11.414L9.172 7.757 7.757 9.172 10.586 12l-2.829 2.828 1.415 1.415L12 13.414l2.828 2.829 1.415-1.415L13.414 12l2.829-2.828-1.415-1.415L12 10.586z"/></svg>
+                </button>
+            </div>
+            <slot name="right"></slot>
+        </label>
+        <p class="feedback-text"></p>
+    </div>
+    `;
 customElements.define('sm-input',
     class extends HTMLElement {
 
@@ -372,6 +372,7 @@ customElements.define('sm-input',
             this.focusOut = this.focusOut.bind(this);
             this.fireEvent = this.fireEvent.bind(this);
             this.checkInput = this.checkInput.bind(this);
+            this.handleKeydown = this.handleKeydown.bind(this);
             this.vibrate = this.vibrate.bind(this);
         }
 
@@ -384,9 +385,9 @@ customElements.define('sm-input',
         }
 
         set value(val) {
+            if (val === this.input.value) return;
             this.input.value = val;
             this.checkInput();
-            this.fireEvent();
         }
 
         get placeholder() {
@@ -453,9 +454,9 @@ customElements.define('sm-input',
                         this.feedbackText.classList.add('error');
                         this.feedbackText.classList.remove('success');
                         this.feedbackText.innerHTML = `
-                            <svg class="status-icon status-icon--error" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z"/></svg>
-                        ${this._errorText}
-                        `;
+                                <svg class="status-icon status-icon--error" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z"/></svg>
+                            ${this._errorText}
+                            `;
                     }
                 }
                 return (_isValid && _customValid);
@@ -508,6 +509,15 @@ customElements.define('sm-input',
                 this.feedbackText.textContent = '';
             }
         }
+        handleKeydown(e) {
+            if (e.key.length === 1) {
+                if (!['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'].includes(e.key)) {
+                    e.preventDefault();
+                } else if (e.key === '.' && e.target.value.includes('.')) {
+                    e.preventDefault();
+                }
+            }
+        }
         vibrate() {
             this.outerContainer.animate([
                 { transform: 'translateX(-1rem)' },
@@ -549,6 +559,10 @@ customElements.define('sm-input',
                 else if (name === 'type') {
                     if (this.hasAttribute('type') && this.getAttribute('type') === 'number') {
                         this.input.setAttribute('inputmode', 'decimal');
+                        this.input.addEventListener('keydown', this.handleKeydown);
+                    } else {
+                        this.input.removeEventListener('keydown', this.handleKeydown);
+
                     }
                 }
                 else if (name === 'helper-text') {
@@ -586,117 +600,118 @@ customElements.define('sm-input',
         disconnectedCallback() {
             this.input.removeEventListener('input', this.checkInput);
             this.clearBtn.removeEventListener('click', this.clear);
+            this.input.removeEventListener('keydown', this.handleKeydown);
         }
     })
 
-//textarea
 const smTextarea = document.createElement('template')
 smTextarea.innerHTML = `
-    <style>
-    *,
-    *::before,
-    *::after { 
-        padding: 0;
-        margin: 0;
-        -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-    } 
-    ::-moz-focus-inner{
-        border: none;
-    }
-    .hide{
-        opacity: 0 !important;
-    }
-    :host{
-        display: grid;
-        --danger-color: red;
-        --background: rgba(var(--text-color,(17,17,17)), 0.06);
-        --padding: initial;
-        --max-height: 8rem;
-    }
-    :host([variant="outlined"]) .textarea {
-        box-shadow: 0 0 0 0.1rem rgba(var(--text-color,(17,17,17)), 0.4) inset;
-        background: rgba(var(--background-color,(255,255,255)), 1);
-    }
-    .textarea{
-        display: grid;
-        position: relative;
-        cursor: text;
-        min-width: 0;
-        text-align: left;
-        overflow: hidden auto;
-        grid-template-columns: 1fr;
-        align-items: stretch;
-        max-height: var(--max-height);
-        background: var(--background);
-        border-radius: var(--border-radius, 0.3rem);
-        padding: var(--padding);
-    }
-    .textarea::after,
-    textarea{
-        padding: 0.7rem 1rem;
-        width: 100%;
-        min-width: 1em;
-        font: inherit;
-        color: inherit;
-        resize: none;
-        grid-area: 2/1;
-        justify-self: stretch;
-        background: none;
-        appearance: none;
-        border: none;
-        outline: none;
-        line-height: 1.5;
-    }
-    .textarea::after{
-        content: attr(data-value) ' ';
-        visibility: hidden;
-        white-space: pre-wrap;
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-        hyphens: auto;
-        overflow: hidden;
-    }
-    .readonly{
-        pointer-events: none;
-    }
-    .textarea:focus-within:not(.readonly){
-        box-shadow: 0 0 0 0.1rem var(--accent-color,teal) inset;
-    }
-    .placeholder{
-        position: absolute;
-        margin: 0.7rem 1rem;
-        opacity: .7;
-        font-weight: inherit;
-        font-size: inherit;
-        line-height: 1.5;
-        pointer-events: none;
-        user-select: none;
-    }
-    :host([disabled]) .textarea{
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-    @media (any-hover: hover){
-        ::-webkit-scrollbar{
-            width: 0.5rem;
-            height: 0.5rem;
+        <style>
+        *,
+        *::before,
+        *::after { 
+            padding: 0;
+            margin: 0;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+        } 
+        ::-moz-focus-inner{
+            border: none;
         }
-        
-        ::-webkit-scrollbar-thumb{
-            background: rgba(var(--text-color,(17,17,17)), 0.3);
-            border-radius: 1rem;
-            &:hover{
-                background: rgba(var(--text-color,(17,17,17)), 0.5);
+        .hide{
+            opacity: 0 !important;
+        }
+        :host{
+            display: grid;
+            --danger-color: red;
+            --border-radius: 0.3rem;
+            --background: rgba(var(--text-color,(17,17,17)), 0.06);
+            --padding: initial;
+            --max-height: 8rem;
+        }
+        :host([variant="outlined"]) .textarea {
+            box-shadow: 0 0 0 0.1rem rgba(var(--text-color,(17,17,17)), 0.4) inset;
+            background: rgba(var(--background-color,(255,255,255)), 1);
+        }
+        .textarea{
+            display: grid;
+            position: relative;
+            cursor: text;
+            min-width: 0;
+            text-align: left;
+            overflow: hidden auto;
+            grid-template-columns: 1fr;
+            align-items: stretch;
+            max-height: var(--max-height);
+            background: var(--background);
+            border-radius: var(--border-radius);
+            padding: var(--padding);
+        }
+        .textarea::after,
+        textarea{
+            padding: 0.7rem 1rem;
+            width: 100%;
+            min-width: 1em;
+            font: inherit;
+            color: inherit;
+            resize: none;
+            grid-area: 2/1;
+            justify-self: stretch;
+            background: none;
+            appearance: none;
+            border: none;
+            outline: none;
+            line-height: 1.5;
+            overflow: hidden;
+        }
+        .textarea::after{
+            content: attr(data-value) ' ';
+            visibility: hidden;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+        .readonly{
+            pointer-events: none;
+        }
+        .textarea:focus-within:not(.readonly){
+            box-shadow: 0 0 0 0.1rem var(--accent-color,teal) inset;
+        }
+        .placeholder{
+            position: absolute;
+            margin: 0.7rem 1rem;
+            opacity: .7;
+            font-weight: inherit;
+            font-size: inherit;
+            line-height: 1.5;
+            pointer-events: none;
+            user-select: none;
+        }
+        :host([disabled]) .textarea{
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        @media (any-hover: hover){
+            ::-webkit-scrollbar{
+                width: 0.5rem;
+                height: 0.5rem;
+            }
+            
+            ::-webkit-scrollbar-thumb{
+                background: rgba(var(--text-color,(17,17,17)), 0.3);
+                border-radius: 1rem;
+                &:hover{
+                    background: rgba(var(--text-color,(17,17,17)), 0.5);
+                }
             }
         }
-    }
-    </style>
-    <label class="textarea" part="textarea">
-        <span class="placeholder"></span>
-        <textarea rows="1"></textarea>
-    </label>
-    `;
+        </style>
+        <label class="textarea" part="textarea">
+            <span class="placeholder"></span>
+            <textarea rows="1"></textarea>
+        </label>
+        `;
 customElements.define('sm-textarea',
     class extends HTMLElement {
         constructor() {
@@ -788,26 +803,26 @@ customElements.define('sm-textarea',
     })
 const smForm = document.createElement('template');
 smForm.innerHTML = `
-        <style>
-        *{
-            padding: 0;
-            margin: 0;
-            box-sizing: border-box;
-        }
-        :host{
-            display: flex;
-            width: 100%;
-        }
-        form{
-            display: grid;
-            gap: var(--gap, 1.5rem);
-            width: 100%;
-        }
-        </style>
-        <form part="form" onsubmit="return false">
-            <slot></slot>
-        </form>
-    `;
+            <style>
+            *{
+                padding: 0;
+                margin: 0;
+                box-sizing: border-box;
+            }
+            :host{
+                display: grid;
+                width: 100%;
+            }
+            form{
+                display: inherit;
+                gap: var(--gap, 1.5rem);
+                width: 100%;
+            }
+            </style>
+            <form part="form" onsubmit="return false">
+                <slot></slot>
+            </form>
+        `;
 
 customElements.define('sm-form', class extends HTMLElement {
     constructor() {
@@ -821,7 +836,7 @@ customElements.define('sm-form', class extends HTMLElement {
         this.requiredElements
         this.submitButton
         this.resetButton
-        this.allRequiredValid = false;
+        this.invalidFields = false;
 
         this.debounce = this.debounce.bind(this)
         this._checkValidity = this._checkValidity.bind(this)
@@ -839,18 +854,13 @@ customElements.define('sm-form', class extends HTMLElement {
         };
     }
     _checkValidity() {
-        this.allRequiredValid = this.requiredElements.every(elem => elem.isValid)
         if (!this.submitButton) return;
-        if (this.allRequiredValid) {
-            this.submitButton.disabled = false;
-        }
-        else {
-            this.submitButton.disabled = true;
-        }
+        this.invalidFields = this.requiredElements.filter(elem => !elem.isValid)
+        this.submitButton.disabled = this.invalidFields.length;
     }
     handleKeydown(e) {
-        if (e.key === 'Enter' && !e.target.tagName.includes('TEXTAREA')) {
-            if (this.allRequiredValid) {
+        if (e.key === 'Enter' && e.target.tagName.includes('SM-INPUT')) {
+            if (!this.invalidFields.length) {
                 if (this.submitButton) {
                     this.submitButton.click()
                 }
@@ -858,9 +868,8 @@ customElements.define('sm-form', class extends HTMLElement {
                     bubbles: true,
                     composed: true,
                 }))
-            }
-            else {
-                this.requiredElements.find(elem => !elem.isValid).vibrate()
+            } else {
+                this.requiredElements.forEach(elem => { if (!elem.isValid) elem.vibrate() })
             }
         }
     }
@@ -878,14 +887,22 @@ customElements.define('sm-form', class extends HTMLElement {
         this._checkValidity()
     }
     connectedCallback() {
-        const slot = this.shadowRoot.querySelector('slot')
-        slot.addEventListener('slotchange', this.elementsChanged)
+        this.shadowRoot.querySelector('slot').addEventListener('slotchange', this.elementsChanged)
         this.addEventListener('input', this.debounce(this._checkValidity, 100));
         this.addEventListener('keydown', this.debounce(this.handleKeydown, 100));
+        const mutationObserver = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                if (mutation.type === 'childList') {
+                    this.elementsChanged()
+                }
+            })
+        })
+        mutationObserver.observe(this, { childList: true, subtree: true })
     }
     disconnectedCallback() {
         this.removeEventListener('input', this.debounce(this._checkValidity, 100));
         this.removeEventListener('keydown', this.debounce(this.handleKeydown, 100));
+        mutationObserver.disconnect()
     }
 })
 //switch
@@ -1134,7 +1151,7 @@ smSelect.innerHTML = `
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
-    --min-width: 100%;
+    --min-width: max-content;
 }
 :host([disabled]) .select{
     opacity: 0.6;
@@ -1175,7 +1192,7 @@ smSelect.innerHTML = `
     grid-template-columns: 1fr auto;
         grid-template-areas: 'heading heading' '. .';
     padding: var(--padding,0.6rem 0.8rem);
-    background: rgba(var(--text-color,(17,17,17)), 0.06);
+    background: var(--background, rgba(var(--text-color,(17,17,17)), 0.06));
     -webkit-box-align: center;
         -ms-flex-align: center;
             align-items: center;
@@ -1215,7 +1232,7 @@ smSelect.innerHTML = `
     -webkit-box-shadow: 0.4rem 0.8rem 1.2rem #00000030;
             box-shadow: 0.4rem 0.8rem 1.2rem #00000030;
 }
-.rotate{
+:host([open]) .toggle-icon{
     -webkit-transform: rotate(180deg);
         -ms-transform: rotate(180deg);
             transform: rotate(180deg)
@@ -1241,7 +1258,7 @@ smSelect.innerHTML = `
 <div class="select">
     <div class="selection">
         <div class="selected-option-text"></div>
-        <svg class="icon toggle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 13.172l4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222z"/></svg>
+        <svg class="icon toggle-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 13.172l4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222z"/></svg>
     </div>
     <div part="options" class="options hide">
         <slot></slot> 
@@ -1263,9 +1280,11 @@ customElements.define('sm-select', class extends HTMLElement {
         this.handleOptionSelection = this.handleOptionSelection.bind(this)
         this.handleKeydown = this.handleKeydown.bind(this)
         this.handleClickOutside = this.handleClickOutside.bind(this)
+        this.selectOption = this.selectOption.bind(this)
 
         this.availableOptions
         this.previousOption
+        this._value = undefined;
         this.isOpen = false;
         this.label = ''
         this.slideDown = [{
@@ -1293,7 +1312,6 @@ customElements.define('sm-select', class extends HTMLElement {
         }
 
         this.optionList = this.shadowRoot.querySelector('.options')
-        this.chevron = this.shadowRoot.querySelector('.toggle')
         this.selection = this.shadowRoot.querySelector('.selection')
         this.selectedOptionText = this.shadowRoot.querySelector('.selected-option-text')
     }
@@ -1307,12 +1325,7 @@ customElements.define('sm-select', class extends HTMLElement {
         const selectedOption = this.availableOptions.find(option => option.getAttribute('value') === val)
         if (selectedOption) {
             this.setAttribute('value', val)
-            this.selectedOptionText.textContent = `${this.label}${selectedOption.textContent}`;
-            if (this.previousOption) {
-                this.previousOption.classList.remove('check-selected')
-            }
-            selectedOption.classList.add('check-selected')
-            this.previousOption = selectedOption
+            this.selectOption(selectedOption)
         } else {
             console.warn(`There is no option with ${val} as value`)
         }
@@ -1320,17 +1333,23 @@ customElements.define('sm-select', class extends HTMLElement {
 
     reset(fire = true) {
         if (this.availableOptions[0] && this.previousOption !== this.availableOptions[0]) {
-            const firstElement = this.availableOptions[0];
-            if (this.previousOption) {
-                this.previousOption.classList.remove('check-selected')
-            }
-            firstElement.classList.add('check-selected')
-            this.value = firstElement.getAttribute('value')
-            this.selectedOptionText.textContent = `${this.label}${firstElement.textContent}`
-            this.previousOption = firstElement;
+            const selectedOption = this.availableOptions.find(option => option.hasAttribute('selected')) || this.availableOptions[0];
+            this.value = selectedOption.getAttribute('value')
             if (fire) {
                 this.fireEvent()
             }
+        }
+    }
+    selectOption(selectedOption) {
+        if (this.previousOption) {
+            this.previousOption.classList.remove('check-selected')
+            this.previousOption.removeAttribute('selected')
+        }
+        if (this.previousOption !== selectedOption) {
+            selectedOption.classList.add('check-selected')
+            selectedOption.setAttribute('selected', '')
+            this.selectedOptionText.textContent = `${this.label}${selectedOption.textContent}`;
+            this.previousOption = selectedOption
         }
     }
 
@@ -1341,11 +1360,11 @@ customElements.define('sm-select', class extends HTMLElement {
     open() {
         this.optionList.classList.remove('hide')
         this.optionList.animate(this.slideDown, this.animationOptions)
-        this.chevron.classList.add('rotate')
+        this.setAttribute('open', '')
         this.isOpen = true
     }
     collapse() {
-        this.chevron.classList.remove('rotate')
+        this.removeAttribute('open')
         this.optionList.animate(this.slideUp, this.animationOptions)
             .onfinish = () => {
                 this.optionList.classList.add('hide')
@@ -1437,6 +1456,11 @@ customElements.define('sm-select', class extends HTMLElement {
         let slot = this.shadowRoot.querySelector('slot')
         slot.addEventListener('slotchange', e => {
             this.availableOptions = slot.assignedElements()
+            this.availableOptions.forEach(elem => {
+                if (elem.hasAttribute('selected')) {
+                    this._value = elem.value;
+                }
+            });
             this.reset(false)
         });
         this.addEventListener('click', this.handleClick)
