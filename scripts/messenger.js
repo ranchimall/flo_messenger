@@ -1090,7 +1090,7 @@
                     txid: txid,
                     data: content
                 }, key);
-                resolve(multisig_addr);
+                resolve(multisig.address);
             }).catch(error => reject(error))
         })
     }
