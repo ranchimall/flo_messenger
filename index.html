@@ -34,7 +34,8 @@
             //invoke the startup functions
             floDapps.launchStartUp().then(result => {
                 console.log(result)
-                getRef("greet_tag").value = myFloID
+                document.querySelectorAll('.user-flo-id').forEach(el => el.value = floDapps.user.id)
+                document.querySelectorAll('.user-btc-id').forEach(el => el.value = btcOperator.convert.legacy2bech(floDapps.user.id))
                 //load messages from IDB and render them
                 console.log(`Loading Data! Please Wait...`)
                 //Set UI render functions
@@ -235,10 +236,15 @@
                         </sm-menu>
                     </div>
                 </header>
-                <div class="margin-bottom-0-5" style="padding: 0 1rem;">
-                    <button class="button button--small button--outlined" onclick="openCreationPopup('multisig')">Create
-                        multisig</button>
-                </div>
+                <section class="grid gap-0-5" style="padding: 1rem;">
+                    <h5>Multisig</h5>
+                    <div class="margin-bottom-0-5">
+                        <button class="button button--small" onclick="openCreationPopup('multisig')">Create
+                            address</button>
+                        <button class="button button--small" onclick="openPopup('multisig_tx_popup')">Initiate
+                            transaction</button>
+                    </div>
+                </section>
                 <div id="chats_list" class="flex observe-empty-state"></div>
                 <div class="empty-state flex flex-direction-column align-center text-center align-self-center">
                     <svg class="icon icon--big" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
@@ -278,6 +284,7 @@
                             <path d="M0 0h24v24H0V0z" fill="none" />
                             <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6-6-6z" />
                         </svg>
+                        <div id="pseudo_background"></div>
                     </button>
                 </header>
                 <section id="messages_container" class="flex flex-direction-column"></section>
@@ -384,8 +391,8 @@
                 <a class="sidebar-item interactive" href="#/settings/about">About</a>
             </aside>
             <div id="settings_panel" class=" hide-on-mobile">
-                <header id="settings_header" class="flex  align-center hide-on-desktop">
-                    <a href="#/settings" class="button icon-only back-button margin-right-0-5">
+                <header id="settings_header" class="flex flex-direction-column gap-0-5 hide-on-desktop">
+                    <a href="#/settings" class="button icon-only back-button">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                             width="24px" fill="#000000">
                             <path d="M0 0h24v24H0V0z" fill="none" />
@@ -394,27 +401,40 @@
                     </a>
                     <h4 id="settings_title"></h4>
                 </header>
-                <div id="profile" class="panel">
-                    <section>
-                        <h4>My FLO ID</h4>
-                        <sm-copy id="greet_tag"></sm-copy>
-                        <button id="sign_out" onclick="signOut()" class="button button--danger"
-                            style="margin-top: 0.5rem;">
-                            <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg"
-                                enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
-                                fill="#000000">
-                                <g>
-                                    <path d="M0,0h24v24H0V0z" fill="none" />
-                                </g>
-                                <g>
-                                    <path
-                                        d="M17,8l-1.41,1.41L17.17,11H9v2h8.17l-1.58,1.58L17,16l4-4L17,8z M5,5h7V3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h7v-2H5V5z" />
-                                </g>
-                            </svg>
-                            Sign Out
-                        </button>
-                    </section>
-                    <section>
+                <div id="profile" class="panel grid gap-0-5">
+                    <div class="grid gap-1-5 card">
+                        <div class="grid gap-0-5">
+                            <h4>
+                                BTC integrated with FLO
+                            </h4>
+                            <p>
+                                You can use your FLO private key to perform transactions on the BTC network within our
+                                app
+                                ecosystem. The private key is the same for both.
+                            </p>
+                        </div>
+                        <div class="grid gap-0-5">
+                            <b>My FLO address</b>
+                            <sm-copy class="user-flo-id" clip-text></sm-copy>
+                        </div>
+                        <div class="grid gap-0-5">
+                            <b>My Bitcoin address</b>
+                            <sm-copy class="user-btc-id" clip-text></sm-copy>
+                        </div>
+                        <button class="button button--danger justify-self-start" onclick="signOut()">Sign out</button>
+                    </div>
+                    <div class="grid gap-1 card">
+                        <h4>Secure private key</h4>
+                        <p>
+                            You can set a password to secure your private key and use the password instead of private
+                            key.
+                            This is applied to this browser only.
+                        </p>
+                        <button id="secure_pwd_button" class="button button--primary justify-self-start secure-priv-key"
+                            onclick="openPopup('secure_pwd_popup')">Set
+                            password</button>
+                    </div>
+                    <section class="grid gap-1 card">
                         <h4>Clear data</h4>
                         <p><strong></strong>This can't be undone.</strong> Make sure you have stored the PRIVATE KEY and
                             backed up the data.</p>
@@ -436,22 +456,22 @@
                         </button>
                     </section>
                 </div>
-                <div id="chat" class="panel hidden">
-                    <sm-switch id="is_enter_send_toggle">
-                        <div slot="left" class="flex flex-direction-column">
+                <div id="chat" class="panel hidden grid gap-0-5">
+                    <sm-switch id="is_enter_send_toggle" class="card w-100">
+                        <div slot="left" class="grid gap-1">
                             <h4>Send by Enter</h4>
                             <p>If this toggle is ON then pressing 'Enter' key will send messages</p>
                         </div>
                     </sm-switch>
-                    <sm-switch id="haptic_feedback_switcher">
-                        <div slot="left" class="flex flex-direction-column">
+                    <sm-switch id="haptic_feedback_switcher" class="card w-100">
+                        <div slot="left" class="grid gap-1">
                             <h4>Haptic feedback</h4>
                             <p>Turn haptic feedback (vibrations) on/off.</p>
                         </div>
                     </sm-switch>
                 </div>
-                <div id="blocked" class="panel hidden">
-                    <section>
+                <div id="blocked" class="panel grid gap-0-5 hidden">
+                    <section class="card">
                         <h4>Blocked</h4>
                         <ul id="blocked_list" class="observe-empty-state"></ul>
                         <div class="empty-state">
@@ -459,8 +479,8 @@
                         </div>
                     </section>
                 </div>
-                <div id="personalize" class="panel hidden">
-                    <section>
+                <div id="personalize" class="panel grid gap-0-5 hidden">
+                    <section class="card">
                         <h4>Chat preview</h4>
                         <div id="chat_preview">
                             <div class="message sent">
@@ -473,14 +493,14 @@
                             </div>
                         </div>
                     </section>
-                    <section>
+                    <section class="grid gap-0-5 card">
                         <h4>Toggle dark theme</h4>
                         <div class="flex align-center space-between">
                             <p>Only applied to this browser</p>
                             <theme-toggle></theme-toggle>
                         </div>
                     </section>
-                    <section>
+                    <section class="grid gap-1 card">
                         <h4>Set chat and mail background image</h4>
                         <fieldset id="bg_preview_container" class="flex">
                             <label id="selected_bg_preview" class="bg-preview hidden">
@@ -503,7 +523,7 @@
                             <input type="file" id="select_bg_image" accept="image/*" />
                         </label>
                     </section>
-                    <section id="backdrop_options" class="hidden">
+                    <section id="backdrop_options" class="hidden grid gap-1 card">
                         <h4>App backdrop</h4>
                         <label class="grid gap-0-3">
                             <span>Wallpaper dimming</span>
@@ -520,13 +540,13 @@
                             </div>
                         </label>
                     </section>
-                    <section>
+                    <section class="grid gap-1 card">
                         <h4>Accent color</h4>
                         <color-grid id="accent_color_selector"></color-grid>
                     </section>
                 </div>
-                <div id="backup" class="panel hidden">
-                    <section>
+                <div id="backup" class="panel grid gap-0-5 hidden">
+                    <section class="grid gap-1 card">
                         <h4>Backup data</h4>
                         <p>Create a backup of contacts, conversations and mails. Which can later be used to restore
                             these in case of data is cleared. </p>
@@ -546,7 +566,7 @@
                         </button>
                         <span id="backup_info"></span>
                     </section>
-                    <section>
+                    <section class="grid gap-1 card">
                         <h4>Restore backup</h4>
                         <p>Select backup file with extension '.json'. Which was downloaded when backup was performed.
                         </p>
@@ -562,8 +582,8 @@
                         </label>
                     </section>
                 </div>
-                <div id="about" class="panel hidden">
-                    <section>
+                <div id="about" class="panel grid gap-0-5 hidden">
+                    <section class="card">
                         <p>Created by RanchiMall, a Blockchain incorporated entity</p>
                     </section>
                 </div>
@@ -915,6 +935,196 @@
             <p>You don't have any other contacts to show.</p>
         </div>
     </sm-popup>
+    <sm-popup id="secure_pwd_popup">
+        <header slot="header" class="popup__header">
+            <button class="popup__header__close justify-self-start">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                    fill="#000000">
+                    <path d="M0 0h24v24H0V0z" fill="none" />
+                    <path
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                </svg>
+            </button>
+            <h3 id="secure_pwd_title">Set password</h3>
+        </header>
+        <sm-form>
+            <sm-input id="secure_pwd_input" type="password" placeholder="Password" animate required autofocus>
+            </sm-input>
+            <button class="button button--primary cta secure-priv-key" type="submit" onclick="setSecurePassword()">
+                Set
+            </button>
+        </sm-form>
+    </sm-popup>
+    <sm-popup id="multisig_tx_popup">
+        <header slot="header" class="popup__header">
+            <button class="popup__header__close justify-self-start">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                    fill="#000000">
+                    <path d="M0 0h24v24H0V0z" fill="none" />
+                    <path
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                </svg>
+            </button>
+            <h3>Initiate multisig transaction </h3>
+        </header>
+        <div id="multisig_process" class="grid gap-2">
+            <div class="grid gap-1">
+                <b style="font-size: 0.9rem;">Select multisig address</b>
+                <ul id="select_multisig_list" class="grid gap-0-3"></ul>
+                <button id="enter_receiver_button" class="button button--primary margin-left-auto cta hidden"
+                    onclick="showChildElement('multisig_process',1,{entry: slideInLeft, exit: slideOutLeft})">
+                    Next
+                </button>
+            </div>
+            <div class="grid gap-1 hidden">
+                <button class="button icon-only back-button justify-self-start"
+                    onclick="showChildElement('multisig_process',0,{entry: slideInRight, exit: slideOutRight})">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                        fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                    </svg>
+                </button>
+                <div class="grid gap-0-5 card" style="padding: 1rem;">
+                    <span style="font-size: 0.9rem;">Selected sender</span>
+                    <h4 id="selected_multisig" class="wrap-around" style="font-size: 0.9rem;"></h4>
+                </div>
+                <sm-form id="send_tx">
+                    <div class="grid gap-0-5">
+                        <b style="font-size: 0.9rem;">Enter receiver(s)</b>
+                        <div id="receiver_container">
+                            <fieldset class="receiver-card">
+                                <sm-input class="receiver-input" placeholder="Receiver address" data-btc-address
+                                    error-text="Invalid BTC address" animate required>
+                                    <div class="currency-symbol flex" slot="icon">
+                                        <svg class="icon" xmlns="http://www.w3.org/2000/svg"
+                                            enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24"
+                                            width="24px" fill="#000000">
+                                            <g>
+                                                <rect fill="none" height="24" width="24"></rect>
+                                            </g>
+                                            <g>
+                                                <path
+                                                    d="M17.06,11.57C17.65,10.88,18,9.98,18,9c0-1.86-1.27-3.43-3-3.87L15,3h-2v2h-2V3H9v2H6v2h2v10H6v2h3v2h2v-2h2v2h2v-2 c2.21,0,4-1.79,4-4C19,13.55,18.22,12.27,17.06,11.57z M10,7h4c1.1,0,2,0.9,2,2s-0.9,2-2,2h-4V7z M15,17h-5v-4h5c1.1,0,2,0.9,2,2 S16.1,17,15,17z">
+                                                </path>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                </sm-input>
+                                <div class="flex align-start gap-0-5 remove-card-wrapper">
+                                    <sm-input type="number" class="amount-input w-100" placeholder="Amount"
+                                        min="0.0000001" step="0.00000001" error-text="Invalid amount" animate required>
+                                        <div class="currency-symbol flex" slot="icon">
+                                            <svg class="icon" xmlns="http://www.w3.org/2000/svg"
+                                                enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24"
+                                                width="24px" fill="#000000">
+                                                <g>
+                                                    <rect fill="none" height="24" width="24"></rect>
+                                                </g>
+                                                <g>
+                                                    <path
+                                                        d="M17.06,11.57C17.65,10.88,18,9.98,18,9c0-1.86-1.27-3.43-3-3.87L15,3h-2v2h-2V3H9v2H6v2h2v10H6v2h3v2h2v-2h2v2h2v-2 c2.21,0,4-1.79,4-4C19,13.55,18.22,12.27,17.06,11.57z M10,7h4c1.1,0,2,0.9,2,2s-0.9,2-2,2h-4V7z M15,17h-5v-4h5c1.1,0,2,0.9,2,2 S16.1,17,15,17z">
+                                                    </path>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                    </sm-input>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <button id="add_receiver" class="button button--small">
+                            <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
+                                viewBox="0 0 24 24" width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0V0z" fill="none" />
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                            </svg>
+                            Add receiver</button>
+                    </div>
+                    <div class="grid gap-0-5">
+                        <div class="flex align-center space-between">
+                            <h4>Fees</h4>
+                            <strip-select id="fees_selector" class="hidden">
+                                <strip-option value="suggested" selected>Suggested</strip-option>
+                                <strip-option value="custom">Custom</strip-option>
+                            </strip-select>
+                        </div>
+                        <p id="selected_fee_tip" class="hidden">Estimated time of confirmation is 1hr</p>
+                        <sm-input type="number" id="send_fee" placeholder="Fee" min="0.00000001" step="0.00000001"
+                            error-text="Please enter valid fees" animate required>
+                            <div class="currency-symbol flex" slot="icon">
+                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24"
+                                    height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
+                                    <g>
+                                        <rect fill="none" height="24" width="24"></rect>
+                                    </g>
+                                    <g>
+                                        <path
+                                            d="M17.06,11.57C17.65,10.88,18,9.98,18,9c0-1.86-1.27-3.43-3-3.87L15,3h-2v2h-2V3H9v2H6v2h2v10H6v2h3v2h2v-2h2v2h2v-2 c2.21,0,4-1.79,4-4C19,13.55,18.22,12.27,17.06,11.57z M10,7h4c1.1,0,2,0.9,2,2s-0.9,2-2,2h-4V7z M15,17h-5v-4h5c1.1,0,2,0.9,2,2 S16.1,17,15,17z">
+                                        </path>
+                                    </g>
+                                </svg>
+                            </div>
+                        </sm-input>
+                    </div>
+                    <div class="multi-state-button margin-bottom-1-5">
+                        <button id="initiate_transaction" type="submit" class="button button--primary cta w-100"
+                            disabled>Initiate</button>
+                    </div>
+                </sm-form>
+            </div>
+        </div>
+    </sm-popup>
+
+    <!-- Templates -->
+    <template id="receiver_template">
+        <fieldset class="receiver-card">
+            <sm-input class="receiver-input" placeholder="Receiver address" data-btc-address
+                error-text="Invalid BTC address" animate required>
+                <div class="currency-symbol flex" slot="icon">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px"
+                        viewBox="0 0 24 24" width="24px" fill="#000000">
+                        <g>
+                            <rect fill="none" height="24" width="24"></rect>
+                        </g>
+                        <g>
+                            <path
+                                d="M17.06,11.57C17.65,10.88,18,9.98,18,9c0-1.86-1.27-3.43-3-3.87L15,3h-2v2h-2V3H9v2H6v2h2v10H6v2h3v2h2v-2h2v2h2v-2 c2.21,0,4-1.79,4-4C19,13.55,18.22,12.27,17.06,11.57z M10,7h4c1.1,0,2,0.9,2,2s-0.9,2-2,2h-4V7z M15,17h-5v-4h5c1.1,0,2,0.9,2,2 S16.1,17,15,17z">
+                            </path>
+                        </g>
+                    </svg>
+                </div>
+            </sm-input>
+            <div class="flex align-start gap-0-5 remove-card-wrapper">
+                <sm-input type="number" class="amount-input w-100" placeholder="Amount" min="0.0000001"
+                    step="0.00000001" error-text="Invalid amount" animate required>
+                    <div class="currency-symbol flex" slot="icon">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24"
+                            height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
+                            <g>
+                                <rect fill="none" height="24" width="24"></rect>
+                            </g>
+                            <g>
+                                <path
+                                    d="M17.06,11.57C17.65,10.88,18,9.98,18,9c0-1.86-1.27-3.43-3-3.87L15,3h-2v2h-2V3H9v2H6v2h2v10H6v2h3v2h2v-2h2v2h2v-2 c2.21,0,4-1.79,4-4C19,13.55,18.22,12.27,17.06,11.57z M10,7h4c1.1,0,2,0.9,2,2s-0.9,2-2,2h-4V7z M15,17h-5v-4h5c1.1,0,2,0.9,2,2 S16.1,17,15,17z">
+                                </path>
+                            </g>
+                        </svg>
+                    </div>
+                </sm-input>
+                <button class="remove-card button--small">
+                    <svg class="icon margin-right-0-3" xmlns="http://www.w3.org/2000/svg" height="24px"
+                        viewBox="0 0 24 24" width="24px" fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path
+                            d="M7 11v2h10v-2H7zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+                    </svg>
+                    Remove
+                </button>
+            </div>
+        </fieldset>
+    </template>
+
+
     <script src="scripts/components.js"></script>
     <script src="scripts/script.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
@@ -1056,7 +1266,7 @@
                     const floID = floGlobals.activeFloID;
                     const isGroup = messenger.groups.hasOwnProperty(floID);
                     if (isGroup)
-                        isAdmin = messenger.groups[floID].admin === myFloID
+                        isAdmin = messenger.groups[floID].admin === floDapps.user.id
                     if (clickedContact.chatCard.closest('#chats_list')) {
                         let isAdmin = false
                         let addAsContact
@@ -1187,6 +1397,13 @@
                     }
                     renderElem(getRef('mail_contact_list'), html`${mailingContacts}`)
                     break;
+                case 'multisig_tx_popup':
+                    messenger.multisig.listAddress().then(addresses => {
+                        console.log(addresses)
+                        const list = Object.keys(addresses).map(address => render.multisigOption(address))
+                        renderElem(getRef('select_multisig_list'), html`${list}`)
+                    }).catch(err => notify(err, 'error'))
+                    break;
             }
         })
 
@@ -1211,6 +1428,11 @@
                     break;
                 case 'compose_mail_popup':
                     renderElem(getRef('mail_contact_list'), html``)
+                    break;
+                case 'multisig_tx_popup':
+                    renderElem(getRef('select_multisig_list'), html``)
+                    showChildElement('multisig_process', 0)
+                    getRef('enter_receiver_button').classList.add('hidden')
                     break;
             }
             if (popupStack.items.length === 0) {
@@ -1325,6 +1547,7 @@
                     break;
                 case 'error':
                     icon = `<svg class="icon icon--error" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z"/></svg>`
+                    options.pinned = true
                     break;
             }
             getRef("notification_drawer").push(message, { icon, ...options });
@@ -1388,7 +1611,7 @@
                 return floGlobals.contacts[floID]
             else if (messenger.groups[floID])
                 return messenger.groups[floID].name
-            else if (floID === myFloID)
+            else if (floID === floDapps.user.id)
                 return 'You'
             else
                 return floID
@@ -1397,6 +1620,7 @@
         window.addEventListener("load", () => {
             document.body.classList.remove('hidden')
             document.querySelectorAll('sm-input[data-flo-id]').forEach(input => input.customValidation = floCrypto.validateAddr)
+            getRef('receiver_container').querySelectorAll('sm-input[data-btc-address]').forEach(input => input.customValidation = btcOperator.validateAddress)
             document.addEventListener('keyup', (e) => {
                 if (e.key === 'Escape') {
                     closePopup()
@@ -1470,10 +1694,11 @@
             let params = {}
             let searchParams
             if (targetPage === '') {
-                if (typeof myFloID === "undefined") {
+                try {
+                    if (floDapps.user.id)
+                        pageId = 'chat_page'
+                } catch (e) {
                     pageId = 'sign_in'
-                } else {
-                    pageId = 'chat_page'
                 }
             } else {
                 if (targetPage.includes('/')) {
@@ -1494,10 +1719,13 @@
                     pageId = targetPage
                 }
             }
-            if (typeof myFloID === "undefined" && !(['sign_up', 'sign_in', 'loading', 'landing'].includes(pageId))) return
-            else if (typeof myFloID !== "undefined" && (['sign_up', 'sign_in', 'loading', 'landing'].includes(pageId))) {
-                history.replaceState(null, null, '#/chat_page');
-                pageId = 'chat_page'
+            try {
+                if (floDapps.user.id && (['sign_up', 'sign_in', 'loading', 'landing'].includes(pageId))) {
+                    history.replaceState(null, null, '#/chat_page');
+                    pageId = 'chat_page'
+                }
+            } catch (e) {
+                if (!(['sign_up', 'sign_in', 'loading', 'landing'].includes(pageId))) return
             }
             if (searchParams) {
                 const urlSearchParams = new URLSearchParams('?' + searchParams);
@@ -1508,13 +1736,11 @@
                     setTimeout(() => {
                         getRef('private_key_field').focusIn()
                     }, 0);
-                    targetPage = 'sign_in'
                     break;
                 case 'sign_up':
                     const { floID, privKey } = floCrypto.generateNewID()
                     getRef('generated_flo_id').value = floID
                     getRef('generated_private_key').value = privKey
-                    targetPage = 'sign_up'
                     break;
                 case 'chat_page':
                     if (subPageId1 && params.floId) {
@@ -1540,7 +1766,7 @@
                         getRef('contacts').classList.add('hide-on-mobile')
                         getRef('main_navbar').classList.add('hide-on-mobile')
                     } else {
-                        if (activeChat.floID && !isMobileView) {
+                        if (activeChat.floID && !floGlobals.isMobileView) {
                             history.replaceState(null, null, `#/chat_page/messages?floId=${activeChat.floID}`);
                         } else {
                             history.replaceState(null, null, '#/chat_page');
@@ -1605,7 +1831,7 @@
                         getRef('main_navbar').classList.remove('hide-away', 'hidden')
                         getRef('main_navbar').animate([
                             {
-                                transform: isMobileView ? `translateY(100%)` : `translateX(-100%)`,
+                                transform: floGlobals.isMobileView ? `translateY(100%)` : `translateX(-100%)`,
                                 opacity: 0,
                             },
                             {
@@ -1627,7 +1853,7 @@
                         const indicatorDimensions = previousIndicator.getBoundingClientRect()
                         const currentActiveElementDimensions = currentActiveElement.getBoundingClientRect()
                         let moveBy
-                        if (isMobileView) {
+                        if (floGlobals.isMobileView) {
                             moveBy = ((currentActiveElementDimensions.width - indicatorDimensions.width) / 2) + indicatorDimensions.width
                         } else {
                             moveBy = ((currentActiveElementDimensions.height - indicatorDimensions.height) / 2) + indicatorDimensions.height
@@ -1639,7 +1865,7 @@
                                 opacity: 1,
                             },
                             {
-                                transform: `translate${isMobileView ? 'X' : 'Y'}(${isOnTop ? `${moveBy}px` : `-${moveBy}px`})`,
+                                transform: `translate${floGlobals.isMobileView ? 'X' : 'Y'}(${isOnTop ? `${moveBy}px` : `-${moveBy}px`})`,
                                 opacity: 0,
                             },
                         ], { ...animOptions, easing: 'ease-in' }).onfinish = () => {
@@ -1665,7 +1891,7 @@
                                 opacity: 1,
                             },
                             {
-                                transform: isMobileView ? `translateY(100%)` : `translateX(-100%)`,
+                                transform: floGlobals.isMobileView ? `translateY(100%)` : `translateX(-100%)`,
                                 opacity: 0,
                             },
                         ], {
@@ -1710,7 +1936,7 @@
                     currentActiveElement.append(currentIndicator)
                     currentIndicator.animate([
                         {
-                            transform: `translate${isMobileView ? 'X' : 'Y'}(${isOnTop ? `-${moveBy}px` : `${moveBy}px`})`,
+                            transform: `translate${floGlobals.isMobileView ? 'X' : 'Y'}(${isOnTop ? `-${moveBy}px` : `${moveBy}px`})`,
                             opacity: 0,
                         },
                         {
@@ -1871,11 +2097,10 @@
             }
         }
 
-        let isMobileView = false
         const mobileQuery = window.matchMedia('(max-width: 40rem)')
         function handleMobileChange(e) {
-            isMobileView = e.matches
-            if (isMobileView) {
+            floGlobals.isMobileView = e.matches
+            if (floGlobals.isMobileView) {
             } else {
                 getRef('settings_sidebar').style = ''
                 getRef('settings_panel').style = ''
@@ -1960,62 +2185,92 @@
         ]
 
         function showChildElement(id, index, options = {}) {
-            const { mobileView = false, entry, exit } = options
-            const animOptions = {
-                duration: 150,
-                easing: 'ease',
-                fill: 'forwards'
-            }
-            const visibleElement = [...getRef(id).children].find(elem => !elem.classList.contains(mobileView ? 'hide-on-mobile' : 'hidden'));
-            if (visibleElement === getRef(id).children[index]) return;
-            visibleElement.getAnimations().forEach(anim => anim.cancel())
-            getRef(id).children[index].getAnimations().forEach(anim => anim.cancel())
-            if (visibleElement) {
-                if (exit) {
-                    visibleElement.animate(exit, animOptions).onfinish = () => {
+            return new Promise((resolve) => {
+                const { mobileView = false, entry, exit } = options
+                const animOptions = {
+                    duration: 150,
+                    easing: 'ease',
+                    fill: 'forwards'
+                }
+                const visibleElement = [...getRef(id).children].find(elem => !elem.classList.contains(mobileView ? 'hide-on-mobile' : 'hidden'));
+                if (visibleElement === getRef(id).children[index]) return;
+                visibleElement.getAnimations().forEach(anim => anim.cancel())
+                getRef(id).children[index].getAnimations().forEach(anim => anim.cancel())
+                if (visibleElement) {
+                    if (exit) {
+                        visibleElement.animate(exit, animOptions).onfinish = () => {
+                            visibleElement.classList.add(mobileView ? 'hide-on-mobile' : 'hidden')
+                            getRef(id).children[index].classList.remove(mobileView ? 'hide-on-mobile' : 'hidden')
+                            if (entry)
+                                getRef(id).children[index].animate(entry, animOptions).onfinish = () => resolve()
+                        }
+                    } else {
                         visibleElement.classList.add(mobileView ? 'hide-on-mobile' : 'hidden')
                         getRef(id).children[index].classList.remove(mobileView ? 'hide-on-mobile' : 'hidden')
-                        if (entry)
-                            getRef(id).children[index].animate(entry, animOptions)
+                        resolve()
                     }
                 } else {
-                    visibleElement.classList.add(mobileView ? 'hide-on-mobile' : 'hidden')
                     getRef(id).children[index].classList.remove(mobileView ? 'hide-on-mobile' : 'hidden')
+                    getRef(id).children[index].animate(entry, animOptions).onfinish = () => resolve()
                 }
-            } else {
-                getRef(id).children[index].classList.remove(mobileView ? 'hide-on-mobile' : 'hidden')
-                getRef(id).children[index].animate(entry, animOptions)
-            }
+            })
         }
         function getSignedIn(passwordType) {
             return new Promise((resolve, reject) => {
                 showPage('landing')
-                if (passwordType === 'PIN/Password') {
-                    getRef('private_key_field').removeAttribute('data-private-key');
-                    getRef('private_key_field').setAttribute('placeholder', 'PIN');
-                    getRef('private_key_field').customValidation = null
-
-                } else {
-                    getRef('private_key_field').dataset.privateKey = ''
-                    getRef('private_key_field').setAttribute('placeholder', 'FLO private key');
-                    getRef('private_key_field').customValidation = floCrypto.getPubKeyHex
+                try {
+                    console.log(floDapps.user.id)
+                    getPromptInput('Enter password', '', {
+                        isPassword: true,
+                    }).then(password => {
+                        if (password) {
+                            resolve(password)
+                        }
+                    })
+                } catch (err) {
+                    if (passwordType === 'PIN/Password') {
+                        floGlobals.isPrivKeySecured = true;
+                        getRef('private_key_field').removeAttribute('data-private-key');
+                        getRef('private_key_field').setAttribute('placeholder', 'Password');
+                        getRef('private_key_field').customValidation = null
+                        getRef('secure_pwd_button').closest('.card').classList.add('hidden');
+                    } else {
+                        floGlobals.isPrivKeySecured = false;
+                        getRef('private_key_field').dataset.privateKey = ''
+                        getRef('private_key_field').setAttribute('placeholder', 'FLO private key');
+                        getRef('private_key_field').customValidation = floCrypto.getPubKeyHex;
+                        getRef('secure_pwd_button').closest('.card').classList.remove('hidden');
+                    }
+                    if (window.location.hash.includes('sign_in') || window.location.hash.includes('sign_up')) {
+                        showPage(window.location.hash);
+                    } else {
+                        location.hash = floGlobals.isPrivKeySecured ? '#/sign_in' : `#/landing`;
+                    }
+                    getRef('sign_in_button').onclick = () => {
+                        resolve(getRef('private_key_field').value.trim());
+                        getRef('private_key_field').value = '';
+                        showPage('loading');
+                    };
+                    getRef('sign_up_button').onclick = () => {
+                        resolve(getRef('generated_private_key').value.trim());
+                        getRef('generated_private_key').value = '';
+                        showPage('loading');
+                    };
                 }
-                if (window.location.hash.includes('sign_in') || window.location.hash.includes('sign_up')) {
-                    showPage(window.location.hash);
-                } else {
-                    location.hash = `#/landing`;
-                }
-                getRef('sign_in_button').onclick = () => {
-                    resolve(getRef('private_key_field').value.trim());
-                    getRef('private_key_field').value = '';
-                    showPage('loading');
-                };
-                getRef('sign_up_button').onclick = () => {
-                    resolve(getRef('generated_private_key').value.trim());
-                    getRef('generated_private_key').value = '';
-                    showPage('loading');
-                };
             });
+        }
+        function setSecurePassword() {
+            if (!floGlobals.isPrivKeySecured) {
+                const password = getRef('secure_pwd_input').value.trim();
+                floDapps.securePrivKey(password).then(() => {
+                    floGlobals.isPrivKeySecured = true;
+                    notify('Password set successfully', 'success');
+                    getRef('secure_pwd_button').closest('.card').classList.add('hidden');
+                    closePopup();
+                }).catch(err => {
+                    notify(err, 'error');
+                })
+            }
         }
         function signOut() {
             getConfirmation('Sign out?', 'You are about to sign out of the app, continue?', 'Stay', 'Leave')
@@ -2060,7 +2315,7 @@
             },
             mail(from, to, subject, timestamp, content) {
                 let senderName, floID
-                if (from === myFloID) {
+                if (from === floDapps.user.id) {
                     let count = 0, list = [];
                     to.forEach(f => floGlobals.contacts[f] ? list.push(getContactName(f)) : count++)
                     senderName = `To : ${list.join(', ')}`
@@ -2159,12 +2414,12 @@
                 let { admin = false, newMembers = [], rmMembers = [], groupID, name, description, sender, floID, message, time: timestamp, category, unconfirmed = false, updateChatCard = false } = msg
                 if (activeChat.isGroup) {
                     floID = groupID
-                    category = sender === myFloID ? 'sent' : 'received'
+                    category = sender === floDapps.user.id ? 'sent' : 'received'
                 }
                 if (message) {
                     let senderName = null
                     if (sender) {
-                        if (sender !== myFloID && lastSender !== sender)
+                        if (sender !== floDapps.user.id && lastSender !== sender)
                             senderName = html.node`<a href="${`#/chat_page/messages?floId=${sender}`}" class="sender-name" style=${`color: var(${contactColor(sender)})`}>${getContactName(sender)}</a>`
                         lastSender = sender
                     }
@@ -2209,7 +2464,7 @@
                         const cards = document.createDocumentFragment()
                         const { admin } = messenger.groups[groupID]
                         newMembers.forEach(member => {
-                            let eventCard = html.node`<p class="group-event-card">${getContactName(admin)} added ${member === myFloID ? 'you' : getContactName(member)}</p>`
+                            let eventCard = html.node`<p class="group-event-card">${getContactName(admin)} added ${member === floDapps.user.id ? 'you' : getContactName(member)}</p>`
                             cards.append(eventCard)
                         })
                         return cards
@@ -2217,7 +2472,7 @@
                         const cards = document.createDocumentFragment()
                         const { admin } = messenger.groups[groupID]
                         rmMembers.forEach(member => {
-                            let eventCard = html.node`<p class="group-event-card">${getContactName(admin)} removed ${member === myFloID ? 'you' : getContactName(member)}</p>`
+                            let eventCard = html.node`<p class="group-event-card">${getContactName(admin)} removed ${member === floDapps.user.id ? 'you' : getContactName(member)}</p>`
                             cards.append(eventCard)
                         })
                         return cards
@@ -2276,6 +2531,25 @@
                         <h4 class="name">${name}</h4>
                     </button>
                 `
+            },
+            multisigOption(address) {
+                btcOperator.getBalance(address).then(balance => {
+                    const target = getRef('select_multisig_list').querySelector(`input[value="${address}"]`).parentNode.querySelector('.multisig-option__balance');
+                    if (target)
+                        target.textContent = `Balance: ${balance}`;
+                }).catch(err => notify(err, 'error'))
+                return html`
+                    <li>
+                        <label class="flex align-center multisig-option interactive">
+                            <input type="radio" name="multisig-group" value="${address}"/>
+                            <div class="grid gap-0-5">
+                                <span class="wrap-around">${address}</span>
+                                <span class="multisig-option__balance flex align-center">Balance: <sm-spinner><sm-spinner></span>
+                            </div>
+                            <div class="indicator"></div>
+                        </label>
+                    </li>
+                `
             }
         }
 
@@ -2291,7 +2565,7 @@
                     let { message, time, sender, category } = lastMessage
                     if (type === 'group' && time === 0)
                         lastMessage.time = messenger.groups[floID].created
-                    const amISender = type === 'chat' && category === 'sent' || type === 'group' && sender === myFloID
+                    const amISender = type === 'chat' && category === 'sent' || type === 'group' && sender === floDapps.user.id
                     lastMessage.lastMessage = ''
                     if (messenger.blocked.has(floID)) {
                         lastMessage.lastText = 'Blocked conversation'
@@ -2408,7 +2682,7 @@
                 const { category, floID, time, message, sender, groupID, admin, name } = messagesData[messageId]
                 // code to run if a chat is opened
                 if (activeChat && activeChat.floID === (floID || groupID)) {
-                    if (!sentByMe && sender && sender === myFloID) {
+                    if (!sentByMe && sender && sender === floDapps.user.id) {
                         // if message is sent by me, then dont add it to the chat
                     } else {
                         getRef('messages_container').append(render.messageBubble(messagesData[messageId]))
@@ -2419,7 +2693,7 @@
                         scrollToBottom()
                     }
                     // remove encryption badge if it exists
-                    if (!groupID && floGlobals.checkEncryption[activeChat.floID] && floID !== myFloID) {
+                    if (!groupID && floGlobals.checkEncryption[activeChat.floID] && floID !== floDapps.user.id) {
                         getRef('warn_no_encryption').remove()
                         delete floGlobals.checkEncryption[activeChat.floID]
                     }
@@ -2471,7 +2745,7 @@
                 if (messenger.groups && messenger.groups[groupID]) {
                     if (floGlobals.contacts[sender])
                         finalMessage = `${floGlobals.contacts[sender]}: ${message}`
-                    else if (floID === myFloID)
+                    else if (floID === floDapps.user.id)
                         finalMessage = `You: ${message}`
                 }
                 else
@@ -2658,7 +2932,7 @@
                 floID: e.delegateTarget.dataset.floId,
                 isGroup: messenger.groups.hasOwnProperty(e.delegateTarget.dataset.floId)
             }
-            if (clickedContact['floID'] === myFloID) return
+            if (clickedContact['floID'] === floDapps.user.id) return
             if (e.target.closest(".initial") || e.target.closest(".menu")) {
                 floGlobals.activeFloID = clickedContact.floID
                 openPopup('contact_details_popup')
@@ -2706,7 +2980,7 @@
                             getRef('multisig_creation__warning').classList.add('info--error')
                         }
                         getRef('multisig_creation__warning').textContent = warning
-                        getRef('skip_members_button').classList.remove('hidden')
+                        getRef('multisig_creation__warning').classList.remove('hidden')
                     }).catch(err => notify(err, 'error'))
                     break;
                 default:
@@ -2794,9 +3068,13 @@
         }
         getRef('skip_members_button').addEventListener('click', e => {
             if (getRef('creation_popup').dataset.type === 'multisig') {
-                showChildElement('creation_process', 2, { entry: slideInLeft, exit: slideOutLeft })
+                showChildElement('creation_process', 2, { entry: slideInLeft, exit: slideOutLeft }).then(() => {
+                    getRef('min_sign_required').focusIn()
+                })
             } else {
-                showChildElement('creation_process', 1, { entry: slideInLeft, exit: slideOutLeft })
+                showChildElement('creation_process', 1, { entry: slideInLeft, exit: slideOutLeft }).then(() => {
+                    getRef('group_name_field').focusIn()
+                })
             }
         })
 
@@ -2867,7 +3145,7 @@
         getRef('emoji_picker').addEventListener('emoji-click', e => {
             const clickedEmoji = e.detail.unicode
             getRef('type_message').value += clickedEmoji
-            if (!isMobileView) {
+            if (!floGlobals.isMobileView) {
                 setTimeout(() => {
                     getRef('type_message').focusIn()
                 }, 0);
@@ -2985,7 +3263,7 @@
             messenger.backupData().then(blob => {
                 renderElem(getRef("backup_info"), html`
                     Backup file generated! If the download didn't start automatically, 
-                    <a href="${URL.createObjectURL(blob)}" download="${`BackupFor_${myFloID}_${Date.now()}.json`}">click here</a>
+                    <a href="${URL.createObjectURL(blob)}" download="${`BackupFor_${floDapps.user.id}_${Date.now()}.json`}">click here</a>
                 `)
                 getRef("backup_info").querySelector('a').click();
             }).catch(error => {
@@ -3020,7 +3298,7 @@
             })
         })
         async function sendMessage() {
-            if (!isMobileView)
+            if (!floGlobals.isMobileView)
                 getRef('type_message').focusIn()
             let receiver = activeChat.floID
             let message = getRef('type_message').value.trim();
@@ -3030,7 +3308,7 @@
             let msgObj = { message, time, unconfirmed: true }
             if (activeChat.isGroup) {
                 msgObj['groupID'] = activeChat.floID
-                msgObj['sender'] = myFloID
+                msgObj['sender'] = floDapps.user.id
             } else {
                 msgObj['floID'] = activeChat.floID
                 msgObj['category'] = 'sent'
@@ -3055,7 +3333,7 @@
         function addContact() {
             let floID = getRef('add_contact_floID').value.trim();
             let name = getRef('add_contact_name').value.trim();
-            if (floID === myFloID) {
+            if (floID === floDapps.user.id) {
                 notify(`you can't add your own FLO ID as contact`, 'error')
                 return
             }
@@ -3074,7 +3352,7 @@
                     getRef('add_as_contact_option').remove()
                 }
                 if (activeChat.floID === floID)
-                    getRef('receiver_name').textContent = name
+                    updateChatHeaderName(name)
             }).catch(error => notify(error, "error"));
         }
 
@@ -3154,7 +3432,7 @@
                 getRef('type_message').value = floGlobals.typedMessages[floID] || ''
                 activeChat.floID = floID
                 activeChat.isGroup = messenger.groups.hasOwnProperty(floID)
-                getRef("receiver_name").textContent = getContactName(floID);
+                updateChatHeaderName(getContactName(floID));
                 if (activeChat.isGroup) {
                     getRef("receiver_initial").innerHTML = ` <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
                 } else {
@@ -3182,12 +3460,12 @@
             let inboxCount = 0, sentCount = 0
             for (let m in mails) {
                 let { from, to, prev, ref, subject, time, content } = mails[m]
-                if (from === myFloID) {
+                if (from === floDapps.user.id) {
                     sentMails.prepend(render.mailCard(to, ref, subject, time, content, markUnread))
                     if (markUnread) {
                         sentCount++
                     }
-                } else if (to.includes(myFloID)) {
+                } else if (to.includes(floDapps.user.id)) {
                     inboxMails.prepend(render.mailCard(from, ref, subject, time, content, markUnread))
                     if (markUnread) {
                         inboxCount++
@@ -3221,7 +3499,7 @@
                 }
                 //set values for reply mail form if new view
                 if (newView) {
-                    getRef('reply_mail_popup').dataset["to"] = (from === myFloID ? to.join(',') : from)
+                    getRef('reply_mail_popup').dataset["to"] = (from === floDapps.user.id ? to.join(',') : from)
                     getRef('reply_mail_popup').dataset["prev"] = mailRef;
                     getRef('subject_of_reply_mail').value = subject.startsWith("Re: ") ? subject : `Re: ${subject}`;
                     getRef("show_reply_popup").classList.remove("hidden");
@@ -3352,7 +3630,7 @@
         }
 
         function hidePanel() {
-            if (isMobileView && !getRef('settings_panel').classList.contains('hide-on-mobile')) {
+            if (floGlobals.isMobileView && !getRef('settings_panel').classList.contains('hide-on-mobile')) {
                 animateTo(getRef('settings_panel'), flyOutRight, animOptions).onfinish = () => {
                     getRef('settings_title').textContent = ''
                     getRef('settings_panel').style = ''
@@ -3394,7 +3672,7 @@
 
         function updateChatCards({ name, floID, isGroup = false }) {
             if (activeChat.floID && activeChat.floID === clickedContact.floID) {
-                getRef('receiver_name').textContent = name
+                updateChatHeaderName(name)
             }
             if (!isGroup) {
                 getRef('contact_initial').textContent = name.charAt(0)
@@ -3579,7 +3857,7 @@
 
         document.addEventListener('colorselected', e => {
             const color = e.detail.value
-            localStorage.setItem(`accent-color${myFloID}`, color);
+            localStorage.setItem(`accent-color${floDapps.user.id}`, color);
             document.body.style.setProperty('--accent-color', color);
         })
 
@@ -3672,6 +3950,167 @@
             compactIDB.writeData('userSettings', validBlur, 'bgBlur')
                 .catch(err => console.error(err))
         })
+
+
+
+        function updateChatHeaderName(name) {
+            if (!floGlobals.isMobileView) {
+                const animOptions = {
+                    duration: 200,
+                    easing: 'ease',
+                    fill: 'forwards'
+                };
+                let originalName = getRef('receiver_name').textContent
+                getRef('chat_details_button').style.overflow = 'initial'
+                const originalWidth = getRef('chat_details_button').getBoundingClientRect().width;
+                getRef('receiver_name').textContent = name
+                const changedWidth = getRef('chat_details_button').getBoundingClientRect().width;
+                const widthDelta = changedWidth - originalWidth
+                const leftMove = -widthDelta / 2;
+                const rightMove = widthDelta / 2;
+                const scale = (changedWidth / originalWidth).toFixed(2);
+                getRef('receiver_name').textContent = originalName
+                getRef('pseudo_background').animate([
+                    {
+                        width: `${originalWidth}px`
+                    }, {
+                        width: `${changedWidth}px`
+                    }
+                ], animOptions).onfinish = (e) => {
+                    getRef('chat_details_button').style.overflow = 'hidden'
+                    e.target.cancel()
+                }
+                getRef('chat_details_button').querySelector('#receiver_initial').animate([
+                    {
+                        transform: `none`
+                    },
+                    {
+                        transform: `translateX(${leftMove}px)`
+                    },
+                ], animOptions).onfinish = e => {
+                    e.target.cancel()
+                }
+                getRef('chat_details_button').children[2].animate([
+                    {
+                        transform: `none`
+                    },
+                    {
+                        transform: `translateX(${rightMove}px)`
+                    },
+                ], animOptions).onfinish = e => {
+                    e.target.cancel()
+                }
+                getRef('chat_details_button').querySelector('#receiver_name').animate([
+                    {
+                        transform: `none`,
+                        opacity: 1,
+                    }, {
+                        transform: `scaleX(${scale})`,
+                        opacity: 0,
+                    }
+                ], animOptions).onfinish = e => {
+                    e.target.cancel()
+                    getRef('receiver_name').textContent = name
+                }
+            } else {
+                getRef('receiver_name').textContent = name
+            }
+        }
+
+        getRef('select_multisig_list').addEventListener('change', e => {
+            getRef('selected_multisig').textContent = e.target.value
+            setTimeout(() => {
+                showChildElement('multisig_process', 1, { entry: slideInLeft, exit: slideOutLeft }).then(() => {
+                    getRef('send_tx').querySelector('sm-input').focusIn()
+                    getRef('enter_receiver_button').classList.remove('hidden')
+                })
+            }, 300);
+        })
+
+        const txParticipantsObserver = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                if (mutation.type === 'childList') {
+                    if (mutation.addedNodes.length > 0 && mutation.target.children.length > 1) {
+                        const removeButton = mutation.target.firstElementChild.querySelector('.remove-card')
+                        if (!removeButton) {
+                            const newRemoveButton = html.node`
+                        <button class="remove-card button--small">
+                            <svg class="icon margin-right-0-3" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0V0z" fill="none"></path>
+                                <path d="M7 11v2h10v-2H7zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
+                            </svg>
+                            Remove
+                        </button>
+                    `
+                            mutation.target.firstElementChild.querySelector('.remove-card-wrapper').appendChild(newRemoveButton)
+                        }
+                    } else if (mutation.removedNodes.length > 0 && mutation.target.children.length === 1) {
+                        const removeButton = mutation.target.firstElementChild.querySelector('.remove-card')
+                        if (removeButton) {
+                            removeButton.remove()
+                        }
+                    }
+                }
+            })
+        })
+        txParticipantsObserver.observe(getRef('receiver_container'), {
+            childList: true
+        })
+        let globalExchangeRate = {}
+        async function getExchangeRate() {
+            return new Promise((resolve, reject) => {
+                Promise.all(['usd', 'inr'].map(cur => fetch(`https://bitpay.com/api/rates/btc/${cur}`))).then(responses => {
+                    Promise.all(responses.map(res => res.json())).then(rates => {
+                        rates.forEach(rate => {
+                            globalExchangeRate[rate.code.toLowerCase()] = rate.rate
+                        })
+                        globalExchangeRate.btc = 1
+                        resolve(globalExchangeRate)
+                    }).catch(err => console.log(err))
+                }).catch(err => console.log(err))
+            })
+        }
+        getRef('add_receiver').onclick = evt => {
+            let receiverCard = getRef('receiver_template').content.cloneNode(true)
+            if (!getRef('receiver_container').children.length) {
+                receiverCard.querySelector('.remove-card').remove()
+            }
+            receiverCard.querySelector('.currency-symbol').innerHTML = `<svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24"></rect> </g> <g> <path d="M17.06,11.57C17.65,10.88,18,9.98,18,9c0-1.86-1.27-3.43-3-3.87L15,3h-2v2h-2V3H9v2H6v2h2v10H6v2h3v2h2v-2h2v2h2v-2 c2.21,0,4-1.79,4-4C19,13.55,18.22,12.27,17.06,11.57z M10,7h4c1.1,0,2,0.9,2,2s-0.9,2-2,2h-4V7z M15,17h-5v-4h5c1.1,0,2,0.9,2,2 S16.1,17,15,17z"> </path> </g> </svg>`
+            getRef('receiver_container').appendChild(receiverCard);
+            getRef('receiver_container').querySelectorAll('sm-input[data-btc-address]').forEach(input => input.customValidation = btcOperator.validateAddress)
+        }
+        delegate(getRef('receiver_container'), 'click', '.remove-card', e => {
+            e.target.closest('.receiver-card').remove()
+        })
+
+        getRef('initiate_transaction').onclick = async evt => {
+            buttonLoader('initiate_transaction', true)
+            const selectedInput = getRef('select_multisig_list').querySelector(':checked')
+            if (!selectedInput) return notify('Please select a multisig address', 'error')
+            const selectedMultisigAddress = selectedInput.value
+            const receivers = [...getRef('receiver_container').querySelectorAll('.receiver-input')].map(input => input.value.trim());
+            const amounts = [...getRef('receiver_container').querySelectorAll('.amount-input')].map(input => {
+                return parseFloat(input.value.trim())
+            });
+            try {
+                const allMultisigs = await messenger.multisig.listAddress()
+                const { redeemScript } = allMultisigs[selectedMultisigAddress]
+                const fee = parseFloat(getRef('send_fee').value.trim());
+                console.debug(selectedMultisigAddress, receivers, amounts, fee);
+                messenger.multisig.createTx(selectedMultisigAddress, redeemScript, receivers, amounts, fee).then(result => {
+                    console.log(result);
+                    notify('Initiated transaction', 'success')
+                    closePopup();
+                    getRef('send_tx').reset()
+                }).catch(error => {
+                    notify(`Error intiating transaction \n ${error}`, 'error');
+                }).finally(_ => {
+                    buttonLoader('initiate_transaction', false)
+                })
+            } catch (err) {
+                notify(err, 'error')
+            }
+        }
 
     </script>
 </body>
