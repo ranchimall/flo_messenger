@@ -1037,7 +1037,7 @@ sm-button[variant=primary] {
   grid-template-columns: auto 1fr;
   grid-template-areas: "dp .";
 }
-.contact.chat, .contact.group {
+.contact.chat, .contact.group, .contact.pipeline {
   grid-template-columns: auto 1fr auto;
   grid-template-areas: "dp . time" "dp . .";
 }
@@ -1196,40 +1196,37 @@ sm-button[variant=primary] {
   font-weight: 500;
 }
 
-#warn_no_encryption,
-.date-card,
-.group-event-card {
+.event-card {
   padding: 0.4rem 0.6rem;
   font-weight: 500;
   font-size: 0.8rem;
   background-color: rgba(var(--text-color), 0.04);
-  border-radius: 0.3rem;
+  border-radius: 0.5rem;
   color: rgba(var(--text-color), 0.8);
   margin: 1rem 0;
   justify-self: center;
   align-self: center;
   text-align: center;
 }
-#warn_no_encryption + #warn_no_encryption,
-#warn_no_encryption + .date-card,
-#warn_no_encryption + .group-event-card,
-.date-card + #warn_no_encryption,
-.date-card + .date-card,
-.date-card + .group-event-card,
-.group-event-card + #warn_no_encryption,
-.group-event-card + .date-card,
-.group-event-card + .group-event-card {
+.event-card + .event-card {
   margin-top: 0;
 }
 
 .group-event-card {
-  font-size: 0.8rem;
   font-weight: 400;
 }
 
 #warn_no_encryption {
   background: rgb(255, 253, 141);
   color: #111;
+}
+
+.pipeline-event {
+  padding: 0.6rem 0.8rem;
+  background-color: rgba(var(--foreground-color), 0.6);
+}
+.pipeline-event--signed .icon {
+  fill: var(--green);
 }
 
 .contact,
@@ -2264,6 +2261,9 @@ sm-button[variant=primary] {
     --width: 24rem;
     --min-width: 24rem;
     --border-radius: 0.5rem;
+  }
+  #multisig_tx_popup {
+    --width: 28rem;
   }
   #landing {
     align-items: center;

@@ -1,11 +1,11 @@
-(function(EXPORTS) { //btcOperator v1.0.8
+(function (EXPORTS) { //btcOperator v1.0.8
     /* BTC Crypto and API Operator */
     const btcOperator = EXPORTS;
 
     //This library uses API provided by chain.so (https://chain.so/)
     const URL = "https://chain.so/api/v2/";
 
-    const fetch_api = btcOperator.fetch = function(api) {
+    const fetch_api = btcOperator.fetch = function (api) {
         return new Promise((resolve, reject) => {
             console.debug(URL + api);
             fetch(URL + api).then(response => {
@@ -23,8 +23,8 @@
             fetch('https://api.blockchain.info/mempool/fees').then(response => {
                 if (response.ok)
                     response.json()
-                    .then(result => resolve(result.regular))
-                    .catch(error => reject(error));
+                        .then(result => resolve(result.regular))
+                        .catch(error => reject(error));
                 else
                     reject(response);
             }).catch(error => reject(error))
@@ -69,7 +69,7 @@
 
     coinjs.compressed = true;
 
-    const verifyKey = btcOperator.verifyKey = function(addr, key) {
+    const verifyKey = btcOperator.verifyKey = function (addr, key) {
         if (!addr || !key)
             return undefined;
         switch (coinjs.addressDecode(addr).type) {
@@ -84,7 +84,7 @@
         }
     }
 
-    const validateAddress = btcOperator.validateAddress = function(addr) {
+    const validateAddress = btcOperator.validateAddress = function (addr) {
         if (!addr)
             return undefined;
         let type = coinjs.addressDecode(addr).type;
@@ -94,7 +94,7 @@
             return false;
     }
 
-    btcOperator.multiSigAddress = function(pubKeys, minRequired) {
+    btcOperator.multiSigAddress = function (pubKeys, minRequired) {
         if (!Array.isArray(pubKeys))
             throw "pubKeys must be an array of public keys";
         else if (pubKeys.length < minRequired)
@@ -105,7 +105,7 @@
     //convert from one blockchain to another blockchain (target version)
     btcOperator.convert = {};
 
-    btcOperator.convert.wif = function(source_wif, target_version = coinjs.priv) {
+    btcOperator.convert.wif = function (source_wif, target_version = coinjs.priv) {
         let keyHex = decodeLegacy(source_wif).hex;
         if (!keyHex || keyHex.length < 66 || !/01$/.test(keyHex))
             return null;
@@ -113,7 +113,7 @@
             return encodeLegacy(keyHex, target_version);
     }
 
-    btcOperator.convert.legacy2legacy = function(source_addr, target_version = coinjs.pub) {
+    btcOperator.convert.legacy2legacy = function (source_addr, target_version = coinjs.pub) {
         let rawHex = decodeLegacy(source_addr).hex;
         if (!rawHex)
             return null;
@@ -121,7 +121,7 @@
             return encodeLegacy(rawHex, target_version);
     }
 
-    btcOperator.convert.legacy2bech = function(source_addr, target_version = coinjs.bech32.version, target_hrp = coinjs.bech32.hrp) {
+    btcOperator.convert.legacy2bech = function (source_addr, target_version = coinjs.bech32.version, target_hrp = coinjs.bech32.hrp) {
         let rawHex = decodeLegacy(source_addr).hex;
         if (!rawHex)
             return null;
@@ -129,7 +129,7 @@
             return encodeBech32(rawHex, target_version, target_hrp);
     }
 
-    btcOperator.convert.bech2bech = function(source_addr, target_version = coinjs.bech32.version, target_hrp = coinjs.bech32.hrp) {
+    btcOperator.convert.bech2bech = function (source_addr, target_version = coinjs.bech32.version, target_hrp = coinjs.bech32.hrp) {
         let rawHex = decodeBech32(source_addr).hex;
         if (!rawHex)
             return null;
@@ -137,7 +137,7 @@
             return encodeBech32(rawHex, target_version, target_hrp);
     }
 
-    btcOperator.convert.bech2legacy = function(source_addr, target_version = coinjs.pub) {
+    btcOperator.convert.bech2legacy = function (source_addr, target_version = coinjs.pub) {
         let rawHex = decodeBech32(source_addr).hex;
         if (!rawHex)
             return null;
@@ -319,7 +319,7 @@
                         script = Crypto.util.bytesToHex(s.buffer);
                     } else //redeemScript for multisig
                         script = rs;
-                    tx.addinput(utxos[i].txid, utxos[i].output_no, script, 0xfffffffd /*sequence*/ ); //0xfffffffd for Replace-by-fee
+                    tx.addinput(utxos[i].txid, utxos[i].output_no, script, 0xfffffffd /*sequence*/); //0xfffffffd for Replace-by-fee
                 }
                 addUTXOs(tx, senders, redeemScripts, required_amount, n + 1)
                     .then(result => resolve(result))
@@ -373,7 +373,7 @@
             current_value.add(new BigInteger('' + edit_value)) : parseInt(current_value + edit_value);
     }
 
-    btcOperator.sendTx = function(senders, privkeys, receivers, amounts, fee, change_addr = null) {
+    btcOperator.sendTx = function (senders, privkeys, receivers, amounts, fee, change_addr = null) {
         return new Promise((resolve, reject) => {
             try {
                 ({
@@ -404,7 +404,7 @@
             //create transaction
             createTransaction(senders, redeemScripts, receivers, amounts, fee, change_addr || senders[0]).then(tx => {
                 console.debug("Unsigned:", tx.serialize());
-                new Set(wif_keys).forEach(key => console.debug("Signing key:", key, tx.sign(key, 1 /*sighashtype*/ ))); //Sign the tx using private key WIF
+                new Set(wif_keys).forEach(key => console.debug("Signing key:", key, tx.sign(key, 1 /*sighashtype*/))); //Sign the tx using private key WIF
                 console.debug("Signed:", tx.serialize());
                 debugger;
                 broadcast(tx.serialize())
@@ -414,7 +414,7 @@
         })
     }
 
-    btcOperator.createTx = function(senders, receivers, amounts, fee = null, change_addr = null) {
+    btcOperator.createTx = function (senders, receivers, amounts, fee = null, change_addr = null) {
         return new Promise((resolve, reject) => {
             try {
                 ({
@@ -441,7 +441,7 @@
         })
     }
 
-    btcOperator.createMultiSigTx = function(sender, redeemScript, receivers, amounts, fee) {
+    btcOperator.createMultiSigTx = function (sender, redeemScript, receivers, amounts, fee) {
         return new Promise((resolve, reject) => {
             //validate tx parameters
             if (validateAddress(sender) !== "multisig")
@@ -483,7 +483,7 @@
         return tx;
     }
 
-    btcOperator.signTx = function(tx, privkeys, sighashtype = 1) {
+    btcOperator.signTx = function (tx, privkeys, sighashtype = 1) {
         tx = deserializeTx(tx);
         if (!Array.isArray(privkeys))
             privkeys = [privkeys];
@@ -494,7 +494,7 @@
         return tx.serialize();
     }
 
-    btcOperator.checkSigned = function(tx, bool = true) {
+    btcOperator.checkSigned = function (tx, bool = true) {
         tx = deserializeTx(tx);
         let n = [];
         for (let i in tx.ins) {
@@ -519,7 +519,7 @@
         return bool ? !(n.filter(x => x !== true).length) : n;
     }
 
-    btcOperator.checkIfSameTx = function(tx1, tx2) {
+    btcOperator.checkIfSameTx = function (tx1, tx2) {
         tx1 = deserializeTx(tx1);
         tx2 = deserializeTx(tx2);
         if (tx1.ins.length !== tx2.ins.length || tx1.outs.length !== tx2.outs.length)

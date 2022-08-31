@@ -42,6 +42,7 @@
                 messenger.renderUI.chats = renderChatList;
                 messenger.renderUI.directChat = renderDirectUI;
                 messenger.renderUI.groupChat = renderGroupUI;
+                messenger.renderUI.pipeline = renderPipelineUI;
                 messenger.renderUI.mails = m => renderMailList(m, false);
                 messenger.renderUI.marked = renderMarked;
                 //init messenger
@@ -218,33 +219,34 @@
     <main id="main_page" class="page grid hidden">
         <section id="chat_page" class="inner-page">
             <div id="contacts" class="grid">
-                <header class="grid header">
-                    <div class="flex align-center">
-                        <sm-input id="search_chats" class="margin-right-0-5" type="search"
-                            placeholder="Search FLO ID or name">
-                            <svg slot="icon" class="icon" xmlns="http://www.w3.org/2000/svg" height="24px"
-                                viewBox="0 0 24 24" width="24px" fill="#000000">
-                                <path d="M0 0h24v24H0V0z" fill="none" />
-                                <path
-                                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
-                            </svg>
-                        </sm-input>
-                        <sm-menu align-options="right">
-                            <sm-menu-option onclick="openCreationPopup('group')">
-                                Create new group
-                            </sm-menu-option>
-                        </sm-menu>
-                    </div>
-                </header>
                 <section class="grid gap-0-5" style="padding: 1rem;">
                     <h5>Multisig</h5>
-                    <div class="margin-bottom-0-5">
+                    <div>
                         <button class="button button--small" onclick="openCreationPopup('multisig')">Create
                             address</button>
                         <button class="button button--small" onclick="openPopup('multisig_tx_popup')">Initiate
                             transaction</button>
                     </div>
                 </section>
+                <div class="grid header">
+                    <div class="flex align-center space-between">
+                        <h4>Messages</h4>
+                        <sm-menu align-options="right">
+                            <sm-menu-option onclick="openCreationPopup('group')">
+                                Create new group
+                            </sm-menu-option>
+                        </sm-menu>
+                    </div>
+                    <sm-input id="search_chats" class="margin-right-0-5" type="search"
+                        placeholder="Search FLO ID or name">
+                        <svg slot="icon" class="icon" xmlns="http://www.w3.org/2000/svg" height="24px"
+                            viewBox="0 0 24 24" width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0V0z" fill="none" />
+                            <path
+                                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                        </svg>
+                    </sm-input>
+                </div>
                 <div id="chats_list" class="flex observe-empty-state"></div>
                 <div class="empty-state flex flex-direction-column align-center text-center align-self-center">
                     <svg class="icon icon--big" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
@@ -794,19 +796,6 @@
                     </svg>
                     Add contact
                 </button>
-                <button id="crate_multisig_option" class="option interactive" onclick="openCreationPopup('multisig')">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px"
-                        viewBox="0 0 24 24" width="24px" fill="#000000">
-                        <g>
-                            <rect fill="none" height="24" width="24" />
-                        </g>
-                        <g>
-                            <path
-                                d="M20,9V6h-2v3h-3v2h3v3h2v-3h3V9H20z M9,12c2.21,0,4-1.79,4-4c0-2.21-1.79-4-4-4S5,5.79,5,8C5,10.21,6.79,12,9,12z M9,6 c1.1,0,2,0.9,2,2c0,1.1-0.9,2-2,2S7,9.1,7,8C7,6.9,7.9,6,9,6z M15.39,14.56C13.71,13.7,11.53,13,9,13c-2.53,0-4.71,0.7-6.39,1.56 C1.61,15.07,1,16.1,1,17.22V20h16v-2.78C17,16.1,16.39,15.07,15.39,14.56z M15,18H3v-0.78c0-0.38,0.2-0.72,0.52-0.88 C4.71,15.73,6.63,15,9,15c2.37,0,4.29,0.73,5.48,1.34C14.8,16.5,15,16.84,15,17.22V18z" />
-                        </g>
-                    </svg>
-                    Create multisig address
-                </button>
             </fieldset>
             <div class="grid gap-1">
                 <h5>Contacts</h5>
@@ -821,17 +810,15 @@
     </sm-popup>
     <sm-popup id="creation_popup">
         <header class="grid popup__header" slot="header">
-            <div class="flex align-center">
-                <button class="popup__header__close justify-self-start">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                        fill="#000000">
-                        <path d="M0 0h24v24H0V0z" fill="none" />
-                        <path
-                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
-                    </svg>
-                </button>
-                <h4 id="creation_popup__title">Create group</h4>
-            </div>
+            <button class="popup__header__close justify-self-start">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                    fill="#000000">
+                    <path d="M0 0h24v24H0V0z" fill="none" />
+                    <path
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                </svg>
+            </button>
+            <h3 id="creation_popup__title">Create group</h3>
         </header>
         <div id="creation_process">
             <div>
@@ -986,8 +973,9 @@
                     </svg>
                 </button>
                 <div class="grid gap-0-5 card" style="padding: 1rem;">
-                    <span style="font-size: 0.9rem;">Selected sender</span>
+                    <span style="font-size: 0.9rem;">Selected multisig address</span>
                     <h4 id="selected_multisig" class="wrap-around" style="font-size: 0.9rem;"></h4>
+                    <p id="selected_multisig__balance"></p>
                 </div>
                 <sm-form id="send_tx">
                     <div class="grid gap-0-5">
@@ -1257,6 +1245,14 @@
             popupStack.peek().popup.hide()
         }
 
+        function getFloIdType(floID) {
+            if (messenger.groups.hasOwnProperty(floID))
+                return 'group';
+            else if (messenger.pipeline.hasOwnProperty(floID))
+                return 'pipeline';
+            else return 'plain';
+        }
+
         document.addEventListener('popupopened', async e => {
             getRef('main_page').setAttribute('inert', '')
             //pushes popup as septate entry in history
@@ -1264,61 +1260,60 @@
             switch (e.target.id) {
                 case 'contact_details_popup':
                     const floID = floGlobals.activeFloID;
-                    const isGroup = messenger.groups.hasOwnProperty(floID);
-                    if (isGroup)
+                    const floIdType = getFloIdType(floID);
+                    if (floIdType === 'group')
                         isAdmin = messenger.groups[floID].admin === floDapps.user.id
-                    if (clickedContact.chatCard.closest('#chats_list')) {
-                        let isAdmin = false
-                        let addAsContact
-                        if (!floGlobals.contacts.hasOwnProperty(floID) && !isGroup)
-                            addAsContact = html`
+                    let isAdmin = false
+                    let addAsContact
+                    if (!floGlobals.contacts.hasOwnProperty(floID) && floIdType === 'plain')
+                        addAsContact = html`
                                 <button id="add_as_contact_option" class="option" onclick="addAsContact()">
                                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <path d="M20,9V6h-2v3h-3v2h3v3h2v-3h3V9H20z M9,12c2.21,0,4-1.79,4-4c0-2.21-1.79-4-4-4S5,5.79,5,8C5,10.21,6.79,12,9,12z M9,6 c1.1,0,2,0.9,2,2c0,1.1-0.9,2-2,2S7,9.1,7,8C7,6.9,7.9,6,9,6z M15.39,14.56C13.71,13.7,11.53,13,9,13c-2.53,0-4.71,0.7-6.39,1.56 C1.61,15.07,1,16.1,1,17.22V20h16v-2.78C17,16.1,16.39,15.07,15.39,14.56z M15,18H3v-0.78c0-0.38,0.2-0.72,0.52-0.88 C4.71,15.73,6.63,15,9,15c2.37,0,4.29,0.73,5.48,1.34C14.8,16.5,15,16.84,15,17.22V18z" /> </g> </svg>
                                     Add as contact
                                 </button>`;
-                        let markReadUnread
-                        if (messenger.marked[floID] && messenger.marked[floID].includes('unread')) {
-                            markReadUnread = html`
+                    let markReadUnread
+                    if (messenger.marked[floID] && messenger.marked[floID].includes('unread')) {
+                        markReadUnread = html`
                             <button id="mark_read_option" class="option" onclick="markAsRead()">
                                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> <path d="M12,18l-6,0l-4,4V4c0-1.1,0.9-2,2-2h16c1.1,0,2,0.9,2,2v7l-2,0V4H4v12l8,0V18z M23,14.34l-1.41-1.41l-4.24,4.24l-2.12-2.12 l-1.41,1.41L17.34,20L23,14.34z" /> </g> </svg>
                                 Mark as read
                             </button>
                             `;
-                        } else {
-                            markReadUnread = html`
+                    } else {
+                        markReadUnread = html`
                                 <button id="mark_unread_option" class="option" onclick="markAsUnread()">
                                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <g> <path d="M20,16H4V4h10.1c-0.08-0.39-0.18-1.11,0-2H4C2.9,2,2,2.9,2,4v18l4-4h14c1.1,0,2-0.9,2-2V6.98c-0.58,0.44-1.26,0.77-2,0.92 V16z" /> <circle cx="19" cy="3" r="3" /> <rect height="2" width="8" x="6" y="12" /> <rect height="2" width="12" x="6" y="9" /> <path d="M6,8h12V7.9c-1.21-0.25-2.25-0.95-2.97-1.9H6V8z" /> </g> </g> </svg>
                                     Mark as unread
                                 </button>
                             `;
-                        }
-                        let blockUnblock
-                        if (messenger.blocked.has(floID)) {
-                            blockUnblock = html`
+                    }
+                    let blockUnblock
+                    if (messenger.blocked.has(floID)) {
+                        blockUnblock = html`
                                 <button class="option" onclick="unblockUser()">
                                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7 11v2h10v-2H7zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
                                     Unblock
                                 </button>
                             `;
-                        } else {
-                            blockUnblock = html`
+                    } else {
+                        blockUnblock = html`
                                 <button class="option option--danger" onclick="blockUser()">
                                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z"/></svg>
                                     Block
                                 </button>
                             `;
-                        }
+                    }
 
-                        let deleteChat
-                        if (!isGroup) {
-                            deleteChat = html`
+                    let deleteChat
+                    if (floIdType === 'plain') {
+                        deleteChat = html`
                             <button id="delete_chat_option" class="option option--danger" onclick="deleteChat()">
                                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0V0z" fill="none" /> <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" /> </svg>
                                 Delete this chat
                             </button>
                             `
-                        }
-                        renderElem(getRef('contact_options'), html`
+                    }
+                    renderElem(getRef('contact_options'), html`
                             ${addAsContact}
                             ${markReadUnread}
                             ${blockUnblock}
@@ -1328,8 +1323,7 @@
                             </button>
                             ${deleteChat}
                         `)
-                    }
-                    if (isGroup) {
+                    if (floIdType === 'group') {
                         const { description, created } = messenger.groups[floID]
                         getRef("contact_initial").innerHTML = ` <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
                         getRef("last_interaction_time").textContent = `Created ${getFormattedTime(created)}`;
@@ -1448,12 +1442,6 @@
             }
         })
 
-        function setAttributes(el, attrs) {
-            for (key in attrs) {
-                el.setAttribute(key, attrs[key]);
-            }
-        }
-
         const selectedColors = [
             '--dark-red',
             '--red',
@@ -1481,12 +1469,6 @@
                 contactsInfo[floID] = randomColor()
             }
             return contactsInfo[floID]
-        }
-
-        function clearElements(array = []) {
-            array.forEach(item => {
-                getRef(item).innerHTML = ``
-            })
         }
 
         // displays a popup for asking permission. Use this instead of JS confirm
@@ -2363,6 +2345,8 @@
                 if (type === 'group') {
                     initial = html`<svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
                     name = messenger.groups[floID].name
+                } else if (type === 'pipeline') {
+                    initial = html`<svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><g><path d="M6,15c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S4.9,15,6,15 M6,13c-2.2,0-4,1.8-4,4s1.8,4,4,4s4-1.8,4-4S8.2,13,6,13z M12,5 c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S10.9,5,12,5 M12,3C9.8,3,8,4.8,8,7s1.8,4,4,4s4-1.8,4-4S14.2,3,12,3z M18,15 c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S16.9,15,18,15 M18,13c-2.2,0-4,1.8-4,4s1.8,4,4,4s4-1.8,4-4S20.2,13,18,13z"/></g></g></svg>`
                 } else {
                     initial = name.charAt(0)
                 }
@@ -2411,9 +2395,13 @@
                 `
             },
             messageBubble(msg) {
-                let { admin = false, newMembers = [], rmMembers = [], groupID, name, description, sender, floID, message, time: timestamp, category, unconfirmed = false, updateChatCard = false } = msg
-                if (activeChat.isGroup) {
+                let { admin = false, newMembers = [], rmMembers = [], groupID, name, description, sender, floID, message, time: timestamp, category, unconfirmed = false,
+                    pipeID, type } = msg
+                if (activeChat.type === 'group') {
                     floID = groupID
+                    category = sender === floDapps.user.id ? 'sent' : 'received'
+                } else if (activeChat.type === 'pipeline') {
+                    floID = pipeID
                     category = sender === floDapps.user.id ? 'sent' : 'received'
                 }
                 if (message) {
@@ -2447,7 +2435,7 @@
                     let dateCard
                     if (!renderedDates.hasOwnProperty(messageDate) || renderedDates[messageDate] > timestamp) {
                         getRef('messages_container').querySelectorAll(`.date-card[data-date="${messageDate}"]`).forEach(card => card.remove())
-                        dateCard = html.node`<time class="date-card" data-date="${messageDate}">${messageDate}</time>`
+                        dateCard = html.node`<time class="date-card event-card" data-date="${messageDate}">${messageDate}</time>`
                         renderedDates[messageDate] = timestamp
                     }
                     const className = `message ${category} ${unconfirmed ? 'unconfirmed' : ''} ${senderName ? 'distinct-sender' : ''}`
@@ -2464,7 +2452,7 @@
                         const cards = document.createDocumentFragment()
                         const { admin } = messenger.groups[groupID]
                         newMembers.forEach(member => {
-                            let eventCard = html.node`<p class="group-event-card">${getContactName(admin)} added ${member === floDapps.user.id ? 'you' : getContactName(member)}</p>`
+                            let eventCard = html.node`<p class="group-event-card event-card">${getContactName(admin)} added ${member === floDapps.user.id ? 'you' : getContactName(member)}</p>`
                             cards.append(eventCard)
                         })
                         return cards
@@ -2472,14 +2460,30 @@
                         const cards = document.createDocumentFragment()
                         const { admin } = messenger.groups[groupID]
                         rmMembers.forEach(member => {
-                            let eventCard = html.node`<p class="group-event-card">${getContactName(admin)} removed ${member === floDapps.user.id ? 'you' : getContactName(member)}</p>`
+                            let eventCard = html.node`<p class="group-event-card event-card">${getContactName(admin)} removed ${member === floDapps.user.id ? 'you' : getContactName(member)}</p>`
                             cards.append(eventCard)
                         })
                         return cards
                     } else if (name) {
-                        return html.node`<p class="group-event-card">Changed group name to '${name}'</p>`
+                        return html.node`<p class="group-event-card event-card">Changed group name to '${name}'</p>`
                     } else if (description) {
-                        return html.node`<p class="group-event-card">Changed group description to '${description}'</p>`
+                        return html.node`<p class="group-event-card event-card">Changed group description to '${description}'</p>`
+                    }
+                } else if (type) {
+                    switch (type) {
+                        case 'TRANSACTION':
+                            return html.node`<p class="pipeline-event pipeline-event--signed event-card flex align-center">
+                                    <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M23,12l-2.44-2.79l0.34-3.69l-3.61-0.82L15.4,1.5L12,2.96L8.6,1.5L6.71,4.69L3.1,5.5L3.44,9.2L1,12l2.44,2.79l-0.34,3.7 l3.61,0.82L8.6,22.5l3.4-1.47l3.4,1.46l1.89-3.19l3.61-0.82l-0.34-3.69L23,12z M10.09,16.72l-3.8-3.81l1.48-1.48l2.32,2.33 l5.85-5.87l1.48,1.48L10.09,16.72z"/></g></svg>
+                                    ${getContactName(sender)} signed the transaction
+                                </p>`
+                            break;
+                        case 'BROADCAST':
+                            return html.node`<div class="pipeline-event pipeline-event--signed event-card flex align-center">
+                                <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M23,12l-2.44-2.79l0.34-3.69l-3.61-0.82L15.4,1.5L12,2.96L8.6,1.5L6.71,4.69L3.1,5.5L3.44,9.2L1,12l2.44,2.79l-0.34,3.7 l3.61,0.82L8.6,22.5l3.4-1.47l3.4,1.46l1.89-3.19l3.61-0.82l-0.34-3.69L23,12z M10.09,16.72l-3.8-3.81l1.48-1.48l2.32,2.33 l5.85-5.87l1.48,1.48L10.09,16.72z"/></g></svg>
+                                <h4>Transaction approved</h4>
+                                <a class="button--small margin-left-0-5" href="${`https://www.blockchain.com/btc/tx/${msg.txid}`}" target="_blank">View on blockchain</a>
+                            </div>`
+                            break;
                     }
                 }
 
@@ -2536,7 +2540,7 @@
                 btcOperator.getBalance(address).then(balance => {
                     const target = getRef('select_multisig_list').querySelector(`input[value="${address}"]`).parentNode.querySelector('.multisig-option__balance');
                     if (target)
-                        target.textContent = `Balance: ${balance}`;
+                        target.textContent = `Balance: ${balance} BTC`;
                 }).catch(err => notify(err, 'error'))
                 return html`
                     <li>
@@ -2676,12 +2680,20 @@
             updateMessageUI(data.messages)
         }
 
+        function renderPipelineUI(model, data) {
+            if (Object.keys(data.messages).length && appState.lastPage !== 'chat_page') {
+                document.title = `New message(s)`
+                addNotificationBadge('#chat_page_button', Object.keys(data.messages).length)
+            }
+            updateMessageUI(data.messages)
+        }
+
         function updateMessageUI(messagesData, sentByMe = false) {
             for (let messageId in messagesData) {
                 console.log(messagesData[messageId])
-                const { category, floID, time, message, sender, groupID, admin, name } = messagesData[messageId]
+                const { category, floID, time, message, sender, groupID, admin, name, pipeID } = messagesData[messageId]
                 // code to run if a chat is opened
-                if (activeChat && activeChat.floID === (floID || groupID)) {
+                if (activeChat && activeChat.floID === (floID || groupID || pipeID)) {
                     if (!sentByMe && sender && sender === floDapps.user.id) {
                         // if message is sent by me, then dont add it to the chat
                     } else {
@@ -2698,13 +2710,13 @@
                         delete floGlobals.checkEncryption[activeChat.floID]
                     }
                 }
-                let chatCard = getChatCard(floID || groupID)
+                let chatCard = getChatCard(floID || groupID || pipeID)
                 if (chatCard) {
                     if (admin) {
                         if (name)
                             chatCard.querySelector('.name').textContent = name
                     }
-                    if ((floID || groupID) !== getRef('chats_list').children[0].dataset.floId) {
+                    if ((floID || groupID || pipeID) !== getRef('chats_list').children[0].dataset.floId) {
                         const animOptions = {
                             easing: 'ease',
                             duration: 300,
@@ -2755,20 +2767,20 @@
                 if (chatCard.querySelector('.time'))
                     chatCard.querySelector('.time').textContent = getFormattedTime(time, 'relative')
 
-                if (activeChat.floID === (floID || groupID)) {
+                if (activeChat.floID === (floID || groupID || pipeID)) {
                     if (chatScrollInfo.isScrolledUp)
                         getRef('scroll_to_bottom').classList.add('new-message')
                     else {
                         if (document.hasFocus()) {
-                            messenger.removeMark((floID || groupID), 'unread')
+                            messenger.removeMark((floID || groupID || pipeID), 'unread')
                             setTimeout(() => {
                                 document.title = 'FLO Messenger'
-                                getChatCard(floID || groupID).classList.remove('unread')
+                                getChatCard(floID || groupID || pipeID).classList.remove('unread')
                             }, 1000);
                         }
                     }
                 } else {
-                    getChatCard(floID || groupID).classList.add('unread')
+                    getChatCard(floID || groupID || pipeID).classList.add('unread')
                 }
             }
         }
@@ -3306,20 +3318,33 @@
             if (message === '') return
             let time = Date.now()
             let msgObj = { message, time, unconfirmed: true }
-            if (activeChat.isGroup) {
-                msgObj['groupID'] = activeChat.floID
-                msgObj['sender'] = floDapps.user.id
-            } else {
-                msgObj['floID'] = activeChat.floID
-                msgObj['category'] = 'sent'
+            switch (activeChat.type) {
+                case 'group':
+                    msgObj['groupID'] = receiver
+                    msgObj['sender'] = floDapps.user.id
+                    break;
+                case 'pipeline':
+                    msgObj['pipeID'] = receiver
+                    msgObj['sender'] = floDapps.user.id
+                    break;
+                case 'plain':
+                    msgObj['floID'] = activeChat.floID
+                    msgObj['category'] = 'sent'
+                    break;
             }
             updateMessageUI({ msgObj }, true)
             try {
-                if (activeChat.isGroup) {
-                    await messenger.sendGroupMessage(message, receiver)
-                } else
-                    await messenger.sendMessage(message, receiver)
-
+                switch (activeChat.type) {
+                    case 'group':
+                        await messenger.sendGroupMessage(message, receiver)
+                        break;
+                    case 'pipeline':
+                        await messenger.sendPipelineMessage(message, receiver)
+                        break;
+                    case 'plain':
+                        await messenger.sendMessage(message, receiver)
+                        break;
+                }
                 if (getRef('messages_container').querySelector(`.unconfirmed`))
                     getRef('messages_container').querySelector(`.unconfirmed`).classList.remove('unconfirmed')
                 const chatCard = getChatCard(activeChat.floID)
@@ -3373,6 +3398,8 @@
                     type = 'chat'
                 else if (messenger.groups[floID])
                     type = 'group'
+                else if (messenger.pipeline[floID])
+                    type = 'pipeline'
                 return render.contactCard(floID, { type, markUnread, ref: getRef('chats_list') })
             })
             renderElem(getRef('chats_list'), html`${chats}`)
@@ -3400,6 +3427,7 @@
         function renderMessages(floID) {
             return new Promise(async (resolve, reject) => {
                 messenger.getChat(floID).then(chat => {
+                    console.log(chat)
                     if (chatLazyLoader) {
                         chatLazyLoader.update(Object.values(chat))
                     } else {
@@ -3431,12 +3459,19 @@
                 // restore typed message if any
                 getRef('type_message').value = floGlobals.typedMessages[floID] || ''
                 activeChat.floID = floID
-                activeChat.isGroup = messenger.groups.hasOwnProperty(floID)
+                activeChat.type = getFloIdType(floID)
                 updateChatHeaderName(getContactName(floID));
-                if (activeChat.isGroup) {
-                    getRef("receiver_initial").innerHTML = ` <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
+                const chatCard = getChatCard(floID);
+                if (chatCard) {
+                    getRef("receiver_initial").innerHTML = chatCard.querySelector('.initial').innerHTML;
                 } else {
-                    getRef("receiver_initial").textContent = getContactName(floID).charAt(0);
+                    if (activeChat.type === 'group') {
+                        getRef("receiver_initial").innerHTML = ` <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
+                    } else if (activeChat.type === 'pipeline') {
+                        getRef("receiver_initial").innerHTML = `<svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><g><path d="M6,15c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S4.9,15,6,15 M6,13c-2.2,0-4,1.8-4,4s1.8,4,4,4s4-1.8,4-4S8.2,13,6,13z M12,5 c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S10.9,5,12,5 M12,3C9.8,3,8,4.8,8,7s1.8,4,4,4s4-1.8,4-4S14.2,3,12,3z M18,15 c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S16.9,15,18,15 M18,13c-2.2,0-4,1.8-4,4s1.8,4,4,4s4-1.8,4-4S20.2,13,18,13z"/></g></g></svg>`
+                    } else {
+                        getRef("receiver_initial").textContent = getContactName(floID).charAt(0);
+                    }
                 }
                 getRef("receiver_initial").setAttribute('style', `--contact-color: var(${contactColor(floID)})`)
                 messenger.removeMark(floID, "unread");
@@ -3445,8 +3480,8 @@
                     getRef('scroll_to_bottom').classList.remove('no-transformations')
                 }
                 renderMessages(floID).then(() => {
-                    if (!floGlobals.pubKeys[floID] && !activeChat.isGroup) {
-                        getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption">Converstion is not encrypted until receiver replies</strong>`)
+                    if (!floGlobals.pubKeys[floID] && activeChat.type === 'plain') {
+                        getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption" class="event-card">Converstion is not encrypted until receiver replies</strong>`)
                         floGlobals.checkEncryption[floID] = true
                     }
                     resolve()
@@ -3689,7 +3724,7 @@
         }
 
         function getChatCard(floID) {
-            return getRef('chats_list').querySelector(`.chat[data-flo-id="${floID}"], .group[data-flo-id="${floID}"]`)
+            return getRef('chats_list').querySelector(`[data-flo-id="${floID}"]`)
         }
 
         function addAsContact() {
@@ -4017,16 +4052,16 @@
             }
         }
 
-        getRef('select_multisig_list').addEventListener('change', e => {
-            getRef('selected_multisig').textContent = e.target.value
+        delegate(getRef('select_multisig_list'), 'click', '.multisig-option', e => {
+            getRef('selected_multisig').textContent = e.delegateTarget.querySelector('input').value;
+            getRef('selected_multisig__balance').textContent = e.delegateTarget.querySelector('.multisig-option__balance').textContent;
             setTimeout(() => {
                 showChildElement('multisig_process', 1, { entry: slideInLeft, exit: slideOutLeft }).then(() => {
                     getRef('send_tx').querySelector('sm-input').focusIn()
                     getRef('enter_receiver_button').classList.remove('hidden')
                 })
-            }, 300);
+            }, 200);
         })
-
         const txParticipantsObserver = new MutationObserver(mutations => {
             mutations.forEach(mutation => {
                 if (mutation.type === 'childList') {
