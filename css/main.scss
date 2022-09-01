@@ -1147,6 +1147,9 @@ sm-button[variant="primary"] {
   input {
     margin-left: auto;
   }
+  button {
+    margin-left: auto;
+  }
 }
 
 .group-member {
@@ -1273,8 +1276,8 @@ sm-button[variant="primary"] {
   color: #111;
 }
 .pipeline-event {
-  padding: 0.6rem 0.8rem;
-  background-color: rgba(var(--foreground-color), 0.6);
+  padding: 0.8rem 1rem;
+  border: solid thin rgba(var(--text-color), 0.2);
   &--signed {
     .icon {
       fill: var(--green);

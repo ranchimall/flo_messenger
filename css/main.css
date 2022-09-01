@@ -1108,6 +1108,9 @@ sm-button[variant=primary] {
 .selectable-contact input {
   margin-left: auto;
 }
+.selectable-contact button {
+  margin-left: auto;
+}
 
 .group-member {
   display: flex;
@@ -1222,8 +1225,8 @@ sm-button[variant=primary] {
 }
 
 .pipeline-event {
-  padding: 0.6rem 0.8rem;
-  background-color: rgba(var(--foreground-color), 0.6);
+  padding: 0.8rem 1rem;
+  border: solid thin rgba(var(--text-color), 0.2);
 }
 .pipeline-event--signed .icon {
   fill: var(--green);

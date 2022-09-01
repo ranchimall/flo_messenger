@@ -743,7 +743,7 @@
             </div>
             <div id="group_members_card" class="hidden">
                 <div class="flex align-center">
-                    <h4 class="h4">Group members</h4>
+                    <h4 class="h4">Members</h4>
                     <button id="edit_group_button" class="button hidden justify-right"
                         onclick="editGroupMembers()">Edit</button>
                 </div>
@@ -830,8 +830,8 @@
                     </div>
                     <div id="selected_contacts_container" class="observe-empty-state"></div>
                     <div class="empty-state">
-                        <p class="info info--warning">*Contacts that haven't yet replied to you, won't be visible here.
-                        </p>
+                        <p class="info info--warning">*Contacts that haven't yet replied to you, can't be selected. you
+                            can send a request or message them.</p>
                     </div>
                 </div>
                 <div class="scrolling-wrapper">
@@ -1224,9 +1224,25 @@
                 document.querySelector(element).classList.remove(className);
             });
         }
+        // toggle class on condition
+        function conditionalClass(elem, condition, className) {
+            if (condition) {
+                elem.classList.add(className)
+            } else {
+                elem.classList.remove(className)
+            }
+        }
         // return querySelectorAll elements as an array
         function getAllElements(selector) {
             return Array.from(document.querySelectorAll(selector));
+        }
+        // toggle attribute based on condition
+        function toggleAttr(elem, condition, attr) {
+            if (condition) {
+                elem.setAttribute(attr, '')
+            } else {
+                elem.removeAttribute(attr)
+            }
         }
 
         let zIndex = 50
@@ -1261,9 +1277,9 @@
                 case 'contact_details_popup':
                     const floID = floGlobals.activeFloID;
                     const floIdType = getFloIdType(floID);
+                    let isAdmin = false
                     if (floIdType === 'group')
                         isAdmin = messenger.groups[floID].admin === floDapps.user.id
-                    let isAdmin = false
                     let addAsContact
                     if (!floGlobals.contacts.hasOwnProperty(floID) && floIdType === 'plain')
                         addAsContact = html`
@@ -1330,27 +1346,28 @@
                         getRef("group_description").value = description === '' ? 'Add group description' : description;
                         render.groupMembers(floID)
                         getRef('contact_details_popup').classList.add('is-group');
-                        getRef('group_members_card').classList.remove('hidden')
-                        getRef('group_description_card').classList.remove('hidden')
+                        removeClass(['#group_members_card', '#group_description_card'], 'hidden')
                         getRef('edit_group_button').dataset.groupId = floID;
                         getRef('flo_id_type').textContent = 'Group FLO ID'
-                        if (isAdmin) {
-                            getRef('contact_name').disabled = false
-                            getRef('group_description').disabled = false
-                            getRef('edit_group_button').classList.remove('hidden')
-                        } else {
-                            getRef('contact_name').disabled = true
-                            getRef('group_description').disabled = true
-                            getRef('edit_group_button').classList.add('hidden')
-                        }
+                        toggleAttr(getRef('contact_name'), !isAdmin, 'disabled')
+                        toggleAttr(getRef('group_description'), !isAdmin, 'disabled')
+                        conditionalClass(getRef('edit_group_button'), !isAdmin, 'hidden')
+                    } else if (floIdType === 'pipeline') {
+                        const { model, members } = messenger.pipeline[floID]
+                        getRef("contact_initial").innerHTML = ` <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"></rect></g><g><g><path d="M6,15c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S4.9,15,6,15 M6,13c-2.2,0-4,1.8-4,4s1.8,4,4,4s4-1.8,4-4S8.2,13,6,13z M12,5 c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S10.9,5,12,5 M12,3C9.8,3,8,4.8,8,7s1.8,4,4,4s4-1.8,4-4S14.2,3,12,3z M18,15 c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S16.9,15,18,15 M18,13c-2.2,0-4,1.8-4,4s1.8,4,4,4s4-1.8,4-4S20.2,13,18,13z"></path></g></g></svg>`
+                        render.pipelineMembers(floID)
+                        getRef('contact_details_popup').classList.add('is-group');
+                        removeClass(['#group_members_card'], 'hidden')
+                        addClass(['#group_members_tip', '#group_description_card'], 'hidden')
+                        getRef('flo_id_type').textContent = 'Pipeline FLO ID'
+                        getRef("last_interaction_time").textContent = ``;
                     } else {
                         getRef('flo_id_type').textContent = 'FLO ID'
                         getRef('contact_name').disabled = false
                         getRef('contact_initial').textContent = getContactName(floID).charAt(0)
                         getRef("last_interaction_time").textContent = ``;
                         getRef('contact_details_popup').classList.remove('is-group');
-                        getRef('group_members_card').classList.add('hidden')
-                        getRef('group_description_card').classList.add('hidden')
+                        addClass(['#group_members_card', '#group_description_card'], 'hidden')
                     }
                     getRef('contact_initial').setAttribute('style', `--contact-color: var(${contactColor(floID)})`)
                     getRef('contact_name').value = getContactName(floID)
@@ -1375,15 +1392,19 @@
                     }
                     renderContactList(floGlobals.contacts)
                     break
-                case 'creation_popup':
-                    const validContacts = []
+                case 'creation_popup': {
+                    const contacts = []
                     for (const floID in floGlobals.contacts) {
+                        if (getFloIdType(floID) !== 'plain') continue;
                         if (floGlobals.pubKeys.hasOwnProperty(floID)) {
-                            validContacts.push(render.selectableContact(floID))
+                            contacts.push(render.selectableContact(floID))
+                        } else {
+                            contacts.push(render.actionableContact(floID))
                         }
                     }
-                    renderElem(getRef('select_contacts_container'), html`${validContacts}`)
+                    renderElem(getRef('select_contacts_container'), html`${contacts}`)
                     break;
+                }
                 case 'compose_mail_popup':
                     const mailingContacts = []
                     for (const floID in floGlobals.contacts) {
@@ -2394,6 +2415,17 @@
                     </label>
                 `
             },
+            actionableContact(floID) {
+                const name = getContactName(floID)
+                const initial = name.charAt(0)
+                return html`
+                    <div class="flex align-center selectable-contact" data-flo-id=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
+                        <div class="initial flex align-center"> ${initial} </div>
+                        <h4 class="name">${name}</h4>
+                        <button class="button button--small request-pubkey">Request</button>
+                    </div>
+                `
+            },
             messageBubble(msg) {
                 let { admin = false, newMembers = [], rmMembers = [], groupID, name, description, sender, floID, message, time: timestamp, category, unconfirmed = false,
                     pipeID, type } = msg
@@ -2472,6 +2504,11 @@
                 } else if (type) {
                     switch (type) {
                         case 'TRANSACTION':
+                            if (floGlobals.pipeSigns[pipeID]) {
+                                floGlobals.pipeSigns[pipeID].add(sender)
+                            } else {
+                                floGlobals.pipeSigns[pipeID] = new Set()
+                            }
                             return html.node`<p class="pipeline-event pipeline-event--signed event-card flex align-center">
                                     <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M23,12l-2.44-2.79l0.34-3.69l-3.61-0.82L15.4,1.5L12,2.96L8.6,1.5L6.71,4.69L3.1,5.5L3.44,9.2L1,12l2.44,2.79l-0.34,3.7 l3.61,0.82L8.6,22.5l3.4-1.47l3.4,1.46l1.89-3.19l3.61-0.82l-0.34-3.69L23,12z M10.09,16.72l-3.8-3.81l1.48-1.48l2.32,2.33 l5.85-5.87l1.48,1.48L10.09,16.72z"/></g></svg>
                                     ${getContactName(sender)} signed the transaction
@@ -2509,6 +2546,20 @@
                         
                         `)
                     }
+                })
+                renderElem(getRef('group_members_list'), html`${groupMembersCards}`)
+            },
+            pipelineMembers(pipeID) {
+                const groupMembersCards = [];
+                messenger.pipeline[pipeID].members.forEach(floID => {
+                    let name = getContactName(floID)
+                    let initial = name.charAt(0)
+                    groupMembersCards.push(html`
+                            <div class="group-member" .dataset=${{ floId: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
+                                <div class="initial flex align-center"> ${initial} </div>
+                                <h4 class="name wrap-around">${name}</h4>
+                            </div>
+                            `)
                 })
                 renderElem(getRef('group_members_list'), html`${groupMembersCards}`)
             },
@@ -2747,6 +2798,8 @@
                         getRef('chats_list').prepend(html.node`${render.contactCard(floID, { type: 'chat', prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
                     } else if (groupID) {
                         getRef('chats_list').prepend(html.node`${render.contactCard(groupID, { type: 'group', prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
+                    } else {
+                        getRef('chats_list').prepend(html.node`${render.contactCard(pipeID, { type: 'pipeline', prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
                     }
                     chatCard = getRef('chats_list').children[0]
                     if (sentByMe) {
@@ -3010,6 +3063,12 @@
                 selectContact(e.target.value)
             else
                 removeSelectedContact(e.target.value)
+        })
+        delegate(getRef('select_contacts_container'), 'click', '.request-pubkey', e => {
+            const floID = e.delegateTarget.closest('.selectable-contact').dataset.floId
+            // messenger.request_pubKey(floID, 'hey there!')
+            e.delegateTarget.disabled = true;
+            e.delegateTarget.textContent = 'Request sent'
         })
         delegate(getRef('selected_contacts_container'), 'click', '.remove-selected', e => {
             removeSelectedContact(e.target.closest('.contact-preview').dataset.floId)
@@ -3427,7 +3486,6 @@
         function renderMessages(floID) {
             return new Promise(async (resolve, reject) => {
                 messenger.getChat(floID).then(chat => {
-                    console.log(chat)
                     if (chatLazyLoader) {
                         chatLazyLoader.update(Object.values(chat))
                     } else {
@@ -3446,6 +3504,7 @@
 
         floGlobals.typedMessages = {}
         floGlobals.checkEncryption = {}
+        floGlobals.pipeSigns = {}
         function viewConversation(floID) {
             return new Promise((resolve, reject) => {
                 // clear rendered date cards if any 
@@ -3479,10 +3538,33 @@
                     chatScrollInfo['isScrolledUp'] = false
                     getRef('scroll_to_bottom').classList.remove('no-transformations')
                 }
+                const floIdType = getFloIdType(floID)
+                if (floIdType === 'pipeline' && messenger.pipeline[floID].disabled) {
+                    getRef('chat_footer').classList.add('hidden')
+                } else {
+                    getRef('chat_footer').classList.remove('hidden')
+                }
+                lastSender = ''
                 renderMessages(floID).then(() => {
-                    if (!floGlobals.pubKeys[floID] && activeChat.type === 'plain') {
-                        getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption" class="event-card">Converstion is not encrypted until receiver replies</strong>`)
-                        floGlobals.checkEncryption[floID] = true
+                    if (activeChat.type === 'plain') {
+                        if (!floGlobals.pubKeys[floID]) {
+                            getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption" class="event-card">Converstion is not encrypted until receiver replies</strong>`)
+                            floGlobals.checkEncryption[floID] = true
+                        }
+                    } else if (activeChat.type === 'pipeline') {
+                        if (!messenger.pipeline[floID].disabled && !floGlobals.pipeSigns[floID].has(floDapps.user.id)) {
+                            getRef('messages_container').append(html.node`
+                                <div class="grid gap-1 card signing-banner" style="margin: auto;">
+                                    <div class="grid gap-0-5">
+                                        <h4>You haven't signed the transaction</h4>
+                                        <p>Use "Sign now" button to approve the transaction</p>
+                                    </div>
+                                    <div class="multi-state-button">
+                                        <button class="button button--primary cta" onclick="${() => signTransaction(floID)}">Sign now</button>
+                                    </div>
+                                </div>
+                            `)
+                        }
                     }
                     resolve()
                 })
@@ -4128,8 +4210,8 @@
                 return parseFloat(input.value.trim())
             });
             try {
-                const allMultisigs = await messenger.multisig.listAddress()
-                const { redeemScript } = allMultisigs[selectedMultisigAddress]
+                const allMultiSigs = await messenger.multisig.listAddress()
+                const { redeemScript } = allMultiSigs[selectedMultisigAddress]
                 const fee = parseFloat(getRef('send_fee').value.trim());
                 console.debug(selectedMultisigAddress, receivers, amounts, fee);
                 messenger.multisig.createTx(selectedMultisigAddress, redeemScript, receivers, amounts, fee).then(result => {
@@ -4145,6 +4227,18 @@
             } catch (err) {
                 notify(err, 'error')
             }
+        }
+
+        function signTransaction(pipeID) {
+            const banner = getRef('messages_container').querySelector('.signing-banner')
+            const button = banner.querySelector('button')
+            buttonLoader(button, true)
+            messenger.multisig.signTx(pipeID).then(() => {
+                getRef('messages_container').querySelector('.signing-banner').remove()
+            }).catch(err => {
+                console.log(err, 'error')
+                buttonLoader(button, false)
+            })
         }
 
     </script>
