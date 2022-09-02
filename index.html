@@ -219,13 +219,26 @@
     <main id="main_page" class="page grid hidden">
         <section id="chat_page" class="inner-page">
             <div id="contacts" class="grid">
-                <section class="grid gap-0-5" style="padding: 1rem;">
-                    <h5>Multisig</h5>
-                    <div>
-                        <button class="button button--small" onclick="openCreationPopup('multisig')">Create
-                            address</button>
-                        <button class="button button--small" onclick="openPopup('multisig_tx_popup')">Initiate
-                            transaction</button>
+                <section class="grid gap-0-5 card" style="padding: 1rem 1rem 0 1rem; border-radius: 0 0 1rem 1rem;">
+                    <h4>Bitcoin multisig</h4>
+                    <div class="flex align-center gap-0-5" style="margin: 0 -0.5rem 0.5rem;">
+                        <button class="prime-action" onclick="openCreationPopup('multisig')">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
+                            </svg>
+                            Create address
+                        </button>
+                        <button class="prime-action" onclick="openPopup('multisig_tx_popup')">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0z" fill="none" />
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                            </svg>
+                            Initiate transaction
+                        </button>
                     </div>
                 </section>
                 <div class="grid header">
@@ -2504,11 +2517,6 @@
                 } else if (type) {
                     switch (type) {
                         case 'TRANSACTION':
-                            if (floGlobals.pipeSigns[pipeID]) {
-                                floGlobals.pipeSigns[pipeID].add(sender)
-                            } else {
-                                floGlobals.pipeSigns[pipeID] = new Set()
-                            }
                             return html.node`<p class="pipeline-event pipeline-event--signed event-card flex align-center">
                                     <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M23,12l-2.44-2.79l0.34-3.69l-3.61-0.82L15.4,1.5L12,2.96L8.6,1.5L6.71,4.69L3.1,5.5L3.44,9.2L1,12l2.44,2.79l-0.34,3.7 l3.61,0.82L8.6,22.5l3.4-1.47l3.4,1.46l1.89-3.19l3.61-0.82l-0.34-3.69L23,12z M10.09,16.72l-3.8-3.81l1.48-1.48l2.32,2.33 l5.85-5.87l1.48,1.48L10.09,16.72z"/></g></svg>
                                     ${getContactName(sender)} signed the transaction
@@ -2589,9 +2597,9 @@
             },
             multisigOption(address) {
                 btcOperator.getBalance(address).then(balance => {
-                    const target = getRef('select_multisig_list').querySelector(`input[value="${address}"]`).parentNode.querySelector('.multisig-option__balance');
+                    const target = getRef('select_multisig_list').querySelector(`input[value="${address}"]`);
                     if (target)
-                        target.textContent = `Balance: ${balance} BTC`;
+                        target.parentNode.querySelector('.multisig-option__balance').textContent = `Balance: ${balance} BTC`;
                 }).catch(err => notify(err, 'error'))
                 return html`
                     <li>
@@ -3494,6 +3502,18 @@
                         });
                     }
                     chatLazyLoader.init()
+                    if (getFloIdType(floID) === 'pipeline') {
+                        for (const key in chat) {
+                            const { type, sender } = chat[key]
+                            if (type === 'TRANSACTION') {
+                                if (floGlobals.pipeSigns[floID]) {
+                                    floGlobals.pipeSigns[floID].add(sender)
+                                } else {
+                                    floGlobals.pipeSigns[floID] = new Set()
+                                }
+                            }
+                        }
+                    }
                     resolve()
                 }).catch(error => {
                     console.log(error)
@@ -3566,6 +3586,7 @@
                             `)
                         }
                     }
+                    // to-do: fix signed transaction detection error caused due to lazy loading
                     resolve()
                 })
             })

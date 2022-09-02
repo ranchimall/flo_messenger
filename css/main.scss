@@ -1014,6 +1014,24 @@ sm-button[variant="primary"] {
   grid-template-rows: 1fr auto;
 }
 
+.prime-action {
+  display: flex;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: initial;
+  text-align: left;
+  padding: 0.5rem;
+  .icon {
+    background-color: rgba(var(--text-color), 0.06);
+    fill: var(--accent-color);
+    border-radius: 2rem;
+    padding: 0.6rem;
+    height: 2.6rem;
+    width: 2.6rem;
+    margin-right: 0.5rem;
+  }
+}
+
 .initial {
   position: relative;
   justify-content: center;
