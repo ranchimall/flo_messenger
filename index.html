@@ -219,10 +219,10 @@
     <main id="main_page" class="page grid hidden">
         <section id="chat_page" class="inner-page">
             <div id="contacts" class="grid">
-                <section class="grid gap-0-5 card" style="padding: 1rem 1rem 0 1rem; border-radius: 0 0 1rem 1rem;">
+                <section class="grid gap-0-5 card" style="padding: 1rem 1rem 0 1rem; border-radius: 0;">
                     <h4>Bitcoin multisig</h4>
-                    <div class="flex align-center gap-0-5" style="margin: 0 -0.5rem 0.5rem;">
-                        <button class="prime-action" onclick="openCreationPopup('multisig')">
+                    <div class="flex align-center" style="margin: 0 -0.5rem 0.5rem;">
+                        <button class="prime-action interactive" onclick="openCreationPopup('multisig')">
                             <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                                 width="24px" fill="#000000">
                                 <path d="M0 0h24v24H0z" fill="none" />
@@ -231,7 +231,7 @@
                             </svg>
                             Create address
                         </button>
-                        <button class="prime-action" onclick="openPopup('multisig_tx_popup')">
+                        <button class="prime-action interactive" onclick="openPopup('multisig_tx_popup')">
                             <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                                 width="24px" fill="#000000">
                                 <path d="M0 0h24v24H0z" fill="none" />
@@ -1407,12 +1407,18 @@
                     break
                 case 'creation_popup': {
                     const contacts = []
+                    const sentRequests = await messenger.list_request_sent();
+                    const skipSendingRequest = new Set();
+                    for (const key in sentRequests) {
+                        skipSendingRequest.add(sentRequests[key].floID)
+                    }
                     for (const floID in floGlobals.contacts) {
                         if (getFloIdType(floID) !== 'plain') continue;
                         if (floGlobals.pubKeys.hasOwnProperty(floID)) {
                             contacts.push(render.selectableContact(floID))
                         } else {
-                            contacts.push(render.actionableContact(floID))
+                            const hasSentRequest = skipSendingRequest.has(floID)
+                            contacts.push(render.actionableContact(floID, hasSentRequest))
                         }
                     }
                     renderElem(getRef('select_contacts_container'), html`${contacts}`)
@@ -2428,14 +2434,14 @@
                     </label>
                 `
             },
-            actionableContact(floID) {
+            actionableContact(floID, hasSentRequest) {
                 const name = getContactName(floID)
                 const initial = name.charAt(0)
                 return html`
                     <div class="flex align-center selectable-contact" data-flo-id=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
                         <div class="initial flex align-center"> ${initial} </div>
                         <h4 class="name">${name}</h4>
-                        <button class="button button--small request-pubkey">Request</button>
+                        <button class="button button--small request-pubkey" ?disabled=${hasSentRequest}>${hasSentRequest ? 'Request sent' : 'Request'}</button>
                     </div>
                 `
             },
@@ -2727,6 +2733,7 @@
                 document.title = `New mail(s)`
                 addNotificationBadge('#mail_page_button', Object.keys(data.mails).length)
             }
+            console.log(data.requests, data.responses)
             updateMessageUI(data.messages)
             renderMailList(data.mails, true)
         }
@@ -3074,7 +3081,7 @@
         })
         delegate(getRef('select_contacts_container'), 'click', '.request-pubkey', e => {
             const floID = e.delegateTarget.closest('.selectable-contact').dataset.floId
-            // messenger.request_pubKey(floID, 'hey there!')
+            messenger.request_pubKey(floID, 'hey there!')
             e.delegateTarget.disabled = true;
             e.delegateTarget.textContent = 'Request sent'
         })
@@ -3586,7 +3593,6 @@
                             `)
                         }
                     }
-                    // to-do: fix signed transaction detection error caused due to lazy loading
                     resolve()
                 })
             })

@@ -28,7 +28,7 @@ body {
   --kinda-pink: #e40273;
   --purple: #462191;
   --shady-blue: #324de6;
-  --nice-blue: #256eff;
+  --nice-blue: #3d5afe;
   --maybe-cyan: #00b0ff;
   --teal: #00bcd4;
   --mint-green: #16c79a;
@@ -61,7 +61,7 @@ body[data-theme=dark] {
   --kinda-pink: #c44ae6;
   --purple: #9565f7;
   --shady-blue: #8295fb;
-  --nice-blue: #86afff;
+  --nice-blue: #6d83ff;
   --maybe-cyan: #66cfff;
   --teal: #6aeeff;
   --mint-green: #4dffd2;
@@ -996,7 +996,7 @@ sm-button[variant=primary] {
   background-color: rgba(var(--text-color), 0.06);
   fill: var(--accent-color);
   border-radius: 2rem;
-  padding: 0.6rem;
+  padding: 0.7rem;
   height: 2.6rem;
   width: 2.6rem;
   margin-right: 0.5rem;
@@ -1719,7 +1719,7 @@ sm-button[variant=primary] {
 .sent {
   margin-left: auto;
   background: var(--accent-color);
-  border-radius: 0.3rem 0 0.3rem 0.3rem;
+  border-radius: 0.5rem 0 0.5rem 0.5rem;
 }
 .sent > * {
   color: rgba(var(--background-color), 1);
@@ -1738,7 +1738,7 @@ sm-button[variant=primary] {
 
 .received {
   margin-right: auto;
-  border-radius: 0 0.3rem 0.3rem 0.3rem;
+  border-radius: 0 0.5rem 0.5rem 0.5rem;
   background-color: rgba(var(--text-color), 0.1);
 }
 .received::after {
@@ -1765,12 +1765,12 @@ sm-button[variant=primary] {
 
 .sent + .sent,
 .received + .received {
-  border-radius: 0.3rem;
+  border-radius: 0.5rem;
 }
 
 .distinct-sender {
   display: grid;
-  border-radius: 0 0.3rem 0.3rem 0.3rem !important;
+  border-radius: 0 0.5rem 0.5rem 0.5rem !important;
   margin-top: 0.8rem !important;
 }
 .distinct-sender::after {
