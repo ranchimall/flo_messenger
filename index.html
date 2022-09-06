@@ -5,6 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FLO Messenger</title>
+    <link rel="shortcut icon" href="assets/messenger-favicon_1.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.min.css">
+    <link rel="stylesheet" href="css/style.css">
     <script id="floGlobals">
         /* Constants for FLO blockchain operations !!Make sure to add this at beginning!! */
         const floGlobals = {
@@ -56,11 +61,6 @@
             }).catch(error => notify(error, "error"))
         }
     </script>
-    <link rel="shortcut icon" href="assets/messenger-favicon_1.png" type="image/png">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/main.min.css">
-    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body data-theme="dark" onload="onLoadStartUp()" class="hidden">
@@ -90,7 +90,7 @@
                 <svg class="icon flo-icon" width="64" height="64" viewBox="0 0 64 64" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <mask id="path-1-outside-1_16_6" maskUnits="userSpaceOnUse" x="3" y="3" width="58" height="58">
-                        <rect fill="white" x="3" y="3" width="58" height="58" />
+                        <rect class="foreground-circle" x="3" y="3" width="58" height="58" />
                         <path fill-rule="evenodd" clip-rule="evenodd"
                             d="M31.946 43.6019C28.8545 47.1308 28.7789 51.9719 31.9811 55.1957C35.0078 52.2797 35.0105 46.8446 31.946 43.6019ZM31.9487 10.6835C24.6452 19.1291 24.9206 29.1137 31.9433 37.4108C39.0929 28.9436 39.1118 19.0076 31.9487 10.6808V10.6835ZM37.1111 35.051C43.1861 28.841 50.5976 27.4208 59 28.7654C56.2919 34.9754 52.4714 39.9353 45.7214 42.53C47.2118 41.3609 48.5699 40.4051 49.7984 39.3089C51.8504 37.481 53.303 35.267 54.0293 32.6075C54.2588 31.7678 53.9618 31.5302 53.1896 31.406C50.3627 30.9524 47.7086 31.5464 45.1733 32.702C40.9073 34.646 37.4324 37.6403 34.1735 40.8938C34.1168 40.9532 34.0925 41.0396 33.9899 41.2259C40.3754 41.4689 45.2381 44.0177 48.119 49.9064C44.3768 50.738 40.9532 50.5625 37.778 48.5213C40.1702 49.2557 42.557 49.7903 45.176 48.5483C44.852 48.0083 44.663 47.3765 44.231 47.0228C43.0511 46.0589 41.8415 45.0842 40.505 44.3498C38.4395 43.2212 36.131 42.692 33.5768 42.1682C37.0247 48.2081 36.1607 53.6918 31.946 59C29.9858 56.5295 28.6142 53.9456 28.2389 50.8946C27.8609 47.8328 28.7222 45.0518 30.1991 42.3896C26.9321 41.8658 19.8824 45.6485 18.7916 48.5645C21.3215 49.8443 23.7893 49.2611 26.33 48.3161C24.5048 50.1953 19.2425 50.9648 15.8108 49.8335C18.6593 44.0285 23.4977 41.4716 30.0263 41.2286C29.5457 40.7426 29.1893 40.3673 28.8167 40.0082C26.1005 37.3892 23.2142 34.9862 19.823 33.2366C17.0501 31.8056 14.1422 30.9092 10.9481 31.3871C10.5701 31.4438 10.1948 31.5356 9.6656 31.6436C10.6376 36.6386 13.9856 39.7355 18.1274 42.3464C13.775 41.8199 6.431 34.214 5 28.7546C13.397 27.3938 20.849 28.8842 26.897 35.2319C21.8939 24.089 24.5561 14.2259 31.946 5C39.2765 14.153 41.9657 23.9459 37.1111 35.051" />
                     </mask>
@@ -245,9 +245,9 @@
                     <div class="flex align-center space-between">
                         <h4>Messages</h4>
                         <sm-menu align-options="right">
-                            <sm-menu-option onclick="openCreationPopup('group')">
+                            <menu-option onclick="openCreationPopup('group')">
                                 Create new group
-                            </sm-menu-option>
+                            </menu-option>
                         </sm-menu>
                     </div>
                     <sm-input id="search_chats" class="margin-right-0-5" type="search"
@@ -324,6 +324,10 @@
                         <button id="send_message_button" disabled> Send </button>
                     </div>
                 </footer>
+            </div>
+            <div class="flex flex-direction-column gap-2 align-center justify-center text-center hide-on-mobile">
+                <div class="messenger-illustration"></div>
+                <h4>Chat, Mail and use Bitcoin Multisig</h4>
             </div>
         </section>
         <section class="inner-page hidden" id="mail_page">
@@ -815,7 +819,7 @@
                 <sm-input id="search_contacts" type="search" placeholder="Search name or FLO ID"> </sm-input>
                 <div id="contacts_container" class="observe-empty-state"></div>
                 <div class="empty-state">
-                    <h4 class="margin-bottom-0-5">No contacts found</h4>
+                    <h4 class="margin-bottom-0-5">No saved contacts</h4>
                     <p>Use 'Add contact' to add new FLO ID as a contact.</p>
                 </div>
             </div>
@@ -850,7 +854,23 @@
                 <div class="scrolling-wrapper">
                     <div id="select_contacts_container" class="observe-empty-state"></div>
                     <div class="empty-state">
-                        <p>No contacts found.</p>
+                        <h4 class="margin-bottom-0-5">No saved contacts.</h4>
+                        <p class="margin-bottom-1">Use 'Add contact' to add new FLO ID as a contact.</p>
+                        <button class="button interactive" onclick="openPopup('add_contact_popup')">
+                            <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg"
+                                enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
+                                fill="#000000">
+                                <g>
+                                    <rect fill="none" height="24" width="24"></rect>
+                                </g>
+                                <g>
+                                    <path
+                                        d="M20,9V6h-2v3h-3v2h3v3h2v-3h3V9H20z M9,12c2.21,0,4-1.79,4-4c0-2.21-1.79-4-4-4S5,5.79,5,8C5,10.21,6.79,12,9,12z M9,6 c1.1,0,2,0.9,2,2c0,1.1-0.9,2-2,2S7,9.1,7,8C7,6.9,7.9,6,9,6z M15.39,14.56C13.71,13.7,11.53,13,9,13c-2.53,0-4.71,0.7-6.39,1.56 C1.61,15.07,1,16.1,1,17.22V20h16v-2.78C17,16.1,16.39,15.07,15.39,14.56z M15,18H3v-0.78c0-0.38,0.2-0.72,0.52-0.88 C4.71,15.73,6.63,15,9,15c2.37,0,4.29,0.73,5.48,1.34C14.8,16.5,15,16.84,15,17.22V18z">
+                                    </path>
+                                </g>
+                            </svg>
+                            Add contact
+                        </button>
                     </div>
                 </div>
             </div>
@@ -970,7 +990,13 @@
         <div id="multisig_process" class="grid gap-2">
             <div class="grid gap-1">
                 <b style="font-size: 0.9rem;">Select multisig address</b>
-                <ul id="select_multisig_list" class="grid gap-0-3"></ul>
+                <ul id="select_multisig_list" class="grid gap-0-3 observe-empty-state"></ul>
+                <div class="empty-state grid gap-1">
+                    <p>
+                        There are no multisig addresses created, use the button below to create one.
+                    </p>
+                    <button class="button" onclick="openCreationPopup('multisig')">Create multisig address</button>
+                </div>
                 <button id="enter_receiver_button" class="button button--primary margin-left-auto cta hidden"
                     onclick="showChildElement('multisig_process',1,{entry: slideInLeft, exit: slideOutLeft})">
                     Next
@@ -1033,7 +1059,7 @@
                                 </div>
                             </fieldset>
                         </div>
-                        <button id="add_receiver" class="button button--small">
+                        <button id="add_receiver" class="button button--small margin-right-auto">
                             <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
                                 viewBox="0 0 24 24" width="24px" fill="#000000">
                                 <path d="M0 0h24v24H0V0z" fill="none" />
@@ -1406,22 +1432,7 @@
                     renderContactList(floGlobals.contacts)
                     break
                 case 'creation_popup': {
-                    const contacts = []
-                    const sentRequests = await messenger.list_request_sent();
-                    const skipSendingRequest = new Set();
-                    for (const key in sentRequests) {
-                        skipSendingRequest.add(sentRequests[key].floID)
-                    }
-                    for (const floID in floGlobals.contacts) {
-                        if (getFloIdType(floID) !== 'plain') continue;
-                        if (floGlobals.pubKeys.hasOwnProperty(floID)) {
-                            contacts.push(render.selectableContact(floID))
-                        } else {
-                            const hasSentRequest = skipSendingRequest.has(floID)
-                            contacts.push(render.actionableContact(floID, hasSentRequest))
-                        }
-                    }
-                    renderElem(getRef('select_contacts_container'), html`${contacts}`)
+                    renderCreationList()
                     break;
                 }
                 case 'compose_mail_popup':
@@ -1433,9 +1444,13 @@
                     break;
                 case 'multisig_tx_popup':
                     messenger.multisig.listAddress().then(addresses => {
-                        console.log(addresses)
                         const list = Object.keys(addresses).map(address => render.multisigOption(address))
-                        renderElem(getRef('select_multisig_list'), html`${list}`)
+                        if (list.length) {
+                            renderElem(getRef('select_multisig_list'), html`${list}`)
+                            getRef('select_multisig_list').previousElementSibling.classList.remove('hidden')
+                        } else {
+                            getRef('select_multisig_list').previousElementSibling.classList.add('hidden')
+                        }
                     }).catch(err => notify(err, 'error'))
                     break;
             }
@@ -1785,6 +1800,7 @@
 
                         getRef('chat_view').classList.remove('hidden')
                         getRef('chat_view').classList.remove('hide-on-mobile')
+                        getRef('chat_view').nextElementSibling.classList.add('hidden')
                         getRef('contacts').classList.add('hide-on-mobile')
                         getRef('main_navbar').classList.add('hide-on-mobile')
                     } else {
@@ -1793,6 +1809,7 @@
                         } else {
                             history.replaceState(null, null, '#/chat_page');
                             getRef('chat_view').classList.add('hide-on-mobile')
+                            getRef('chat_view').nextElementSibling.classList.remove('hidden')
                             getRef('contacts').classList.remove('hide-on-mobile')
                             activeChat = {}
                             getRef('main_navbar').classList.remove('hide-on-mobile')
@@ -2771,9 +2788,9 @@
                         scrollToBottom()
                     }
                     // remove encryption badge if it exists
-                    if (!groupID && floGlobals.checkEncryption[activeChat.floID] && floID !== floDapps.user.id) {
+                    if (!groupID && floGlobals.notEncrypted[activeChat.floID] && floID !== floDapps.user.id) {
                         getRef('warn_no_encryption').remove()
-                        delete floGlobals.checkEncryption[activeChat.floID]
+                        delete floGlobals.notEncrypted[activeChat.floID]
                     }
                 }
                 let chatCard = getChatCard(floID || groupID || pipeID)
@@ -3450,6 +3467,9 @@
                     getRef('contact_name').value = name
                     getRef('add_as_contact_option').remove()
                 }
+                if (popupStack.items.find(elem => elem.popup.id === 'creation_popup')) {
+                    renderCreationList()
+                }
                 if (activeChat.floID === floID)
                     updateChatHeaderName(name)
             }).catch(error => notify(error, "error"));
@@ -3462,6 +3482,24 @@
                 contacts.push(render.contactCard(floID, { type: 'contact', isSelected, ref: getRef('contacts_container') }))
             }
             renderElem(getRef('contacts_container'), html`${contacts}`)
+        }
+        async function renderCreationList() {
+            const contacts = []
+            const sentRequests = await messenger.list_request_sent();
+            const skipSendingRequest = new Set();
+            for (const key in sentRequests) {
+                skipSendingRequest.add(sentRequests[key].floID)
+            }
+            for (const floID in floGlobals.contacts) {
+                if (getFloIdType(floID) !== 'plain') continue;
+                if (floGlobals.pubKeys.hasOwnProperty(floID)) {
+                    contacts.push(render.selectableContact(floID))
+                } else {
+                    const hasSentRequest = skipSendingRequest.has(floID)
+                    contacts.push(render.actionableContact(floID, hasSentRequest))
+                }
+            }
+            renderElem(getRef('select_contacts_container'), html`${contacts}`)
         }
 
         async function renderChatList(chatOrder) {
@@ -3530,7 +3568,7 @@
         }
 
         floGlobals.typedMessages = {}
-        floGlobals.checkEncryption = {}
+        floGlobals.notEncrypted = {}
         floGlobals.pipeSigns = {}
         function viewConversation(floID) {
             return new Promise((resolve, reject) => {
@@ -3576,7 +3614,7 @@
                     if (activeChat.type === 'plain') {
                         if (!floGlobals.pubKeys[floID]) {
                             getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption" class="event-card">Converstion is not encrypted until receiver replies</strong>`)
-                            floGlobals.checkEncryption[floID] = true
+                            floGlobals.notEncrypted[floID] = true
                         }
                     } else if (activeChat.type === 'pipeline') {
                         if (!messenger.pipeline[floID].disabled && !floGlobals.pipeSigns[floID].has(floDapps.user.id)) {
@@ -3912,6 +3950,7 @@
                         getChatCard(floGlobals.activeFloID).remove()
                         closePopup()
                         getRef('chat_view').classList.add('hidden')
+                        getRef('chat_view').nextElementSibling.classList.remove('hidden')
                         notify('Chat deleted', 'success')
                     })
                 }
@@ -4268,6 +4307,51 @@
             })
         }
 
+        const messengerIllustration = `
+                    <svg width="484" height="484" viewBox="0 0 484 484" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <style>
+                            .circle {
+                                fill: var(--accent-color);
+                                opacity: 0.5;
+                            }
+                            .foreground-circle{
+                                fill: rgba(var(--foreground-color), 1)
+                            }
+                            .shadow-overlay{
+                                fill: rgba(0 0 0 /0.1)
+                            }
+                        </style>
+                        <g clip-path="url(#clip0_102_2)">
+                            <circle class="circle" cx="243" cy="242" r="242" fill="#DBE5FF" fill-opacity="0.1" />
+                            <circle class="circle" cx="242.5" cy="241.5" r="162.5" fill="#A6BEFC" fill-opacity="0.1" />
+                            <circle class="circle" cx="242.5" cy="241.5" r="109.5" fill="#7295EE" fill-opacity="0.1" />
+                            <g filter="url(#filter0_d_102_2)"> <circle cx="127.5" cy="383.5" r="42.5" class="foreground-circle" /> </g>
+                            <path d="M140.757 372.193H117.947C116.017 372.193 114.438 373.758 114.438 375.672V391.328C114.438 393.259 116.017 394.807 117.947 394.807H140.757C142.705 394.807 144.266 393.259 144.266 391.328V375.672C144.266 373.758 142.705 372.193 140.757 372.193ZM140.757 378.577L129.352 384.37L117.947 378.577V375.672L129.352 381.43L140.757 375.672V378.577ZM110.929 391.328C110.929 391.624 110.982 391.902 111.017 392.198H103.911C102.942 392.198 102.156 391.415 102.156 390.458C102.156 389.502 102.942 388.719 103.911 388.719H110.929V391.328ZM107.42 374.802H111.017C110.982 375.098 110.929 375.376 110.929 375.672V378.281H107.42C106.455 378.281 105.665 377.498 105.665 376.542C105.665 375.585 106.455 374.802 107.42 374.802ZM103.911 383.5C103.911 382.543 104.7 381.76 105.665 381.76H110.929V385.24H105.665C104.7 385.24 103.911 384.457 103.911 383.5Z" fill="#72EEC1" />
+                            <g filter="url(#filter1_d_102_2)"> <circle cx="410.5" cy="378.5" r="12.5" fill="#7286EE" /> </g>
+                            <g filter="url(#filter2_d_102_2)"> <circle cx="78.5" cy="286.5" r="6.5" fill="#EE7297" /> </g>
+                            <g filter="url(#filter3_d_102_2)"> <circle cx="361" cy="131" r="6" fill="#72B2EE" /> </g>
+                            <g filter="url(#filter4_d_102_2)"> <circle cx="332.5" cy="368.5" r="10.5" class="foreground-circle" /> </g>
+                            <g filter="url(#filter5_d_102_2)"> <circle cx="46.5" cy="185.5" r="10.5" class="foreground-circle" /> </g>
+                            <g filter="url(#filter6_d_102_2)"> <circle cx="356.5" cy="84.5" r="10.5" class="foreground-circle" /> </g>
+                            <g filter="url(#filter7_d_102_2)"> <circle cx="158.5" cy="124.5" r="50.5" class="foreground-circle" /> </g>
+                            <path d="M165.907 119.56C164.951 123.383 159 121.441 157.15 120.917L158.846 114.195C160.758 114.75 166.893 115.552 165.907 119.56ZM156.318 124.37L154.468 131.801C156.749 132.387 163.81 134.638 164.858 130.444C165.968 126.066 158.599 124.925 156.318 124.37ZM188.908 131.462C184.777 147.988 168.065 158.04 151.538 153.908C135.012 149.777 124.969 133.065 129.092 116.538C133.223 100.012 149.935 89.9723 166.462 94.0917C182.958 98.2233 193.009 114.935 188.908 131.462ZM165.814 111.821L167.202 106.271L163.81 105.5L162.453 110.834C161.559 110.618 160.665 110.403 159.74 110.218L161.097 104.76L157.736 103.958L156.348 109.478C155.608 109.293 154.868 109.138 154.19 108.953L149.534 107.782L148.609 111.389C148.609 111.389 151.138 111.975 151.076 112.006C152.463 112.345 152.71 113.208 152.648 113.979L148.856 129.18C148.702 129.612 148.208 130.167 147.314 130.013C147.345 130.043 144.848 129.396 144.848 129.396L143.183 133.25L147.561 134.36C148.393 134.576 149.195 134.792 149.997 134.977L148.578 140.588L151.97 141.452L153.358 135.871C154.283 136.118 155.177 136.333 156.04 136.58L154.653 142.099L158.044 142.963L159.463 137.351C165.167 138.43 169.545 137.998 171.333 132.788C172.875 128.625 171.333 126.158 168.25 124.586C170.47 124 172.135 122.613 172.598 119.591C173.214 115.49 170.069 113.301 165.814 111.821Z" fill="#FFBF5E" />
+                            <path d="M288.653 268.267V279.265C288.653 282.228 287.476 285.069 285.381 287.164C283.285 289.259 280.444 290.437 277.481 290.437H207.957C204.994 290.437 202.153 289.259 200.058 287.164C197.963 285.069 196.786 282.228 196.786 279.265V228.682L182 198L277.481 198.507C278.949 198.507 280.403 198.796 281.759 199.358C283.115 199.921 284.347 200.744 285.384 201.783C286.422 202.822 287.245 204.054 287.805 205.411C288.366 206.768 288.654 208.222 288.653 209.69V237.639" fill= "white" />
+                            <path d="M288.653 210.42V281.939C288.775 293.984 256.437 291.393 256.437 291.393C259.4 291.393 262.242 290.216 264.337 288.12C266.432 286.025 267.609 283.184 267.609 280.221V198.855L277.481 199.24C278.949 199.24 280.402 199.529 281.758 200.091C283.114 200.653 284.346 201.477 285.384 202.515C286.421 203.553 287.244 204.786 287.805 206.142C288.366 207.499 288.654 208.952 288.653 210.42V210.42Z" class="shadow-overlay" />
+                            <path d="M288.653 248.031V259.516" style="stroke: rgba(var(--text-color),1)" stroke-width="6" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M288.653 268.267V279.265C288.653 282.228 287.476 285.069 285.381 287.164C283.285 289.259 280.444 290.437 277.481 290.437H207.957C204.994 290.437 202.153 289.259 200.058 287.164C197.963 285.069 196.786 282.228 196.786 279.265V228.682L182 198L277.481 198.507C278.949 198.507 280.403 198.796 281.759 199.358C283.115 199.921 284.347 200.744 285.384 201.783C286.422 202.822 287.245 204.054 287.805 205.411C288.366 206.768 288.654 208.222 288.653 209.69V237.639" style="stroke: rgba(var(--text-color), 1)" stroke-width="6" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M257.679 257.264C257.679 261.232 256.103 265.037 253.297 267.842C250.492 270.648 246.687 272.224 242.719 272.224C238.752 272.224 234.947 270.648 232.141 267.842C229.336 265.037 227.76 261.232 227.76 257.264C227.76 248.993 257.679 248.993 257.679 257.264Z" fill="#ED1C24" stroke="black" stroke-width="6" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M212.598 236.302C213.112 234.868 214.058 233.629 215.305 232.755C216.551 231.88 218.038 231.413 219.561 231.418C221.084 231.423 222.568 231.899 223.81 232.781C225.051 233.663 225.989 234.908 226.494 236.345" stroke="black" stroke-width="6" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M258.959 236.302C259.473 234.868 260.419 233.629 261.666 232.755C262.913 231.88 264.4 231.413 265.922 231.418C267.445 231.423 268.929 231.899 270.171 232.781C271.412 233.663 272.35 234.908 272.855 236.345" stroke="black" stroke-width="6" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M249.766 251.706C254.278 252.613 257.683 254.46 257.683 257.249C257.684 260.134 256.851 262.959 255.285 265.382C253.719 267.805 251.486 269.724 248.855 270.909" fill="#D30D41" />
+                            <path d="M249.766 251.706C254.278 252.613 257.683 254.46 257.683 257.249C257.684 260.134 256.851 262.959 255.285 265.382C253.719 267.805 251.486 269.724 248.855 270.909" stroke="black" stroke-width="6" stroke-miterlimit="10" />
+                            <g filter="url(#filter8_d_102_2)"> <circle cx="378.5" cy="242.5" r="44.5" class="foreground-circle" /> </g>
+                            <path d="M379 229C388.9 229 397 234.967 397 242.333C397 249.7 388.9 255.667 379 255.667C376.768 255.667 374.626 255.367 372.646 254.833C367.39 259 361 259 361 259C365.194 255.117 365.86 252.5 365.95 251.5C362.89 249.117 361 245.883 361 242.333C361 234.967 369.1 229 379 229Z" fill="#E9707F" />
+                        </g>
+                        <defs> <filter id="filter0_d_102_2" x="53" y="325" width="149" height="149" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"> <feFlood flood-opacity="0" result="BackgroundImageFix" /> <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" /> <feOffset dy="16" /> <feGaussianBlur stdDeviation="16" /> <feComposite in2="hardAlpha" operator="out" /> <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0" /> <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_102_2" /> <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_102_2" result="shape" /> </filter> <filter id="filter1_d_102_2" x="366" y="350" width="89" height="89" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"> <feFlood flood-opacity="0" result="BackgroundImageFix" /> <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" /> <feOffset dy="16" /> <feGaussianBlur stdDeviation="16" /> <feComposite in2="hardAlpha" operator="out" /> <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0" /> <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_102_2" /> <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_102_2" result="shape" /> </filter> <filter id="filter2_d_102_2" x="40" y="264" width="77" height="77" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"> <feFlood flood-opacity="0" result="BackgroundImageFix" /> <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" /> <feOffset dy="16" /> <feGaussianBlur stdDeviation="16" /> <feComposite in2="hardAlpha" operator="out" /> <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0" /> <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_102_2" /> <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_102_2" result="shape" /> </filter> <filter id="filter3_d_102_2" x="323" y="109" width="76" height="76" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"> <feFlood flood-opacity="0" result="BackgroundImageFix" /> <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" /> <feOffset dy="16" /> <feGaussianBlur stdDeviation="16" /> <feComposite in2="hardAlpha" operator="out" /> <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0" /> <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_102_2" /> <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_102_2" result="shape" /> </filter> <filter id="filter4_d_102_2" x="290" y="342" width="85" height="85" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"> <feFlood flood-opacity="0" result="BackgroundImageFix" /> <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" /> <feOffset dy="16" /> <feGaussianBlur stdDeviation="16" /> <feComposite in2="hardAlpha" operator="out" /> <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0" /> <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_102_2" /> <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_102_2" result="shape" /> </filter> <filter id="filter5_d_102_2" x="4" y="159" width="85" height="85" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"> <feFlood flood-opacity="0" result="BackgroundImageFix" /> <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" /> <feOffset dy="16" /> <feGaussianBlur stdDeviation="16" /> <feComposite in2="hardAlpha" operator="out" /> <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0" /> <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_102_2" /> <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_102_2" result="shape" /> </filter> <filter id="filter6_d_102_2" x="314" y="58" width="85" height="85" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"> <feFlood flood-opacity="0" result="BackgroundImageFix" /> <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" /> <feOffset dy="16" /> <feGaussianBlur stdDeviation="16" /> <feComposite in2="hardAlpha" operator="out" /> <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0" /> <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_102_2" /> <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_102_2" result="shape" /> </filter> <filter id="filter7_d_102_2" x="76" y="58" width="165" height="165" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"> <feFlood flood-opacity="0" result="BackgroundImageFix" /> <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" /> <feOffset dy="16" /> <feGaussianBlur stdDeviation="16" /> <feComposite in2="hardAlpha" operator="out" /> <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0" /> <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_102_2" /> <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_102_2" result="shape" /> </filter> <filter id="filter8_d_102_2" x="302" y="182" width="153" height="153" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"> <feFlood flood-opacity="0" result="BackgroundImageFix" /> <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" /> <feOffset dy="16" /> <feGaussianBlur stdDeviation="16" /> <feComposite in2="hardAlpha" operator="out" /> <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0" /> <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_102_2" /> <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_102_2" result="shape" /> </filter> <clipPath id="clip0_102_2"> <rect width="484" height="484" class="foreground-circle" /> </clipPath> </defs>
+                    </svg>`
+        document.querySelectorAll('.messenger-illustration').forEach(elem => {
+            elem.innerHTML = messengerIllustration
+        })
     </script>
 </body>
 

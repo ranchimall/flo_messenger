@@ -521,6 +521,47 @@ ol {
   height: 100%;
 }
 
+.margin-right-0-3 {
+  margin-right: 0.3rem;
+}
+.margin-right-0-5 {
+  margin-right: 0.5rem;
+}
+
+.margin-left-0-5 {
+  margin-left: 0.5rem;
+}
+
+.margin-left-auto {
+  margin-left: auto;
+}
+.margin-right-auto {
+  margin-right: auto;
+}
+
+.margin-bottom-0-5 {
+  margin-bottom: 0.5rem;
+}
+.margin-bottom-1 {
+  margin-bottom: 1rem;
+}
+
+.margin-block-1 {
+  margin-block: 1rem;
+}
+
+.margin-block-1-5 {
+  margin-block: 1.5rem;
+}
+
+.margin-inline-1 {
+  margin-inline: 1rem;
+}
+
+.margin-inline-1-5 {
+  margin-inline: 1.5rem;
+}
+
 .label {
   font-size: 0.8rem;
   color: rgba(var(--text-color), 0.8);
@@ -587,41 +628,6 @@ ol {
     border-radius: 0.5em;
     background-color: var(--accent-color);
   }
-}
-
-.margin-right-0-3 {
-  margin-right: 0.3rem;
-}
-.margin-right-0-5 {
-  margin-right: 0.5rem;
-}
-
-.margin-left-0-5 {
-  margin-left: 0.5rem;
-}
-
-.margin-left-auto {
-  margin-left: auto;
-}
-
-.margin-bottom-0-5 {
-  margin-bottom: 0.5rem;
-}
-
-.margin-block-1 {
-  margin-block: 1rem;
-}
-
-.margin-block-1-5 {
-  margin-block: 1.5rem;
-}
-
-.margin-inline-1 {
-  margin-inline: 1rem;
-}
-
-.margin-inline-1-5 {
-  margin-inline: 1.5rem;
 }
 
 .icon-button {
