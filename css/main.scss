@@ -1884,11 +1884,11 @@ sm-button[variant="primary"] {
 
 @keyframes pop {
   0% {
-    transform: rotate(5deg) translate(-0.5rem, 1rem);
+    transform: translate(-0.5rem, 1rem);
   }
 
   100% {
-    transform: rotate(0) translate(0, 0);
+    transform: translate(0, 0);
   }
 }
 

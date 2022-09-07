@@ -106,9 +106,6 @@
         </header>
         <div id="landing" class="grid inner-page hidden">
             <div class="left">
-                <h4>
-                    FLO Messenger
-                </h4>
                 <h1 class="title-font">
                     Truly Secure, Private and Reliable.
                 </h1>
@@ -2774,13 +2771,27 @@
         function updateMessageUI(messagesData, sentByMe = false) {
             for (let messageId in messagesData) {
                 console.log(messagesData[messageId])
-                const { category, floID, time, message, sender, groupID, admin, name, pipeID } = messagesData[messageId]
+                const { category, floID, time, message, sender, groupID, admin, name, pipeID, unconfirmed } = messagesData[messageId]
                 // code to run if a chat is opened
                 if (activeChat && activeChat.floID === (floID || groupID || pipeID)) {
                     if (!sentByMe && sender && sender === floDapps.user.id) {
                         // if message is sent by me, then dont add it to the chat
                     } else {
-                        getRef('messages_container').append(render.messageBubble(messagesData[messageId]))
+                        const messageBody = render.messageBubble(messagesData[messageId]);
+                        getRef('messages_container').append(messageBody)
+                        if (unconfirmed) {
+                            const messageHeight = getRef('messages_container').lastElementChild.clientHeight;
+                            getRef('messages_container').animate([
+                                { transform: `translateY(${messageHeight}px)` },
+                                { transform: `none` },
+                            ], {
+                                duration: 300,
+                                easing: 'ease',
+                                fill: 'forwards'
+                            }).onfinish = e => {
+                                e.target.cancel()
+                            }
+                        }
                     }
                     if (chatScrollInfo['isScrolledUp']) {
 
@@ -2788,9 +2799,8 @@
                         scrollToBottom()
                     }
                     // remove encryption badge if it exists
-                    if (!groupID && floGlobals.notEncrypted[activeChat.floID] && floID !== floDapps.user.id) {
+                    if (!groupID && floGlobals.pubKeys[activeChat.floID] && floID !== floDapps.user.id) {
                         getRef('warn_no_encryption').remove()
-                        delete floGlobals.notEncrypted[activeChat.floID]
                     }
                 }
                 let chatCard = getChatCard(floID || groupID || pipeID)
@@ -3568,7 +3578,6 @@
         }
 
         floGlobals.typedMessages = {}
-        floGlobals.notEncrypted = {}
         floGlobals.pipeSigns = {}
         function viewConversation(floID) {
             return new Promise((resolve, reject) => {
@@ -3614,7 +3623,6 @@
                     if (activeChat.type === 'plain') {
                         if (!floGlobals.pubKeys[floID]) {
                             getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption" class="event-card">Converstion is not encrypted until receiver replies</strong>`)
-                            floGlobals.notEncrypted[floID] = true
                         }
                     } else if (activeChat.type === 'pipeline') {
                         if (!messenger.pipeline[floID].disabled && !floGlobals.pipeSigns[floID].has(floDapps.user.id)) {
