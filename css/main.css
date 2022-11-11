@@ -1541,7 +1541,6 @@ sm-button[variant=primary] {
   padding: 1rem;
   position: relative;
   gap: 0.5rem;
-  min-height: 4rem;
 }
 #contacts .header sm-input,
 #mails .header sm-input,
@@ -1586,8 +1585,8 @@ sm-button[variant=primary] {
 #contacts {
   position: relative;
   overflow-x: hidden;
-  grid-template-rows: -webkit-max-content -webkit-max-content 1fr;
-  grid-template-rows: max-content max-content 1fr;
+  grid-template-rows: -webkit-max-content 1fr;
+  grid-template-rows: max-content 1fr;
 }
 #contacts .header {
   padding: 0.5rem 1rem;
@@ -1604,6 +1603,41 @@ sm-button[variant=primary] {
 
 #contacts_container .contact {
   padding: 0.5rem 0;
+}
+
+#notifications_wrapper {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+}
+#notifications_wrapper .icon-only {
+  margin-left: -0.5rem;
+}
+
+#notifications_list {
+  margin-top: 0.5rem;
+}
+
+.notification {
+  padding: 1rem;
+  background-color: rgba(var(--text-color), 0.06);
+  border-radius: 0.5rem;
+  margin: 0 -0.8rem;
+  gap: 0.8rem;
+}
+.notification:not(:last-of-type) {
+  margin-bottom: 0.3rem;
+}
+.notification__message {
+  line-height: normal;
+}
+.notification__time {
+  font-size: 0.8rem;
+  color: rgba(var(--text-color), 0.7);
 }
 
 #creation_process .group-icon {
@@ -1960,11 +1994,20 @@ sm-button[variant=primary] {
   text-align: center;
 }
 
+.icon--medium,
+.icon--big {
+  margin-bottom: 1.5rem;
+  justify-self: center;
+}
+
+.icon--medium {
+  height: 4rem;
+  width: 4rem;
+}
+
 .icon--big {
   height: 8rem;
   width: 8rem;
-  margin-bottom: 1.5rem;
-  justify-self: center;
 }
 
 #messages_container,
@@ -1980,7 +2023,7 @@ sm-button[variant=primary] {
 
 #chats_list {
   gap: 0.2rem;
-  padding-bottom: 6rem;
+  padding-bottom: 4rem;
 }
 
 .mail-container {
@@ -2233,6 +2276,9 @@ sm-button[variant=primary] {
   #chats_list,
 #contact_container {
     gap: 0.2rem;
+  }
+  #chats_list {
+    padding-bottom: 10rem;
   }
   #chat_view .message {
     width: auto;

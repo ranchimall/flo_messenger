@@ -30,7 +30,7 @@
     <script src="scripts/messenger.js"></script>
     <script id="onLoadStartUp">
         function onLoadStartUp() {
-            showPage('loading')
+            routeTo('loading')
             floDapps.setAppObjectStores({ userSettings: {} })
             document.body.classList.remove('hidden')
 
@@ -55,7 +55,7 @@
                     console.log(result);
                     //Check for available bg image
                     setBgImage();
-                    showPage(window.location.hash, { firstLoad: true })
+                    routeTo(window.location.hash, { firstLoad: true })
                     floGlobals.loaded = true;
                 }).catch(error => notify(error, "error"))
             }).catch(error => notify(error, "error"))
@@ -238,46 +238,79 @@
                         </button>
                     </div>
                 </section>
-                <div class="grid header">
-                    <div class="flex align-center space-between">
-                        <h4>Messages</h4>
-                        <sm-menu align-options="right">
-                            <menu-option onclick="openCreationPopup('group')">
-                                Create new group
-                            </menu-option>
-                        </sm-menu>
+                <div class="flex flex-direction-column" style="overflow-y: auto; position: relative;">
+                    <div class="grid header">
+                        <div class="flex align-center gap-0-5">
+                            <h4>Messages</h4>
+                            <button id="notification_panel_button" class="icon-only margin-left-auto"
+                                onclick="toggleNotifications()">
+                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                    width="24px" fill="#000000">
+                                    <path d="M0 0h24v24H0V0z" fill="none" />
+                                    <path
+                                        d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z" />
+                                </svg>
+                            </button>
+                            <sm-menu align-options="right">
+                                <menu-option onclick="openCreationPopup('group')">
+                                    Create new group
+                                </menu-option>
+                            </sm-menu>
+                        </div>
+                        <sm-input id="search_chats" class="margin-right-0-5" type="search"
+                            placeholder="Search FLO ID or name">
+                            <svg slot="icon" class="icon" xmlns="http://www.w3.org/2000/svg" height="24px"
+                                viewBox="0 0 24 24" width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0V0z" fill="none" />
+                                <path
+                                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                            </svg>
+                        </sm-input>
                     </div>
-                    <sm-input id="search_chats" class="margin-right-0-5" type="search"
-                        placeholder="Search FLO ID or name">
-                        <svg slot="icon" class="icon" xmlns="http://www.w3.org/2000/svg" height="24px"
-                            viewBox="0 0 24 24" width="24px" fill="#000000">
+                    <div id="chats_list" class="flex observe-empty-state"></div>
+                    <div class="empty-state flex flex-direction-column align-center text-center align-self-center">
+                        <svg class="icon icon--big" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                            width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0z" fill="none" />
+                            <path
+                                d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" />
+                        </svg>
+                        <h4 class="margin-bottom-0-5">Start your first conversation</h4>
+                        <p>Tap/click on 'New chat' to add or select a contact.</p>
+                    </div>
+                    <button id="new_message_button" onclick="openPopup('new_message_popup')"
+                        class="button button--primary fab round">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                            width="24px" fill="#000000">
                             <path d="M0 0h24v24H0V0z" fill="none" />
                             <path
-                                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM5.92 19H5v-.92l9.06-9.06.92.92L5.92 19zM20.71 5.63l-2.34-2.34c-.2-.2-.45-.29-.71-.29s-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41z" />
                         </svg>
-                    </sm-input>
+                        New chat
+                    </button>
+                    <div id="notifications_wrapper" class="hidden">
+                        <div class="flex align-center gap-0-5">
+                            <button class="icon-only" onclick="toggleNotifications()">
+                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                    width="24px" fill="#000000">
+                                    <path d="M0 0h24v24H0V0z" fill="none"></path>
+                                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+                                </svg>
+                            </button>
+                            <h4>Notifications</h4>
+                        </div>
+                        <ul id="notifications_list" class="observe-empty-state"></ul>
+                        <div class="empty-state flex flex-direction-column align-center text-center align-self-center">
+                            <svg class="icon icon--medium" xmlns="http://www.w3.org/2000/svg" height="24px"
+                                viewBox="0 0 24 24" width="24px" fill="#000000">
+                                <path
+                                    d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+                            </svg>
+                            <h4 class="margin-bottom-0-5">No notifications</h4>
+                            <p>When you receive a notification, it will appear here.</p>
+                        </div>
+                    </div>
                 </div>
-                <div id="chats_list" class="flex observe-empty-state"></div>
-                <div class="empty-state flex flex-direction-column align-center text-center align-self-center">
-                    <svg class="icon icon--big" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                        width="24px" fill="#000000">
-                        <path d="M0 0h24v24H0z" fill="none" />
-                        <path
-                            d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" />
-                    </svg>
-                    <h4 class="margin-bottom-0-5">Start your first conversation</h4>
-                    <p>Tap/click on 'New chat' to add or select a contact.</p>
-                </div>
-                <button id="new_message_button" onclick="openPopup('new_message_popup')"
-                    class="button button--primary fab round">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                        fill="#000000">
-                        <path d="M0 0h24v24H0V0z" fill="none" />
-                        <path
-                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM5.92 19H5v-.92l9.06-9.06.92.92L5.92 19zM20.71 5.63l-2.34-2.34c-.2-.2-.45-.29-.71-.29s-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41z" />
-                    </svg>
-                    New chat
-                </button>
             </div>
             <div id="chat_view" class="grid hidden">
                 <header id="chat_header" class="grid align-center">
@@ -678,7 +711,7 @@
             <h4>Add contact</h4>
         </header>
         <sm-form>
-            <sm-input id="add_contact_floID" floId placeholder="FLO address" animate required></sm-input>
+            <sm-input id="add_contact_floID" floId placeholder="FLO address" animate autofocus required></sm-input>
             <sm-input id="add_contact_name" placeholder="Name" animate required></sm-input>
             <sm-button id="add_contact_button" variant="primary" disabled>Add</sm-button>
         </sm-form>
@@ -1426,7 +1459,7 @@
                     } else {
                         getRef('search_contacts').classList.add('hidden')
                     }
-                    renderContactList(floGlobals.contacts)
+                    renderContactList()
                     break
                 case 'creation_popup': {
                     renderCreationList()
@@ -1650,7 +1683,7 @@
             else
                 return floID
         }
-        window.addEventListener('hashchange', e => showPage(window.location.hash))
+        window.addEventListener('hashchange', e => routeTo(window.location.hash))
         window.addEventListener("load", () => {
             document.body.classList.remove('hidden')
             document.querySelectorAll('sm-input[data-flo-id]').forEach(input => input.customValidation = floCrypto.validateAddr)
@@ -1720,7 +1753,7 @@
             params: {},
             openedPages: new Set(),
         }
-        async function showPage(targetPage, options = {}) {
+        async function routeTo(targetPage, options = {}) {
             const { firstLoad, hashChange } = options
             let pageId
             let subPageId1
@@ -1738,21 +1771,17 @@
                 if (targetPage.includes('/')) {
                     if (targetPage.includes('?')) {
                         const splitAddress = targetPage.split('?')
-                        searchParams = splitAddress.pop()
-                        const pages = splitAddress.pop().split('/')
-                        pageId = pages[1]
-                        subPageId1 = pages[2]
-                        subPageId2 = pages[3]
+                        searchParams = splitAddress.pop();
+                        [, pageId, subPageId1, subPageId2] = splitAddress.pop().split('/')
                     } else {
-                        const pages = targetPage.split('/')
-                        pageId = pages[1]
-                        subPageId1 = pages[2]
-                        subPageId2 = pages[3]
+                        [, pageId, subPageId1, subPageId2] = targetPage.split('/')
                     }
                 } else {
                     pageId = targetPage
                 }
             }
+            console.log(pageId, subPageId1, subPageId2)
+            if (!document.querySelector(`#${pageId}`)?.classList.contains('inner-page')) return
             try {
                 if (floDapps.user.id && (['sign_up', 'sign_in', 'loading', 'landing'].includes(pageId))) {
                     history.replaceState(null, null, '#/chat_page');
@@ -1805,13 +1834,15 @@
                             history.replaceState(null, null, `#/chat_page/messages?floId=${activeChat.floID}`);
                         } else {
                             history.replaceState(null, null, '#/chat_page');
-                            getRef('chat_view').classList.add('hide-on-mobile')
+                            getRef('chat_view').classList.add('hidden')
                             getRef('chat_view').nextElementSibling.classList.remove('hidden')
                             getRef('contacts').classList.remove('hide-on-mobile')
+                            getRef('chats_list').querySelector('.active')?.classList.remove('active')
                             activeChat = {}
                             getRef('main_navbar').classList.remove('hide-on-mobile')
                         }
                     }
+                    messenger.list_request_received().then(requests => addNotificationBadge('#notification_panel_button', Object.keys(requests).length, { replace: true }))
                     removeNotificationBadge('#chat_page_button')
                     break;
                 case 'mail_page':
@@ -2162,7 +2193,7 @@
         const slideInLeft = [
             {
                 opacity: 0,
-                transform: 'translateX(1rem)'
+                transform: 'translateX(100%)'
             },
             {
                 opacity: 1,
@@ -2176,13 +2207,13 @@
             },
             {
                 opacity: 0,
-                transform: 'translateX(-1rem)'
+                transform: 'translateX(-100%)'
             },
         ]
         const slideInRight = [
             {
                 opacity: 0,
-                transform: 'translateX(-1rem)'
+                transform: 'translateX(-100%)'
             },
             {
                 opacity: 1,
@@ -2196,13 +2227,13 @@
             },
             {
                 opacity: 0,
-                transform: 'translateX(1rem)'
+                transform: 'translateX(100%)'
             },
         ]
         const slideInDown = [
             {
                 opacity: 0,
-                transform: 'translateY(-1rem)'
+                transform: 'translateY(-100%)'
             },
             {
                 opacity: 1,
@@ -2216,7 +2247,7 @@
             },
             {
                 opacity: 0,
-                transform: 'translateY(-1rem)'
+                transform: 'translateY(-100%)'
             },
         ]
 
@@ -2228,34 +2259,34 @@
                     easing: 'ease',
                     fill: 'forwards'
                 }
-                const visibleElement = [...getRef(id).children].find(elem => !elem.classList.contains(mobileView ? 'hide-on-mobile' : 'hidden'));
-                if (visibleElement === getRef(id).children[index]) return;
+                const parent = typeof id === 'string' ? document.getElementById(id) : id;
+                const visibleElement = [...parent.children].find(elem => !elem.classList.contains(mobileView ? 'hide-on-mobile' : 'hidden'));
+                if (visibleElement === parent.children[index]) return;
                 visibleElement.getAnimations().forEach(anim => anim.cancel())
-                getRef(id).children[index].getAnimations().forEach(anim => anim.cancel())
+                parent.children[index].getAnimations().forEach(anim => anim.cancel())
                 if (visibleElement) {
                     if (exit) {
                         visibleElement.animate(exit, animOptions).onfinish = () => {
                             visibleElement.classList.add(mobileView ? 'hide-on-mobile' : 'hidden')
-                            getRef(id).children[index].classList.remove(mobileView ? 'hide-on-mobile' : 'hidden')
+                            parent.children[index].classList.remove(mobileView ? 'hide-on-mobile' : 'hidden')
                             if (entry)
-                                getRef(id).children[index].animate(entry, animOptions).onfinish = () => resolve()
+                                parent.children[index].animate(entry, animOptions).onfinish = () => resolve()
                         }
                     } else {
                         visibleElement.classList.add(mobileView ? 'hide-on-mobile' : 'hidden')
-                        getRef(id).children[index].classList.remove(mobileView ? 'hide-on-mobile' : 'hidden')
+                        parent.children[index].classList.remove(mobileView ? 'hide-on-mobile' : 'hidden')
                         resolve()
                     }
                 } else {
-                    getRef(id).children[index].classList.remove(mobileView ? 'hide-on-mobile' : 'hidden')
-                    getRef(id).children[index].animate(entry, animOptions).onfinish = () => resolve()
+                    parent.children[index].classList.remove(mobileView ? 'hide-on-mobile' : 'hidden')
+                    parent.children[index].animate(entry, animOptions).onfinish = () => resolve()
                 }
             })
         }
         function getSignedIn(passwordType) {
             return new Promise((resolve, reject) => {
-                showPage('landing')
+                routeTo('landing')
                 try {
-                    console.log(floDapps.user.id)
                     getPromptInput('Enter password', '', {
                         isPassword: true,
                     }).then(password => {
@@ -2278,19 +2309,19 @@
                         getRef('secure_pwd_button').closest('.card').classList.remove('hidden');
                     }
                     if (window.location.hash.includes('sign_in') || window.location.hash.includes('sign_up')) {
-                        showPage(window.location.hash);
+                        routeTo(window.location.hash);
                     } else {
                         location.hash = floGlobals.isPrivKeySecured ? '#/sign_in' : `#/landing`;
                     }
                     getRef('sign_in_button').onclick = () => {
                         resolve(getRef('private_key_field').value.trim());
                         getRef('private_key_field').value = '';
-                        showPage('loading');
+                        routeTo('loading');
                     };
                     getRef('sign_up_button').onclick = () => {
                         resolve(getRef('generated_private_key').value.trim());
                         getRef('generated_private_key').value = '';
-                        showPage('loading');
+                        routeTo('loading');
                     };
                 }
             });
@@ -2633,6 +2664,37 @@
                         </label>
                     </li>
                 `
+            },
+            notification(id, details) {
+                let { floID, message, time, type } = details
+                if (message === '')
+                    message = `${getContactName(floID)} wants to connect with you`
+
+                return html`
+                    <li class="notification grid align-center" .dataset=${{ id }}>
+                        <div class="flex align-center space-between gap-0-5">
+                            <h4>${type}</h4>
+                            <time class="notification__time">${getFormattedTime(time, 'relative')}</time>
+                        </div>
+                        <p class="notification__message">${message}</p>
+                        <div class="flex align-center gap-0-3 margin-left-auto">
+                            <button class="button button--small reject">Reject</button>
+                            <button class="button button--small accept">Accept</button>
+                        </div>
+                    </li>
+                `
+            },
+            async notifications() {
+                try {
+                    const notifications = await messenger.list_request_received()
+                    let receivedRequests = []
+                    for (const key in notifications) {
+                        receivedRequests.unshift(render.notification(key, notifications[key]))
+                    }
+                    renderElem(getRef('notifications_list'), html`${receivedRequests}`)
+                } catch (err) {
+                    notify(err, 'error')
+                }
             }
         }
 
@@ -2686,7 +2748,7 @@
             })
             return messageBody
         }
-        function addNotificationBadge(elem, text) {
+        function addNotificationBadge(elem, text, { replace = false }) {
             const animOptions = {
                 duration: 200,
                 fill: 'forwards',
@@ -2706,7 +2768,10 @@
                 ], animOptions)
             } else {
                 const badge = target.querySelector('.badge');
-                badge.textContent = parseInt(badge.textContent) + parseFloat(text);
+                const oldValue = parseInt(badge.textContent)
+                const newValue = parseInt(text)
+                if (oldValue === newValue) return
+                badge.textContent = replace ? newValue : oldValue + newValue;
                 badge.animate([
                     { transform: 'scale(1)' },
                     { transform: `scale(1.5)` },
@@ -2879,6 +2944,38 @@
                 }
             }
         }
+        function toggleNotifications() {
+            const animOptions = {
+                duration: 300,
+                easing: 'ease',
+                fill: 'forwards'
+            }
+            getRef('notifications_wrapper').parentNode.style.overflow = 'hidden';
+            const allChildren = [...getRef('notifications_wrapper').parentNode.children];
+            const index = allChildren.indexOf(getRef('notifications_wrapper'));
+            const siblings = allChildren.slice(0, index);
+            if (getRef('notifications_wrapper').classList.contains('hidden')) {
+                siblings.forEach(child => {
+                    child.animate(slideOutLeft, animOptions).onfinish = e => {
+                        child.classList.add('hidden')
+                    }
+                })
+                getRef('notifications_wrapper').classList.remove('hidden')
+                render.notifications()
+                getRef('notifications_wrapper').animate(slideInLeft, animOptions).onfinish = e => {
+                    getRef('notifications_wrapper').parentNode.style.overflow = 'auto';
+                }
+            } else {
+                getRef('notifications_wrapper').animate(slideOutLeft, animOptions).onfinish = e => {
+                    getRef('notifications_wrapper').classList.add('hidden');
+                    getRef('notifications_wrapper').parentNode.style.overflow = 'auto';
+                }
+                siblings.slice(0, 4).forEach(child => {
+                    child.classList.remove('hidden')
+                    child.animate(slideInLeft, animOptions)
+                })
+            }
+        }
         getRef('search_chats').addEventListener('keyup', e => {
             if (e.code === 'ArrowDown') {
                 for (child of getRef('chats_list').children) {
@@ -2973,8 +3070,6 @@
             for (contact in floGlobals.contacts) {
                 if (contact.toLowerCase().includes(this.value.toLowerCase()) || floGlobals.contacts[contact].toLowerCase().includes(this.value.toLowerCase())) {
                     contacts[contact] = floGlobals.contacts[contact]
-                    if (!(contact in floGlobals.pubKeys))
-                        delete contacts[contact]
                 }
             }
             renderContactList(contacts)
@@ -3108,7 +3203,7 @@
         })
         delegate(getRef('select_contacts_container'), 'click', '.request-pubkey', e => {
             const floID = e.delegateTarget.closest('.selectable-contact').dataset.floId
-            messenger.request_pubKey(floID, 'hey there!')
+            messenger.request_pubKey(floID)
             e.delegateTarget.disabled = true;
             e.delegateTarget.textContent = 'Request sent'
         })
@@ -3480,12 +3575,15 @@
                 if (popupStack.items.find(elem => elem.popup.id === 'creation_popup')) {
                     renderCreationList()
                 }
+                if (popupStack.items.find(elem => elem.popup.id === 'new_message_popup')) {
+                    renderContactList()
+                }
                 if (activeChat.floID === floID)
                     updateChatHeaderName(name)
             }).catch(error => notify(error, "error"));
         }
 
-        function renderContactList(contactList = {}) {
+        function renderContactList(contactList = floGlobals.contacts) {
             const contacts = []
             for (floID in contactList) {
                 let isSelected = selectedMembers.has(floID)
