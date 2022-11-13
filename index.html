@@ -2865,7 +2865,7 @@
                     }
                     // remove encryption badge if it exists
                     if (!groupID && floGlobals.pubKeys[activeChat.floID] && floID !== floDapps.user.id) {
-                        getRef('warn_no_encryption').remove()
+                        document.getElementById('warn_no_encryption')?.remove()
                     }
                 }
                 let chatCard = getChatCard(floID || groupID || pipeID)
