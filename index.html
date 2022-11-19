@@ -1753,47 +1753,51 @@
             params: {},
             openedPages: new Set(),
         }
+        const generalPages = ['sign_up', 'sign_in', 'loading', 'landing']
         async function routeTo(targetPage, options = {}) {
-            const { firstLoad, hashChange } = options
+            const { firstLoad } = options
             let pageId
             let subPageId1
-            let subPageId2
-            let params = {}
             let searchParams
+            let params
             if (targetPage === '') {
                 try {
                     if (floDapps.user.id)
                         pageId = 'chat_page'
                 } catch (e) {
-                    pageId = 'sign_in'
+                    pageId = 'landing'
                 }
             } else {
                 if (targetPage.includes('/')) {
                     if (targetPage.includes('?')) {
                         const splitAddress = targetPage.split('?')
                         searchParams = splitAddress.pop();
-                        [, pageId, subPageId1, subPageId2] = splitAddress.pop().split('/')
+                        [, pageId, subPageId1] = splitAddress.pop().split('/')
                     } else {
-                        [, pageId, subPageId1, subPageId2] = targetPage.split('/')
+                        [, pageId, subPageId1] = targetPage.split('/')
                     }
                 } else {
                     pageId = targetPage
                 }
             }
-            console.log(pageId, subPageId1, subPageId2)
+
             if (!document.querySelector(`#${pageId}`)?.classList.contains('inner-page')) return
             try {
-                if (floDapps.user.id && (['sign_up', 'sign_in', 'loading', 'landing'].includes(pageId))) {
+                if (floDapps.user.id && (generalPages.includes(pageId))) {
                     history.replaceState(null, null, '#/chat_page');
                     pageId = 'chat_page'
                 }
             } catch (e) {
-                if (!(['sign_up', 'sign_in', 'loading', 'landing'].includes(pageId))) return
+                if (!(generalPages.includes(pageId))) return
             }
+            appState.currentPage = pageId
+
             if (searchParams) {
                 const urlSearchParams = new URLSearchParams('?' + searchParams);
                 params = Object.fromEntries(urlSearchParams.entries());
             }
+            if (params)
+                appState.params = params
             switch (pageId) {
                 case 'sign_in':
                     setTimeout(() => {
@@ -2285,8 +2289,8 @@
         }
         function getSignedIn(passwordType) {
             return new Promise((resolve, reject) => {
-                routeTo('landing')
-                try {
+                routeTo(window.location.hash)
+                if (floGlobals.loaded) {
                     getPromptInput('Enter password', '', {
                         isPassword: true,
                     }).then(password => {
@@ -2294,7 +2298,7 @@
                             resolve(password)
                         }
                     })
-                } catch (err) {
+                } else {
                     if (passwordType === 'PIN/Password') {
                         floGlobals.isPrivKeySecured = true;
                         getRef('private_key_field').removeAttribute('data-private-key');
@@ -2308,9 +2312,7 @@
                         getRef('private_key_field').customValidation = floCrypto.getPubKeyHex;
                         getRef('secure_pwd_button').closest('.card').classList.remove('hidden');
                     }
-                    if (window.location.hash.includes('sign_in') || window.location.hash.includes('sign_up')) {
-                        routeTo(window.location.hash);
-                    } else {
+                    if (!generalPages.find(page => window.location.hash.includes(page))) {
                         location.hash = floGlobals.isPrivKeySecured ? '#/sign_in' : `#/landing`;
                     }
                     getRef('sign_in_button').onclick = () => {
