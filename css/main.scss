@@ -124,14 +124,6 @@ a {
   }
 }
 
-a.button {
-  padding: 0.4rem 0.6rem;
-  border-radius: 0.3rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: inherit;
-}
-
 button,
 .button {
   user-select: none;
@@ -143,13 +135,12 @@ button,
   color: inherit;
   -webkit-tap-highlight-color: transparent;
   align-items: center;
-  font-size: 0.9rem;
+  font-size: inherit;
   font-weight: 500;
   white-space: nowrap;
   padding: 0.8rem;
   border-radius: 0.3rem;
   justify-content: center;
-
   &:focus-visible {
     outline: var(--accent-color) solid medium;
   }
@@ -160,23 +151,28 @@ button,
 }
 
 .button {
-  background-color: rgba(var(--text-color), 0.1);
-
-  &--primary,
-  &--danger {
-    color: rgba(var(--background-color), 1) !important;
+  background-color: rgba(var(--text-color), 0.02);
+  border: solid thin rgba(var(--text-color), 0.06);
+  &--primary {
+    color: rgba(var(--background-color), 1);
+    background-color: var(--accent-color);
 
     .icon {
       fill: rgba(var(--background-color), 1);
     }
   }
-
-  &--primary {
-    background-color: var(--accent-color);
+  &--colored {
+    color: var(--accent-color);
+    .icon {
+      fill: var(--accent-color);
+    }
   }
-
   &--danger {
-    background-color: var(--danger-color);
+    background-color: #ff737310;
+    color: var(--danger-color);
+    .icon {
+      fill: var(--danger-color);
+    }
   }
 
   &--small {
@@ -184,9 +180,17 @@ button,
   }
 
   &--outlined {
-    border: solid rgba(var(--text-color), 0.5) 0.1rem;
+    border: solid rgba(var(--text-color), 0.3) 0.1rem;
     background-color: rgba(var(--foreground-color), 1);
   }
+  &--transparent {
+    background-color: transparent;
+  }
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: saturate(0);
 }
 
 .cta {
@@ -209,10 +213,6 @@ button,
   border-radius: 0.3rem;
   aspect-ratio: 1/1;
   background-color: transparent;
-}
-
-button:disabled {
-  opacity: 0.5;
 }
 
 a:any-link:focus-visible {
@@ -273,27 +273,6 @@ sm-textarea {
   --max-height: 32ch;
 }
 
-sm-button {
-  --padding: 0.8rem;
-
-  &[variant="primary"] {
-    .icon {
-      fill: rgba(var(--background-color), 1);
-    }
-  }
-
-  &[disabled] {
-    .icon {
-      fill: rgba(var(--text-color), 0.6);
-    }
-  }
-
-  &.danger {
-    --background: var(--danger-color);
-    color: rgba(var(--background-color), 1);
-  }
-}
-
 sm-spinner {
   --size: 1rem;
   --stroke-width: 0.1rem;
@@ -312,14 +291,14 @@ sm-option {
   font-size: 0.9rem;
 }
 
-strip-select {
+sm-chips {
   --gap: 0;
   background-color: rgba(var(--text-color), 0.06);
   border-radius: 0.3rem;
   padding: 0.3rem;
 }
 
-strip-option {
+sm-chip {
   position: relative;
   font-size: 0.8rem;
   --border-radius: 0.2rem;
@@ -660,13 +639,24 @@ ol {
   display: grid;
   text-align: center;
   align-items: center;
-
+  justify-items: center;
   & > * {
     grid-area: 1/1/2/2;
   }
-
   button {
     z-index: 1;
+  }
+}
+.password-field {
+  label {
+    display: flex;
+    justify-content: center;
+    input:checked ~ .visible {
+      display: none;
+    }
+    input:not(:checked) ~ .invisible {
+      display: none;
+    }
   }
 }
 
@@ -709,41 +699,37 @@ ol {
 #confirmation_popup,
 #prompt_popup {
   flex-direction: column;
-
   h4 {
-    margin-bottom: 0.5rem;
-  }
-
-  sm-button {
-    margin: 0;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
   }
 
   .flex {
-    padding: 0;
     margin-top: 1rem;
-
-    sm-button:first-of-type {
-      margin-right: 0.6rem;
-      margin-left: auto;
-    }
   }
 }
 
-#prompt_message {
-  margin-bottom: 1.5rem;
-}
-
 .popup__header {
+  position: relative;
   display: grid;
   gap: 0.5rem;
   width: 100%;
   padding: 0 1.5rem;
   align-items: center;
-}
-
-.popup__header__close {
-  padding: 0.5rem;
-  margin-left: -0.5rem;
+  & > * {
+    grid-row: 1;
+  }
+  h3,
+  h4 {
+    grid-column: 1/-1;
+    justify-self: center;
+    align-self: center;
+  }
+  &__close {
+    grid-column: 1;
+    margin-left: -1rem;
+    justify-self: flex-start;
+  }
 }
 
 .flo-icon {
@@ -768,7 +754,13 @@ ol {
 }
 
 .inner-page {
-  background-color: rgba(var(--foreground-color), 0.5);
+  gap: 1rem;
+  display: grid;
+  position: relative;
+  padding: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+  background-color: rgba(var(--foreground-color), 0.3);
 }
 
 #sign_in,
@@ -778,7 +770,7 @@ ol {
 
   section {
     margin-top: -8rem;
-    width: min(24rem, 100%);
+    width: min(26rem, 100%);
   }
 
   sm-form {
@@ -790,38 +782,28 @@ ol {
   .h2 {
     margin-bottom: 0.5rem;
   }
-
-  .card {
-    margin: 1.5rem 0;
-  }
-
-  h5 {
-    color: rgba(var(--text-color), 0.8);
-  }
 }
-
+.generated-keys-wrapper {
+  padding: 1rem;
+  background-color: rgba(var(--foreground-color), 1);
+  border-radius: 0.5rem;
+}
 #flo_id_warning {
   padding-bottom: 1.5rem;
-  border-bottom: thin solid rgba(var(--text-color), 0.3);
-
   .icon {
-    height: 4rem;
-    width: 4rem;
-    padding: 1rem;
+    height: 3rem;
+    width: 3rem;
+    padding: 0.8rem;
+    overflow: visible;
     background-color: #ffc107;
     border-radius: 3rem;
     fill: rgba(0, 0, 0, 0.8);
-    margin-bottom: 1.5rem;
   }
 }
 
 .tip {
   font-size: 0.9rem;
   color: rgba(var(--text-color), 0.8);
-}
-
-sm-button[variant="primary"] {
-  --foreground-color: 255, 255, 255;
 }
 
 .danger {
@@ -1733,7 +1715,7 @@ sm-button[variant="primary"] {
 #mail_type_selector {
   width: fit-content;
 
-  strip-option {
+  sm-chip {
     --padding: 0.5rem 1.2rem;
 
     .badge {
@@ -2147,7 +2129,7 @@ sm-button[variant="primary"] {
     padding: 0 1.5rem;
     margin-top: 2rem;
 
-    sm-button:first-of-type {
+    button:first-of-type {
       margin-right: 0.5rem;
     }
   }
@@ -2311,31 +2293,10 @@ sm-button[variant="primary"] {
       font-size: 2rem;
       font-weight: 500;
     }
-
-    sm-button {
-      width: 100%;
-      display: flex;
-      width: 100% !important;
-    }
   }
 
   #landing_illustration {
     grid-area: illustration;
-  }
-
-  .frame,
-  #sign_in {
-    form {
-      height: 100%;
-    }
-
-    .h2 {
-      margin-top: 3rem;
-    }
-
-    sm-button[variant="primary"] {
-      margin-top: auto;
-    }
   }
 
   .fab {
@@ -2468,6 +2429,8 @@ sm-button[variant="primary"] {
 
   #sign_in {
     width: 24rem;
+    height: auto;
+    border-radius: 0.4rem;
   }
 
   #main_page {

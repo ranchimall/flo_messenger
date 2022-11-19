@@ -113,14 +113,6 @@ a:focus-visible {
   box-shadow: 0 0 0 0.1rem rgba(var(--text-color), 1) inset;
 }
 
-a.button {
-  padding: 0.4rem 0.6rem;
-  border-radius: 0.3rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: inherit;
-}
-
 button,
 .button {
   -webkit-user-select: none;
@@ -134,7 +126,7 @@ button,
   color: inherit;
   -webkit-tap-highlight-color: transparent;
   align-items: center;
-  font-size: 0.9rem;
+  font-size: inherit;
   font-weight: 500;
   white-space: nowrap;
   padding: 0.8rem;
@@ -151,26 +143,44 @@ button:not(:disabled),
 }
 
 .button {
-  background-color: rgba(var(--text-color), 0.1);
-}
-.button--primary, .button--danger {
-  color: rgba(var(--background-color), 1) !important;
-}
-.button--primary .icon, .button--danger .icon {
-  fill: rgba(var(--background-color), 1);
+  background-color: rgba(var(--text-color), 0.02);
+  border: solid thin rgba(var(--text-color), 0.06);
 }
 .button--primary {
+  color: rgba(var(--background-color), 1);
   background-color: var(--accent-color);
 }
+.button--primary .icon {
+  fill: rgba(var(--background-color), 1);
+}
+.button--colored {
+  color: var(--accent-color);
+}
+.button--colored .icon {
+  fill: var(--accent-color);
+}
 .button--danger {
-  background-color: var(--danger-color);
+  background-color: rgba(255, 115, 115, 0.062745098);
+  color: var(--danger-color);
+}
+.button--danger .icon {
+  fill: var(--danger-color);
 }
 .button--small {
   padding: 0.4rem 0.6rem;
 }
 .button--outlined {
-  border: solid rgba(var(--text-color), 0.5) 0.1rem;
+  border: solid rgba(var(--text-color), 0.3) 0.1rem;
   background-color: rgba(var(--foreground-color), 1);
+}
+.button--transparent {
+  background-color: transparent;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: saturate(0);
 }
 
 .cta {
@@ -193,10 +203,6 @@ button:not(:disabled),
   border-radius: 0.3rem;
   aspect-ratio: 1/1;
   background-color: transparent;
-}
-
-button:disabled {
-  opacity: 0.5;
 }
 
 a:-webkit-any-link:focus-visible {
@@ -260,20 +266,6 @@ sm-textarea {
   --max-height: 32ch;
 }
 
-sm-button {
-  --padding: 0.8rem;
-}
-sm-button[variant=primary] .icon {
-  fill: rgba(var(--background-color), 1);
-}
-sm-button[disabled] .icon {
-  fill: rgba(var(--text-color), 0.6);
-}
-sm-button.danger {
-  --background: var(--danger-color);
-  color: rgba(var(--background-color), 1);
-}
-
 sm-spinner {
   --size: 1rem;
   --stroke-width: 0.1rem;
@@ -292,14 +284,14 @@ sm-option {
   font-size: 0.9rem;
 }
 
-strip-select {
+sm-chips {
   --gap: 0;
   background-color: rgba(var(--text-color), 0.06);
   border-radius: 0.3rem;
   padding: 0.3rem;
 }
 
-strip-option {
+sm-chip {
   position: relative;
   font-size: 0.8rem;
   --border-radius: 0.2rem;
@@ -632,12 +624,24 @@ ol li::before {
   display: grid;
   text-align: center;
   align-items: center;
+  justify-items: center;
 }
 .multi-state-button > * {
   grid-area: 1/1/2/2;
 }
 .multi-state-button button {
   z-index: 1;
+}
+
+.password-field label {
+  display: flex;
+  justify-content: center;
+}
+.password-field label input:checked ~ .visible {
+  display: none;
+}
+.password-field label input:not(:checked) ~ .invisible {
+  display: none;
 }
 
 .page {
@@ -679,38 +683,35 @@ ol li::before {
 }
 #confirmation_popup h4,
 #prompt_popup h4 {
-  margin-bottom: 0.5rem;
-}
-#confirmation_popup sm-button,
-#prompt_popup sm-button {
-  margin: 0;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
 }
 #confirmation_popup .flex,
 #prompt_popup .flex {
-  padding: 0;
   margin-top: 1rem;
-}
-#confirmation_popup .flex sm-button:first-of-type,
-#prompt_popup .flex sm-button:first-of-type {
-  margin-right: 0.6rem;
-  margin-left: auto;
-}
-
-#prompt_message {
-  margin-bottom: 1.5rem;
 }
 
 .popup__header {
+  position: relative;
   display: grid;
   gap: 0.5rem;
   width: 100%;
   padding: 0 1.5rem;
   align-items: center;
 }
-
+.popup__header > * {
+  grid-row: 1;
+}
+.popup__header h3,
+.popup__header h4 {
+  grid-column: 1/-1;
+  justify-self: center;
+  align-self: center;
+}
 .popup__header__close {
-  padding: 0.5rem;
-  margin-left: -0.5rem;
+  grid-column: 1;
+  margin-left: -1rem;
+  justify-self: flex-start;
 }
 
 .flo-icon {
@@ -733,7 +734,13 @@ ol li::before {
 }
 
 .inner-page {
-  background-color: rgba(var(--foreground-color), 0.5);
+  gap: 1rem;
+  display: grid;
+  position: relative;
+  padding: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+  background-color: rgba(var(--foreground-color), 0.3);
 }
 
 #sign_in,
@@ -744,7 +751,7 @@ ol li::before {
 #sign_in section,
 #sign_up section {
   margin-top: -8rem;
-  width: min(24rem, 100%);
+  width: min(26rem, 100%);
 }
 #sign_in sm-form,
 #sign_up sm-form {
@@ -754,34 +761,29 @@ ol li::before {
 #sign_up .h2 {
   margin-bottom: 0.5rem;
 }
-#sign_up .card {
-  margin: 1.5rem 0;
-}
-#sign_up h5 {
-  color: rgba(var(--text-color), 0.8);
+
+.generated-keys-wrapper {
+  padding: 1rem;
+  background-color: rgba(var(--foreground-color), 1);
+  border-radius: 0.5rem;
 }
 
 #flo_id_warning {
   padding-bottom: 1.5rem;
-  border-bottom: thin solid rgba(var(--text-color), 0.3);
 }
 #flo_id_warning .icon {
-  height: 4rem;
-  width: 4rem;
-  padding: 1rem;
+  height: 3rem;
+  width: 3rem;
+  padding: 0.8rem;
+  overflow: visible;
   background-color: #ffc107;
   border-radius: 3rem;
   fill: rgba(0, 0, 0, 0.8);
-  margin-bottom: 1.5rem;
 }
 
 .tip {
   font-size: 0.9rem;
   color: rgba(var(--text-color), 0.8);
-}
-
-sm-button[variant=primary] {
-  --foreground-color: 255, 255, 255;
 }
 
 .danger {
@@ -1666,10 +1668,10 @@ sm-button[variant=primary] {
   width: -moz-fit-content;
   width: fit-content;
 }
-#mail_type_selector strip-option {
+#mail_type_selector sm-chip {
   --padding: 0.5rem 1.2rem;
 }
-#mail_type_selector strip-option .badge {
+#mail_type_selector sm-chip .badge {
   margin: 0rem;
 }
 
@@ -2064,7 +2066,7 @@ sm-button[variant=primary] {
   padding: 0 1.5rem;
   margin-top: 2rem;
 }
-#mail > .flex sm-button:first-of-type {
+#mail > .flex button:first-of-type {
   margin-right: 0.5rem;
 }
 
@@ -2217,25 +2219,8 @@ sm-button[variant=primary] {
     font-size: 2rem;
     font-weight: 500;
   }
-  #landing sm-button {
-    width: 100%;
-    display: flex;
-    width: 100% !important;
-  }
   #landing_illustration {
     grid-area: illustration;
-  }
-  .frame form,
-#sign_in form {
-    height: 100%;
-  }
-  .frame .h2,
-#sign_in .h2 {
-    margin-top: 3rem;
-  }
-  .frame sm-button[variant=primary],
-#sign_in sm-button[variant=primary] {
-    margin-top: auto;
   }
   .fab {
     bottom: 4rem;
@@ -2348,6 +2333,8 @@ sm-button[variant=primary] {
   }
   #sign_in {
     width: 24rem;
+    height: auto;
+    border-radius: 0.4rem;
   }
   #main_page {
     grid-template-columns: -webkit-min-content 1fr;
