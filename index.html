@@ -240,89 +240,82 @@
     <main id="main_page" class="page grid hidden">
         <section id="chat_page" class="inner-page">
             <div id="contacts" class="grid">
-                <section class="grid gap-0-5 card" style="padding: 1rem 1rem 0 1rem; border-radius: 0;">
-                    <h4>Bitcoin multisig</h4>
-                    <div class="flex align-center" style="margin: 0 -0.5rem 0.5rem;">
-                        <button class="prime-action interactive" onclick="openCreationPopup('multisig')">
-                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                                width="24px" fill="#000000">
-                                <path d="M0 0h24v24H0z" fill="none" />
-                                <path
-                                    d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
-                            </svg>
-                            Create address
-                        </button>
-                        <button class="prime-action interactive" onclick="openPopup('multisig_tx_popup')">
-                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                                width="24px" fill="#000000">
-                                <path d="M0 0h24v24H0z" fill="none" />
-                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                            </svg>
-                            Initiate transaction
-                        </button>
-                    </div>
-                </section>
-                <div class="flex flex-direction-column" style="overflow-y: auto; position: relative;">
-                    <div class="grid header">
-                        <div class="flex align-center gap-0-5">
-                            <h4>Messages</h4>
-                            <button id="notification_panel_button" class="icon-only margin-left-auto"
-                                onclick="toggleNotifications()">
-                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                                    width="24px" fill="#000000">
+                <div class="header">
+                    <sm-chips id="feature_mode">
+                        <sm-chip value="dm" selected>Chat</sm-chip>
+                        <sm-chip value="multisig">BTC multisig</sm-chip>
+                        <sm-chip value="requests" id="notification_panel_button">Requests</sm-chip>
+                    </sm-chips>
+                </div>
+                <div id="chat_sections">
+                    <div class="flex flex-direction-column gap-0-5" style="overflow: hidden;">
+                        <div class="flex align-center gap-0-5" style="padding: 0 1rem;">
+                            <sm-input id="search_chats" type="search" placeholder="Search FLO address or name">
+                                <svg slot="icon" class="icon" xmlns="http://www.w3.org/2000/svg" height="24px"
+                                    viewBox="0 0 24 24" width="24px" fill="#000000">
                                     <path d="M0 0h24v24H0V0z" fill="none" />
                                     <path
-                                        d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z" />
+                                        d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
                                 </svg>
-                            </button>
+                            </sm-input>
                             <sm-menu align-options="right">
                                 <menu-option onclick="openCreationPopup('group')">
                                     Create new group
                                 </menu-option>
                             </sm-menu>
                         </div>
-                        <sm-input id="search_chats" class="margin-right-0-5" type="search"
-                            placeholder="Search FLO address or name">
-                            <svg slot="icon" class="icon" xmlns="http://www.w3.org/2000/svg" height="24px"
+                        <div id="chats_list" class="flex observe-empty-state"></div>
+                        <div class="empty-state flex flex-direction-column align-center text-center align-self-center">
+                            <svg class="icon icon--big" xmlns="http://www.w3.org/2000/svg" height="24px"
                                 viewBox="0 0 24 24" width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" />
+                            </svg>
+                            <h4 class="margin-bottom-0-5">Start your first conversation</h4>
+                            <p>Tap/click on 'New chat' to add or select a contact.</p>
+                        </div>
+                        <button id="new_message_button" onclick="openPopup('new_message_popup')"
+                            class="button button--primary fab round">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                width="24px" fill="#000000">
                                 <path d="M0 0h24v24H0V0z" fill="none" />
                                 <path
-                                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM5.92 19H5v-.92l9.06-9.06.92.92L5.92 19zM20.71 5.63l-2.34-2.34c-.2-.2-.45-.29-.71-.29s-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41z" />
                             </svg>
-                        </sm-input>
+                            New chat
+                        </button>
                     </div>
-                    <div id="chats_list" class="flex observe-empty-state"></div>
-                    <div class="empty-state flex flex-direction-column align-center text-center align-self-center">
-                        <svg class="icon icon--big" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                            width="24px" fill="#000000">
-                            <path d="M0 0h24v24H0z" fill="none" />
-                            <path
-                                d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" />
-                        </svg>
-                        <h4 class="margin-bottom-0-5">Start your first conversation</h4>
-                        <p>Tap/click on 'New chat' to add or select a contact.</p>
-                    </div>
-                    <button id="new_message_button" onclick="openPopup('new_message_popup')"
-                        class="button button--primary fab round">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                            width="24px" fill="#000000">
-                            <path d="M0 0h24v24H0V0z" fill="none" />
-                            <path
-                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM5.92 19H5v-.92l9.06-9.06.92.92L5.92 19zM20.71 5.63l-2.34-2.34c-.2-.2-.45-.29-.71-.29s-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41z" />
-                        </svg>
-                        New chat
-                    </button>
-                    <div id="notifications_wrapper" class="hidden">
-                        <div class="flex align-center gap-0-5">
-                            <button class="icon-only" onclick="toggleNotifications()">
+                    <div class="hidden flex flex-direction-column gap-0-5">
+                        <div class="flex align-center gap-0-5" style="margin: 0 0.5rem;">
+                            <button class="prime-action interactive" onclick="openCreationPopup('multisig')">
                                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                                     width="24px" fill="#000000">
-                                    <path d="M0 0h24v24H0V0z" fill="none"></path>
-                                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+                                    <path d="M0 0h24v24H0z" fill="none" />
+                                    <path
+                                        d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
                                 </svg>
+                                Create address
                             </button>
-                            <h4>Notifications</h4>
+                            <button class="prime-action interactive" onclick="openPopup('multisig_tx_popup')">
+                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                    width="24px" fill="#000000">
+                                    <path d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                                </svg>
+                                Initiate transaction
+                            </button>
                         </div>
+                        <ul id="select_multisig_list" class="grid gap-0-3 observe-empty-state"></ul>
+                        <div class="empty-state grid gap-1">
+                            <p>
+                                There are no multisig addresses created, use the button below to create one.
+                            </p>
+                            <button class="button" onclick="openCreationPopup('multisig')">Create multisig
+                                address</button>
+                        </div>
+                    </div>
+                    <div id="notifications_wrapper" class="hidden">
                         <ul id="notifications_list" class="observe-empty-state"></ul>
                         <div class="empty-state flex flex-direction-column align-center text-center align-self-center">
                             <svg class="icon icon--medium" xmlns="http://www.w3.org/2000/svg" height="24px"
@@ -330,8 +323,8 @@
                                 <path
                                     d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
                             </svg>
-                            <h4 class="margin-bottom-0-5">No notifications</h4>
-                            <p>When you receive a notification, it will appear here.</p>
+                            <h4 class="margin-bottom-0-5">No requests</h4>
+                            <p>When you receive a request, it will appear here.</p>
                         </div>
                     </div>
                 </div>
@@ -1041,97 +1034,18 @@
             </button>
             <h3>Initiate multisig transaction </h3>
         </header>
-        <div id="multisig_process" class="grid gap-2">
-            <div class="grid gap-1">
-                <b style="font-size: 0.9rem;">Select multisig address</b>
-                <ul id="select_multisig_list" class="grid gap-0-3 observe-empty-state"></ul>
-                <div class="empty-state grid gap-1">
-                    <p>
-                        There are no multisig addresses created, use the button below to create one.
-                    </p>
-                    <button class="button" onclick="openCreationPopup('multisig')">Create multisig address</button>
-                </div>
-                <button id="enter_receiver_button" class="button button--primary margin-left-auto cta hidden"
-                    onclick="showChildElement('multisig_process',1,{entry: slideInLeft, exit: slideOutLeft})">
-                    Next
-                </button>
+        <sm-form id="send_tx">
+            <div class="grid gap-0-5 card" style="padding: 1rem;">
+                <span style="font-size: 0.9rem;">Selected multisig address</span>
+                <h4 id="selected_multisig" class="wrap-around" style="font-size: 0.9rem;"></h4>
+                <p id="selected_multisig__balance"></p>
             </div>
-            <div class="grid gap-1 hidden">
-                <button class="button icon-only back-button justify-self-start"
-                    onclick="showChildElement('multisig_process',0,{entry: slideInRight, exit: slideOutRight})">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                        fill="#000000">
-                        <path d="M0 0h24v24H0V0z" fill="none" />
-                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-                    </svg>
-                </button>
-                <div class="grid gap-0-5 card" style="padding: 1rem;">
-                    <span style="font-size: 0.9rem;">Selected multisig address</span>
-                    <h4 id="selected_multisig" class="wrap-around" style="font-size: 0.9rem;"></h4>
-                    <p id="selected_multisig__balance"></p>
-                </div>
-                <sm-form id="send_tx">
-                    <div class="grid gap-0-5">
-                        <b style="font-size: 0.9rem;">Enter receiver(s)</b>
-                        <div id="receiver_container">
-                            <fieldset class="receiver-card">
-                                <sm-input class="receiver-input" placeholder="Receiver address" data-btc-address
-                                    error-text="Invalid BTC address" animate required>
-                                    <div class="currency-symbol flex" slot="icon">
-                                        <svg class="icon" xmlns="http://www.w3.org/2000/svg"
-                                            enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24"
-                                            width="24px" fill="#000000">
-                                            <g>
-                                                <rect fill="none" height="24" width="24"></rect>
-                                            </g>
-                                            <g>
-                                                <path
-                                                    d="M17.06,11.57C17.65,10.88,18,9.98,18,9c0-1.86-1.27-3.43-3-3.87L15,3h-2v2h-2V3H9v2H6v2h2v10H6v2h3v2h2v-2h2v2h2v-2 c2.21,0,4-1.79,4-4C19,13.55,18.22,12.27,17.06,11.57z M10,7h4c1.1,0,2,0.9,2,2s-0.9,2-2,2h-4V7z M15,17h-5v-4h5c1.1,0,2,0.9,2,2 S16.1,17,15,17z">
-                                                </path>
-                                            </g>
-                                        </svg>
-                                    </div>
-                                </sm-input>
-                                <div class="flex align-start gap-0-5 remove-card-wrapper">
-                                    <sm-input type="number" class="amount-input w-100" placeholder="Amount"
-                                        min="0.0000001" step="0.00000001" error-text="Invalid amount" animate required>
-                                        <div class="currency-symbol flex" slot="icon">
-                                            <svg class="icon" xmlns="http://www.w3.org/2000/svg"
-                                                enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24"
-                                                width="24px" fill="#000000">
-                                                <g>
-                                                    <rect fill="none" height="24" width="24"></rect>
-                                                </g>
-                                                <g>
-                                                    <path
-                                                        d="M17.06,11.57C17.65,10.88,18,9.98,18,9c0-1.86-1.27-3.43-3-3.87L15,3h-2v2h-2V3H9v2H6v2h2v10H6v2h3v2h2v-2h2v2h2v-2 c2.21,0,4-1.79,4-4C19,13.55,18.22,12.27,17.06,11.57z M10,7h4c1.1,0,2,0.9,2,2s-0.9,2-2,2h-4V7z M15,17h-5v-4h5c1.1,0,2,0.9,2,2 S16.1,17,15,17z">
-                                                    </path>
-                                                </g>
-                                            </svg>
-                                        </div>
-                                    </sm-input>
-                                </div>
-                            </fieldset>
-                        </div>
-                        <button id="add_receiver" class="button button--small margin-right-auto">
-                            <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
-                                viewBox="0 0 24 24" width="24px" fill="#000000">
-                                <path d="M0 0h24v24H0V0z" fill="none" />
-                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                            </svg>
-                            Add receiver</button>
-                    </div>
-                    <div class="grid gap-0-5">
-                        <div class="flex align-center space-between">
-                            <h4>Fees</h4>
-                            <sm-chips id="fees_selector" class="hidden">
-                                <sm-chip value="suggested" selected>Suggested</sm-chip>
-                                <sm-chip value="custom">Custom</sm-chip>
-                            </sm-chips>
-                        </div>
-                        <p id="selected_fee_tip" class="hidden">Estimated time of confirmation is 1hr</p>
-                        <sm-input type="number" id="send_fee" placeholder="Fee" min="0.00000001" step="0.00000001"
-                            error-text="Please enter valid fees" animate required>
+            <div class="grid gap-0-5">
+                <b style="font-size: 0.9rem;">Enter receiver(s)</b>
+                <div id="receiver_container">
+                    <fieldset class="receiver-card">
+                        <sm-input class="receiver-input" placeholder="Receiver address" data-btc-address
+                            error-text="Invalid BTC address" animate required>
                             <div class="currency-symbol flex" slot="icon">
                                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24"
                                     height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
@@ -1146,14 +1060,66 @@
                                 </svg>
                             </div>
                         </sm-input>
-                    </div>
-                    <div class="multi-state-button margin-bottom-1-5">
-                        <button id="initiate_transaction" type="submit" class="button button--primary cta w-100"
-                            disabled>Initiate</button>
-                    </div>
-                </sm-form>
+                        <div class="flex align-start gap-0-5 remove-card-wrapper">
+                            <sm-input type="number" class="amount-input w-100" placeholder="Amount" min="0.0000001"
+                                step="0.00000001" error-text="Invalid amount" animate required>
+                                <div class="currency-symbol flex" slot="icon">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg"
+                                        enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
+                                        fill="#000000">
+                                        <g>
+                                            <rect fill="none" height="24" width="24"></rect>
+                                        </g>
+                                        <g>
+                                            <path
+                                                d="M17.06,11.57C17.65,10.88,18,9.98,18,9c0-1.86-1.27-3.43-3-3.87L15,3h-2v2h-2V3H9v2H6v2h2v10H6v2h3v2h2v-2h2v2h2v-2 c2.21,0,4-1.79,4-4C19,13.55,18.22,12.27,17.06,11.57z M10,7h4c1.1,0,2,0.9,2,2s-0.9,2-2,2h-4V7z M15,17h-5v-4h5c1.1,0,2,0.9,2,2 S16.1,17,15,17z">
+                                            </path>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </sm-input>
+                        </div>
+                    </fieldset>
+                </div>
+                <button id="add_receiver" class="button button--small margin-right-auto">
+                    <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
+                        viewBox="0 0 24 24" width="24px" fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                    </svg>
+                    Add receiver</button>
             </div>
-        </div>
+            <div class="grid gap-0-5">
+                <div class="flex align-center space-between">
+                    <h4>Fees</h4>
+                    <sm-chips id="fees_selector" class="hidden">
+                        <sm-chip value="suggested" selected>Suggested</sm-chip>
+                        <sm-chip value="custom">Custom</sm-chip>
+                    </sm-chips>
+                </div>
+                <p id="selected_fee_tip" class="hidden">Estimated time of confirmation is 1hr</p>
+                <sm-input type="number" id="send_fee" placeholder="Fee" min="0.00000001" step="0.00000001"
+                    error-text="Please enter valid fees" animate required>
+                    <div class="currency-symbol flex" slot="icon">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24"
+                            height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
+                            <g>
+                                <rect fill="none" height="24" width="24"></rect>
+                            </g>
+                            <g>
+                                <path
+                                    d="M17.06,11.57C17.65,10.88,18,9.98,18,9c0-1.86-1.27-3.43-3-3.87L15,3h-2v2h-2V3H9v2H6v2h2v10H6v2h3v2h2v-2h2v2h2v-2 c2.21,0,4-1.79,4-4C19,13.55,18.22,12.27,17.06,11.57z M10,7h4c1.1,0,2,0.9,2,2s-0.9,2-2,2h-4V7z M15,17h-5v-4h5c1.1,0,2,0.9,2,2 S16.1,17,15,17z">
+                                </path>
+                            </g>
+                        </svg>
+                    </div>
+                </sm-input>
+            </div>
+            <div class="multi-state-button margin-bottom-1-5">
+                <button id="initiate_transaction" type="submit" class="button button--primary cta w-100"
+                    disabled>Initiate</button>
+            </div>
+        </sm-form>
     </sm-popup>
 
     <!-- Templates -->
@@ -1495,17 +1461,6 @@
                     }
                     renderElem(getRef('mail_contact_list'), html`${mailingContacts}`)
                     break;
-                case 'multisig_tx_popup':
-                    messenger.multisig.listAddress().then(addresses => {
-                        const list = Object.keys(addresses).map(address => render.multisigOption(address))
-                        if (list.length) {
-                            renderElem(getRef('select_multisig_list'), html`${list}`)
-                            getRef('select_multisig_list').previousElementSibling.classList.remove('hidden')
-                        } else {
-                            getRef('select_multisig_list').previousElementSibling.classList.add('hidden')
-                        }
-                    }).catch(err => notify(err, 'error'))
-                    break;
             }
         })
 
@@ -1530,11 +1485,6 @@
                     break;
                 case 'compose_mail_popup':
                     renderElem(getRef('mail_contact_list'), html``)
-                    break;
-                case 'multisig_tx_popup':
-                    renderElem(getRef('select_multisig_list'), html``)
-                    showChildElement('multisig_process', 0)
-                    getRef('enter_receiver_button').classList.add('hidden')
                     break;
             }
             if (popupStack.items.length === 0) {
@@ -2232,7 +2182,7 @@
         const slideInLeft = [
             {
                 opacity: 0,
-                transform: 'translateX(100%)'
+                transform: 'translateX(1.5rem)'
             },
             {
                 opacity: 1,
@@ -2246,13 +2196,13 @@
             },
             {
                 opacity: 0,
-                transform: 'translateX(-100%)'
+                transform: 'translateX(-1.5rem)'
             },
         ]
         const slideInRight = [
             {
                 opacity: 0,
-                transform: 'translateX(-100%)'
+                transform: 'translateX(-1.5rem)'
             },
             {
                 opacity: 1,
@@ -2266,13 +2216,13 @@
             },
             {
                 opacity: 0,
-                transform: 'translateX(100%)'
+                transform: 'translateX(1.5rem)'
             },
         ]
         const slideInDown = [
             {
                 opacity: 0,
-                transform: 'translateY(-100%)'
+                transform: 'translateY(-1.5rem)'
             },
             {
                 opacity: 1,
@@ -2286,7 +2236,7 @@
             },
             {
                 opacity: 0,
-                transform: 'translateY(-100%)'
+                transform: 'translateY(-1.5rem)'
             },
         ]
 
@@ -2534,7 +2484,7 @@
             },
             messageBubble(msg) {
                 let { admin = false, newMembers = [], rmMembers = [], groupID, name, description, sender, floID, message, time: timestamp, category, unconfirmed = false,
-                    pipeID, type } = msg
+                    pipeID, type, tx_hex } = msg
                 if (activeChat.type === 'group') {
                     floID = groupID
                     category = sender === floDapps.user.id ? 'sent' : 'received'
@@ -2610,6 +2560,11 @@
                 } else if (type) {
                     switch (type) {
                         case 'TRANSACTION':
+                            floGlobals.pipelineTxHex = tx_hex
+                            if (tx_hex) {
+                                console.log('tx_hex', tx_hex)
+                                btcOperator.parseTransaction(tx_hex).then(res => console.log(res))
+                            }
                             return html.node`<p class="pipeline-event pipeline-event--signed event-card flex align-center">
                                     <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M23,12l-2.44-2.79l0.34-3.69l-3.61-0.82L15.4,1.5L12,2.96L8.6,1.5L6.71,4.69L3.1,5.5L3.44,9.2L1,12l2.44,2.79l-0.34,3.7 l3.61,0.82L8.6,22.5l3.4-1.47l3.4,1.46l1.89-3.19l3.61-0.82l-0.34-3.69L23,12z M10.09,16.72l-3.8-3.81l1.48-1.48l2.32,2.33 l5.85-5.87l1.48,1.48L10.09,16.72z"/></g></svg>
                                     ${getContactName(sender)} signed the transaction
@@ -2690,22 +2645,27 @@
             },
             multisigOption(address) {
                 btcOperator.getBalance(address).then(balance => {
-                    const target = getRef('select_multisig_list').querySelector(`input[value="${address}"]`);
+                    const target = getRef('select_multisig_list').querySelector(`[data-address="${address}"]`);
                     if (target)
-                        target.parentNode.querySelector('.multisig-option__balance').textContent = `Balance: ${balance} BTC`;
+                        target.querySelector('.multisig-option__balance').textContent = `Balance: ${balance} BTC`;
                 }).catch(err => notify(err, 'error'))
                 return html`
-                    <li>
-                        <label class="flex align-center multisig-option interactive">
-                            <input type="radio" name="multisig-group" value="${address}"/>
-                            <div class="grid gap-0-5">
-                                <span class="wrap-around">${address}</span>
-                                <span class="multisig-option__balance flex align-center">Balance: <sm-spinner><sm-spinner></span>
-                            </div>
-                            <div class="indicator"></div>
-                        </label>
+                    <li class="grid gap-0-5 align-center multisig-option" data-address=${address}>
+                        <span class="wrap-around">${address}</span>
+                        <div class="flex align-center space-between">
+                            <span class="multisig-option__balance flex align-center">Balance: <sm-spinner><sm-spinner></span>
+                            <button class="button button--small button--colored" onclick=${initTransaction}>Init transaction</button>
+                        </div>
                     </li>
                 `
+            },
+            multisigAddresses() {
+                messenger.multisig.listAddress().then(addresses => {
+                    const list = Object.keys(addresses).map(address => render.multisigOption(address))
+                    if (list.length) {
+                        renderElem(getRef('select_multisig_list'), html`${list}`)
+                    }
+                }).catch(err => notify(err, 'error'))
             },
             notification(id, details) {
                 let { floID, message, time, type } = details
@@ -2798,6 +2758,7 @@
             }
             const target = typeof elem === 'string' ? document.querySelector(elem) : elem
             if (!target.querySelector('.badge')) {
+                if (parseInt(text) === 0) return
                 const badge = html.node`<span class="badge">${text}</span>`
                 target.append(badge)
                 badge.animate([
@@ -2810,6 +2771,7 @@
                 ], animOptions)
             } else {
                 const badge = target.querySelector('.badge');
+                if (parseInt(text) === 0) return badge.remove()
                 const oldValue = parseInt(badge.textContent)
                 const newValue = parseInt(text)
                 if (oldValue === newValue) return
@@ -2986,38 +2948,24 @@
                 }
             }
         }
-        function toggleNotifications() {
-            const animOptions = {
-                duration: 300,
-                easing: 'ease',
-                fill: 'forwards'
+        getRef('feature_mode').addEventListener('change', e => {
+            const sections = ['dm', 'multisig', 'requests'];
+            const lastIndex = [...getRef('chat_sections').children].findIndex(el => !el.classList.contains('hidden'))
+            const currentIndex = sections.indexOf(e.target.value)
+            const entry = lastIndex < currentIndex ? slideInLeft : slideInRight
+            const exit = lastIndex < currentIndex ? slideOutLeft : slideOutRight
+            showChildElement(getRef('chat_sections'), currentIndex, { entry, exit })
+            switch (e.target.value) {
+                case 'dm':
+                    break;
+                case 'multisig':
+                    render.multisigAddresses()
+                    break;
+                case 'requests':
+                    render.notifications()
+                    break;
             }
-            getRef('notifications_wrapper').parentNode.style.overflow = 'hidden';
-            const allChildren = [...getRef('notifications_wrapper').parentNode.children];
-            const index = allChildren.indexOf(getRef('notifications_wrapper'));
-            const siblings = allChildren.slice(0, index);
-            if (getRef('notifications_wrapper').classList.contains('hidden')) {
-                siblings.forEach(child => {
-                    child.animate(slideOutLeft, animOptions).onfinish = e => {
-                        child.classList.add('hidden')
-                    }
-                })
-                getRef('notifications_wrapper').classList.remove('hidden')
-                render.notifications()
-                getRef('notifications_wrapper').animate(slideInLeft, animOptions).onfinish = e => {
-                    getRef('notifications_wrapper').parentNode.style.overflow = 'auto';
-                }
-            } else {
-                getRef('notifications_wrapper').animate(slideOutLeft, animOptions).onfinish = e => {
-                    getRef('notifications_wrapper').classList.add('hidden');
-                    getRef('notifications_wrapper').parentNode.style.overflow = 'auto';
-                }
-                siblings.slice(0, 4).forEach(child => {
-                    child.classList.remove('hidden')
-                    child.animate(slideInLeft, animOptions)
-                })
-            }
-        }
+        })
         getRef('search_chats').addEventListener('keyup', e => {
             if (e.code === 'ArrowDown') {
                 for (child of getRef('chats_list').children) {
@@ -3344,6 +3292,7 @@
                 notify('Created multisig address', 'success');
                 closePopup();
                 clearAllMembers();
+                render.multisigAddresses();
             }).catch(error => notify(error, 'error'))
                 .finally(() => {
                     buttonLoader('create_multisig_button', false)
@@ -4348,16 +4297,13 @@
             }
         }
 
-        delegate(getRef('select_multisig_list'), 'click', '.multisig-option', e => {
-            getRef('selected_multisig').textContent = e.delegateTarget.querySelector('input').value;
-            getRef('selected_multisig__balance').textContent = e.delegateTarget.querySelector('.multisig-option__balance').textContent;
-            setTimeout(() => {
-                showChildElement('multisig_process', 1, { entry: slideInLeft, exit: slideOutLeft }).then(() => {
-                    getRef('send_tx').querySelector('sm-input').focusIn()
-                    getRef('enter_receiver_button').classList.remove('hidden')
-                })
-            }, 200);
-        })
+        function initTransaction(e) {
+            const multisig = e.target.closest('.multisig-option')
+            getRef('selected_multisig').textContent = multisig.dataset.address;
+            getRef('selected_multisig__balance').textContent = multisig.querySelector('.multisig-option__balance').textContent;
+            getRef('send_tx').querySelector('sm-input').focusIn()
+            openPopup('multisig_tx_popup')
+        }
         const txParticipantsObserver = new MutationObserver(mutations => {
             mutations.forEach(mutation => {
                 if (mutation.type === 'childList') {
@@ -4365,14 +4311,11 @@
                         const removeButton = mutation.target.firstElementChild.querySelector('.remove-card')
                         if (!removeButton) {
                             const newRemoveButton = html.node`
-                        <button class="remove-card button--small">
-                            <svg class="icon margin-right-0-3" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
-                                <path d="M0 0h24v24H0V0z" fill="none"></path>
-                                <path d="M7 11v2h10v-2H7zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
-                            </svg>
-                            Remove
-                        </button>
-                    `
+                                <button class="remove-card button--small">
+                                    <svg class="icon margin-right-0-3" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0V0z" fill="none"></path> <path d="M7 11v2h10v-2H7zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path> </svg>
+                                    Remove
+                                </button>
+                            `
                             mutation.target.firstElementChild.querySelector('.remove-card-wrapper').appendChild(newRemoveButton)
                         }
                     } else if (mutation.removedNodes.length > 0 && mutation.target.children.length === 1) {
@@ -4416,9 +4359,7 @@
 
         getRef('initiate_transaction').onclick = async evt => {
             buttonLoader('initiate_transaction', true)
-            const selectedInput = getRef('select_multisig_list').querySelector(':checked')
-            if (!selectedInput) return notify('Please select a multisig address', 'error')
-            const selectedMultisigAddress = selectedInput.value
+            const selectedMultisigAddress = getRef('selected_multisig').textContent
             const receivers = [...getRef('receiver_container').querySelectorAll('.receiver-input')].map(input => input.value.trim());
             const amounts = [...getRef('receiver_container').querySelectorAll('.amount-input')].map(input => {
                 return parseFloat(input.value.trim())

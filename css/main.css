@@ -285,16 +285,15 @@ sm-option {
 }
 
 sm-chips {
-  --gap: 0;
-  background-color: rgba(var(--text-color), 0.06);
-  border-radius: 0.3rem;
-  padding: 0.3rem;
+  --gap: 0.3rem;
 }
 
 sm-chip {
   position: relative;
-  font-size: 0.8rem;
-  --border-radius: 0.2rem;
+  font-size: 0.9rem;
+  --border-radius: 0.5rem;
+  --padding: 0.5rem 0.6rem;
+  --background: rgba(var(--text-color), 0.06);
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
@@ -631,6 +630,7 @@ ol li::before {
 }
 .multi-state-button button {
   z-index: 1;
+  width: 100%;
 }
 
 .password-field label {
@@ -994,7 +994,7 @@ ol li::before {
   font-weight: 500;
   white-space: initial;
   text-align: left;
-  padding: 0.5rem;
+  padding: 0.5rem 0;
 }
 .prime-action .icon {
   background-color: rgba(var(--text-color), 0.06);
@@ -1530,6 +1530,7 @@ ol li::before {
 #settings {
   height: 100%;
   overflow-y: hidden;
+  background-color: rgba(var(--foreground-color), 0.3);
 }
 #contacts .header,
 #mails .header,
@@ -1538,20 +1539,15 @@ ol li::before {
   position: relative;
   gap: 0.5rem;
 }
-#contacts .header sm-input,
-#mails .header sm-input,
-#settings .header sm-input {
-  width: 100%;
-}
 #contacts .header h4,
 #mails .header h4,
 #settings .header h4 {
   text-transform: capitalize;
   font-weight: 500;
 }
-#contacts .header sm-menu,
-#mails .header sm-menu,
-#settings .header sm-menu {
+#contacts sm-menu,
+#mails sm-menu,
+#settings sm-menu {
   margin-right: -0.7rem;
 }
 
@@ -1585,6 +1581,8 @@ ol li::before {
   grid-template-rows: max-content 1fr;
 }
 #contacts .header {
+  display: flex;
+  justify-content: space-between;
   padding: 0.5rem 1rem;
 }
 #contacts .scrolling-wrapper {
@@ -1597,15 +1595,31 @@ ol li::before {
   text-align: center;
 }
 
+#notification_panel_button .badge {
+  position: relative;
+  margin: -0.2rem 0 -0.2rem 0.5rem;
+  height: 1.5rem;
+  min-width: 3.3ch;
+  background-color: rgba(var(--background-color), 1);
+  color: var(--accent-color);
+}
+
 #contacts_container .contact {
   padding: 0.5rem 0;
 }
 
+#chat_sections {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  overflow-y: auto;
+  height: 100%;
+  overflow-x: hidden;
+}
+#chat_sections > * {
+  grid-area: 1/1/2/2;
+}
+
 #notifications_wrapper {
-  position: absolute;
-  z-index: 5;
-  top: 0;
-  right: 0;
   width: 100%;
   height: 100%;
   padding: 1rem;
@@ -1636,6 +1650,9 @@ ol li::before {
   color: rgba(var(--text-color), 0.7);
 }
 
+#creation_process {
+  overflow-x: hidden;
+}
 #creation_process .group-icon {
   background-color: var(--accent-color);
   justify-self: center;
@@ -1662,15 +1679,13 @@ ol li::before {
   width: -moz-fit-content;
   width: fit-content;
 }
-#mail_type_selector sm-chip {
-  --padding: 0.5rem 1.2rem;
-}
 #mail_type_selector sm-chip .badge {
   margin: 0rem;
 }
 
 #search_chats {
   --min-height: 2.5rem;
+  width: 100%;
 }
 
 #chat_page,
@@ -2019,7 +2034,7 @@ ol li::before {
 
 #chats_list {
   gap: 0.2rem;
-  padding-bottom: 4rem;
+  padding-bottom: 6rem;
 }
 
 .mail-container {
@@ -2160,30 +2175,12 @@ ol li::before {
   position: relative;
   padding: 1rem;
   border-radius: 0.5rem;
-}
-.multisig-option input {
-  margin-right: 1rem;
-  height: 1rem;
-  width: 1rem;
-}
-.multisig-option .indicator {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  right: 0;
-  border-radius: inherit;
-  box-shadow: 0 0 0 0.1rem rgba(var(--text-color), 0.2) inset;
-  transition: box-shadow 0.2s;
-}
-.multisig-option input:checked ~ .indicator {
-  box-shadow: 0 0 0 0.2rem var(--accent-color) inset;
+  font-size: 0.9rem;
 }
 .multisig-option .wrap-around {
   font-weight: 500;
 }
 .multisig-option__balance {
-  font-size: 0.9rem;
   color: rgba(var(--text-color), 0.8);
 }
 
@@ -2216,23 +2213,10 @@ ol li::before {
   #landing_illustration {
     grid-area: illustration;
   }
-  .fab {
-    bottom: 4rem;
-  }
   .inner-page {
     margin-bottom: 5rem;
   }
   #main_navbar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: -webkit-max-content;
-    width: -moz-max-content;
-    width: max-content;
-    margin: 0.5rem auto;
-    border-radius: 1rem;
-    justify-content: center;
     background-color: transparent;
     -webkit-backdrop-filter: blur(0.5rem);
             backdrop-filter: blur(0.5rem);
@@ -2251,13 +2235,11 @@ ol li::before {
   #main_navbar .nav-item {
     height: 3.8rem;
     width: 4.5rem;
+    margin: 0 auto;
   }
   #chats_list,
 #contact_container {
     gap: 0.2rem;
-  }
-  #chats_list {
-    padding-bottom: 10rem;
   }
   #chat_view .message {
     width: auto;
