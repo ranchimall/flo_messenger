@@ -287,25 +287,16 @@
                         </button>
                     </div>
                     <div class="hidden flex flex-direction-column gap-0-5">
-                        <div class="flex align-center gap-0-5" style="margin: 0 0.5rem;">
-                            <button class="prime-action interactive" onclick="openCreationPopup('multisig')">
-                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                                    width="24px" fill="#000000">
-                                    <path d="M0 0h24v24H0z" fill="none" />
-                                    <path
-                                        d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
-                                </svg>
-                                Create address
-                            </button>
-                            <button class="prime-action interactive" onclick="openPopup('multisig_tx_popup')">
-                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                                    width="24px" fill="#000000">
-                                    <path d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                                </svg>
-                                Initiate transaction
-                            </button>
-                        </div>
+                        <button class="prime-action button--colored" style="margin: 0.5rem 1rem 0 1rem;"
+                            onclick="openCreationPopup('multisig')">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
+                            </svg>
+                            Create multisig address
+                        </button>
                         <ul id="select_multisig_list" class="grid gap-0-3 observe-empty-state"></ul>
                         <div class="empty-state grid gap-1">
                             <p>

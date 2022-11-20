@@ -135,7 +135,7 @@ button,
   color: inherit;
   -webkit-tap-highlight-color: transparent;
   align-items: center;
-  font-size: inherit;
+  font-size: 0.9rem;
   font-weight: 500;
   white-space: nowrap;
   padding: 0.8rem;
@@ -302,6 +302,10 @@ sm-chip {
   --padding: 0.5rem 0.6rem;
   --background: rgba(var(--text-color), 0.06);
   user-select: none;
+  --selected-background-color: rgba(var(--text-color), 0.9);
+  &[selected] {
+    color: rgba(var(--background-color), 1);
+  }
 }
 
 ul,
@@ -1001,7 +1005,8 @@ ol {
   font-weight: 500;
   white-space: initial;
   text-align: left;
-  padding: 0.5rem 0;
+  justify-content: flex-start;
+  padding: 0;
   .icon {
     background-color: rgba(var(--text-color), 0.06);
     fill: var(--accent-color);
@@ -1145,6 +1150,8 @@ ol {
   }
   input {
     margin-left: auto;
+    height: 1.3em;
+    width: 1.3em;
   }
   button {
     margin-left: auto;
@@ -1640,7 +1647,7 @@ ol {
     }
   }
 }
-#notification_panel_button {
+sm-chip {
   .badge {
     position: relative;
     margin: -0.2rem 0 -0.2rem 0.5rem;

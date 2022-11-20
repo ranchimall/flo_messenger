@@ -126,7 +126,7 @@ button,
   color: inherit;
   -webkit-tap-highlight-color: transparent;
   align-items: center;
-  font-size: inherit;
+  font-size: 0.9rem;
   font-weight: 500;
   white-space: nowrap;
   padding: 0.8rem;
@@ -297,6 +297,10 @@ sm-chip {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+  --selected-background-color: rgba(var(--text-color), 0.9);
+}
+sm-chip[selected] {
+  color: rgba(var(--background-color), 1);
 }
 
 ul,
@@ -994,7 +998,8 @@ ol li::before {
   font-weight: 500;
   white-space: initial;
   text-align: left;
-  padding: 0.5rem 0;
+  justify-content: flex-start;
+  padding: 0;
 }
 .prime-action .icon {
   background-color: rgba(var(--text-color), 0.06);
@@ -1129,6 +1134,8 @@ ol li::before {
 }
 .selectable-contact input {
   margin-left: auto;
+  height: 1.3em;
+  width: 1.3em;
 }
 .selectable-contact button {
   margin-left: auto;
@@ -1595,7 +1602,7 @@ ol li::before {
   text-align: center;
 }
 
-#notification_panel_button .badge {
+sm-chip .badge {
   position: relative;
   margin: -0.2rem 0 -0.2rem 0.5rem;
   height: 1.5rem;
