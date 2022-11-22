@@ -1001,21 +1001,8 @@ ol {
 
 .prime-action {
   display: flex;
-  font-size: 0.8rem;
-  font-weight: 500;
-  white-space: initial;
-  text-align: left;
+  gap: 0.5rem;
   justify-content: flex-start;
-  padding: 0;
-  .icon {
-    background-color: rgba(var(--text-color), 0.06);
-    fill: var(--accent-color);
-    border-radius: 2rem;
-    padding: 0.7rem;
-    height: 2.6rem;
-    width: 2.6rem;
-    margin-right: 0.5rem;
-  }
 }
 
 .initial {

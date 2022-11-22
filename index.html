@@ -287,8 +287,7 @@
                         </button>
                     </div>
                     <div class="hidden flex flex-direction-column gap-0-5">
-                        <button class="prime-action button--colored" style="margin: 0.5rem 1rem 0 1rem;"
-                            onclick="openCreationPopup('multisig')">
+                        <button class="button button--primary fab round" onclick="openCreationPopup('multisig')">
                             <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                                 width="24px" fill="#000000">
                                 <path d="M0 0h24v24H0z" fill="none" />
@@ -297,6 +296,7 @@
                             </svg>
                             Create multisig address
                         </button>
+                        <h4 style="margin: 0.5rem 0.5rem 0 1rem;">Multisig addresses</h4>
                         <ul id="select_multisig_list" class="grid gap-0-3 observe-empty-state"></ul>
                         <div class="empty-state grid gap-1">
                             <p>
@@ -2354,7 +2354,7 @@
                 } else
                     contact = floGlobals.contacts[floID] || floID
                 return html.node`
-                    <li class="${`mail-card interactive ${markUnread ? 'unread' : ''}`}" data-name="${ref}" style=${`--contact-color: var(${contactColor(floID)})`}>
+                    <li class="${`mail-card interactive ${markUnread ? 'unread' : ''}`}" data-ref="${ref}" style=${`--contact-color: var(${contactColor(floID)})`}>
                         <div class="initial flex align-center">${contact.charAt(0)}</div>
                         <h5 class="sender">${contact}</h5>
                         <time class="date">${getFormattedTime(timestamp, 'relative')}</time>
@@ -3395,7 +3395,7 @@
         getRef("mail_sections").addEventListener('click', function (e) {
             if (e.target.closest(".mail-card")) {
                 e.target.closest(".mail-card").classList.remove('unread')
-                viewMail(e.target.closest(".mail-card").dataset.name);
+                viewMail(e.target.closest(".mail-card").dataset.ref);
                 getRef("mail_sections").querySelectorAll(".mail-card").forEach(card => {
                     card.classList.remove('active')
                 })
@@ -3735,11 +3735,13 @@
                     if (markUnread) {
                         sentCount++
                     }
+                    sentMails.querySelector(`[data-ref="${prev}"]`)?.remove()
                 } else if (to.includes(floDapps.user.id)) {
                     inboxMails.prepend(render.mailCard(from, ref, subject, time, content, markUnread))
                     if (markUnread) {
                         inboxCount++
                     }
+                    inboxMails.querySelector(`[data-ref="${prev}"]`)?.remove()
                 }
             }
             if (getRef('mail_type_selector').value === 'inbox' && sentCount) {
@@ -3753,20 +3755,25 @@
 
         function viewMail(mailRef, newView = true) {
             //stop rerendering if same mail is already open
-            if (mailRef === (activeMail ? activeMail.dataset.name : '')) return
+            if (mailRef === (activeMail ? activeMail.dataset.ref : '')) return
             messenger.getMail(mailRef).then(result => {
                 let { from, to, prev, ref, subject, time, content } = result
                 if (newView)
                     getRef('mail_container').innerHTML = ''
                 //append the contents to mail container
                 getRef("mail_container").append(render.mail(from, to, subject, time, content));
+                getRef("mail_container").lastElementChild.scrollIntoView();
                 //add prop for previous mail (if available)
                 getRef("prev_mail").dataset["value"] = prev;
-                if (prev) {
-                    getRef("prev_mail").classList.remove("hidden")
-                } else {
+                console.log("prev mail", [prev]);
+                messenger.getMail(prev).then(result => {
+                    getRef("prev_mail").classList.remove("hidden");
+                }).catch(err => {
+                    console.error(err);
+                    getRef("prev_mail").classList.add("hidden");
+                });
+                if (!prev)
                     getRef("prev_mail").classList.add("hidden")
-                }
                 //set values for reply mail form if new view
                 if (newView) {
                     getRef('reply_mail_popup').dataset["to"] = (from === floDapps.user.id ? to.join(',') : from)
