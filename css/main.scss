@@ -1640,8 +1640,8 @@ sm-chip {
     margin: -0.2rem 0 -0.2rem 0.5rem;
     height: 1.5rem;
     min-width: 3.3ch;
-    background-color: rgba(var(--background-color), 1);
-    color: var(--accent-color);
+    background-color: var(--accent-color);
+    color: rgba(var(--background-color), 1);
   }
 }
 
@@ -2391,12 +2391,6 @@ sm-chip {
     gap: 4vw;
     grid-template-columns: 1fr 1fr;
     padding: 0 4vw;
-  }
-
-  #sign_in {
-    width: 24rem;
-    height: auto;
-    border-radius: 0.4rem;
   }
 
   #main_page {
