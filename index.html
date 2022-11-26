@@ -39,8 +39,21 @@
             //invoke the startup functions
             floDapps.launchStartUp().then(result => {
                 console.log(result)
-                document.querySelectorAll('.user-flo-id').forEach(el => el.value = floDapps.user.id)
-                document.querySelectorAll('.user-btc-id').forEach(el => el.value = btcOperator.convert.legacy2bech(floDapps.user.id))
+                let floId = floDapps.user.id
+                if (/\w{34,35}$/.test(floId)) {
+                    const type = coinjs.addressDecode(floId).type
+                    console.log(floId, type)
+                    if (type === 'standard') {
+                        floId = btcOperator.convert.legacy2legacy(floId, 0x23);
+                    } else if (type === 'bech32') {
+                        floId = btcOperator.convert.bech2legacy(floId, 0x23);
+                    } else {
+                        notify(`Multisig address can't be used to sign in`, 'error');
+                        return;
+                    }
+                }
+                document.querySelectorAll('.user-flo-id').forEach(el => el.value = floId)
+                document.querySelectorAll('.user-btc-id').forEach(el => el.value = btcOperator.convert.legacy2bech(floId))
                 //load messages from IDB and render them
                 console.log(`Loading Data! Please Wait...`)
                 //Set UI render functions

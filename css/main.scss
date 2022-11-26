@@ -2176,6 +2176,9 @@ sm-chip {
   }
   .panel {
     padding-bottom: 6rem;
+    & > * {
+      margin: 0 auto;
+    }
   }
   #sign_out::part(button) {
     color: var(--error-color);
