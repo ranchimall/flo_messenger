@@ -40,9 +40,8 @@
             floDapps.launchStartUp().then(result => {
                 console.log(result)
                 let floId = floDapps.user.id
-                if (/\w{34,35}$/.test(floId)) {
+                if (!floCrypto.validateFloID(floId)) {
                     const type = coinjs.addressDecode(floId).type
-                    console.log(floId, type)
                     if (type === 'standard') {
                         floId = btcOperator.convert.legacy2legacy(floId, 0x23);
                     } else if (type === 'bech32') {
