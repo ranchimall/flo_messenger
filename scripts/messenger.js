@@ -1104,9 +1104,14 @@
             compactIDB.searchData("flodata", options).then(result => {
                 let multsigs = {};
                 for (let i in result) {
-                    let addr = result[i].data.address;
-                    let decode = coinjs.script().decodeRedeemScript(result[i].data.redeemScript);
-                    if (!decode || decode.address !== addr)
+                    let addr = result[i].data.address,
+                        addr_type = btcOperator.validateAddress(addr);
+                    let decode = (addr_type == "multisig" ?
+                        coinjs.script().decodeRedeemScript : coinjs.script().decodeRedeemScriptBech32)
+                        (result[i].data.redeemScript);
+                    if (addr_type != "multisig" && addr_type != "multisigBech32")
+                        console.warn("Invalid multi-sig address:", addr);
+                    else if (!decode || decode.address !== addr)
                         console.warn("Invalid redeem-script:", addr);
                     else if (decode.type !== "multisig__")
                         console.warn("Redeem-script is not of a multisig:", addr);
@@ -1128,7 +1133,11 @@
 
     MultiSig.createTx = function (address, redeemScript, receivers, amounts, fee = null, options = {}) {
         return new Promise(async (resolve, reject) => {
-            let decode = coinjs.script().decodeRedeemScript(redeemScript);
+            let addr_type = btcOperator.validateAddress(address);
+            if (addr_type != "multisig" && addr_type != "multisigBech32")
+                return reject("Sender address is not a multisig");
+            let decode = (addr_type == "multisig" ?
+                coinjs.script().decodeRedeemScript : coinjs.script().decodeRedeemScriptBech32)(redeemScript);
             if (!decode || decode.address !== address || decode.type !== "multisig__")
                 return reject("Invalid redeem-script");
             else if (!decode.pubkeys.includes(user.public.toLowerCase()) && !decode.pubkeys.includes(user.public.toUpperCase()))
