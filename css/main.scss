@@ -302,9 +302,9 @@ sm-chip {
   --padding: 0.5rem 0.6rem;
   --background: rgba(var(--text-color), 0.06);
   user-select: none;
-  --selected-background-color: rgba(var(--text-color), 0.9);
   &[selected] {
     color: rgba(var(--background-color), 1);
+    --background: rgba(var(--text-color), 0.9);
   }
 }
 

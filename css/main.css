@@ -297,10 +297,10 @@ sm-chip {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
-  --selected-background-color: rgba(var(--text-color), 0.9);
 }
 sm-chip[selected] {
   color: rgba(var(--background-color), 1);
+  --background: rgba(var(--text-color), 0.9);
 }
 
 ul,
