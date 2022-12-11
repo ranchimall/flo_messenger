@@ -888,16 +888,21 @@
         <div id="creation_process">
             <div>
                 <div id="selected_contacts">
+                    <div class="empty-state" style="padding-top: 0">
+                        <p class="info info--warning">*Contacts that haven't yet replied to you, can't be selected. you
+                            can send a request or message them.</p>
+                    </div>
                     <div class="flex align-center space-between">
                         <h4>Select members</h4>
                         <button id="skip_members_button" class="button button--primary hidden">
                             Skip </button>
                     </div>
+                    <label class="flex align-center" style="padding: 1rem 0;">
+                        <input id="add_self_check" class="margin-right-0-5" style="width: 1.3em; height: 1.3em"
+                            type="checkbox" checked />
+                        <span>Include self as a member</span>
+                    </label>
                     <div id="selected_contacts_container" class="observe-empty-state"></div>
-                    <div class="empty-state">
-                        <p class="info info--warning">*Contacts that haven't yet replied to you, can't be selected. you
-                            can send a request or message them.</p>
-                    </div>
                 </div>
                 <div class="scrolling-wrapper">
                     <div id="select_contacts_container" class="observe-empty-state"></div>
@@ -3285,7 +3290,8 @@
                 e.target.setAttribute('error-text', `Maximum ${selectedMembers.size + 1} allowed`)
         })
         document.getElementById('create_multisig_button').addEventListener('click', () => {
-            selectedMembers.add(floDapps.user.id)
+            if (getRef('add_self_check').checked)
+                selectedMembers.add(floDapps.user.id)
             const selctedPubKeys = [...selectedMembers].map(id => floGlobals.pubKeys[id]);
             const minRequired = parseInt(getRef('min_sign_required').value.trim());
             buttonLoader('create_multisig_button', true)

@@ -1178,7 +1178,7 @@ ol {
 
   &:not(:empty) {
     padding: 0.5rem 0;
-    margin: 0.5rem 0;
+    margin-bottom: 0.5rem;
     border-bottom: solid thin rgba(var(--text-color), 0.1);
   }
 
