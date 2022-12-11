@@ -252,7 +252,19 @@
     <main id="main_page" class="page grid hidden">
         <section id="chat_page" class="inner-page">
             <div id="contacts" class="grid">
-                <div class="header">
+                <div class="header flex flex-direction-column">
+                    <div id="my_id_banner" class="grid">
+                        <div class="grid gap-0-3">
+                            <h5>My FLO address</h5>
+                            <sm-copy class="user-flo-id" clip-text>
+                            </sm-copy>
+                        </div>
+                        <div class="grid gap-0-3 hidden">
+                            <h5>My BTC address</h5>
+                            <sm-copy class="user-btc-id" clip-text>
+                            </sm-copy>
+                        </div>
+                    </div>
                     <sm-chips id="feature_mode">
                         <sm-chip value="dm" selected>Chat</sm-chip>
                         <sm-chip value="multisig">BTC multisig</sm-chip>
@@ -1839,6 +1851,14 @@
                     }
                     messenger.list_request_received().then(requests => addNotificationBadge('#notification_panel_button', Object.keys(requests).length, { replace: true }))
                     removeNotificationBadge('#chat_page_button')
+                    if (floGlobals.idInterval)
+                        clearInterval(floGlobals.idInterval)
+                    let childIndex = 0
+                    floGlobals.idInterval = setInterval(() => {
+                        getRef('my_id_banner').children[childIndex].classList.add('hidden')
+                        childIndex = childIndex === getRef('my_id_banner').children.length - 1 ? 0 : childIndex + 1
+                        getRef('my_id_banner').children[childIndex].classList.remove('hidden')
+                    }, 10000)
                     break;
                 case 'mail_page':
                     if (subPageId1) {

@@ -1635,6 +1635,16 @@ ol {
     }
   }
 }
+#my_id_banner {
+  display: grid;
+  padding: 0.8rem 1rem;
+  margin: -0.5rem -1rem 0.5rem -1rem;
+  background-color: rgba(var(--foreground-color), 0.3);
+  border-bottom: solid 1px rgba(var(--text-color), 0.2);
+  & > * {
+    grid-area: 1/1/2/2;
+  }
+}
 sm-chip {
   .badge {
     position: relative;
