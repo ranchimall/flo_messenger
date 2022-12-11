@@ -310,7 +310,7 @@
                             New chat
                         </button>
                     </div>
-                    <div class="hidden flex flex-direction-column gap-0-5">
+                    <div class="hidden flex flex-direction-column gap-0-5" style="overflow-y: auto;">
                         <button class="button button--primary fab round" onclick="openCreationPopup('multisig')">
                             <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                                 width="24px" fill="#000000">
@@ -321,7 +321,8 @@
                             Create multisig address
                         </button>
                         <h4 style="margin: 0.5rem 0.5rem 0 1rem;">Multisig addresses</h4>
-                        <ul id="select_multisig_list" class="grid gap-0-3 observe-empty-state"></ul>
+                        <ul id="select_multisig_list" class="grid gap-0-3 observe-empty-state"
+                            style="padding-bottom: 6rem; overflow-y:auto;"></ul>
                         <div class="empty-state grid gap-1">
                             <p>
                                 There are no multisig addresses created, use the button below to create one.
