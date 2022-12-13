@@ -3980,10 +3980,11 @@
             }
         }
 
-        getRef('contact_name').addEventListener('contentchanged', e => {
+        getRef('contact_name').addEventListener('change', e => {
+            console.log(e)
             changeContactName(e.detail.value.trim())
         })
-        getRef('group_description').addEventListener('contentchanged', e => {
+        getRef('group_description').addEventListener('change', e => {
             messenger.changeGroupDescription(floGlobals.activeFloID, e.detail.value.trim())
                 .then(res => {
                     notify('Changed group description', 'success')
