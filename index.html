@@ -53,7 +53,7 @@
                 }
                 floGlobals.myFloID = floId
                 floGlobals.myBtcID = btcOperator.convert.legacy2bech(floId)
-                getRef('user_profile_id').textContent = floGlobals.myFloID
+                document.querySelectorAll('.user-profile-id').forEach(el => el.textContent = floGlobals.myFloID)
                 //load messages from IDB and render them
                 console.log(`Loading Data! Please Wait...`)
                 //Set UI render functions
@@ -254,7 +254,7 @@
         <section id="chat_page" class="inner-page">
             <div id="contacts" class="grid">
                 <div class="header flex flex-direction-column">
-                    <div class="grid gap-0-5 align-center" style="grid-template-columns: 1fr auto;">
+                    <div class="grid">
                         <button class="user-profile-button button--small" onclick="openPopup('profile_popup')">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon margin-right-0-5" height="24px"
                                 viewBox="0 0 24 24" width="24px" fill="#000000">
@@ -263,11 +263,10 @@
                                     d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z">
                                 </path>
                             </svg>
-                            <div id="user_profile_id" class="overflow-ellipsis">
+                            <div class="user-profile-id overflow-ellipsis">
                                 bc1qd9trd7u8vslcje85m476zwux0j82yqg439n5f9
                             </div>
                         </button>
-                        <theme-toggle></theme-toggle>
                     </div>
                     <sm-chips id="feature_mode">
                         <sm-chip value="dm" selected>Chat</sm-chip>
@@ -398,7 +397,7 @@
         <section class="inner-page hidden" id="mail_page">
             <div id="mails" class="grid">
                 <header class="grid header">
-                    <div class="grid gap-0-5 align-center" style="grid-template-columns: 1fr auto;">
+                    <div class="grid gap-0-5 align-center">
                         <button class="user-profile-button button--small" onclick="openPopup('profile_popup')">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon margin-right-0-5" height="24px"
                                 viewBox="0 0 24 24" width="24px" fill="#000000">
@@ -407,11 +406,10 @@
                                     d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z">
                                 </path>
                             </svg>
-                            <div id="user_profile_id" class="overflow-ellipsis">
+                            <div class="user-profile-id overflow-ellipsis">
                                 bc1qd9trd7u8vslcje85m476zwux0j82yqg439n5f9
                             </div>
                         </button>
-                        <theme-toggle></theme-toggle>
                     </div>
                     <div class="flex align-center space-between">
                         <h4>Mail</h4>
@@ -534,6 +532,13 @@
                                 <p class="message-body">How are you?</p>
                                 <time class="time">12:00PM</time>
                             </div>
+                        </div>
+                    </section>
+                    <section class="grid gap-0-5 card">
+                        <h4>Toggle dark theme</h4>
+                        <div class="flex align-center space-between">
+                            <p>Only applied to this browser</p>
+                            <theme-toggle></theme-toggle>
                         </div>
                     </section>
                     <section class="grid gap-1 card">
@@ -1830,7 +1835,7 @@
                     let showingFloID = true
                     // alternating between floID and btcID every 10 seconds
                     floGlobals.idInterval = setInterval(() => {
-                        getRef('user_profile_id').textContent = showingFloID ? floGlobals.myBtcID : floGlobals.myFloID
+                        document.querySelectorAll('.user-profile-id').forEach(el => el.textContent = showingFloID ? floGlobals.myFloID : floGlobals.myBtcID)
                         showingFloID = !showingFloID
                     }, 10000)
                     break;
@@ -2655,7 +2660,7 @@
                 }).catch(err => notify(err, 'error'))
                 return html`
                     <li class="grid gap-0-5 align-center multisig-option" data-address=${address}>
-                        <span class="wrap-around">${address}</span>
+                        <sm-copy clip-text value=${address}></sm-copy>
                         <div class="flex align-center space-between">
                             <span class="multisig-option__balance flex align-center">Balance: <sm-spinner><sm-spinner></span>
                             <button class="button button--small button--colored" onclick=${initTransaction}>Init transaction</button>
