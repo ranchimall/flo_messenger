@@ -51,8 +51,9 @@
                         return;
                     }
                 }
-                document.querySelectorAll('.user-flo-id').forEach(el => el.value = floId)
-                document.querySelectorAll('.user-btc-id').forEach(el => el.value = btcOperator.convert.legacy2bech(floId))
+                floGlobals.myFloID = floId
+                floGlobals.myBtcID = btcOperator.convert.legacy2bech(floId)
+                getRef('user_profile_id').textContent = floGlobals.myFloID
                 //load messages from IDB and render them
                 console.log(`Loading Data! Please Wait...`)
                 //Set UI render functions
@@ -253,17 +254,20 @@
         <section id="chat_page" class="inner-page">
             <div id="contacts" class="grid">
                 <div class="header flex flex-direction-column">
-                    <div id="my_id_banner" class="grid">
-                        <div class="grid gap-0-3">
-                            <h5>My FLO address</h5>
-                            <sm-copy class="user-flo-id" clip-text>
-                            </sm-copy>
-                        </div>
-                        <div class="grid gap-0-3 hidden">
-                            <h5>My BTC address</h5>
-                            <sm-copy class="user-btc-id" clip-text>
-                            </sm-copy>
-                        </div>
+                    <div class="grid gap-0-5 align-center" style="grid-template-columns: 1fr auto;">
+                        <button class="user-profile-button button--small" onclick="openPopup('profile_popup')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon margin-right-0-5" height="24px"
+                                viewBox="0 0 24 24" width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0V0z" fill="none"></path>
+                                <path
+                                    d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z">
+                                </path>
+                            </svg>
+                            <div id="user_profile_id" class="overflow-ellipsis">
+                                bc1qd9trd7u8vslcje85m476zwux0j82yqg439n5f9
+                            </div>
+                        </button>
+                        <theme-toggle></theme-toggle>
                     </div>
                     <sm-chips id="feature_mode">
                         <sm-chip value="dm" selected>Chat</sm-chip>
@@ -394,6 +398,21 @@
         <section class="inner-page hidden" id="mail_page">
             <div id="mails" class="grid">
                 <header class="grid header">
+                    <div class="grid gap-0-5 align-center" style="grid-template-columns: 1fr auto;">
+                        <button class="user-profile-button button--small" onclick="openPopup('profile_popup')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon margin-right-0-5" height="24px"
+                                viewBox="0 0 24 24" width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0V0z" fill="none"></path>
+                                <path
+                                    d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z">
+                                </path>
+                            </svg>
+                            <div id="user_profile_id" class="overflow-ellipsis">
+                                bc1qd9trd7u8vslcje85m476zwux0j82yqg439n5f9
+                            </div>
+                        </button>
+                        <theme-toggle></theme-toggle>
+                    </div>
                     <div class="flex align-center space-between">
                         <h4>Mail</h4>
                         <sm-chips id="mail_type_selector">
@@ -463,10 +482,9 @@
                 <header class="grid header">
                     <h4>Settings</h4>
                 </header>
-                <a class="sidebar-item interactive active" href="#/settings/profile">Account</a>
+                <a class="sidebar-item interactive" href="#/settings/personalize">personalize</a>
                 <a class="sidebar-item interactive" href="#/settings/chat">chat</a>
                 <a class="sidebar-item interactive" href="#/settings/blocked">Blocked</a>
-                <a class="sidebar-item interactive" href="#/settings/personalize">personalize</a>
                 <a class="sidebar-item interactive" href="#/settings/backup">backup & restore</a>
                 <a class="sidebar-item interactive" href="#/settings/about">About</a>
             </aside>
@@ -481,61 +499,6 @@
                     </a>
                     <h4 id="settings_title"></h4>
                 </header>
-                <div id="profile" class="panel grid gap-0-5">
-                    <div class="grid gap-1-5 card">
-                        <div class="grid gap-0-5">
-                            <h4>
-                                BTC integrated with FLO
-                            </h4>
-                            <p>
-                                You can use your FLO private key to perform transactions on the BTC network within our
-                                app
-                                ecosystem. The private key is the same for both.
-                            </p>
-                        </div>
-                        <div class="grid gap-0-5">
-                            <b>My FLO address</b>
-                            <sm-copy class="user-flo-id" clip-text></sm-copy>
-                        </div>
-                        <div class="grid gap-0-5">
-                            <b>My Bitcoin address</b>
-                            <sm-copy class="user-btc-id" clip-text></sm-copy>
-                        </div>
-                        <button class="button button--danger justify-self-start" onclick="signOut()">Sign out</button>
-                    </div>
-                    <div class="grid gap-1 card">
-                        <h4>Secure private key</h4>
-                        <p>
-                            You can set a password to secure your private key and use the password instead of private
-                            key.
-                            This is applied to this browser only.
-                        </p>
-                        <button id="secure_pwd_button" class="button button--primary justify-self-start secure-priv-key"
-                            onclick="openPopup('secure_pwd_popup')">Set
-                            password</button>
-                    </div>
-                    <section class="grid gap-1 card">
-                        <h4>Clear data</h4>
-                        <p><strong></strong>This can't be undone.</strong> Make sure you have stored the PRIVATE KEY and
-                            backed up the data.</p>
-                        <button id="clear_data" class="button">
-                            <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg"
-                                enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
-                                fill="#000000">
-                                <g>
-                                    <rect fill="none" height="24" width="24" />
-                                </g>
-                                <g>
-                                    <g>
-                                        <path
-                                            d="M16,11h-1V3c0-1.1-0.9-2-2-2h-2C9.9,1,9,1.9,9,3v8H8c-2.76,0-5,2.24-5,5v7h18v-7C21,13.24,18.76,11,16,11z M11,3h2v8h-2V3 z M19,21h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H9v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H5 v-5c0-1.65,1.35-3,3-3h8c1.65,0,3,1.35,3,3V21z" />
-                                    </g>
-                                </g>
-                            </svg>
-                            Clear Data
-                        </button>
-                    </section>
-                </div>
                 <div id="chat" class="panel hidden grid gap-0-5">
                     <sm-switch id="is_enter_send_toggle" class="card w-100">
                         <div slot="left" class="grid gap-1">
@@ -571,13 +534,6 @@
                                 <p class="message-body">How are you?</p>
                                 <time class="time">12:00PM</time>
                             </div>
-                        </div>
-                    </section>
-                    <section class="grid gap-0-5 card">
-                        <h4>Toggle dark theme</h4>
-                        <div class="flex align-center space-between">
-                            <p>Only applied to this browser</p>
-                            <theme-toggle></theme-toggle>
                         </div>
                     </section>
                     <section class="grid gap-1 card">
@@ -1140,6 +1096,20 @@
             </div>
         </sm-form>
     </sm-popup>
+    <sm-popup id="profile_popup">
+        <header slot="header" class="popup__header">
+            <button class="popup__header__close justify-self-start" onclick="closePopup()">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                    fill="#000000">
+                    <path d="M0 0h24v24H0V0z" fill="none" />
+                    <path
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                </svg>
+            </button>
+            <h3>Profile</h3>
+        </header>
+        <div id="profile_popup__content" class="grid gap-3"></div>
+    </sm-popup>
 
     <!-- Templates -->
     <template id="receiver_template">
@@ -1479,6 +1449,9 @@
                         mailingContacts.push(render.contactOnly(floID))
                     }
                     renderElem(getRef('mail_contact_list'), html`${mailingContacts}`)
+                    break;
+                case 'profile_popup':
+                    renderElem(getRef('profile_popup__content'), render.profile())
                     break;
             }
         })
@@ -1854,11 +1827,11 @@
                     removeNotificationBadge('#chat_page_button')
                     if (floGlobals.idInterval)
                         clearInterval(floGlobals.idInterval)
-                    let childIndex = 0
+                    let showingFloID = true
+                    // alternating between floID and btcID every 10 seconds
                     floGlobals.idInterval = setInterval(() => {
-                        getRef('my_id_banner').children[childIndex].classList.add('hidden')
-                        childIndex = childIndex === getRef('my_id_banner').children.length - 1 ? 0 : childIndex + 1
-                        getRef('my_id_banner').children[childIndex].classList.remove('hidden')
+                        getRef('user_profile_id').textContent = showingFloID ? floGlobals.myBtcID : floGlobals.myFloID
+                        showingFloID = !showingFloID
                     }, 10000)
                     break;
                 case 'mail_page':
@@ -1893,7 +1866,11 @@
                     if (subPageId1) {
                         showPanel(subPageId1)
                     } else {
-                        hidePanel()
+                        if (!floGlobals.isMobileView) {
+                            history.replaceState(null, null, '#/settings/personalize');
+                            showPanel('personalize')
+                        } else
+                            hidePanel()
                     }
                     break;
                 default:
@@ -2724,6 +2701,49 @@
                 } catch (err) {
                     notify(err, 'error')
                 }
+            },
+            profile() {
+                return html`
+                    <div class="grid gap-1-5">
+                        <div class="grid gap-0-5">
+                            <h4>
+                                BTC integrated with FLO
+                            </h4>
+                            <p>
+                                You can use your FLO private key to perform transactions on the BTC network within our
+                                app
+                                ecosystem. The private key is the same for both.
+                            </p>
+                        </div>
+                        <div class="grid gap-0-5">
+                            <b>My FLO address</b>
+                            <sm-copy class="user-flo-id" clip-text value=${floGlobals.myFloID}></sm-copy>
+                        </div>
+                        <div class="grid gap-0-5">
+                            <b>My Bitcoin address</b>
+                            <sm-copy class="user-btc-id" clip-text value=${floGlobals.myBtcID}></sm-copy>
+                        </div>
+                        <button class="button button--danger justify-self-start" onclick="signOut()">Sign out</button>
+                    </div>
+                    <div class="grid gap-1">
+                        <div class="grid gap-0-5">
+                            <h4>Secure private key</h4>
+                            <p>
+                                You can set a password to secure your private key and use the password instead of private key. This is applied to this browser only.
+                            </p>
+                        </div>
+                        <button id="secure_pwd_button" class=${`button button--primary justify-self-start secure-priv-key ${floGlobals.isPrivKeySecured ? 'hidden' : ''}`} onclick="openPopup('secure_pwd_popup')">Set password</button>
+                    </div>
+                    <div class="grid gap-1">
+                        <h4>Clear data</h4>
+                        <p><strong></strong>This can't be undone.</strong> Make sure you have stored the PRIVATE KEY and
+                            backed up the data.</p>
+                        <button id="clear_data" class="button justify-self-start" onclick=${clearUserData}>
+                            <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <g> <path d="M16,11h-1V3c0-1.1-0.9-2-2-2h-2C9.9,1,9,1.9,9,3v8H8c-2.76,0-5,2.24-5,5v7h18v-7C21,13.24,18.76,11,16,11z M11,3h2v8h-2V3 z M19,21h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H9v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H5 v-5c0-1.65,1.35-3,3-3h8c1.65,0,3,1.35,3,3V21z" /> </g> </g> </svg>
+                            Clear Data
+                        </button>
+                    </div>
+                `;
             }
         }
 
@@ -3466,16 +3486,16 @@
             }
         })
 
-        getRef("clear_data").addEventListener('click', async function (e) {
+        function clearUserData() {
             getConfirmation('Clear Data', { message: 'Are you sure you want to clear all data?', confirmText: 'Yes', cancelText: 'No' }).then(confirmed => {
                 if (confirmed) {
                     messenger.clearUserData().then(result => {
                         notify("Successfully Cleared local data", 'success')
-                        setTimeout(onLoadStartUp, 2000)
+                        onLoadStartUp()
                     }).catch(error => notify(error, "error"))
                 }
             })
-        });
+        }
 
         getRef('add_contact_button').addEventListener("click", addContact)
 

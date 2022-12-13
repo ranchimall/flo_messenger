@@ -1635,15 +1635,11 @@ ol {
     }
   }
 }
-#my_id_banner {
-  display: grid;
-  padding: 0.8rem 1rem;
-  margin: -0.5rem -1rem 0.5rem -1rem;
-  background-color: rgba(var(--foreground-color), 0.3);
-  border-bottom: solid 1px rgba(var(--text-color), 0.2);
-  & > * {
-    grid-area: 1/1/2/2;
-  }
+.user-profile-button {
+  background-color: rgba(var(--text-color), 0.06);
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  padding: 0.6rem 0.8rem;
 }
 sm-chip {
   .badge {
@@ -2440,6 +2436,9 @@ sm-chip {
       border-radius: 0 1rem 1rem 0;
       bottom: auto;
     }
+  }
+  #profile_popup {
+    --width: 32rem;
   }
 
   #add_contact_popup {
