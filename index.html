@@ -1187,12 +1187,12 @@
         const domRefs = {}
         //Checks for internet connection status
         if (!navigator.onLine)
-            notify('There seems to be a problem connecting to the internet, Please check you internet connection.', 'error', '', true)
+            floGlobals.connectionErrorNotification = notify('There seems to be a problem connecting to the internet, Please check you internet connection.', 'error')
         window.addEventListener('offline', () => {
-            notify('There seems to be a problem connecting to the internet, Please check you internet connection.', 'error', true, true)
+            floGlobals.connectionErrorNotification = notify('There seems to be a problem connecting to the internet, Please check you internet connection.', 'error')
         })
         window.addEventListener('online', () => {
-            getRef('notification_drawer').clearAll()
+            getRef('notification_drawer').remove(floGlobals.connectionErrorNotification)
             notify('We are back online.', 'success')
         })
 
@@ -1598,10 +1598,10 @@
                     options.pinned = true
                     break;
             }
-            getRef("notification_drawer").push(message, { icon, ...options });
             if (mode === 'error') {
                 console.error(message)
             }
+            return getRef("notification_drawer").push(message, { icon, ...options });
         }
 
         function getFormattedTime(timestamp, format) {
@@ -3703,11 +3703,9 @@
                         for (const key in chat) {
                             const { type, sender } = chat[key]
                             if (type === 'TRANSACTION') {
-                                if (floGlobals.pipeSigns[floID]) {
-                                    floGlobals.pipeSigns[floID].add(sender)
-                                } else {
+                                if (!floGlobals.pipeSigns[floID])
                                     floGlobals.pipeSigns[floID] = new Set()
-                                }
+                                floGlobals.pipeSigns[floID].add(sender)
                             }
                         }
                     }
@@ -3767,7 +3765,7 @@
                             getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption" class="event-card">Converstion is not encrypted until receiver replies</strong>`)
                         }
                     } else if (activeChat.type === 'pipeline') {
-                        if (!messenger.pipeline[floID].disabled && !floGlobals.pipeSigns[floID].has(floDapps.user.id)) {
+                        if (!messenger.pipeline[floID].disabled && floGlobals.pipeSigns[floID] && !floGlobals.pipeSigns[floID].has(floDapps.user.id)) {
                             getRef('messages_container').append(html.node`
                                 <div class="grid gap-1 card signing-banner" style="margin: auto;">
                                     <div class="grid gap-0-5">
@@ -4435,6 +4433,7 @@
                     notify('Initiated transaction', 'success')
                     closePopup();
                     getRef('send_tx').reset()
+                    location.hash = `#/chat_page/messages?floId=${result}`
                 }).catch(error => {
                     notify(`Error intiating transaction \n ${error}`, 'error');
                 }).finally(_ => {
