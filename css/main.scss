@@ -1054,16 +1054,25 @@ ol {
 
   &:not(.chat) {
     grid-template-columns: auto 1fr;
-    grid-template-areas: "dp .";
+    grid-template-areas: "dp name";
   }
 
   &.chat,
-  &.group,
+  &.group {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "dp name time"
+      "dp . .";
+  }
   &.pipeline {
     grid-template-columns: auto 1fr auto;
     grid-template-areas:
-      "dp . time"
+      "dp tag time"
+      "dp name name"
       "dp . .";
+    .name {
+      margin: 0.5rem 0 0.3rem 0;
+    }
   }
 
   &.admin {
@@ -1085,8 +1094,18 @@ ol {
     overflow: hidden;
     color: rgba(var(--text-color), 0.8);
   }
-
+  .tag {
+    grid-area: tag;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.4rem;
+    background-color: rgba(var(--text-color), 0.6);
+    color: rgba(var(--foreground-color), 1);
+    border-radius: 0.3rem;
+    margin-right: auto;
+    font-weight: 500;
+  }
   .name {
+    grid-area: name;
     width: 100%;
     font-size: 1em;
     font-weight: 500;

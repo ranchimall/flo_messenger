@@ -944,8 +944,8 @@
                 <p id="multisig_creation__warning" class="info info--warning"></p>
                 <sm-form>
                     <p>Enter minimum signatures required for approval of a transaction</p>
-                    <sm-input id="min_sign_required" placeholder="Min required" min="1" type="number"
-                        error-text="At least 1 member is required" animate required>
+                    <sm-input id="min_sign_required" placeholder="Min required" min="2" type="number"
+                        error-text="At least 2 members are required" animate required>
                     </sm-input>
                     <div class="multi-state-button">
                         <button id="create_multisig_button" class="button button--primary" type="submit" disabled>
@@ -1828,7 +1828,7 @@
                             getRef('main_navbar').classList.remove('hide-on-mobile')
                         }
                     }
-                    messenger.list_request_received().then(requests => addNotificationBadge('#notification_panel_button', Object.keys(requests).length, { replace: true }))
+                    messenger.list_request_received({ completed: false }).then(requests => addNotificationBadge('#notification_panel_button', Object.keys(requests).length, { replace: true }))
                     removeNotificationBadge('#chat_page_button')
                     if (floGlobals.idInterval)
                         clearInterval(floGlobals.idInterval)
@@ -2303,13 +2303,11 @@
                         getRef('private_key_field').removeAttribute('data-private-key');
                         getRef('private_key_field').setAttribute('placeholder', 'Password');
                         getRef('private_key_field').customValidation = null
-                        getRef('secure_pwd_button').closest('.card').classList.add('hidden');
                     } else {
                         floGlobals.isPrivKeySecured = false;
                         getRef('private_key_field').dataset.privateKey = ''
                         getRef('private_key_field').setAttribute('placeholder', 'FLO private key');
                         getRef('private_key_field').customValidation = floCrypto.getPubKeyHex;
-                        getRef('secure_pwd_button').closest('.card').classList.remove('hidden');
                     }
                     if (!generalPages.find(page => window.location.hash.includes(page))) {
                         location.hash = floGlobals.isPrivKeySecured ? '#/sign_in' : `#/landing`;
@@ -2333,7 +2331,6 @@
                 floDapps.securePrivKey(password).then(() => {
                     floGlobals.isPrivKeySecured = true;
                     notify('Password set successfully', 'success');
-                    getRef('secure_pwd_button').closest('.card').classList.add('hidden');
                     closePopup();
                 }).catch(err => {
                     notify(err, 'error');
@@ -2465,6 +2462,7 @@
                         <div class="initial flex align-center">
                             ${initial}
                         </div>
+                        ${type === 'pipeline' ? html`<div class="tag">Multisig transaction</div>` : ''}
                         <h4 class="name">${name}</h4>
                     </div>
                 `
@@ -2680,16 +2678,14 @@
                 let { floID, message, time, type } = details
                 if (message === '')
                     message = `${getContactName(floID)} wants to connect with you`
-
                 return html`
                     <li class="notification grid align-center" .dataset=${{ id }}>
                         <div class="flex align-center space-between gap-0-5">
-                            <h4>${type}</h4>
+                            <h4>Connection request</h4>
                             <time class="notification__time">${getFormattedTime(time, 'relative')}</time>
                         </div>
                         <p class="notification__message">${message}</p>
                         <div class="flex align-center gap-0-3 margin-left-auto">
-                            <button class="button button--small reject">Reject</button>
                             <button class="button button--small accept">Accept</button>
                         </div>
                     </li>
@@ -2697,9 +2693,10 @@
             },
             async notifications() {
                 try {
-                    const notifications = await messenger.list_request_received()
+                    const notifications = await messenger.list_request_received({ completed: false })
                     let receivedRequests = []
                     for (const key in notifications) {
+                        console.log(key, notifications[key])
                         receivedRequests.unshift(render.notification(key, notifications[key]))
                     }
                     renderElem(getRef('notifications_list'), html`${receivedRequests}`)
@@ -2890,8 +2887,12 @@
         }
 
         function updateMessageUI(messagesData, sentByMe = false) {
+            const animOptions = {
+                duration: 300,
+                easing: 'ease',
+                fill: 'forwards'
+            }
             for (let messageId in messagesData) {
-                console.log(messagesData[messageId])
                 const { category, floID, time, message, sender, groupID, admin, name, pipeID, unconfirmed } = messagesData[messageId]
                 // code to run if a chat is opened
                 if (activeChat && activeChat.floID === (floID || groupID || pipeID)) {
@@ -2900,24 +2901,9 @@
                     } else {
                         const messageBody = render.messageBubble(messagesData[messageId]);
                         getRef('messages_container').append(messageBody)
-                        if (unconfirmed) {
-                            const messageHeight = getRef('messages_container').lastElementChild.clientHeight;
-                            getRef('messages_container').animate([
-                                { transform: `translateY(${messageHeight}px)` },
-                                { transform: `none` },
-                            ], {
-                                duration: 300,
-                                easing: 'ease',
-                                fill: 'forwards'
-                            }).onfinish = e => {
-                                e.target.cancel()
-                            }
-                        }
                     }
-                    if (chatScrollInfo['isScrolledUp']) {
-
-                    } else {
-                        scrollToBottom()
+                    if (!chatScrollInfo['isScrolledUp']) {
+                        scrollToBottom(true)
                     }
                     // remove encryption badge if it exists
                     if (!groupID && floGlobals.pubKeys[activeChat.floID] && floID !== floDapps.user.id) {
@@ -2931,11 +2917,6 @@
                             chatCard.querySelector('.name').textContent = name
                     }
                     if ((floID || groupID || pipeID) !== getRef('chats_list').children[0].dataset.floId) {
-                        const animOptions = {
-                            easing: 'ease',
-                            duration: 300,
-                            fill: 'forwards'
-                        }
                         const cloneContact = chatCard.cloneNode(true)
                         chatCard.remove()
                         getRef('chats_list').animate([
@@ -3331,7 +3312,7 @@
         getRef('min_sign_required').addEventListener('input', e => {
             const { rangeOverflow, rangeUnderflow } = e.target.validity;
             if (rangeUnderflow)
-                e.target.setAttribute('error-text', 'At least 1 member is required ')
+                e.target.setAttribute('error-text', 'At least 2 members are required ')
             if (rangeOverflow)
                 e.target.setAttribute('error-text', `Maximum ${selectedMembers.size + 1} allowed`)
         })
@@ -4433,7 +4414,6 @@
                     notify('Initiated transaction', 'success')
                     closePopup();
                     getRef('send_tx').reset()
-                    location.hash = `#/chat_page/messages?floId=${result}`
                 }).catch(error => {
                     notify(`Error intiating transaction \n ${error}`, 'error');
                 }).finally(_ => {
@@ -4501,6 +4481,32 @@
         document.querySelectorAll('.messenger-illustration').forEach(elem => {
             elem.innerHTML = messengerIllustration
         })
+
+
+        delegate(getRef('notifications_list'), 'click', '.accept', e => {
+            getConfirmation('Are you sure you want to accept this request?').then((res) => {
+                if (!res) return;
+                const vectorClock = e.target.closest('.notification').dataset.id;
+                messenger.respond_pubKey(vectorClock).then(() => {
+                    e.target.closest('.notification').remove()
+                    notify('Request accepted', 'success')
+                }).catch(err => {
+                    notify(`Error accepting request\n${err}`, 'error')
+                })
+            })
+        })
+        // delegate(getRef('notifications_list'), 'click', '.reject', e => {
+        //     getConfirmation('Are you sure you want to reject this request?').then((res) => {
+        //         if (!res) return;
+        //         const vectorClock = e.target.closest('.notification').dataset.id;
+        //         floCloudAPI.noteApplicationData(vectorClock, 'rejected').then(() => {
+        //             e.target.closest('.notification').remove()
+        //             notify('Request rejected', 'success')
+        //         }).catch(err => {
+        //             notify(`Error rejecting request\n${err}`, 'error')
+        //         })
+        //     })
+        // })
     </script>
 </body>
 
