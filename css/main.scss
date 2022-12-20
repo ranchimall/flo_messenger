@@ -219,22 +219,25 @@ a:any-link:focus-visible {
   outline: rgba(var(--text-color), 1) 0.1rem solid;
 }
 
-details summary {
-  display: flex;
-  user-select: none;
-  cursor: pointer;
-  align-items: center;
-  justify-content: space-between;
-  color: var(--accent-color);
-}
+details {
+  &[open] {
+    & summary {
+      margin-bottom: 1rem;
+    }
 
-details[open] {
-  & summary {
-    margin-bottom: 1rem;
+    & > summary .down-arrow {
+      transform: rotate(180deg);
+    }
   }
-
-  & > summary .down-arrow {
-    transform: rotate(180deg);
+  summary {
+    display: flex;
+    user-select: none;
+    cursor: pointer;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .down-arrow {
+    margin-left: 0.5rem;
   }
 }
 
@@ -1783,6 +1786,16 @@ sm-chip {
   flex-direction: column;
   height: 100%;
   overflow-y: auto;
+}
+#transaction_details {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  flex: 1;
+  background-color: rgba(var(--background-color), 0.8);
+  border: solid thin rgba(var(--text-color), 0.2);
+  margin: 1.5rem auto;
+  backdrop-filter: blur(1rem);
 }
 
 .message {

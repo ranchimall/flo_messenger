@@ -217,6 +217,12 @@ a:any-link:focus-visible {
   outline: rgba(var(--text-color), 1) 0.1rem solid;
 }
 
+details[open] summary {
+  margin-bottom: 1rem;
+}
+details[open] > summary .down-arrow {
+  transform: rotate(180deg);
+}
 details summary {
   display: flex;
   -webkit-user-select: none;
@@ -225,14 +231,9 @@ details summary {
   cursor: pointer;
   align-items: center;
   justify-content: space-between;
-  color: var(--accent-color);
 }
-
-details[open] summary {
-  margin-bottom: 1rem;
-}
-details[open] > summary .down-arrow {
-  transform: rotate(180deg);
+details .down-arrow {
+  margin-left: 0.5rem;
 }
 
 fieldset {
@@ -1737,6 +1738,19 @@ sm-chip .badge {
   flex-direction: column;
   height: 100%;
   overflow-y: auto;
+}
+
+#transaction_details {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  flex: 1;
+  background-color: rgba(var(--background-color), 0.8);
+  border: solid thin rgba(var(--text-color), 0.2);
+  margin: 1.5rem auto;
+  -webkit-backdrop-filter: blur(1rem);
+          backdrop-filter: blur(1rem);
 }
 
 .message {

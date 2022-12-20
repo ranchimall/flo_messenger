@@ -1194,6 +1194,7 @@
         window.addEventListener('online', () => {
             getRef('notification_drawer').remove(floGlobals.connectionErrorNotification)
             notify('We are back online.', 'success')
+            location.reload()
         })
 
         let isHapticOn
@@ -2567,11 +2568,6 @@
                 } else if (type) {
                     switch (type) {
                         case 'TRANSACTION':
-                            floGlobals.pipelineTxHex = tx_hex
-                            if (tx_hex) {
-                                console.log('tx_hex', tx_hex)
-                                btcOperator.parseTransaction(tx_hex).then(res => console.log(res))
-                            }
                             return html.node`<p class="pipeline-event pipeline-event--signed event-card flex align-center">
                                     <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M23,12l-2.44-2.79l0.34-3.69l-3.61-0.82L15.4,1.5L12,2.96L8.6,1.5L6.71,4.69L3.1,5.5L3.44,9.2L1,12l2.44,2.79l-0.34,3.7 l3.61,0.82L8.6,22.5l3.4-1.47l3.4,1.46l1.89-3.19l3.61-0.82l-0.34-3.69L23,12z M10.09,16.72l-3.8-3.81l1.48-1.48l2.32,2.33 l5.85-5.87l1.48,1.48L10.09,16.72z"/></g></svg>
                                     ${getContactName(sender)} signed the transaction
@@ -2696,7 +2692,6 @@
                     const notifications = await messenger.list_request_received({ completed: false })
                     let receivedRequests = []
                     for (const key in notifications) {
-                        console.log(key, notifications[key])
                         receivedRequests.unshift(render.notification(key, notifications[key]))
                     }
                     renderElem(getRef('notifications_list'), html`${receivedRequests}`)
@@ -3677,16 +3672,19 @@
                     } else {
                         chatLazyLoader = new LazyLoader('#messages_container', Object.values(chat), render.messageBubble, {
                             bottomFirst: true,
+                            batchSize: 20,
                         });
                     }
                     chatLazyLoader.init()
                     if (getFloIdType(floID) === 'pipeline') {
                         for (const key in chat) {
-                            const { type, sender } = chat[key]
+                            const { type, sender, tx_hex } = chat[key]
                             if (type === 'TRANSACTION') {
                                 if (!floGlobals.pipeSigns[floID])
                                     floGlobals.pipeSigns[floID] = new Set()
                                 floGlobals.pipeSigns[floID].add(sender)
+                                if (tx_hex)
+                                    floGlobals.pipelineTxHex = tx_hex
                             }
                         }
                     }
@@ -3748,7 +3746,7 @@
                     } else if (activeChat.type === 'pipeline') {
                         if (!messenger.pipeline[floID].disabled && floGlobals.pipeSigns[floID] && !floGlobals.pipeSigns[floID].has(floDapps.user.id)) {
                             getRef('messages_container').append(html.node`
-                                <div class="grid gap-1 card signing-banner" style="margin: auto;">
+                                <div class="grid gap-1 card signing-banner" style="margin: 1.5rem auto;">
                                     <div class="grid gap-0-5">
                                         <h4>You haven't signed the transaction</h4>
                                         <p>Use "Sign now" button to approve the transaction</p>
@@ -3758,6 +3756,38 @@
                                     </div>
                                 </div>
                             `)
+                        }
+                        if (floGlobals.pipelineTxHex) {
+                            btcOperator.parseTransaction(floGlobals.pipelineTxHex).then((details) => {
+                                console.log(details)
+                                const { inputs, outputs, fee } = details
+                                const { s: signsDone, r: minSignsRequired, t: totalMembers } = inputs[0].signed
+                                const pendingSigns = minSignsRequired - signsDone
+                                if (minSignsRequired) {
+                                    getRef('messages_container').prepend(html.node`
+                                        <details id="transaction_details" class="grid gap-1 card" open>
+                                            <summary>
+                                                <h4>Transaction is waiting for ${pendingSigns} more signature${pendingSigns > 1 ? 's' : ''}</h4>
+                                                <svg class="icon down-arrow" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M24 24H0V0h24v24z" fill="none" opacity=".87"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z"/></svg>
+                                            </summary>
+                                            <div class="grid margin-bottom-1">
+                                                <h5>Receiver</h5>
+                                                <sm-copy value=${outputs[0].address} clip-text></sm-copy>
+                                            </div>
+                                            <div class="flex align-center gap-1-5">
+                                                <div class="grid">
+                                                    <h5>Amount</h5>
+                                                    <p>${outputs[0].value} BTC</p>
+                                                </div>
+                                                <div class="grid">
+                                                    <h5>Fee</h5>
+                                                    <p>${fee} BTC</p>
+                                                </div>
+                                            </div>
+                                        </details>
+                                    `)
+                                }
+                            })
                         }
                     }
                     resolve()
@@ -4488,8 +4518,8 @@
                 if (!res) return;
                 const vectorClock = e.target.closest('.notification').dataset.id;
                 messenger.respond_pubKey(vectorClock).then(() => {
-                    e.target.closest('.notification').remove()
                     notify('Request accepted', 'success')
+                    render.notifications()
                 }).catch(err => {
                     notify(`Error accepting request\n${err}`, 'error')
                 })
