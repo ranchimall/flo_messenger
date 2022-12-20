@@ -4460,6 +4460,9 @@
             buttonLoader(button, true)
             messenger.multisig.signTx(pipeID).then(() => {
                 getRef('messages_container').querySelector('.signing-banner').remove()
+                notify('Transaction signed', 'success')
+                if (messenger.pipeline[pipeID].disabled)
+                    document.getElementById('transaction_details').querySelector('h4').textContent = 'Transaction signatures complete'
             }).catch(err => {
                 console.log(err, 'error')
                 buttonLoader(button, false)
