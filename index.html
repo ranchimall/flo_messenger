@@ -2903,7 +2903,7 @@
                         getRef('messages_container').append(messageBody)
                     }
                     if (!chatScrollInfo['isScrolledUp']) {
-                        scrollToBottom(true)
+                        scrollToBottom()
                     }
                     // remove encryption badge if it exists
                     if (!groupID && floGlobals.pubKeys[activeChat.floID] && floID !== floDapps.user.id) {
@@ -3672,6 +3672,7 @@
         }
 
         function scrollToBottom(smooth = false) {
+            console.log('scrolling to bottom')
             if (activeChat.floID) {
                 messenger.removeMark(activeChat.floID, 'unread')
                 if (getChatCard(activeChat.floID))
