@@ -153,7 +153,8 @@
                 response_received: {},
                 flodata: {},
                 appendix: {},
-                userSettings: {}
+                userSettings: {},
+                multisigLabels: {}
             }
             let user_db = `${floGlobals.application}_${floCrypto.toFloID(user.id)}`;
             compactIDB.initDB(user_db, obj).then(result => {

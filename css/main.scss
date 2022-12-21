@@ -2282,10 +2282,14 @@ sm-chip {
 .multisig-option {
   position: relative;
   padding: 1rem;
-  border-radius: 0.5rem;
   font-size: 0.9rem;
+  border-bottom: thin solid rgba(var(--text-color), 0.3);
   .wrap-around {
     font-weight: 500;
+  }
+  &__label {
+    font-weight: 500;
+    font-size: 1rem;
   }
   &__balance {
     color: rgba(var(--text-color), 0.8);

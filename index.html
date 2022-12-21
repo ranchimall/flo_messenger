@@ -31,7 +31,6 @@
     <script id="onLoadStartUp">
         function onLoadStartUp() {
             routeTo('loading')
-            floDapps.setAppObjectStores({ userSettings: {} })
             document.body.classList.remove('hidden')
 
             floDapps.setCustomPrivKeyInput(getSignedIn)
@@ -943,10 +942,14 @@
                 </button>
                 <p id="multisig_creation__warning" class="info info--warning"></p>
                 <sm-form>
-                    <p>Enter minimum signatures required for approval of a transaction</p>
-                    <sm-input id="min_sign_required" placeholder="Min required" min="2" type="number"
-                        error-text="At least 2 members are required" animate required>
-                    </sm-input>
+                    <sm-input id="multisig_label" placeholder="Label" error-text="Please add a label" animated
+                        required></sm-input>
+                    <div class="grid gap-0-5">
+                        <p>Minimum signatures required for transaction approval</p>
+                        <sm-input id="min_sign_required" placeholder="Min required" min="2" type="number"
+                            error-text="At least 2 members are required" animate required>
+                        </sm-input>
+                    </div>
                     <div class="multi-state-button">
                         <button id="create_multisig_button" class="button button--primary" type="submit" disabled>
                             Create
@@ -2646,7 +2649,7 @@
                     </button>
                 `
             },
-            multisigOption(address) {
+            multisigOption(address, label) {
                 btcOperator.getBalance(address).then(balance => {
                     const target = getRef('select_multisig_list').querySelector(`[data-address="${address}"]`);
                     if (target)
@@ -2654,6 +2657,7 @@
                 }).catch(err => notify(err, 'error'))
                 return html`
                     <li class="grid gap-0-5 align-center multisig-option" data-address=${address}>
+                        <text-field class="multisig-option__label" placeholder="Label" value=${label || 'Add a label'}></text-field>
                         <sm-copy clip-text value=${address}></sm-copy>
                         <div class="flex align-center space-between">
                             <span class="multisig-option__balance flex align-center">Balance: <sm-spinner><sm-spinner></span>
@@ -2663,12 +2667,13 @@
                 `
             },
             multisigAddresses() {
-                messenger.multisig.listAddress().then(addresses => {
-                    const list = Object.keys(addresses).map(address => render.multisigOption(address))
-                    if (list.length) {
-                        renderElem(getRef('select_multisig_list'), html`${list}`)
-                    }
-                }).catch(err => notify(err, 'error'))
+                Promise.all([messenger.multisig.listAddress(), compactIDB.readAllData('multisigLabels')])
+                    .then(([addresses, labels]) => {
+                        const list = Object.keys(addresses).map(address => render.multisigOption(address, labels[address]))
+                        if (list.length) {
+                            renderElem(getRef('select_multisig_list'), html`${list}`)
+                        }
+                    }).catch(err => notify(err, 'error'))
             },
             notification(id, details) {
                 let { floID, message, time, type } = details
@@ -3295,7 +3300,7 @@
         getRef('skip_members_button').addEventListener('click', e => {
             if (getRef('creation_popup').dataset.type === 'multisig') {
                 showChildElement('creation_process', 2, { entry: slideInLeft, exit: slideOutLeft }).then(() => {
-                    getRef('min_sign_required').focusIn()
+                    getRef('multisig_label').focusIn()
                 })
             } else {
                 showChildElement('creation_process', 1, { entry: slideInLeft, exit: slideOutLeft }).then(() => {
@@ -3316,16 +3321,29 @@
                 selectedMembers.add(floDapps.user.id)
             const selctedPubKeys = [...selectedMembers].map(id => floGlobals.pubKeys[id]);
             const minRequired = parseInt(getRef('min_sign_required').value.trim());
+            const label = getRef('multisig_label').value.trim();
             buttonLoader('create_multisig_button', true)
             messenger.multisig.createAddress(selctedPubKeys, minRequired).then(multisigAddress => {
-                notify('Created multisig address', 'success');
-                closePopup();
-                clearAllMembers();
-                render.multisigAddresses();
+                compactIDB.writeData('multisigLabels', label, multisigAddress).then(() => {
+                    notify('Created multisig address', 'success');
+                    closePopup();
+                    clearAllMembers();
+                    render.multisigAddresses();
+                }).catch(error => notify(error, 'error'))
             }).catch(error => notify(error, 'error'))
                 .finally(() => {
                     buttonLoader('create_multisig_button', false)
                 })
+        })
+
+        getRef('select_multisig_list').addEventListener('change', e => {
+            const multisigAddress = e.target.closest('.multisig-option').dataset.address;
+            let label = e.target.value.trim();
+            if (label === '')
+                label = 'Unnamed'
+            compactIDB.writeData('multisigLabels', label, multisigAddress).then(() => {
+                notify('Updated label', 'success');
+            }).catch(error => notify(error, 'error'))
         })
 
 
