@@ -325,7 +325,7 @@
                         <h4 style="margin: 0.5rem 0.5rem 0 1rem;">Multisig addresses</h4>
                         <ul id="select_multisig_list" class="grid gap-0-3 observe-empty-state"
                             style="padding-bottom: 6rem; overflow-y:auto;"></ul>
-                        <div class="empty-state grid gap-1">
+                        <div class="empty-state" style="padding: 1rem;">
                             <p>
                                 There are no multisig addresses created, use the button below to create one.
                             </p>
@@ -501,12 +501,6 @@
                         <div slot="left" class="grid gap-1">
                             <h4>Send by Enter</h4>
                             <p>If this toggle is ON then pressing 'Enter' key will send messages</p>
-                        </div>
-                    </sm-switch>
-                    <sm-switch id="haptic_feedback_switcher" class="card w-100">
-                        <div slot="left" class="grid gap-1">
-                            <h4>Haptic feedback</h4>
-                            <p>Turn haptic feedback (vibrations) on/off.</p>
                         </div>
                     </sm-switch>
                 </div>
@@ -1199,30 +1193,6 @@
             notify('We are back online.', 'success')
             location.reload()
         })
-
-        let isHapticOn
-        if (getRef('haptic_feedback_switcher')) {
-            if (localStorage.getItem('haptic') === null)
-                localStorage.setItem("haptic", "on");
-
-            if (localStorage.haptic === "on") {
-                isHapticOn = true
-                getRef('haptic_feedback_switcher').checked = true;
-            } else {
-                isHapticOn = false
-                getRef('haptic_feedback_switcher').checked = false;
-            }
-            getRef('haptic_feedback_switcher').addEventListener('change', function (e) {
-                if (this.checked) {
-                    isHapticOn = true
-                    localStorage.setItem("haptic", "on");
-                }
-                else {
-                    isHapticOn = false
-                    localStorage.setItem("haptic", "off");
-                }
-            })
-        }
         // Use instead of document.getElementById
         function getRef(elementId) {
             if (!domRefs.hasOwnProperty(elementId)) {
@@ -3110,8 +3080,6 @@
         getRef('chats_list').addEventListener('touchstart', e => {
             if (e.target.closest('.contact')) {
                 holdTimeout = setTimeout(() => {
-                    if (isHapticOn)
-                        navigator.vibrate(100)
                     let contact = e.target.closest(".contact")
                     clickedContact['chatCard'] = contact
                     clickedContact['floID'] = contact.dataset.floId
@@ -3672,7 +3640,6 @@
         }
 
         function scrollToBottom(smooth = false) {
-            console.log('scrolling to bottom')
             if (activeChat.floID) {
                 messenger.removeMark(activeChat.floID, 'unread')
                 if (getChatCard(activeChat.floID))
