@@ -626,7 +626,7 @@
                     pubKey: user.public,
                     data: floDapps.user.encipher(data),
                 }
-                blobData.sign = floDapps.sign(blobData.data);
+                blobData.sign = floDapps.user.sign(blobData.data);
                 resolve(new Blob([JSON.stringify(blobData)], {
                     type: 'application/json'
                 }));
