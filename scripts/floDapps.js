@@ -1,4 +1,4 @@
-(function (EXPORTS) { //floDapps v2.3.2d
+(function (EXPORTS) { //floDapps v2.3.3
     /* General functions for FLO Dapps*/
     'use strict';
     const floDapps = EXPORTS;
@@ -181,6 +181,7 @@
                 credentials: {},
                 //for Dapps
                 subAdmins: {},
+                trustedIDs: {},
                 settings: {},
                 appObjects: {},
                 generalData: {},
@@ -244,6 +245,12 @@
                             compactIDB.removeData("supernodes", sn, DEFAULT.root);
                         for (let sn in content.newNodes)
                             compactIDB.writeData("supernodes", content.newNodes[sn], sn, DEFAULT.root);
+                        for (let sn in content.updateNodes)
+                            compactIDB.readData("supernodes", sn, DEFAULT.root).then(r => {
+                                r = r || {}
+                                r.uri = content.updateNodes[sn];
+                                compactIDB.writeData("supernodes", r, sn, DEFAULT.root);
+                            });
                     }
                     compactIDB.writeData("lastTx", result.totalTxs, floCloudAPI.SNStorageID, DEFAULT.root);
                     compactIDB.readAllData("supernodes", DEFAULT.root).then(nodes => {
@@ -274,6 +281,12 @@
                         if (Array.isArray(content.addSubAdmin))
                             for (var k = 0; k < content.addSubAdmin.length; k++)
                                 compactIDB.writeData("subAdmins", true, content.addSubAdmin[k]);
+                        if (Array.isArray(content.removeTrustedID))
+                            for (var j = 0; j < content.removeTrustedID.length; j++)
+                                compactIDB.removeData("trustedIDs", content.removeTrustedID[j]);
+                        if (Array.isArray(content.addTrustedID))
+                            for (var k = 0; k < content.addTrustedID.length; k++)
+                                compactIDB.writeData("trustedIDs", true, content.addTrustedID[k]);
                         if (content.settings)
                             for (let l in content.settings)
                                 compactIDB.writeData("settings", content.settings[l], l)
@@ -577,6 +590,28 @@
                     addSubAdmin: addList,
                     removeSubAdmin: rmList,
                     settings: settings
+                }
+            }
+            var floID = floCrypto.getFloID(adminPrivKey)
+            if (floID != DEFAULT.adminID)
+                reject('Access Denied for Admin privilege')
+            else
+                floBlockchainAPI.writeData(floID, JSON.stringify(floData), adminPrivKey)
+                    .then(result => resolve(['Updated App Configuration', result]))
+                    .catch(error => reject(error))
+        })
+    }
+
+    floDapps.manageAppTrustedIDs = function (adminPrivKey, addList, rmList) {
+        return new Promise((resolve, reject) => {
+            if (!Array.isArray(addList) || !addList.length) addList = undefined;
+            if (!Array.isArray(rmList) || !rmList.length) rmList = undefined;
+            if (!addList && !rmList)
+                return reject("No change in list")
+            var floData = {
+                [DEFAULT.application]: {
+                    addTrustedID: addList,
+                    removeTrustedID: rmList
                 }
             }
             var floID = floCrypto.getFloID(adminPrivKey)
