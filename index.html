@@ -3976,8 +3976,7 @@
         }
 
         getRef('contact_name').addEventListener('change', e => {
-            console.log(e)
-            changeContactName(e.detail.value.trim())
+            changeContactName(e.target.value.trim())
         })
         getRef('group_description').addEventListener('change', e => {
             messenger.changeGroupDescription(floGlobals.activeFloID, e.detail.value.trim())
