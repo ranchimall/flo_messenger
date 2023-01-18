@@ -712,9 +712,9 @@
                 </svg>
             </button>
             <h4>Compose Mail</h4>
-            <p>You can send mail to multiple FLO addresss by entering comma separated IDs </p>
         </header>
         <sm-form>
+            <p>You can send mail to multiple FLO addresses by entering commas </p>
             <div id="auto_complete_contact" class="flex flex-direction-column">
                 <sm-input id="send_mail_to" placeholder="To" animate required></sm-input>
                 <div id="mail_contact_list" class="hidden contact-list"></div>
@@ -2769,7 +2769,7 @@
             })
             return messageBody
         }
-        function addNotificationBadge(elem, text, { replace = false }) {
+        function addNotificationBadge(elem, text, { replace = false } = {}) {
             const animOptions = {
                 duration: 200,
                 fill: 'forwards',
@@ -3792,13 +3792,15 @@
                     if (markUnread) {
                         sentCount++
                     }
-                    sentMails.querySelector(`[data-ref="${prev}"]`)?.remove()
+                    if (sentMails.querySelector(`[data-ref="${prev}"]`))
+                        sentMails.querySelector(`[data-ref="${prev}"]`).remove()
                 } else if (to.includes(floDapps.user.id)) {
                     inboxMails.prepend(render.mailCard(from, ref, subject, time, content, markUnread))
                     if (markUnread) {
                         inboxCount++
                     }
-                    inboxMails.querySelector(`[data-ref="${prev}"]`)?.remove()
+                    if (inboxMails.querySelector(`[data-ref="${prev}"]`))
+                        inboxMails.querySelector(`[data-ref="${prev}"]`).remove()
                 }
             }
             if (getRef('mail_type_selector').value === 'inbox' && sentCount) {
@@ -3858,10 +3860,11 @@
                 })
                 buttonLoader('send_mail_button', true)
                 messenger.sendMail(subject, content, recipients).then(result => {
-                    notify(`Mail(s) sent!`)
+                    notify(`Mail sent!`, 'success')
                     renderMailList(result)
                     closePopup()
-                }).catch(error => notify("Failed to send mail!", "error", error))
+                })
+                    .catch(error => notify("Failed to send mail!", "error", error))
                     .finally(() => buttonLoader('send_mail_button', false))
             } catch (error) {
                 notify(error, "error")
