@@ -1052,7 +1052,7 @@ ol li::before {
 }
 .contact:not(.chat) {
   grid-template-columns: auto 1fr;
-  grid-template-areas: "dp name";
+  grid-template-areas: "dp name" "dp .";
 }
 .contact.chat, .contact.group {
   grid-template-columns: auto 1fr auto;
@@ -1098,6 +1098,10 @@ ol li::before {
   font-weight: 500;
   margin-bottom: 0.3rem;
 }
+.contact__flo-address {
+  font-size: 0.8rem;
+  color: rgba(var(--text-color), 0.6);
+}
 .contact .span-2 {
   display: flex;
   justify-content: space-between;
@@ -1138,7 +1142,7 @@ ol li::before {
           user-select: none;
 }
 .selectable-contact:not(:last-of-type) {
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.5rem;
 }
 .selectable-contact input {
   margin-left: auto;
@@ -1628,6 +1632,9 @@ sm-chip .badge {
 
 #contacts_container .contact {
   padding: 0.5rem 0;
+}
+#contacts_container .contact:not(:last-of-type) {
+  margin-bottom: 0.5rem;
 }
 
 #chat_sections {
@@ -2336,8 +2343,8 @@ sm-chip .badge {
     margin: 0.5rem 0;
   }
   sm-popup {
-    --width: 24rem;
-    --min-width: 24rem;
+    --width: 25rem;
+    --min-width: 25rem;
     --border-radius: 0.5rem;
   }
   #multisig_tx_popup {

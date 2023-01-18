@@ -2438,6 +2438,7 @@
                         </div>
                         ${type === 'pipeline' ? html`<div class="tag">Multisig transaction</div>` : ''}
                         <h4 class="name">${name}</h4>
+                        ${type === 'contact' ? html`<p class="contact__flo-address wrap-around">${floID}</p>` : ''}
                     </div>
                 `
             },
@@ -2447,7 +2448,10 @@
                 return html`
                     <label class="flex align-center selectable-contact interactive" data-flo-id=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
                         <div class="initial flex align-center"> ${initial} </div>
-                        <h4 class="name">${name}</h4>
+                        <div class="grid gap-0-3">
+                            <h4 class="name">${name}</h4>
+                            <p class="contact__flo-address wrap-around">${floID}</p>
+                        </div>
                         <input type="checkbox" autocomplete="off" value=${floID}/>
                     </label>
                 `
@@ -2458,7 +2462,10 @@
                 return html`
                     <div class="flex align-center selectable-contact" data-flo-id=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
                         <div class="initial flex align-center"> ${initial} </div>
-                        <h4 class="name">${name}</h4>
+                        <div class="grid gap-0-3">
+                            <h4 class="name">${name}</h4>
+                            <p class="contact__flo-address wrap-around">${floID}</p>
+                        </div>
                         <button class="button button--small request-pubkey" ?disabled=${hasSentRequest}>${hasSentRequest ? 'Request sent' : 'Request'}</button>
                     </div>
                 `

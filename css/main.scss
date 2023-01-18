@@ -1057,7 +1057,7 @@ ol {
 
   &:not(.chat) {
     grid-template-columns: auto 1fr;
-    grid-template-areas: "dp name";
+    grid-template-areas: "dp name" "dp .";
   }
 
   &.chat,
@@ -1114,6 +1114,10 @@ ol {
     font-weight: 500;
     margin-bottom: 0.3rem;
   }
+  &__flo-address {
+    font-size: 0.8rem;
+    color: rgba(var(--text-color), 0.6);
+  }
 
   .span-2 {
     display: flex;
@@ -1156,7 +1160,7 @@ ol {
   border-radius: 0.5rem;
   user-select: none;
   &:not(:last-of-type) {
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.5rem;
   }
   input {
     margin-left: auto;
@@ -1677,6 +1681,9 @@ sm-chip {
 #contacts_container {
   .contact {
     padding: 0.5rem 0;
+    &:not(:last-of-type) {
+      margin-bottom: 0.5rem;
+    }
   }
 }
 #chat_sections {
@@ -2424,8 +2431,8 @@ sm-chip {
   }
 
   sm-popup {
-    --width: 24rem;
-    --min-width: 24rem;
+    --width: 25rem;
+    --min-width: 25rem;
     --border-radius: 0.5rem;
   }
   #multisig_tx_popup {
