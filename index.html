@@ -2332,16 +2332,15 @@
         const render = {
             mailCard(floID, ref, subject, timestamp, content, markUnread) {
                 let mailSummery = content.split(' ').splice(16).join(' ')
-                let contact;
+                let contact = floGlobals.contacts[floID] || floID
                 if (Array.isArray(floID)) {
                     // find known floID name
                     contact = floID.find(id => floGlobals.contacts[id])
-                    contact = contact || `${floID[0].substring(12)}...`;
+                    contact = floGlobals.contacts[contact] || `${floID[0].substring(12)}...`;
                     if (floID.length > 1)
                         contact = `${contact} & ${floID.length - 1} others(s)`
                     floID = floID.join(', ')
-                } else
-                    contact = floGlobals.contacts[floID] || floID
+                }
                 return html.node`
                     <li class="${`mail-card interactive ${markUnread ? 'unread' : ''}`}" data-ref="${ref}" style=${`--contact-color: var(${contactColor(floID)})`}>
                         <div class="initial flex align-center">${contact.charAt(0)}</div>
@@ -3831,11 +3830,9 @@
                 getRef("mail_container").lastElementChild.scrollIntoView();
                 //add prop for previous mail (if available)
                 getRef("prev_mail").dataset["value"] = prev;
-                console.log("prev mail", [prev]);
                 messenger.getMail(prev).then(result => {
                     getRef("prev_mail").classList.remove("hidden");
                 }).catch(err => {
-                    console.error(err);
                     getRef("prev_mail").classList.add("hidden");
                 });
                 if (!prev)
