@@ -1725,13 +1725,9 @@
                 }
             } else {
                 if (targetPage.includes('/')) {
-                    if (targetPage.includes('?')) {
-                        const splitAddress = targetPage.split('?')
-                        searchParams = splitAddress.pop();
-                        [, pageId, subPageId1, subPageId2] = splitAddress.pop().split('/')
-                    } else {
-                        [, pageId, subPageId1, subPageId2] = targetPage.split('/')
-                    }
+                    let path;
+                    [path, searchParams] = targetPage.split('?');
+                    [, pageId, subPageId1, subPageId2] = path.split('/')
                 } else {
                     pageId = targetPage
                 }
