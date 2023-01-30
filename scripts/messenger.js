@@ -1321,8 +1321,7 @@
                 case "BROADCAST": {
                     data.txid = unparsed.message;
                     //the following check is done on parallel (in background) instead of sync
-                    btcOperator.getTx(data.txid).then(tx => {
-                        let tx_hex_final = tx.tx_hex;
+                    btcOperator.getTx.hex(data.txid).then(tx_hex_final => {
                         getChat(pipeID).then(result => {
                             let tx_hex_inital = Object.keys(result).sort().map(i => result[i].message).filter(x => x).shift();
                             if (btcOperator.checkIfSameTx(tx_hex_inital, tx_hex_final))
