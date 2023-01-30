@@ -2837,7 +2837,8 @@
                 document.title = `New mail(s)`
                 addNotificationBadge('#mail_page_button', Object.keys(data.mails).length)
             }
-            console.log(data.requests, data.responses)
+            // console.log(data.requests, data.responses)
+            messenger.list_request_received({ completed: false }).then(requests => addNotificationBadge('#notification_panel_button', Object.keys(requests).length, { replace: true }))
             updateMessageUI(data.messages)
             renderMailList(data.mails, true)
         }
