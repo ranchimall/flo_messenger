@@ -1015,7 +1015,7 @@
             <div class="grid gap-0-5 card" style="padding: 1rem;">
                 <span style="font-size: 0.9rem;">Selected multisig address</span>
                 <h4 id="selected_multisig" class="wrap-around" style="font-size: 0.9rem;"></h4>
-                <p id="selected_multisig__balance"></p>
+                <div id="selected_multisig__balance" class="flex align-center"></div>
             </div>
             <div class="grid gap-0-5">
                 <b style="font-size: 0.9rem;">Enter receiver(s)</b>
@@ -2622,17 +2622,14 @@
                 `
             },
             multisigOption(address, label) {
-                btcOperator.getBalance(address).then(balance => {
-                    const target = getRef('select_multisig_list').querySelector(`[data-address="${address}"]`);
-                    if (target)
-                        target.querySelector('.multisig-option__balance').textContent = `Balance: ${balance} BTC`;
-                }).catch(err => notify(err, 'error'))
                 return html`
                     <li class="grid gap-0-5 align-center multisig-option" data-address=${address}>
                         <text-field class="multisig-option__label" placeholder="Label" value=${label || 'Add a label'}></text-field>
                         <sm-copy clip-text value=${address}></sm-copy>
-                        <div class="flex align-center space-between">
-                            <span class="multisig-option__balance flex align-center">Balance: <sm-spinner><sm-spinner></span>
+                        <div class="flex align-center space-between gap-1">
+                            <div class="multisig-option__balance flex align-center gap-0-5">
+                                <button class="button button--small" onclick=${checkBalance}>Check balance</button>
+                            </div>
                             <button class="button button--small button--colored" onclick=${initTransaction}>Init transaction</button>
                         </div>
                     </li>
@@ -3167,7 +3164,7 @@
                     getRef('skip_members_button').classList.add('hidden')
                     popupTitle = 'Create multisig address'
                     getRef('multisig_creation__warning').classList.add('hide')
-                    floBlockchainAPI.getBalance(floDapps.user.id).then(balance => {
+                    floBlockchainAPI.getBalance(floGlobals.myFloID).then(balance => {
                         let warning = `Creation of multisig address consumes FLO, you have ${balance} FLO.`;
                         getRef('multisig_creation__warning').classList.add('info--warning')
                         if (balance < 0.2) {
@@ -4356,10 +4353,27 @@
             }
         }
 
+        function checkBalance(e) {
+            const multisig = e.target.closest('.multisig-option')
+            const multisigAddress = multisig.dataset.address;
+            renderElem(multisig.querySelector('.multisig-option__balance'), html`<sm-spinner></sm-spinner>`);
+            btcOperator.getBalance(multisigAddress).then(balance => {
+                renderElem(multisig.querySelector('.multisig-option__balance'), html`
+                    ${balance} BTC
+                    <button class="button icon-only" onclick=${checkBalance} title="Refresh">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>    
+                    </button>
+                `);
+            }).catch(err => notify(err, 'error'))
+        }
+
         function initTransaction(e) {
             const multisig = e.target.closest('.multisig-option')
             getRef('selected_multisig').textContent = multisig.dataset.address;
-            getRef('selected_multisig__balance').textContent = multisig.querySelector('.multisig-option__balance').textContent;
+            renderElem(getRef('selected_multisig__balance'), html`Fetching balance... <sm-spinner></sm-spinner>`)
+            btcOperator.getBalance(multisig.dataset.address).then(balance => {
+                renderElem(getRef('selected_multisig__balance'), html`Balance: ${balance} BTC`)
+            }).catch(err => notify(err, 'error'))
             getRef('send_tx').querySelector('sm-input').focusIn()
             openPopup('multisig_tx_popup')
         }

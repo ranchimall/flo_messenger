@@ -371,7 +371,6 @@ ol {
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
-  hyphens: auto;
 }
 
 .full-bleed {
@@ -1169,6 +1168,7 @@ ol {
   }
   button {
     margin-left: auto;
+    min-width: fit-content;
   }
 }
 
@@ -2300,6 +2300,9 @@ sm-chip {
   }
   &__balance {
     color: rgba(var(--text-color), 0.8);
+  }
+  .icon-only {
+    padding: 0.3rem;
   }
 }
 .remove-card-wrapper {
