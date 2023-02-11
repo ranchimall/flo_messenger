@@ -39,7 +39,7 @@
         },
         marked: {
             set: ui_fn => UI.marked = ui_fn
-        },
+        }
     });
 
     const _loaded = {};
@@ -461,12 +461,16 @@
             console.debug(newInbox);
             UI.direct(newInbox)
         }
-        floCloudAPI.requestApplicationData(null, {
-            receiverID: user.id,
-            lowerVectorClock: _loaded.appendix.lastReceived + 1,
-            callback: callbackFn
-        }).then(conn_id => directConnID = conn_id)
-            .catch(error => console.error("request-direct:", error));
+        return new Promise((resolve, reject) => {
+            floCloudAPI.requestApplicationData(null, {
+                receiverID: user.id,
+                lowerVectorClock: _loaded.appendix.lastReceived + 1,
+                callback: callbackFn
+            }).then(conn_id => {
+                directConnID = conn_id;
+                resolve("Direct Inbox connected");
+            }).catch(error => reject(error))
+        })
     }
 
     messenger.getMail = function (mailRef) {
@@ -952,7 +956,7 @@
         }
     }
 
-    function requestGroupInbox(groupID) {
+    function requestGroupInbox(groupID, _async = true) {
         if (groupConnID[groupID]) { //close existing request connection (if any)
             floCloudAPI.closeRequest(groupConnID[groupID]);
             delete groupConnID[groupID];
@@ -988,13 +992,22 @@
             console.debug(newInbox);
             UI.group(newInbox);
         }
-        floCloudAPI.requestApplicationData(null, {
+        let fn = floCloudAPI.requestApplicationData(null, {
             receiverID: groupID,
             lowerVectorClock: _loaded.appendix[`lastReceived_${groupID}`] + 1,
             callback: callbackFn
-        }).then(conn_id => groupConnID[groupID] = conn_id)
-            .catch(error => console.error(`request-group(${groupID}):`, error))
-
+        });
+        if (_async) {
+            fn.then(conn_id => groupConnID[groupID] = conn_id)
+                .catch(error => console.error(`request-group(${groupID}):`, error))
+        } else {
+            return new Promise((resolve, reject) => {
+                fn.then(conn_id => {
+                    groupConnID[groupID] = conn_id;
+                    resolve(`Connected to group ${groupID}`);
+                }).catch(error => reject(error))
+            });
+        }
     }
 
     //messenger startups
@@ -1016,16 +1029,19 @@
                     UI.mails(data.mails);
                     UI.marked(data.marked);
                     //request data from cloud
-                    requestDirectInbox();
+                    let promises = [];
+                    promises.push(requestDirectInbox());
                     for (let g in data.groups)
                         if (data.groups[g].disabled !== true)
-                            requestGroupInbox(g);
+                            promises.push(requestGroupInbox(g, false));
                     for (let p in data.pipeline)
                         if (data.pipeline[p].disabled !== true)
-                            requestPipelineInbox(p, data.pipeline[p].model);
-                    loadDataFromBlockchain()
-                        .then(result => resolve("Messenger initiated"))
-                        .catch(error => reject(error))
+                            promises.push(requestPipelineInbox(p, data.pipeline[p].model, false));
+                    loadDataFromBlockchain().then(result => {
+                        Promise.all(promises)
+                            .then(result => resolve("Messenger initiated"))
+                            .catch(error => reject(error))
+                    }).catch(error => reject(error))
                 }).catch(error => reject(error));
             })
         })
@@ -1228,7 +1244,7 @@
         })
     }
 
-    function requestPipelineInbox(pipeID, model) {
+    function requestPipelineInbox(pipeID, model, _async = true) {
         if (pipeConnID[pipeID]) { //close existing request connection (if any)
             floCloudAPI.closeRequest(pipeConnID[pipeID]);
             delete pipeConnID[pipeID];
@@ -1261,12 +1277,22 @@
             UI.pipeline(model, newInbox);
         }
 
-        floCloudAPI.requestApplicationData(null, {
+        let fn = floCloudAPI.requestApplicationData(null, {
             receiverID: pipeID,
             lowerVectorClock: _loaded.appendix[`lastReceived_${pipeID}`] + 1,
             callback: callbackFn
-        }).then(conn_id => pipeConnID[pipeID] = conn_id)
-            .catch(error => console.error(`request-pipeline(${pipeID}):`, error))
+        });
+        if (_async) {
+            fn.then(conn_id => pipeConnID[pipeID] = conn_id)
+                .catch(error => console.error(`request-pipeline(${pipeID}):`, error))
+        } else {
+            return new Promise((resolve, reject) => {
+                fn.then(conn_id => {
+                    pipeConnID[pipeID] = conn_id;
+                    resolve(`Connected to pipeline ${pipeID}`);
+                }).catch(error => reject(error))
+            });
+        }
     }
 
     const disablePipeline = messenger.disablePipeline = function (pipeID) {
