@@ -740,44 +740,30 @@ ol li::before {
   width: 100%;
 }
 
-#sign_in,
-#sign_up {
+#sign_in {
   justify-items: center;
   align-content: center;
   padding: 1.5rem;
   margin: 0;
 }
-#sign_in section,
-#sign_up section {
+#sign_in section {
   margin-top: -8rem;
   width: min(26rem, 100%);
 }
-#sign_in sm-form,
-#sign_up sm-form {
+#sign_in sm-form {
   margin: 2rem 0;
 }
 
+#sign_up {
+  justify-items: center;
+  align-content: center;
+}
+#sign_up keys-generator {
+  width: min(26rem, 100%);
+  margin-top: -4rem;
+}
 #sign_up .h2 {
   margin-bottom: 0.5rem;
-}
-
-.generated-keys-wrapper {
-  padding: 1rem;
-  background-color: rgba(var(--foreground-color), 1);
-  border-radius: 0.5rem;
-}
-
-#flo_id_warning {
-  padding-bottom: 1.5rem;
-}
-#flo_id_warning .icon {
-  height: 3rem;
-  width: 3rem;
-  padding: 0.8rem;
-  overflow: visible;
-  background-color: #ffc107;
-  border-radius: 3rem;
-  fill: rgba(0, 0, 0, 0.8);
 }
 
 .tip {

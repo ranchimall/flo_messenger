@@ -762,8 +762,7 @@ ol {
   width: 100%;
 }
 
-#sign_in,
-#sign_up {
+#sign_in {
   justify-items: center;
   align-content: center;
   padding: 1.5rem;
@@ -779,25 +778,14 @@ ol {
 }
 
 #sign_up {
+  justify-items: center;
+  align-content: center;
+  keys-generator {
+    width: min(26rem, 100%);
+    margin-top: -4rem;
+  }
   .h2 {
     margin-bottom: 0.5rem;
-  }
-}
-.generated-keys-wrapper {
-  padding: 1rem;
-  background-color: rgba(var(--foreground-color), 1);
-  border-radius: 0.5rem;
-}
-#flo_id_warning {
-  padding-bottom: 1.5rem;
-  .icon {
-    height: 3rem;
-    width: 3rem;
-    padding: 0.8rem;
-    overflow: visible;
-    background-color: #ffc107;
-    border-radius: 3rem;
-    fill: rgba(0, 0, 0, 0.8);
   }
 }
 
