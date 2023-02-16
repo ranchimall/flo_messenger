@@ -1174,6 +1174,7 @@
             uiGlobals.connectionErrorNotification.forEach(notification => notification.remove())
             notify('We are back online.', 'success')
             location.reload()
+            uiGlobals.connectionErrorNotification = []
         })
         // Use instead of document.getElementById
         function getRef(elementId) {
@@ -3864,7 +3865,7 @@
                             btcOperator.parseTransaction(floGlobals.pipelineTxHex).then((details) => {
                                 console.log(details)
                                 const { inputs, outputs, fee } = details
-                                const { s: signsDone, r: minSignsRequired, t: totalMembers } = inputs[0].signed
+                                const { s: signsDone, r: minSignsRequired, t: totalMembers } = inputs[0]?.signed || {}
                                 const pendingSigns = minSignsRequired - signsDone
                                 if (minSignsRequired) {
                                     getRef('messages_container').prepend(html.node`
