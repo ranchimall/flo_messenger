@@ -304,6 +304,10 @@ sm-chip[selected] {
   --background: rgba(var(--text-color), 0.9);
 }
 
+sm-popup::part(popup) {
+  background-color: rgba(var(--foreground-color), 1);
+}
+
 ul,
 ol {
   list-style: none;
@@ -1099,6 +1103,7 @@ ol li::before {
   opacity: 0.9;
 }
 .contact .menu {
+  flex-shrink: 0;
   justify-self: flex-end;
   padding: 0.2rem;
   fill: rgba(var(--text-color), 1);
@@ -2235,6 +2240,31 @@ sm-chip .badge {
 }
 .receiver-card:not(:last-of-type) {
   border-bottom: solid thin rgba(var(--text-color), 0.3);
+}
+
+#selected_fee_tip,
+#error_section {
+  font-weight: 500;
+}
+
+.error {
+  color: var(--danger-color);
+}
+.error .icon {
+  fill: var(--danger-color);
+}
+
+#send_fee_wrapper {
+  display: grid;
+}
+#send_fee_wrapper > * {
+  grid-area: 1/1;
+}
+
+#send_fee_loader {
+  background-color: rgba(var(--foreground-color), 1);
+  z-index: 1;
+  width: 100%;
 }
 
 @media screen and (max-width: 640px) {
