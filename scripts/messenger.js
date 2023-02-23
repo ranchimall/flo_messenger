@@ -1080,7 +1080,9 @@
 
     //BTC multisig application
     const MultiSig = messenger.multisig = {}
-    const TYPE_BTC_MULTISIG = "btc_multisig";
+    const TYPE_BTC_MULTISIG = "btc_multisig", //used for both pipeline and multisig address creation
+        TYPE_FLO_MULTISIG = "flo_multisig"; //only used for pipeline
+
     MultiSig.createAddress = function (pubKeys, minRequired) {
         return new Promise(async (resolve, reject) => {
             let co_owners = pubKeys.map(p => floCrypto.getFloID(p));
@@ -1148,6 +1150,7 @@
         })
     }
 
+    //create multisig tx for BTC
     MultiSig.createTx_BTC = function (address, redeemScript, receivers, amounts, fee = null, options = {}) {
         return new Promise(async (resolve, reject) => {
             let addr_type = btcOperator.validateAddress(address);
@@ -1175,6 +1178,7 @@
         })
     }
 
+    //sign multisig tx for BTC
     MultiSig.signTx_BTC = function (pipeID) {
         return new Promise((resolve, reject) => {
             if (_loaded.pipeline[pipeID].disabled)
@@ -1192,6 +1196,64 @@
                         });
                     debugger;
                     btcOperator.broadcastTx(tx_hex_signed).then(txid => {
+                        console.debug(txid);
+                        sendRaw(encrypt(txid, pipeline.eKey), pipeline.id, "BROADCAST", false)
+                            .then(result => resolve({
+                                tx_hex: tx_hex_signed,
+                                txid: txid
+                            })).catch(error => reject(error))
+                    }).catch(error => reject(error))
+                }).catch(error => reject(error))
+            }).catch(error => console.error(error))
+        })
+    }
+
+    //create multisig tx for FLO
+    MultiSig.createTx_FLO = function (address, redeemScript, receivers, amounts, floData = '', options = {}) {
+        return new Promise(async (resolve, reject) => {
+            if (!floCrypto.validateFloID(address)) { //not a flo multisig, but maybe btc multisig address
+                let addr_type = btcOperator.validateAddress(address);
+                if (addr_type != "multisig" && addr_type != "multisigBech32")
+                    return reject("Sender address is not a multisig");
+                address = floCrypto.toMultisigFloID(address);
+            }
+            let decode = floCrypto.decodeRedeemScript(redeemScript);
+            if (!decode || decode.address !== address)
+                return reject("Invalid redeem-script");
+            else if (!decode.pubkeys.includes(user.public.toLowerCase()) && !decode.pubkeys.includes(user.public.toUpperCase()))
+                return reject("User is not a part of this multisig");
+            else if (decode.pubkeys.length < decode.required)
+                return reject("Invalid multisig (required is greater than users)");
+            let co_owners = decode.pubkeys.map(p => floCrypto.getFloID(p));
+            let privateKey = await floDapps.user.private;
+            floBlockchainAPI.createMultisigTx(redeemScript, receivers, amounts, floData).then(tx_hex => {
+                tx_hex = floBlockchainAPI.signTx(tx_hex, privateKey);
+                createPipeline(TYPE_FLO_MULTISIG, co_owners, 32).then(pipeline => {
+                    let message = encrypt(tx_hex, pipeline.eKey);
+                    sendRaw(message, pipeline.id, "TRANSACTION", false)
+                        .then(result => resolve(pipeline.id))
+                        .catch(error => reject(error))
+                }).catch(error => reject(error))
+            }).catch(error => reject(error))
+        })
+    }
+
+    //sign multisig tx for FLO
+    MultiSig.signTx_FLO = function (pipeID) {
+        return new Promise((resolve, reject) => {
+            if (_loaded.pipeline[pipeID].disabled)
+                return reject("Pipeline is already closed");
+            getChat(pipeID).then(async result => {
+                let pipeline = _loaded.pipeline[pipeID],
+                    tx_hex_latest = Object.keys(result).sort().map(i => result[i].tx_hex).filter(x => x).pop();
+                let privateKey = await floDapps.user.private;
+                let tx_hex_signed = floBlockchainAPI.signTx(tx_hex_latest, privateKey);
+                let message = encrypt(tx_hex_signed, pipeline.eKey);
+                sendRaw(message, pipeline.id, "TRANSACTION", false).then(result => {
+                    if (!floBlockchainAPI.checkSigned(tx_hex_signed))
+                        return resolve({ tx_hex: tx_hex_signed });
+                    debugger;
+                    floBlockchainAPI.broadcastTx(tx_hex_signed).then(txid => {
                         console.debug(txid);
                         sendRaw(encrypt(txid, pipeline.eKey), pipeline.id, "BROADCAST", false)
                             .then(result => resolve({
@@ -1324,6 +1386,8 @@
     }
 
     processData.pipeline = {};
+
+    //pipeline model for btc multisig
     processData.pipeline[TYPE_BTC_MULTISIG] = function (pipeID) {
         return (unparsed, newInbox) => {
             if (!_loaded.pipeline[pipeID].members.includes(floCrypto.toFloID(unparsed.senderID)))
@@ -1349,10 +1413,56 @@
                     //the following check is done on parallel (in background) instead of sync
                     btcOperator.getTx.hex(data.txid).then(tx_hex_final => {
                         getChat(pipeID).then(result => {
-                            let tx_hex_inital = Object.keys(result).sort().map(i => result[i].message).filter(x => x).shift();
+                            let tx_hex_inital = Object.keys(result).sort().map(i => result[i].tx_hex).filter(x => x).shift();
                             if (btcOperator.checkIfSameTx(tx_hex_inital, tx_hex_final))
                                 disablePipeline(pipeID);
                         }).catch(error => console.error(error))
+                    }).catch(error => console.error(error))
+                    break;
+                }
+                case "MESSAGE": {
+                    data.message = encrypt(unparsed.message);
+                    break;
+                }
+            }
+            compactIDB.addData("messages", Object.assign({}, data), `${pipeID}|${vc}`);
+            if (data.message)
+                data.message = decrypt(data.message);
+            newInbox.messages[vc] = data;
+        }
+    }
+
+    //pipeline model for flo multisig
+    processData.pipeline[TYPE_FLO_MULTISIG] = function (pipeID) {
+        return (unparsed, newInbox) => {
+            if (!_loaded.pipeline[pipeID].members.includes(floCrypto.toFloID(unparsed.senderID)))
+                return;
+            let data = {
+                time: unparsed.time,
+                sender: unparsed.senderID,
+                pipeID: unparsed.receiverID
+            }
+            let vc = unparsed.vectorClock,
+                k = _loaded.pipeline[pipeID].eKey;
+            unparsed.message = decrypt(unparsed.message, k)
+            //store the pubKey if not stored already
+            floDapps.storePubKey(unparsed.senderID, unparsed.pubKey);
+            data.type = unparsed.type;
+            switch (unparsed.type) {
+                case "TRANSACTION": {
+                    data.tx_hex = unparsed.message;
+                    break;
+                }
+                case "BROADCAST": {
+                    data.txid = unparsed.message;
+                    //the following check is done on parallel (in background) instead of sync
+                    getChat(pipeID).then(result => {
+                        var tx_hex_list = Object.keys(result).sort().map(i => result[i].tx_hex).filter(x => x).shift();
+                        let tx_hex_inital = tx_hex_list[0],
+                            tx_hex_final = tx_hex_list.pop();
+                        if (floBlockchainAPI.checkIfSameTx(tx_hex_inital, tx_hex_final) &&
+                            floBlockchainAPI.transactionID(tx_hex_final) == data.txid) //compare the txHex and txid
+                            disablePipeline(pipeID);
                     }).catch(error => console.error(error))
                     break;
                 }
