@@ -4707,7 +4707,7 @@
                 const { redeemScript } = allMultiSigs[selectedMultisigAddress]
                 const fee = parseFloat(getRef('send_fee').value.trim());
                 console.debug(selectedMultisigAddress, receivers, amounts, fee);
-                messenger.multisig.createTx(selectedMultisigAddress, redeemScript, receivers, amounts, fee).then(result => {
+                messenger.multisig.createTx_BTC(selectedMultisigAddress, redeemScript, receivers, amounts, fee).then(result => {
                     console.log(result);
                     notify('Initiated transaction', 'success')
                     closePopup();
@@ -4726,7 +4726,7 @@
             const banner = getRef('messages_container').querySelector('.signing-banner')
             const button = banner.querySelector('button')
             buttonLoader(button, true)
-            messenger.multisig.signTx(pipeID).then(() => {
+            messenger.multisig.signTx_BTC(pipeID).then(() => {
                 getRef('messages_container').querySelector('.signing-banner').remove()
                 notify('Transaction signed', 'success')
                 if (messenger.pipeline[pipeID].disabled)

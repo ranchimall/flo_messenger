@@ -1148,7 +1148,7 @@
         })
     }
 
-    MultiSig.createTx = function (address, redeemScript, receivers, amounts, fee = null, options = {}) {
+    MultiSig.createTx_BTC = function (address, redeemScript, receivers, amounts, fee = null, options = {}) {
         return new Promise(async (resolve, reject) => {
             let addr_type = btcOperator.validateAddress(address);
             if (addr_type != "multisig" && addr_type != "multisigBech32")
@@ -1175,7 +1175,7 @@
         })
     }
 
-    MultiSig.signTx = function (pipeID) {
+    MultiSig.signTx_BTC = function (pipeID) {
         return new Promise((resolve, reject) => {
             if (_loaded.pipeline[pipeID].disabled)
                 return reject("Pipeline is already closed");
