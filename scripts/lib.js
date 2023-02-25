@@ -1,4 +1,4 @@
-(function (GLOBAL) { //lib v1.4.2
+(function (GLOBAL) { //lib v1.4.2b
     'use strict';
     /* Utility Libraries required for Standard operations
      * All credits for these codes belong to their respective creators, moderators and owners.
@@ -4355,6 +4355,12 @@
         bitjs.multisig = 0x5e; //flochange - prefix for FLO Mainnet Multisig 0x5e
         bitjs.compressed = false;
 
+        if (GLOBAL.cryptocoin == 'FLO_TEST') {
+            bitjs.pub = 0x73; // flochange - changed the prefix to FLO TestNet PublicKey Prefix 0x73
+            bitjs.priv = 0xa3; //flochange - changed the prefix to FLO TestNet Private key prefix 0xa3
+            bitjs.multisig = 0xc6; //flochange - prefix for FLO TestNet Multisig 0xc6
+        }
+
         /* provide a privkey and return an WIF  */
         bitjs.privkey2wif = function (h) {
             var r = Crypto.util.hexToBytes(h);
@@ -4521,14 +4527,12 @@
                 if (addr.version === bitjs.pub) { // regular address
                     buf.push(118); //OP_DUP
                     buf.push(169); //OP_HASH160
-                    buf.push(addr.bytes.length);
-                    buf = buf.concat(addr.bytes); // address in bytes
+                    buf = this.writeBytesToScriptBuffer(buf, addr.bytes);// address in bytes
                     buf.push(136); //OP_EQUALVERIFY
                     buf.push(172); //OP_CHECKSIG
                 } else if (addr.version === bitjs.multisig) { // multisig address
                     buf.push(169); //OP_HASH160
-                    buf.push(addr.bytes.length);
-                    buf = buf.concat(addr.bytes); // address in bytes
+                    buf = this.writeBytesToScriptBuffer(buf, addr.bytes);// address in bytes
                     buf.push(135); //OP_EQUAL
                 }
 
@@ -4790,6 +4794,27 @@
                 return KBigInt;
             };
 
+            btrx.writeBytesToScriptBuffer = function (buf, bytes) {
+                if (bytes.length < 76) { //OP_PUSHDATA1
+                    buf.push(bytes.length);
+                } else if (bytes.length <= 0xff) {
+                    buf.push(76); //OP_PUSHDATA1
+                    buf.push(bytes.length);
+                } else if (bytes.length <= 0xffff) {
+                    buf.push(77); //OP_PUSHDATA2
+                    buf.push(bytes.length & 0xff);
+                    buf.push((bytes.length >>> 8) & 0xff);
+                } else {
+                    buf.push(78); //OP_PUSHDATA4
+                    buf.push(bytes.length & 0xff);
+                    buf.push((bytes.length >>> 8) & 0xff);
+                    buf.push((bytes.length >>> 16) & 0xff);
+                    buf.push((bytes.length >>> 24) & 0xff);
+                }
+                buf = buf.concat(bytes);
+                return buf;
+            }
+
             btrx.parseScript = function (script) {
 
                 var chunks = [];
@@ -4853,8 +4878,7 @@
                 var signature = this.transactionSig(index, wif, shType);
                 var buf = [];
                 var sigBytes = Crypto.util.hexToBytes(signature);
-                buf.push(sigBytes.length);
-                buf = buf.concat(sigBytes);
+                buf = this.writeBytesToScriptBuffer(buf, sigBytes);
                 var pubKeyBytes = Crypto.util.hexToBytes(key['pubkey']);
                 buf.push(pubKeyBytes.length);
                 buf = buf.concat(pubKeyBytes);
@@ -4902,16 +4926,14 @@
                     for (let y in sigsList) {
                         var sighash = Crypto.util.hexToBytes(this.transactionHash(index, sigsList[y].slice(-1)[0] * 1));
                         if (bitjs.verifySignature(sighash, sigsList[y], pubkeyList[x])) {
-                            buf.push(sigsList[y].length);
-                            buf = buf.concat(sigsList[y]);
+                            buf = this.writeBytesToScriptBuffer(buf, sigsList[y]);
                             break; //ensures duplicate sigs from same pubkey are not added
                         }
                     }
                 }
 
                 //append redeemscript
-                buf.push(redeemScript.length);
-                buf = buf.concat(redeemScript);
+                buf = this.writeBytesToScriptBuffer(buf, redeemScript);
 
                 this.inputs[index].script = buf;
                 return true;
@@ -5301,23 +5323,22 @@
             if ("string" == typeof bytes) {
                 var d = Bitcoin.Address.decodeString(bytes);
                 bytes = d.hash;
-                if (GLOBAL.cryptocoin == "FLO" && (d.version == Bitcoin.Address.standardVersion || d.version == Bitcoin.Address.multisigVersion))
-                    this.version = d.version;
-                else if (GLOBAL.cryptocoin == "FLO_TEST" && d.version == Bitcoin.Address.testnetVersion)
+                if (d.version == Bitcoin.Address.standardVersion || d.version == Bitcoin.Address.multisigVersion)
                     this.version = d.version;
                 else throw "Version (prefix) " + d.version + " not supported!";
             } else {
-                if (GLOBAL.cryptocoin == "FLO")
-                    this.version = Bitcoin.Address.standardVersion;
-                else if (GLOBAL.cryptocoin == "FLO_TEST")
-                    this.version = Bitcoin.Address.testnetVersion; // FLO testnet public address
+                this.version = Bitcoin.Address.standardVersion;
             }
             this.hash = bytes;
         };
 
         Bitcoin.Address.standardVersion = 0x23; // (FLO mainnet 0x23, 35D), (Bitcoin Mainnet, 0x00, 0D)
         Bitcoin.Address.multisigVersion = 0x5e; // (FLO multisig 0x5e, 94D)
-        Bitcoin.Address.testnetVersion = 0x73; // (FLO testnet 0x73, 115D)
+
+        if (GLOBAL.cryptocoin == "FLO_TEST") {
+            Bitcoin.Address.standardVersion = 0x73; // (FLO testnet 0x73, 115D), (Bitcoin Mainnet, 0x00, 0D)
+            Bitcoin.Address.multisigVersion = 0xc6; // (FLO testnet multisig 0xc6, 198D)
+        }
 
         /**
          * Serialize this object as a standard Bitcoin address.
