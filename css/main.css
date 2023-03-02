@@ -1038,6 +1038,10 @@ ol li::before {
           user-select: none;
   overflow: hidden;
 }
+.contact.highlight {
+  -webkit-animation: highlight 0.5s ease-in-out 4 alternate;
+          animation: highlight 0.5s ease-in-out 4 alternate;
+}
 .contact:not(.chat) {
   grid-template-columns: auto 1fr;
   grid-template-areas: "dp name" "dp .";
@@ -2226,6 +2230,38 @@ sm-chip .badge {
 }
 .multisig-option .icon-only {
   padding: 0.3rem;
+}
+.multisig-option.highlight {
+  -webkit-animation: highlight 0.5s ease-in-out infinite alternate;
+          animation: highlight 0.5s ease-in-out infinite alternate;
+}
+
+@-webkit-keyframes highlight {
+  0% {
+    background-color: rgba(var(--text-color), 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes highlight {
+  0% {
+    background-color: rgba(var(--text-color), 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+.multisig-type-button {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  justify-items: flex-start;
+  background-color: rgba(var(--text-color), 0.04);
+  padding: 1.5rem 1.2rem;
+  font-size: 1rem;
+  text-align: start;
 }
 
 .remove-card-wrapper {
