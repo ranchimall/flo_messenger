@@ -134,7 +134,7 @@
                 <p>Welcome back, glad to see you again</p>
                 <sm-form id="sign_in_form">
                     <sm-input id="private_key_field" class="password-field" type="password"
-                        placeholder="FLO private key" error-text="Private key is invalid" data-private-key required>
+                        placeholder="FLO/BTC private key" error-text="Private key is invalid" data-private-key required>
                         <label slot="right" class="interact">
                             <input type="checkbox" class="hidden" autocomplete="off" readonly
                                 onchange="togglePrivateKeyVisibility(this)">
@@ -2215,7 +2215,7 @@
                     } else {
                         floGlobals.isPrivKeySecured = false;
                         getRef('private_key_field').dataset.privateKey = ''
-                        getRef('private_key_field').setAttribute('placeholder', 'FLO private key');
+                        getRef('private_key_field').setAttribute('placeholder', 'FLO/BTC private key');
                         getRef('private_key_field').customValidation = floCrypto.getPubKeyHex;
                     }
                     if (!generalPages.find(page => window.location.hash.includes(page))) {
