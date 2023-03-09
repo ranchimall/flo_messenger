@@ -1181,6 +1181,8 @@
     //sign multisig tx for BTC
     MultiSig.signTx_BTC = function (pipeID) {
         return new Promise((resolve, reject) => {
+            if(_loaded.pipeline[pipeID].model !== TYPE_BTC_MULTISIG)
+                return reject('Incorrect pipeline model. Only works for BTC-multisig');
             if (_loaded.pipeline[pipeID].disabled)
                 return reject("Pipeline is already closed");
             getChat(pipeID).then(async result => {
@@ -1241,6 +1243,8 @@
     //sign multisig tx for FLO
     MultiSig.signTx_FLO = function (pipeID) {
         return new Promise((resolve, reject) => {
+            if(_loaded.pipeline[pipeID].model !== TYPE_FLO_MULTISIG)
+                return reject('Incorrect pipeline model. Only works for FLO-multisig');
             if (_loaded.pipeline[pipeID].disabled)
                 return reject("Pipeline is already closed");
             getChat(pipeID).then(async result => {
