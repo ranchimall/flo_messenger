@@ -1462,7 +1462,7 @@
                     data.txid = unparsed.message;
                     //the following check is done on parallel (in background) instead of sync
                     getChat(pipeID).then(result => {
-                        var tx_hex_list = Object.keys(result).sort().map(i => result[i].tx_hex).filter(x => x).shift();
+                        var tx_hex_list = Object.keys(result).sort().map(i => result[i].tx_hex).filter(x => x);
                         let tx_hex_inital = tx_hex_list[0],
                             tx_hex_final = tx_hex_list.pop();
                         if (floBlockchainAPI.checkIfSameTx(tx_hex_inital, tx_hex_final) &&
