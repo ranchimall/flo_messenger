@@ -725,8 +725,10 @@
 
     messenger.clearUserData = function () {
         return new Promise((resolve, reject) => {
+            let user_floID = floCrypto.toFloID(user.id);
             let promises = [
-                compactIDB.deleteDB(),
+                compactIDB.deleteDB(`${floGlobals.application}_${user_floID}`),
+                compactIDB.removeData('lastTx', `${floGlobals.application}|${user_floID}`, floDapps.root),
                 floDapps.clearCredentials()
             ]
             Promise.all(promises)
