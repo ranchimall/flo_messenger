@@ -166,8 +166,14 @@ button:not(:disabled),
 .button--danger .icon {
   fill: var(--danger-color);
 }
+.button--filled {
+  background-color: rgba(var(--text-color), 0.06);
+}
 .button--small {
   padding: 0.4rem 0.6rem;
+}
+.button--rounded {
+  border-radius: 4em !important;
 }
 .button--outlined {
   border: solid rgba(var(--text-color), 0.3) 0.1rem;
@@ -201,8 +207,9 @@ button:disabled {
 .icon-only {
   padding: 0.5rem;
   border-radius: 0.3rem;
-  aspect-ratio: 1/1;
   background-color: transparent;
+  aspect-ratio: 1/1;
+  flex-shrink: 0;
 }
 
 a:-webkit-any-link:focus-visible {
@@ -1594,6 +1601,7 @@ ol li::before {
   overflow-x: hidden;
   grid-template-rows: -webkit-max-content 1fr;
   grid-template-rows: max-content 1fr;
+  grid-template-columns: minmax(0, 1fr);
 }
 #contacts .header {
   display: flex;
@@ -1691,6 +1699,7 @@ sm-chip .badge {
 
 #mails {
   position: relative;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: -webkit-max-content 1fr;
   grid-template-rows: max-content 1fr;
 }

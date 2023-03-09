@@ -174,11 +174,15 @@ button,
       fill: var(--danger-color);
     }
   }
-
+  &--filled {
+    background-color: rgba(var(--text-color), 0.06);
+  }
   &--small {
     padding: 0.4rem 0.6rem;
   }
-
+  &--rounded {
+    border-radius: 4em !important;
+  }
   &--outlined {
     border: solid rgba(var(--text-color), 0.3) 0.1rem;
     background-color: rgba(var(--foreground-color), 1);
@@ -211,8 +215,9 @@ button:disabled {
 .icon-only {
   padding: 0.5rem;
   border-radius: 0.3rem;
-  aspect-ratio: 1/1;
   background-color: transparent;
+  aspect-ratio: 1/1;
+  flex-shrink: 0;
 }
 
 a:any-link:focus-visible {
@@ -1639,7 +1644,7 @@ ol {
   position: relative;
   overflow-x: hidden;
   grid-template-rows: max-content 1fr;
-
+  grid-template-columns: minmax(0, 1fr);
   .header {
     display: flex;
     justify-content: space-between;
@@ -1738,6 +1743,7 @@ sm-chip {
 
 #mails {
   position: relative;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: max-content 1fr;
 }
 
