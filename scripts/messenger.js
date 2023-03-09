@@ -1248,7 +1248,6 @@
             if (_loaded.pipeline[pipeID].disabled)
                 return reject("Pipeline is already closed");
             getChat(pipeID).then(async result => {
-                console.log(result)
                 let pipeline = _loaded.pipeline[pipeID],
                     tx_hex_latest = Object.keys(result).sort().map(i => result[i].tx_hex).filter(x => x).pop();
                 let privateKey = await floDapps.user.private;
