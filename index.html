@@ -3897,6 +3897,7 @@
                                 const { s: signsDone, r: minSignsRequired, t: totalMembers } = inputs[0]?.signed || {}
                                 const pendingSigns = minSignsRequired - signsDone
                                 if (minSignsRequired) {
+                                    if ($('#transaction_details')) $('#transaction_details').remove()
                                     getRef('messages_container').prepend(html.node`
                                         <details id="transaction_details" class="grid gap-1 card" open>
                                             <summary>
