@@ -1246,7 +1246,7 @@ ol li::before {
 .event-card {
   padding: 0.4rem 0.6rem;
   font-weight: 500;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   background-color: rgba(var(--text-color), 0.04);
   border-radius: 0.5rem;
   color: rgba(var(--text-color), 0.8);
@@ -1271,9 +1271,14 @@ ol li::before {
 .pipeline-event {
   padding: 0.8rem 1rem;
   border: solid thin rgba(var(--text-color), 0.2);
+  text-align: start;
 }
 .pipeline-event--signed .icon {
   fill: var(--green);
+}
+.pipeline-event .time {
+  font-size: 0.8rem;
+  color: rgba(var(--text-color), 0.7);
 }
 
 .contact,
