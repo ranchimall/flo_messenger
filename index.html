@@ -2672,6 +2672,9 @@
                                 <h4>Transaction approved</h4>
                                 <a class="button--small margin-left-0-5" href="${`${redirectTo}${msg.txid}`}" target="_blank">View on blockchain</a>
                             </div>`
+                            if ($('#transaction_details'))
+                                $('#transaction_details').remove()
+                            getRef('chat_footer').classList.remove('hidden')
                             break;
                     }
                 }
