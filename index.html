@@ -2741,7 +2741,7 @@
             },
             multisigAddressCard(address, label, mode = 'btc') {
                 const floMultisig = floCrypto.toMultisigFloID(address)
-                return html`
+                return html.for(getRef('select_multisig_list'), mode === 'btc' ? address : floMultisig)`
                     <li class="grid gap-0-5 align-center multisig-option" data-address=${address}>
                         <text-field class="multisig-option__label" placeholder="Label" value=${label || 'Add a label'}></text-field>
                         <sm-copy clip-text value=${mode !== 'btc' ? floMultisig : address}></sm-copy>
