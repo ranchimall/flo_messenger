@@ -2664,6 +2664,9 @@
                                 </p>`
                             break;
                         case 'BROADCAST':
+                            if ($('#transaction_details'))
+                                $('#transaction_details').remove()
+                            getRef('chat_footer').classList.remove('hidden')
                             let redirectTo = `https://live.blockcypher.com/btc/tx/`
                             if (messenger.pipeline[activeChat.address].model === 'flo_multisig')
                                 redirectTo = `https://flosight.ranchimall.net/tx/`
@@ -2672,9 +2675,6 @@
                                 <h4>Transaction approved</h4>
                                 <a class="button--small margin-left-0-5" href="${`${redirectTo}${msg.txid}`}" target="_blank">View on blockchain</a>
                             </div>`
-                            if ($('#transaction_details'))
-                                $('#transaction_details').remove()
-                            getRef('chat_footer').classList.remove('hidden')
                             break;
                     }
                 }
@@ -3893,7 +3893,7 @@
                                         details = await btcOperator.parseTransaction(floGlobals.pipelineTxHex)
                                         break;
                                 }
-                                const { inputs, outputs, fee } = details
+                                const { inputs, outputs, fee, floData } = details
                                 const { s: signsDone, r: minSignsRequired, t: totalMembers } = inputs[0]?.signed || {}
                                 const pendingSigns = minSignsRequired - signsDone
                                 if (minSignsRequired) {
@@ -3905,10 +3905,14 @@
                                                 <svg class="icon down-arrow" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M24 24H0V0h24v24z" fill="none" opacity=".87"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z"/></svg>
                                             </summary>
                                             <div class="grid margin-bottom-1">
+                                                <h5>Multisig address</h5>
+                                                <sm-copy value=${inputs[0].address} clip-text></sm-copy>
+                                            </div>
+                                            <div class="grid margin-bottom-1">
                                                 <h5>Receiver</h5>
                                                 <sm-copy value=${outputs[0].address} clip-text></sm-copy>
                                             </div>
-                                            <div class="flex align-center gap-1-5">
+                                            <div class="flex align-center gap-1-5 margin-bottom-1">
                                                 <div class="grid">
                                                     <h5>Amount</h5>
                                                     <p>${outputs[0].value} ${currency}</p>
@@ -3918,6 +3922,12 @@
                                                     <p>${fee} ${currency}</p>
                                                 </div>
                                             </div>
+                                            ${floData ? html`
+                                                <div class="grid gap-0-3">
+                                                    <h5>FLO data</h5>
+                                                    <p>${floData}</p>
+                                                </div>`: ''
+                                        }
                                         </details>
                                     `)
                                 }
