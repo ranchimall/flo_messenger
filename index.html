@@ -3000,7 +3000,7 @@
                 const { category, floID, time, message, sender, groupID, admin, name, pipeID, unconfirmed } = messagesData[messageId]
                 console.log('messageData', messagesData[messageId])
                 // code to run if a chat is opened
-                if (activeChat && activeChat.address === (floID || groupID || pipeID)) {
+                if (activeChat && (activeChat.address === (floID || groupID || pipeID) || floCrypto.toFloID(activeChat.address) === (floID || groupID || pipeID))) {
                     if (!sentByMe && sender && sender === floDapps.user.id) {
                         // if message is sent by me, then dont add it to the chat
                     } else {
@@ -3064,10 +3064,10 @@
                 }
                 let finalMessage
                 if (messenger.groups && messenger.groups[groupID]) {
-                    if (floGlobals.contacts[sender])
-                        finalMessage = `${floGlobals.contacts[sender]}: ${message}`
-                    else if (floID === floDapps.user.id)
+                    if (sender === floDapps.user.id)
                         finalMessage = `You: ${message}`
+                    else if (floGlobals.contacts[sender])
+                        finalMessage = `${floGlobals.contacts[sender]}: ${message}`
                 }
                 else
                     finalMessage = message
