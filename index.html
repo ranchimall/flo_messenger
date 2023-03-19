@@ -2998,9 +2998,9 @@
             }
             for (let messageId in messagesData) {
                 const { category, floID, time, message, sender, groupID, admin, name, pipeID, unconfirmed } = messagesData[messageId]
-                console.log('messageData', messagesData[messageId])
+                const chatAddress = floID || groupID || pipeID
                 // code to run if a chat is opened
-                if (activeChat && (activeChat.address === (floID || groupID || pipeID) || floCrypto.toFloID(activeChat.address) === (floID || groupID || pipeID))) {
+                if (activeChat && (activeChat.address === chatAddress || activeChat.address === floCrypto.toFloID(chatAddress))) {
                     if (!sentByMe && sender && sender === floDapps.user.id) {
                         // if message is sent by me, then dont add it to the chat
                     } else {
@@ -3015,14 +3015,14 @@
                         document.getElementById('warn_no_encryption')?.remove()
                     }
                 }
-                let chatCard = getChatCard(floID || groupID || pipeID)
+                let chatCard = getChatCard(chatAddress)
                 if (chatCard) {
                     if (admin) {
                         if (name)
                             chatCard.querySelector('.name').textContent = name
                     }
                     const topChatCard = getRef('chats_list').children[0]
-                    if ((floID || groupID || pipeID) !== topChatCard.dataset.floAddress && (floID || groupID || pipeID) !== floCrypto.toFloID(topChatCard.dataset.floAddress)) {
+                    if (chatAddress !== topChatCard.dataset.floAddress && chatAddress !== floCrypto.toFloID(topChatCard.dataset.floAddress)) {
                         const cloneContact = chatCard.cloneNode(true)
                         chatCard.remove()
                         getRef('chats_list').animate([
@@ -3042,22 +3042,14 @@
                         ], animOptions)
                     }
                 } else {
+                    const chatType = floID ? 'chat' : groupID ? 'group' : 'pipeline'
                     if (floID) {
-                        try {
-                            if (!(floID in messenger.chats) && !(floCrypto.toFloID(floID) in messenger.chats)) {
-                                console.log('adding chat', floID)
-                                await messenger.addChat(floID)
-                            }
-                            getRef('chats_list').prepend(html.node`${render.contactCard(floID, { type: 'chat', prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
-                        } catch (e) {
-                            console.error(e)
+                        if (!(floID in messenger.chats) && !(floCrypto.toFloID(floID) in messenger.chats)) {
+                            await messenger.addChat(floID).catch(err => console.error(err))
                         }
-                    } else if (groupID) {
-                        getRef('chats_list').prepend(html.node`${render.contactCard(groupID, { type: 'group', prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
-                    } else {
-                        getRef('chats_list').prepend(html.node`${render.contactCard(pipeID, { type: 'pipeline', prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
                     }
-                    chatCard = getRef('chats_list').children[0]
+                    getRef('chats_list').prepend(html.node`${render.contactCard(chatAddress, { type: chatType, prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
+                    chatCard = getRef('chats_list').firstElementChild
                     if (sentByMe) {
                         chatCard.classList.add('active')
                     }
@@ -3076,20 +3068,20 @@
                 if (chatCard.querySelector('.time'))
                     chatCard.querySelector('.time').textContent = getFormattedTime(time, 'relative')
 
-                if (activeChat.address === (floID || groupID || pipeID)) {
+                if (activeChat.address === chatAddress) {
                     if (chatScrollInfo.isScrolledUp)
                         getRef('scroll_to_bottom').classList.add('new-message')
                     else {
                         if (document.hasFocus()) {
-                            messenger.removeMark((floID || groupID || pipeID), 'unread')
+                            messenger.removeMark(chatAddress, 'unread')
                             setTimeout(() => {
                                 document.title = 'RanchiMall Messenger'
-                                getChatCard(floID || groupID || pipeID).classList.remove('unread')
+                                getChatCard(chatAddress).classList.remove('unread')
                             }, 1000);
                         }
                     }
                 } else {
-                    getChatCard(floID || groupID || pipeID).classList.add('unread')
+                    getChatCard(chatAddress).classList.add('unread')
                 }
             }
         }
