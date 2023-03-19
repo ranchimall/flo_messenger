@@ -2990,7 +2990,7 @@
             updateMessageUI(data.messages)
         }
 
-        function updateMessageUI(messagesData, sentByMe = false) {
+        async function updateMessageUI(messagesData, sentByMe = false) {
             const animOptions = {
                 duration: 300,
                 easing: 'ease',
@@ -2998,6 +2998,7 @@
             }
             for (let messageId in messagesData) {
                 const { category, floID, time, message, sender, groupID, admin, name, pipeID, unconfirmed } = messagesData[messageId]
+                console.log('messageData', messagesData[messageId])
                 // code to run if a chat is opened
                 if (activeChat && activeChat.address === (floID || groupID || pipeID)) {
                     if (!sentByMe && sender && sender === floDapps.user.id) {
@@ -3020,7 +3021,8 @@
                         if (name)
                             chatCard.querySelector('.name').textContent = name
                     }
-                    if ((floID || groupID || pipeID) !== getRef('chats_list').children[0].dataset.floAddress) {
+                    const topChatCard = getRef('chats_list').children[0]
+                    if ((floID || groupID || pipeID) !== topChatCard.dataset.floAddress && (floID || groupID || pipeID) !== floCrypto.toFloID(topChatCard.dataset.floAddress)) {
                         const cloneContact = chatCard.cloneNode(true)
                         chatCard.remove()
                         getRef('chats_list').animate([
@@ -3041,9 +3043,15 @@
                     }
                 } else {
                     if (floID) {
-                        if (!(floID in messenger.chats))
-                            messenger.addChat(floID)
-                        getRef('chats_list').prepend(html.node`${render.contactCard(floID, { type: 'chat', prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
+                        try {
+                            if (!(floID in messenger.chats) && !(floCrypto.toFloID(floID) in messenger.chats)) {
+                                console.log('adding chat', floID)
+                                await messenger.addChat(floID)
+                            }
+                            getRef('chats_list').prepend(html.node`${render.contactCard(floID, { type: 'chat', prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
+                        } catch (e) {
+                            console.error(e)
+                        }
                     } else if (groupID) {
                         getRef('chats_list').prepend(html.node`${render.contactCard(groupID, { type: 'group', prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
                     } else {
@@ -3735,11 +3743,12 @@
         }
 
         function renderContactList(contactList = floGlobals.contacts) {
-            const contacts = []
-            for (floID in contactList) {
-                let isSelected = selectedMembers.has(floID)
-                contacts.push(render.contactCard(floID, { type: 'contact', isSelected, ref: getRef('contacts_container') }))
-            }
+            const contacts = Object.keys(contactList)
+                .sort((a, b) => getContactName(a).localeCompare(getContactName(b)))
+                .map(floID => {
+                    const isSelected = selectedMembers.has(floID)
+                    return render.contactCard(floID, { type: 'contact', isSelected, ref: getRef('contacts_container') })
+                })
             renderElem(getRef('contacts_container'), html`${contacts}`)
         }
         async function renderCreationList() {
@@ -4191,7 +4200,7 @@
         }
 
         function getChatCard(floID) {
-            return getRef('chats_list').querySelector(`[data-flo-address="${floID}"]`)
+            return getRef('chats_list').querySelector(`[data-flo-address="${floID}"]`) || getRef('chats_list').querySelector(`[data-flo-address="${floCrypto.toFloID(floID)}"]`)
         }
 
         function addAsContact() {
@@ -4272,6 +4281,8 @@
                         getRef('chat_view').classList.add('hidden')
                         getRef('chat_view').nextElementSibling.classList.remove('hidden')
                         notify('Chat deleted', 'success')
+                    }).catch(error => {
+                        console.log(error)
                     })
                 }
             })

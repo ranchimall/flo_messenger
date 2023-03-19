@@ -1243,6 +1243,23 @@ ol li::before {
   font-weight: 500;
 }
 
+#search_contacts {
+  position: -webkit-sticky;
+  position: sticky;
+  top: -1rem;
+  z-index: 1;
+}
+#search_contacts::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: calc(100% + 1rem);
+  width: 100%;
+  background: rgba(var(--foreground-color), 1);
+  z-index: -1;
+}
+
 .event-card {
   padding: 0.4rem 0.6rem;
   font-weight: 500;
