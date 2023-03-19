@@ -3022,7 +3022,7 @@
                             chatCard.querySelector('.name').textContent = name
                     }
                     const topChatCard = getRef('chats_list').children[0]
-                    if (chatAddress !== topChatCard.dataset.floAddress && chatAddress !== floCrypto.toFloID(topChatCard.dataset.floAddress)) {
+                    if (chatAddress !== topChatCard.dataset.floAddress || chatAddress !== floCrypto.toFloID(topChatCard.dataset.floAddress)) {
                         const cloneContact = chatCard.cloneNode(true)
                         chatCard.remove()
                         getRef('chats_list').animate([
@@ -3044,7 +3044,7 @@
                 } else {
                     const chatType = floID ? 'chat' : groupID ? 'group' : 'pipeline'
                     if (floID) {
-                        if (!(floID in messenger.chats) && !(floCrypto.toFloID(floID) in messenger.chats)) {
+                        if (!(floID in messenger.chats) || !(floCrypto.toFloID(floID) in messenger.chats)) {
                             await messenger.addChat(floID).catch(err => console.error(err))
                         }
                     }
