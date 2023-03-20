@@ -1088,6 +1088,7 @@
     MultiSig.createAddress = function (pubKeys, minRequired) {
         return new Promise(async (resolve, reject) => {
             let co_owners = pubKeys.map(p => floCrypto.getFloID(p));
+            console.log(co_owners);
             if (co_owners.includes(null))
                 return reject("Invalid public key: " + pubKeys[co_owners.indexOf(null)]);
             let privateKey = await floDapps.user.private;
@@ -1183,7 +1184,7 @@
     //sign multisig tx for BTC
     MultiSig.signTx_BTC = function (pipeID) {
         return new Promise((resolve, reject) => {
-            if(_loaded.pipeline[pipeID].model !== TYPE_BTC_MULTISIG)
+            if (_loaded.pipeline[pipeID].model !== TYPE_BTC_MULTISIG)
                 return reject('Incorrect pipeline model. Only works for BTC-multisig');
             if (_loaded.pipeline[pipeID].disabled)
                 return reject("Pipeline is already closed");
@@ -1245,7 +1246,7 @@
     //sign multisig tx for FLO
     MultiSig.signTx_FLO = function (pipeID) {
         return new Promise((resolve, reject) => {
-            if(_loaded.pipeline[pipeID].model !== TYPE_FLO_MULTISIG)
+            if (_loaded.pipeline[pipeID].model !== TYPE_FLO_MULTISIG)
                 return reject('Incorrect pipeline model. Only works for FLO-multisig');
             if (_loaded.pipeline[pipeID].disabled)
                 return reject("Pipeline is already closed");

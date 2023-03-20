@@ -3488,9 +3488,9 @@
         })
         document.getElementById('create_multisig_button').addEventListener('click', () => {
             if (getRef('add_self_check').checked)
-                selectedMembers.add(floGlobals.myFloID)
+                selectedMembers.add(floDapps.user.id)
             const selctedPubKeys = [...selectedMembers].map(id => {
-                if (id === floGlobals.myFloID)
+                if (id === floDapps.user.id)
                     return floDapps.user.public
                 return floGlobals.pubKeys[id]
             });
