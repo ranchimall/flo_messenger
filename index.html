@@ -769,8 +769,12 @@
                     <p id="last_interaction_time"></p>
                 </div>
                 <div class="popup-section">
-                    <h5 id="flo_id_type">Address</h5>
+                    <h5 id="flo_id_type"></h5>
                     <sm-copy id="contact_flo_id"></sm-copy>
+                </div>
+                <div class="popup-section hidden">
+                    <h5>BTC address</h5>
+                    <sm-copy id="contact_btc_id"></sm-copy>
                 </div>
                 <div id="group_description_card" class="hidden">
                     <h5>Group description</h5>
@@ -1335,10 +1339,10 @@
                         getRef('contact_details_popup').classList.add('is-group');
                         removeClass(['#group_members_card'], 'hidden')
                         addClass(['#group_members_tip', '#group_description_card'], 'hidden')
-                        getRef('flo_id_type').textContent = 'Pipeline FLO address'
+                        getRef('flo_id_type').textContent = 'Multisig group FLO address'
                         getRef("last_interaction_time").textContent = ``;
                     } else {
-                        getRef('flo_id_type').textContent = 'Address'
+                        getRef('flo_id_type').textContent = 'FLO address'
                         getRef('contact_name').disabled = false
                         getRef('contact_initial').textContent = getContactName(floID).charAt(0)
                         getRef("last_interaction_time").textContent = ``;
@@ -1347,7 +1351,13 @@
                     }
                     getRef('contact_initial').setAttribute('style', `--contact-color: var(${contactColor(floID)})`)
                     getRef('contact_name').value = getContactName(floID) === floID ? 'Unnamed' : getContactName(floID)
-                    getRef('contact_flo_id').value = floID
+                    getRef('contact_flo_id').value = floCrypto.toFloID(floID)
+                    if (floIdType === 'plain') {
+                        getRef('contact_btc_id').value = btcOperator.convert.legacy2bech(floCrypto.toFloID(floID))
+                        getRef('contact_btc_id').parentNode.classList.remove('hidden')
+                    } else {
+                        getRef('contact_btc_id').parentNode.classList.add('hidden')
+                    }
                     break;
                 case 'contacts_popup':
                     const contacts = []
@@ -2973,6 +2983,29 @@
             updateMessageUI(data.messages)
             renderMailList(data.mails, true)
         }
+        // merge sorted arrays of objects by a key
+        function mergeSortedArrays(arr1 = [], arr2 = [], key) {
+            const merged = []
+            let i = 0, j = 0
+            while (i < arr1.length && j < arr2.length) {
+                if (arr1[i][key] < arr2[j][key]) {
+                    merged.push(arr1[i])
+                    i++
+                } else {
+                    merged.push(arr2[j])
+                    j++
+                }
+            }
+            while (i < arr1.length) {
+                merged.push(arr1[i])
+                i++
+            }
+            while (j < arr2.length) {
+                merged.push(arr2[j])
+                j++
+            }
+            return merged
+        }
 
         function renderGroupUI(data) {
             if (Object.keys(data.messages).length && appState.lastPage !== 'chat_page') {
@@ -3021,6 +3054,7 @@
                         if (name)
                             chatCard.querySelector('.name').textContent = name
                     }
+                    // move chat card to top if it is not already there
                     const topChatCard = getRef('chats_list').children[0]
                     if (chatAddress !== topChatCard.dataset.floAddress || chatAddress !== floCrypto.toFloID(topChatCard.dataset.floAddress)) {
                         const cloneContact = chatCard.cloneNode(true)
@@ -3703,20 +3737,32 @@
         }
 
         function addContact() {
-            let floID = getRef('add_contact_floID').value.trim();
+            let addressToSave = getRef('add_contact_floID').value.trim();
             let name = getRef('add_contact_name').value.trim();
-            if (floID === floDapps.user.id) {
+            if (addressToSave === floDapps.user.id) {
                 notify(`you can't add your own FLO/BTC address as contact`, 'error')
                 return
             }
-            if (floGlobals.contacts.hasOwnProperty(floID)) {
+            if (floGlobals.contacts.hasOwnProperty(addressToSave)) {
                 notify(`Contact already saved`, 'error')
                 return
             }
-            messenger.storeContact(floID, name).then(result => {
+            // check whether an equivalent BTC/FLO address is already ssaved
+            if (floCrypto.validateFloID(addressToSave)) {
+                const addrInBtc = btcOperator.convert.legacy2bech(addressToSave)
+                if (floGlobals.contacts.hasOwnProperty(addrInBtc))
+                    notify(`Equivalnet Bitcoin address is already saved as ${getContactName(addrInBtc)}`, 'error')
+                return
+            } else {
+                const addrInFlo = floCrypto.toFloID(addressToSave)
+                if (floGlobals.contacts.hasOwnProperty(addrInFlo))
+                    notify(`Equivalnet FLO address is already saved as ${getContactName(addrInFlo)}`, 'error')
+                return
+            }
+            messenger.storeContact(addressToSave, name).then(result => {
                 closePopup()
-                notify(`Added Contact: ${floID}`)
-                const chatCard = getChatCard(floID)
+                notify(`Added Contact: ${addressToSave}`)
+                const chatCard = getChatCard(addressToSave)
                 if (chatCard)
                     chatCard.querySelector('.name').textContent = name
                 if (popupStack.peek().popup.id === 'contact_details_popup') {
@@ -3729,7 +3775,7 @@
                 if (popupStack.items.find(elem => elem.popup.id === 'new_message_popup')) {
                     renderContactList()
                 }
-                if (activeChat.address === floID)
+                if (activeChat.address === addressToSave)
                     updateChatHeaderName(name)
             }).catch(error => notify(error, "error"));
         }
@@ -3762,8 +3808,33 @@
             renderElem(getRef('select_contacts_container'), html`${contacts}`)
         }
 
-        async function renderChatList(chatOrder) {
-            const chats = chatOrder.map(floID => {
+        async function renderChatList(chatOrder = messenger.getChatOrder()) {
+            const chatOrderLookup = new Set()
+            const mergedChatOrder = []
+            // merge equivalent addresses
+            chatOrder.forEach(address => {
+                let priorityAddress
+                if (floCrypto.validateFloID(address)) {
+                    const addrInBtc = btcOperator.convert.legacy2bech(address)
+                    if (floGlobals.contacts.hasOwnProperty(address))
+                        priorityAddress = address
+                    else if (floGlobals.contacts.hasOwnProperty(addrInBtc))
+                        priorityAddress = addrInBtc
+                    if (chatOrderLookup.has(addrInBtc)) return
+                } else {
+                    const addrInFlo = floCrypto.toFloID(address)
+                    if (floGlobals.contacts.hasOwnProperty(address))
+                        priorityAddress = address
+                    else if (floGlobals.contacts.hasOwnProperty(addrInFlo))
+                        priorityAddress = addrInFlo
+                    if (chatOrderLookup.has(addrInFlo)) return
+                }
+                if (!chatOrderLookup.has(priorityAddress || address)) {
+                    mergedChatOrder.push(priorityAddress || address)
+                    chatOrderLookup.add(priorityAddress || address)
+                }
+            })
+            const chats = mergedChatOrder.map(floID => {
                 const markUnread = messenger.marked[floID] ? messenger.marked[floID].includes('unread') : false;
                 let type
                 if (messenger.chats[floID])
@@ -3798,33 +3869,37 @@
         let chatLazyLoader
         function renderMessages(floID) {
             return new Promise(async (resolve, reject) => {
-                messenger.getChat(floID).then(chat => {
-                    if (chatLazyLoader) {
-                        chatLazyLoader.update(Object.values(chat))
-                    } else {
-                        chatLazyLoader = new LazyLoader('#messages_container', Object.values(chat), render.messageBubble, {
-                            bottomFirst: true,
-                            batchSize: 20,
-                        });
-                    }
-                    chatLazyLoader.init()
-                    if (getFloIdType(floID) === 'pipeline') {
-                        if (!floGlobals.pipeSigns[floID])
-                            floGlobals.pipeSigns[floID] = new Set()
-                        for (const key in chat) {
-                            const { type, sender, tx_hex } = chat[key]
-                            if (type === 'TRANSACTION') {
-                                floGlobals.pipeSigns[floID].add(sender)
-                                if (tx_hex)
-                                    floGlobals.pipelineTxHex = tx_hex
+                let floChatID = floCrypto.toFloID(floID);
+                let btcChatID = btcOperator.convert.legacy2bech(floChatID);
+                Promise.all([messenger.getChat(floChatID), messenger.getChat(btcChatID)])
+                    .then(([floChat, btcChat]) => {
+                        let chat = mergeSortedArrays(Object.values(floChat), Object.values(btcChat), 'time')
+                        if (chatLazyLoader) {
+                            chatLazyLoader.update(chat)
+                        } else {
+                            chatLazyLoader = new LazyLoader('#messages_container', chat, render.messageBubble, {
+                                bottomFirst: true,
+                                batchSize: 20,
+                            });
+                        }
+                        chatLazyLoader.init()
+                        if (getFloIdType(floID) === 'pipeline') {
+                            if (!floGlobals.pipeSigns[floID])
+                                floGlobals.pipeSigns[floID] = new Set()
+                            for (const key in chat) {
+                                const { type, sender, tx_hex } = chat[key]
+                                if (type === 'TRANSACTION') {
+                                    floGlobals.pipeSigns[floID].add(sender)
+                                    if (tx_hex)
+                                        floGlobals.pipelineTxHex = tx_hex
+                                }
                             }
                         }
-                    }
-                    resolve()
-                }).catch(error => {
-                    console.log(error)
-                    reject(error)
-                })
+                        resolve()
+                    }).catch(error => {
+                        console.log(error)
+                        reject(error)
+                    })
             })
         }
 
@@ -4237,7 +4312,7 @@
                         notify('Address unblocked', 'success')
                         closePopup()
                         render.blockedList()
-                        renderChatList(messenger.getChatOrder())
+                        renderChatList()
                     })
                 }
             })
