@@ -126,7 +126,7 @@
         <div id="landing" class="grid inner-page hidden">
             <div class="left">
                 <h1 class="title-font">
-                    Truly Secure, Private and Reliable.
+                    Secure, Private and Reliable.
                 </h1>
                 <p class="margin-block-1">A messenger made with Blockchain and Open Source technologies. Your data
                     remains with you, as it should.</p>
@@ -3052,8 +3052,6 @@
             for (let messageId in messagesData) {
                 const { category, floID, time, message, sender, groupID, admin, name, pipeID, unconfirmed } = messagesData[messageId]
                 const chatAddress = floID || groupID || pipeID
-                const activeChatFloAdress = floCrypto.toFloID(activeChat.address)
-                const activeChatBtcAddress = btcOperator.convert.legacy2bech(activeChatFloAdress)
                 // code to run if a chat is opened
                 if (activeChat && (activeChat.address === chatAddress || activeChat.address === floCrypto.toFloID(chatAddress))) {
                     if (!sentByMe && sender && sender === floDapps.user.id) {
@@ -3112,13 +3110,14 @@
                 }
                 let finalMessage
                 if (messenger.groups && messenger.groups[groupID]) {
-                    if (sender === floDapps.user.id)
-                        finalMessage = `You: ${message}`
-                    else if (floGlobals.contacts[sender])
+                    if (floGlobals.contacts[sender])
                         finalMessage = `${floGlobals.contacts[sender]}: ${message}`
+                    else if (sender === floDapps.user.id)
+                        finalMessage = `You: ${message}`
                 }
                 else
                     finalMessage = message
+                console.log(finalMessage, 'finalMessage')
                 if (chatCard.querySelector('.last-message'))
                     chatCard.querySelector('.last-message').textContent = finalMessage
                 if (chatCard.querySelector('.time'))
