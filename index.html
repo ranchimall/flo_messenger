@@ -3489,10 +3489,15 @@
         document.getElementById('create_multisig_button').addEventListener('click', () => {
             if (getRef('add_self_check').checked)
                 selectedMembers.add(floGlobals.myFloID)
-            const selctedPubKeys = [...selectedMembers].map(id => floGlobals.pubKeys[id]);
+            const selctedPubKeys = [...selectedMembers].map(id => {
+                if (id === floGlobals.myFloID)
+                    return floDapps.user.public
+                return floGlobals.pubKeys[id]
+            });
             const minRequired = parseInt(getRef('min_sign_required').value.trim());
             const label = getRef('multisig_label').value.trim();
             buttonLoader('create_multisig_button', true)
+            console.log('creating multisig address', selctedPubKeys, minRequired)
             messenger.multisig.createAddress(selctedPubKeys, minRequired).then(multisigAddress => {
                 console.log('created multisig address', multisigAddress)
                 compactIDB.writeData('multisigLabels', label, multisigAddress).then(() => {
