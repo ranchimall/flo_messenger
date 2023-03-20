@@ -1088,7 +1088,6 @@
     MultiSig.createAddress = function (pubKeys, minRequired) {
         return new Promise(async (resolve, reject) => {
             let co_owners = pubKeys.map(p => floCrypto.getFloID(p));
-            console.log(co_owners);
             if (co_owners.includes(null))
                 return reject("Invalid public key: " + pubKeys[co_owners.indexOf(null)]);
             let privateKey = await floDapps.user.private;
@@ -1284,7 +1283,6 @@
                     m in floGlobals.pubKeys ? null :
                         m != user.id ? imem2.push(m) : null
             );
-            console.log(imem1, imem2)
             if (imem1.length)
                 return reject(`Invalid Members(floIDs): ${imem1}`);
             else if (imem2.length)
