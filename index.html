@@ -3752,14 +3752,17 @@
             // check whether an equivalent BTC/FLO address is already ssaved
             if (floCrypto.validateFloID(addressToSave)) {
                 const addrInBtc = btcOperator.convert.legacy2bech(addressToSave)
-                if (floGlobals.contacts.hasOwnProperty(addrInBtc))
-                    notify(`Equivalnet Bitcoin address is already saved as ${getContactName(addrInBtc)}`, 'error')
-                return
+                if (floGlobals.contacts.hasOwnProperty(addrInBtc)) {
+                    notify(`Equivalent Bitcoin address is already saved as ${getContactName(addrInBtc)}`, 'error')
+                    return
+
+                }
             } else {
                 const addrInFlo = floCrypto.toFloID(addressToSave)
-                if (floGlobals.contacts.hasOwnProperty(addrInFlo))
-                    notify(`Equivalnet FLO address is already saved as ${getContactName(addrInFlo)}`, 'error')
-                return
+                if (floGlobals.contacts.hasOwnProperty(addrInFlo)) {
+                    notify(`Equivalent FLO address is already saved as ${getContactName(addrInFlo)}`, 'error')
+                    return
+                }
             }
             messenger.storeContact(addressToSave, name).then(result => {
                 closePopup()
@@ -3950,7 +3953,7 @@
                 renderMessages(floID).then(async () => {
                     if (activeChat.type === 'plain') {
                         if (!floGlobals.pubKeys[floID]) {
-                            getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption" class="event-card">Converstion is not encrypted until receiver replies</strong>`)
+                            getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption" class="event-card">Conversation is not encrypted until receiver replies</strong>`)
                         }
                     } else if (activeChat.type === 'pipeline') {
                         if (!messenger.pipeline[floID].disabled && floGlobals.pipeSigns[floID] && !floGlobals.pipeSigns[floID].has(floDapps.user.id)) {
