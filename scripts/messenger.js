@@ -1170,7 +1170,7 @@
             let privateKey = await floDapps.user.private;
             btcOperator.createMultiSigTx(address, redeemScript, receivers, amounts, fee, options).then(({ tx_hex }) => {
                 tx_hex = btcOperator.signTx(tx_hex, privateKey);
-                createPipeline(TYPE_BTC_MULTISIG, co_owners, 32).then(pipeline => {
+                createPipeline(TYPE_BTC_MULTISIG, co_owners, 32, decode.pubkeys).then(pipeline => {
                     let message = encrypt(tx_hex, pipeline.eKey);
                     sendRaw(message, pipeline.id, "TRANSACTION", false)
                         .then(result => resolve(pipeline.id))
@@ -1232,7 +1232,7 @@
             let privateKey = await floDapps.user.private;
             floBlockchainAPI.createMultisigTx(redeemScript, receivers, amounts, floData).then(tx_hex => {
                 tx_hex = floBlockchainAPI.signTx(tx_hex, privateKey);
-                createPipeline(TYPE_FLO_MULTISIG, co_owners, 32).then(pipeline => {
+                createPipeline(TYPE_FLO_MULTISIG, co_owners, 32, decode.pubkeys).then(pipeline => {
                     let message = encrypt(tx_hex, pipeline.eKey);
                     sendRaw(message, pipeline.id, "TRANSACTION", false)
                         .then(result => resolve(pipeline.id))
@@ -1273,16 +1273,29 @@
     }
 
     //Pipelines
-    const createPipeline = function (model, members, ekeySize = 16) {
+    const createPipeline = function (model, members, ekeySize = 16, pubkeys = null) {
         return new Promise((resolve, reject) => {
+            //optional pubkey parameter
+            if (pubkeys !== null) {
+                if (!Array.isArray(pubkeys))
+                    return reject('pubkeys must be an array (if passed)');
+                else if (pubkeys.length !== members.length)
+                    return reject('pubkey length doesnot match members length');
+            }
+
             //validate members
             let imem1 = [],
                 imem2 = []
-            members.forEach(m =>
-                !floCrypto.validateAddr(m) ? imem1.push(m) :
-                    m in floGlobals.pubKeys ? null :
-                        m != user.id ? imem2.push(m) : null
-            );
+            members.forEach((m, i) => {
+                if (!floCrypto.validateAddr(m))
+                    imem1.push(m);
+                else if (!(m in floGlobals.pubKeys) && m != user.id) {
+                    if (pubkeys !== null && floCrypto.verifyPubKey(pubkeys[i], m))
+                        floGlobals.pubKeys[m] = pubkeys[i];
+                    else
+                        imem2.push(m);
+                }
+            });
             if (imem1.length)
                 return reject(`Invalid Members(floIDs): ${imem1}`);
             else if (imem2.length)
