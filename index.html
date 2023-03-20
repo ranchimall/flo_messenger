@@ -873,7 +873,7 @@
                         <button id="skip_members_button" class="button button--primary hidden">
                             Skip </button>
                     </div>
-                    <label class="flex align-center" style="padding: 1rem 0;">
+                    <label class="flex align-center hidden" style="padding: 1rem 0;">
                         <input id="add_self_check" class="margin-right-0-5" style="width: 1.3em; height: 1.3em"
                             type="checkbox" checked />
                         <span>Include self as a member</span>
@@ -3327,8 +3327,10 @@
                 case 'group':
                     popupTitle = 'Create group'
                     getRef('skip_members_button').classList.remove('hidden')
+                    getRef('add_self_check').parentNode.classList.add('hidden')
                     break;
                 case 'multisig':
+                    getRef('add_self_check').parentNode.classList.remove('hidden')
                     getRef('skip_members_button').classList.add('hidden')
                     popupTitle = 'Create multisig address'
                     getRef('multisig_creation__warning').classList.add('hide')
