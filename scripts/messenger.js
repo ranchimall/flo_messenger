@@ -1284,6 +1284,7 @@
                     m in floGlobals.pubKeys ? null :
                         m != user.id ? imem2.push(m) : null
             );
+            console.log(imem1, imem2)
             if (imem1.length)
                 return reject(`Invalid Members(floIDs): ${imem1}`);
             else if (imem2.length)
