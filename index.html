@@ -1008,6 +1008,20 @@
             </button>
         </sm-form>
     </sm-popup>
+    <sm-popup id="multisig_detail_popup">
+        <header slot="header" class="popup__header">
+            <button class="popup__header__close justify-self-start">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                    fill="#000000">
+                    <path d="M0 0h24v24H0V0z" fill="none" />
+                    <path
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                </svg>
+            </button>
+            <h3>Multisig address</h3>
+        </header>
+        <div id="multisig_details" class="grid gap-1-5"></div>
+    </sm-popup>
     <sm-popup id="multisig_tx_popup">
         <header slot="header" class="popup__header">
             <button class="popup__header__close justify-self-start">
@@ -1339,7 +1353,7 @@
                         getRef('contact_details_popup').classList.add('is-group');
                         removeClass(['#group_members_card'], 'hidden')
                         addClass(['#group_members_tip', '#group_description_card'], 'hidden')
-                        getRef('flo_id_type').textContent = 'Multisig group FLO address'
+                        getRef('flo_id_type').textContent = `${messenger.pipeline[floID].model === 'flo_multisig' ? 'FLO' : 'BTC'} Multisig address`
                         getRef("last_interaction_time").textContent = ``;
                     } else {
                         getRef('flo_id_type').textContent = 'FLO address'
@@ -1351,7 +1365,34 @@
                     }
                     getRef('contact_initial').setAttribute('style', `--contact-color: var(${contactColor(floID)})`)
                     getRef('contact_name').value = getContactName(floID) === floID ? 'Unnamed' : getContactName(floID)
-                    getRef('contact_flo_id').value = floCrypto.toFloID(floID)
+                    if (floIdType === 'pipeline') {
+                        // Get pipeline origin multisig address
+                        let floChatID = floCrypto.toFloID(floID);
+                        let btcChatID = btcOperator.convert.legacy2bech(floChatID);
+                        Promise.all([messenger.getChat(floChatID), messenger.getChat(btcChatID)])
+                            .then(async ([floChat, btcChat]) => {
+                                let chat = mergeSortedArrays(Object.values(floChat), Object.values(btcChat), 'time')
+                                for (const key in chat) {
+                                    const { type, tx_hex } = chat[key]
+                                    if (type === 'TRANSACTION' && tx_hex) {
+                                        let details
+                                        switch (messenger.pipeline[floID].model) {
+                                            case 'flo_multisig':
+                                                details = await floBlockchainAPI.parseTransaction(tx_hex)
+                                                break;
+                                            case 'btc_multisig':
+                                                details = await btcOperator.parseTransaction(tx_hex)
+                                                break;
+                                        }
+                                        getRef('contact_flo_id').value = details.inputs[0].address
+                                    }
+                                }
+                            }).catch(error => {
+                                console.error(error)
+                            })
+                    } else {
+                        getRef('contact_flo_id').value = floCrypto.toFloID(floID)
+                    }
                     if (floIdType === 'plain') {
                         getRef('contact_btc_id').value = btcOperator.convert.legacy2bech(floCrypto.toFloID(floID))
                         getRef('contact_btc_id').parentNode.classList.remove('hidden')
@@ -2723,7 +2764,7 @@
                             groupMembersCards.push(render.selectableContact(floID))
                     } else {
                         groupMembersCards.push(html`
-                            <div class="group-member interactive" .dataset=${{ floAddress: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
+                            <div class="group-member" .dataset=${{ floAddress: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
                                 <div class="initial flex align-center">
                                     ${initial}
                                 </div>
@@ -2774,12 +2815,30 @@
                     </button>
                 `
             },
+            multisigMemberCard(pubKey) {
+                const floID = floCrypto.getFloID(pubKey)
+                const name = getContactName(floID)
+                return html`
+                    <li class="group-member" style=${`--contact-color: var(${contactColor(floID)})`}>
+                        <div class="initial flex align-center">
+                            ${name[0].toUpperCase()}
+                        </div>
+                        ${getContactName(floID) !== floID ?
+                        html`<h4 class="name wrap-around">${name}</h4>` :
+                        html`<sm-copy value=${floID} clip-text></sm-copy>`
+                    }
+                    </li>`
+            },
             multisigAddressCard(address, details, label, mode = 'btc') {
-                console.log(details)
                 const floMultisig = floCrypto.toMultisigFloID(address)
                 return html.for(getRef('select_multisig_list'), mode === 'btc' ? address : floMultisig)`
                     <li class="grid gap-0-5 align-center multisig-option" data-address=${address}>
-                        <text-field class="multisig-option__label" placeholder="Label" value=${label || 'Add a label'}></text-field>
+                        <div class="flex align-center space-between gap-0-5">
+                            <text-field class="multisig-option__label" placeholder="Label" value=${label || 'Add a label'}></text-field>
+                            <button onclick=${showMultisigDetails}>
+                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                            </button>
+                        </div>
                         <sm-copy clip-text value=${mode !== 'btc' ? floMultisig : address}></sm-copy>
                         <div class="flex align-center space-between gap-1">
                             <div class="multisig-option__balance flex align-center gap-0-5">
@@ -4673,6 +4732,37 @@
                 notify('Failed to check balance', 'error')
                 renderElem(multisig.querySelector('.multisig-option__balance'), html` <button class="button button--small" onclick=${checkBalance}>Check balance</button> `)
             }
+        }
+        function showMultisigDetails(e) {
+            const multisigAddress = e.target.closest('.multisig-option').dataset.address;
+            renderElem(getRef('multisig_details'), html`<sm-spinner></sm-spinner>`)
+            openPopup('multisig_detail_popup')
+            messenger.multisig.listAddress().then(addresses => {
+                const { minRequired, pubKeys, time } = addresses[multisigAddress]
+                renderElem(getRef('multisig_details'), html`
+                    <div class="grid gap-0-3">
+                        <div class="label">Address</div>
+                        <sm-copy value=${multisigAddress} clip-text></sm-copy>
+                    </div>
+                    <div class="grid">
+                        <div class="label">Created</div>
+                        <p><time class="value">${getFormattedTime(time)}</time></p>
+                    </div>
+                    <div class="grid">
+                        <div class="label">Min. signatures required</div>
+                        <p class="value">${minRequired}</p>
+                    </div>
+                    <div class="grid">
+                        <div class="label">Members</div>
+                        <ul>
+                            ${pubKeys.map(pubKey => render.multisigMemberCard(pubKey))}
+                        </ul>
+                    </div>
+                `)
+            }).catch(err => {
+                console.error(err)
+                notify('Failed to fetch multisig addresses', 'error')
+            })
         }
         const debouncedFeeCalculation = debounce(calculateFees, 300)
         function startMultisigProcess(e) {

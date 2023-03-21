@@ -1092,9 +1092,6 @@ ol li::before {
 }
 .contact .name {
   grid-area: name;
-  width: 100%;
-  font-size: 1em;
-  font-weight: 500;
   margin-bottom: 0.3rem;
 }
 .contact__flo-address {
@@ -1123,6 +1120,12 @@ ol li::before {
   color: rgba(var(--text-color), 0.7);
   grid-area: time;
   font-size: 0.8rem;
+}
+
+.name {
+  width: 100%;
+  font-size: 1em;
+  font-weight: 500;
 }
 
 .selectable-contact,
