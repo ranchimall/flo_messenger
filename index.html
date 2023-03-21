@@ -3048,8 +3048,8 @@
                 const { category, floID, time, message, sender, groupID, admin, name, pipeID, unconfirmed } = messagesData[messageId]
                 const chatAddress = floID || groupID || pipeID
                 // code to run if a chat is opened
-                if (activeChat && (activeChat.address === chatAddress || activeChat.address === floCrypto.toFloID(chatAddress))) {
-                    if (!sentByMe && sender && sender === floDapps.user.id) {
+                if (activeChat && floCrypto.isSameAddr(activeChat.address, chatAddress)) {
+                    if (!sentByMe && sender && floCrypto.isSameAddr(sender, floDapps.user.id)) {
                         // if message is sent by me, then dont add it to the chat
                     } else {
                         const messageBody = render.messageBubble(messagesData[messageId]);
@@ -3082,7 +3082,7 @@
                     }
                     // move chat card to top if it is not already there
                     const topChatCard = getRef('chats_list').children[0]
-                    if (chatAddress !== topChatCard.dataset.floAddress && chatAddress !== floCrypto.toFloID(topChatCard.dataset.floAddress)) {
+                    if (!floCrypto.isSameAddr(chatAddress, topChatCard.dataset.floAddress)) {
                         const cloneContact = chatCard.cloneNode(true)
                         chatCard.remove()
                         getRef('chats_list').animate([
@@ -4689,7 +4689,7 @@
                     getRef('selected_multisig__balance').textContent = `Balance: ${balance} BTC`;
                 }).catch(err => notify(err, 'error'))
                 renderElem(getRef('send_tx__dynamic_content'), html`
-                    <div id="fees_section" class="grid gap-0-5 hidden">
+                    <div id="fees_section" class="grid gap-0-5">
                         <div class="flex align-center space-between">
                             <h4>Fees</h4>
                             <sm-chips id="fees_selector" onchange="handleFeeSelector(event)">
@@ -4697,7 +4697,7 @@
                                 <sm-chip value="custom">Custom</sm-chip>
                             </sm-chips>
                         </div>
-                        <p id="selected_fee_tip"></p>
+                        <p id="selected_fee_tip">*Fill out all fields for exact fee!</p>
                         <div id="send_fee_wrapper">
                             <sm-input type="number" id="send_fee" placeholder="Fee" min="0.00000001" step="0.00000001"
                                 error-text="Please enter valid fees" readonly animate required>
