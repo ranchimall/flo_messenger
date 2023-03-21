@@ -1144,7 +1144,9 @@
                         multsigs[addr] = {
                             redeemScript: decode.redeemscript,
                             pubKeys: decode.pubkeys,
-                            minRequired: decode.signaturesRequired
+                            minRequired: decode.signaturesRequired,
+                            time: result[i].time,
+                            txid: result[i].txid
                         }
                 }
                 resolve(multsigs);
@@ -1321,7 +1323,7 @@
                     requestPipelineInbox(pipeline.id, pipeline.model);
                     resolve(_loaded.pipeline[pipeline.id])
                 }).catch(error => reject(error))
-            })
+            }).catch(error => reject(error))
         })
     }
 
