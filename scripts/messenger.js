@@ -1323,7 +1323,7 @@
                     requestPipelineInbox(pipeline.id, pipeline.model);
                     resolve(_loaded.pipeline[pipeline.id])
                 }).catch(error => reject(error))
-            }).catch(error => reject(error))
+            })
         })
     }
 
