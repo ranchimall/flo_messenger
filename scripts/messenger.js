@@ -952,7 +952,7 @@
             if (data.message)
                 data.message = decrypt(data.message);
             newInbox.messages[vc] = data;
-            if (data.sender !== user.id)
+            if (!floCrypto.isSameAddr(data.sender, user.id))
                 addMark(data.groupID, "unread");
             return infoChange;
         }
@@ -1289,7 +1289,7 @@
             members.forEach((m, i) => {
                 if (!floCrypto.validateAddr(m))
                     imem1.push(m);
-                else if (!(m in floGlobals.pubKeys) && m != user.id) {
+                else if (!(m in floGlobals.pubKeys) && !floCrypto.isSameAddr(user.id, m)) {
                     if (pubkeys !== null && floCrypto.verifyPubKey(pubkeys[i], m))
                         floGlobals.pubKeys[m] = pubkeys[i];
                     else
@@ -1311,7 +1311,7 @@
                 pipeline.eKey = floCrypto.randString(ekeySize);
             //send pipeline info to members
             let pipelineInfo = JSON.stringify(pipeline);
-            let promises = members.filter(m => m != user.id).map(m => sendRaw(pipelineInfo, m, "CREATE_PIPELINE", true));
+            let promises = members.filter(m => !floCrypto.isSameAddr(m, user.id)).map(m => sendRaw(pipelineInfo, m, "CREATE_PIPELINE", true));
             Promise.allSettled(promises).then(results => {
                 console.debug(results.filter(r => r.status === "rejected").map(r => r.reason));
                 _loaded.pipeline[pipeline.id] = Object.assign({}, pipeline);
@@ -1344,7 +1344,7 @@
                     continue;
                 try {
                     parseData(dataSet[vc], newInbox);
-                    if (dataSet[vc].senderID !== user.id)
+                    if (!floCrypto.isSameAddr(dataSet[vc].senderID, user.id))
                         addMark(pipeID, "unread")
                     if (!_loaded.appendix[`lastReceived_${pipeID}`] ||
                         _loaded.appendix[`lastReceived_${pipeID}`] < vc)
