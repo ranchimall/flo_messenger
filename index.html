@@ -1596,15 +1596,15 @@
             })
         }
 
-        function getContactName(floID) {
-            if (floDapps.user.get_contact(floID))
-                return floDapps.user.get_contact(floID)
-            else if (messenger.groups[floID])
-                return messenger.groups[floID].name
-            else if (floID === floDapps.user.id)
+        function getContactName(contactAddress) {
+            if (floDapps.user.get_contact(contactAddress))
+                return floDapps.user.get_contact(contactAddress)
+            else if (messenger.groups[contactAddress])
+                return messenger.groups[contactAddress].name
+            else if (floCrypto.isSameAddr(contactAddress, floDapps.user.id))
                 return 'You'
             else
-                return floID
+                return contactAddress
         }
         window.addEventListener('hashchange', e => routeTo(window.location.hash))
         window.addEventListener("load", () => {
@@ -2525,13 +2525,13 @@
                     </div>
                 `
             },
-            contactCard(floID, options = {}) {
+            contactCard(contactAddress, options = {}) {
                 let { type, prepend = false, markUnread = false, ref } = options
-                let name = getContactName(floID)
+                let name = getContactName(contactAddress)
                 let initial
                 if (type === 'group') {
                     initial = html`<svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
-                    name = messenger.groups[floID].name
+                    name = messenger.groups[contactAddress].name
                 } else if (type === 'pipeline') {
                     initial = html`<svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><g><path d="M6,15c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S4.9,15,6,15 M6,13c-2.2,0-4,1.8-4,4s1.8,4,4,4s4-1.8,4-4S8.2,13,6,13z M12,5 c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S10.9,5,12,5 M12,3C9.8,3,8,4.8,8,7s1.8,4,4,4s4-1.8,4-4S14.2,3,12,3z M18,15 c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S16.9,15,18,15 M18,13c-2.2,0-4,1.8-4,4s1.8,4,4,4s4-1.8,4-4S20.2,13,18,13z"/></g></g></svg>`
                 } else {
@@ -2539,9 +2539,9 @@
                 }
                 if (type !== 'contact') {
                     //render chat card for newly added contact
-                    getLastMessage(floID).then(lastMessage => {
+                    getLastMessage(contactAddress).then(lastMessage => {
                         const { lastText, time } = lastMessage
-                        const chatCard = getChatCard(floID)
+                        const chatCard = getChatCard(contactAddress)
                         if (chatCard && !chatCard.querySelector('.last-message')) {
                             const timeAndOptions = html`
                                 <time class="time">${time ? getFormattedTime(time, 'relative') : ''}</time>
@@ -2556,23 +2556,23 @@
                         }
                     }).catch(error => console.error(error))
                     if (prepend) {
-                        activeChat.address = floID
+                        activeChat.address = contactAddress
                         getRef('chats_list').querySelectorAll('.active').forEach(child => child.classList.remove('active'))
                     }
                 }
                 let tag = 'BTC'
-                if (type === 'pipeline' && messenger.pipeline[floID].model === 'flo_multisig') {
+                if (type === 'pipeline' && messenger.pipeline[contactAddress].model === 'flo_multisig') {
                     tag = 'FLO'
                 }
                 const className = `contact ${type !== 'contact' ? type : ''} ${markUnread ? 'unread' : ''} interactive`
-                return html.for(ref, floID)`
-                    <div class="${className}" .dataset=${{ floAddress: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
+                return html.for(ref, contactAddress)`
+                    <div class="${className}" .dataset=${{ floAddress: contactAddress }} style=${`--contact-color: var(${contactColor(contactAddress)})`}>
                         <div class="initial flex align-center">
                             ${initial}
                         </div>
-                        ${type === 'pipeline' ? html`<div class="tag">${tag} Multisig ${messenger.pipeline[floID].disabled ? ' - Completed' : ''}</div>` : ''}
+                        ${type === 'pipeline' ? html`<div class="tag">${tag} Multisig ${messenger.pipeline[contactAddress].disabled ? ' - Completed' : ''}</div>` : ''}
                         <h4 class="name">${name}</h4>
-                        ${type === 'contact' ? html`<p class="contact__flo-address wrap-around">${floID}</p>` : ''}
+                        ${type === 'contact' ? html`<p class="contact__flo-address wrap-around">${contactAddress}</p>` : ''}
                     </div>
                 `
             },
