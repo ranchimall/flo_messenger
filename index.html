@@ -1597,8 +1597,8 @@
         }
 
         function getContactName(floID) {
-            if (floGlobals.contacts[floID])
-                return floGlobals.contacts[floID]
+            if (floDapps.user.get_contact(floID))
+                return floDapps.user.get_contact(floID)
             else if (messenger.groups[floID])
                 return messenger.groups[floID].name
             else if (floID === floDapps.user.id)
