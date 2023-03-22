@@ -1051,6 +1051,11 @@ ol {
   flex-shrink: 0;
   user-select: none;
   overflow: hidden;
+  & > * {
+    &:empty {
+      display: none;
+    }
+  }
   &.highlight {
     animation: highlight 0.5s ease-in-out 4 alternate;
   }
@@ -1064,14 +1069,14 @@ ol {
     grid-template-columns: auto 1fr auto;
     grid-template-areas:
       "dp name time"
-      "dp . .";
+      "dp . menu";
   }
   &.pipeline {
     grid-template-columns: auto 1fr auto;
     grid-template-areas:
       "dp tag time"
       "dp name name"
-      "dp . .";
+      "dp . menu";
     .name {
       margin: 0.5rem 0 0.3rem 0;
     }
@@ -1105,6 +1110,22 @@ ol {
     border-radius: 0.3rem;
     margin-right: auto;
     font-weight: 500;
+    justify-self: flex-start;
+  }
+  &.no-message {
+    &.chat,
+    &.group {
+      grid-template-areas: "dp name menu";
+      grid-template-rows: 1fr;
+    }
+    &.pipeline {
+      grid-template-areas:
+        "dp tag tag"
+        "dp name menu";
+    }
+    .name {
+      margin-bottom: 0;
+    }
   }
   .name {
     grid-area: name;
@@ -1130,6 +1151,7 @@ ol {
   }
 
   .menu {
+    grid-area: menu;
     flex-shrink: 0;
     justify-self: flex-end;
     padding: 0.2rem;

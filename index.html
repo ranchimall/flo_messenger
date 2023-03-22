@@ -1371,21 +1371,20 @@
                         let btcChatID = btcOperator.convert.legacy2bech(floChatID);
                         Promise.all([messenger.getChat(floChatID), messenger.getChat(btcChatID)])
                             .then(async ([floChat, btcChat]) => {
-                                let chat = mergeSortedArrays(Object.values(floChat), Object.values(btcChat), 'time')
-                                for (const key in chat) {
-                                    const { type, tx_hex } = chat[key]
-                                    if (type === 'TRANSACTION' && tx_hex) {
-                                        let details
-                                        switch (messenger.pipeline[floID].model) {
-                                            case 'flo_multisig':
-                                                details = await floBlockchainAPI.parseTransaction(tx_hex)
-                                                break;
-                                            case 'btc_multisig':
-                                                details = await btcOperator.parseTransaction(tx_hex)
-                                                break;
-                                        }
-                                        getRef('contact_flo_id').value = details.inputs[0].address
+                                const transaction = mergeSortedArrays(Object.values(floChat), Object.values(btcChat), 'time')
+                                    .find(message => message.tx_hex)
+                                if (transaction) {
+                                    const { type, tx_hex } = transaction
+                                    let details
+                                    switch (messenger.pipeline[floID].model) {
+                                        case 'flo_multisig':
+                                            details = await floBlockchainAPI.parseTransaction(tx_hex)
+                                            break;
+                                        case 'btc_multisig':
+                                            details = await btcOperator.parseTransaction(tx_hex)
+                                            break;
                                     }
+                                    getRef('contact_flo_id').value = details.inputs[0].address
                                 }
                             }).catch(error => {
                                 console.error(error)
@@ -2586,14 +2585,14 @@
                         if (chatCard && !chatCard.querySelector('.last-message')) {
                             const timeAndOptions = html`
                                 <time class="time">${time ? getFormattedTime(time, 'relative') : ''}</time>
-                                <div class="span-2">
-                                    <p class="last-message">${lastText}</p>
-                                    <button class="menu">
-                                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                                    </button>
-                                </div>
-                                `;
+                                <p class="last-message">${lastText}</p>
+                                <button class="menu">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                                </button>
+                            `;
                             chatCard.append(html.node`${timeAndOptions}`)
+                            if (time)
+                                chatCard.classList.remove('no-message')
                         }
                     }).catch(error => console.error(error))
                     if (prepend) {
@@ -2605,7 +2604,7 @@
                 if (type === 'pipeline' && messenger.pipeline[contactAddress].model === 'flo_multisig') {
                     tag = 'FLO'
                 }
-                const className = `contact ${type !== 'contact' ? type : ''} ${markUnread ? 'unread' : ''} interactive`
+                const className = `contact ${type !== 'contact' ? type : ''} ${markUnread ? 'unread' : ''} interactive no-message`
                 return html.for(ref, contactAddress)`
                     <div class="${className}" .dataset=${{ floAddress: contactAddress }} style=${`--contact-color: var(${contactColor(contactAddress)})`}>
                         <div class="initial flex align-center">
@@ -3149,7 +3148,7 @@
                             { transform: 'none' },
                         ], animOptions)
                         getRef('chats_list').prepend(cloneContact)
-                        cloneContact.animate([
+                        await cloneContact.animate([
                             {
                                 transform: 'scale(0.8)',
                                 opacity: 0
@@ -3158,7 +3157,7 @@
                                 transform: 'none',
                                 opacity: 1
                             },
-                        ], animOptions)
+                        ], animOptions).finished
                     }
                 } else {
                     const chatType = floID ? 'chat' : groupID ? 'group' : 'pipeline'
@@ -3168,23 +3167,21 @@
                         }
                     }
                     getRef('chats_list').prepend(html.node`${render.contactCard(chatAddress, { type: chatType, prepend: true, markUnread: true, ref: getRef('chats_list') })}`)
-                    chatCard = getRef('chats_list').firstElementChild
-                    if (sentByMe) {
-                        chatCard.classList.add('active')
-                    }
+                }
+                chatCard = getRef('chats_list').firstElementChild
+                if (sentByMe) {
+                    chatCard.classList.add('active')
                 }
                 let finalMessage
                 if (messenger.groups && messenger.groups[groupID]) {
-                    if (floGlobals.contacts[sender])
-                        finalMessage = `${floGlobals.contacts[sender]}: ${message}`
-                    else if (sender === floDapps.user.id)
-                        finalMessage = `You: ${message}`
+                    finalMessage = `${getContactName(sender)}: ${message}`
                 }
                 else
                     finalMessage = message
-                console.log(finalMessage, 'finalMessage')
-                if (chatCard.querySelector('.last-message'))
+                if (chatCard.querySelector('.last-message')) {
                     chatCard.querySelector('.last-message').textContent = finalMessage
+                    chatCard.classList.remove('no-message')
+                }
                 if (chatCard.querySelector('.time'))
                     chatCard.querySelector('.time').textContent = getFormattedTime(time, 'relative')
 
@@ -3821,9 +3818,6 @@
                 }
                 if (getRef('messages_container').querySelector(`.unconfirmed`))
                     getRef('messages_container').querySelector(`.unconfirmed`).classList.remove('unconfirmed')
-                const chatCard = getChatCard(receiver)
-                chatCard.querySelector('.last-message').textContent = `You: ${message}`
-                chatCard.querySelector('.time').textContent = getFormattedTime(Date.now(), 'relative')
             } catch (err) {
                 notify(err, "error")
             }
@@ -4112,7 +4106,7 @@
                                                 </div>
                                             </div>
                                             ${floData ? html`
-                                                <div class="grid gap-0-3">
+                                                <div class="grid">
                                                     <h5>FLO data</h5>
                                                     <p>${floData}</p>
                                                 </div>`: ''

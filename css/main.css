@@ -1045,6 +1045,9 @@ ol li::before {
           user-select: none;
   overflow: hidden;
 }
+.contact > *:empty {
+  display: none;
+}
 .contact.highlight {
   -webkit-animation: highlight 0.5s ease-in-out 4 alternate;
           animation: highlight 0.5s ease-in-out 4 alternate;
@@ -1055,11 +1058,11 @@ ol li::before {
 }
 .contact.chat, .contact.group {
   grid-template-columns: auto 1fr auto;
-  grid-template-areas: "dp name time" "dp . .";
+  grid-template-areas: "dp name time" "dp . menu";
 }
 .contact.pipeline {
   grid-template-columns: auto 1fr auto;
-  grid-template-areas: "dp tag time" "dp name name" "dp . .";
+  grid-template-areas: "dp tag time" "dp name name" "dp . menu";
 }
 .contact.pipeline .name {
   margin: 0.5rem 0 0.3rem 0;
@@ -1089,6 +1092,17 @@ ol li::before {
   border-radius: 0.3rem;
   margin-right: auto;
   font-weight: 500;
+  justify-self: flex-start;
+}
+.contact.no-message.chat, .contact.no-message.group {
+  grid-template-areas: "dp name menu";
+  grid-template-rows: 1fr;
+}
+.contact.no-message.pipeline {
+  grid-template-areas: "dp tag tag" "dp name menu";
+}
+.contact.no-message .name {
+  margin-bottom: 0;
 }
 .contact .name {
   grid-area: name;
@@ -1111,6 +1125,7 @@ ol li::before {
   opacity: 0.9;
 }
 .contact .menu {
+  grid-area: menu;
   flex-shrink: 0;
   justify-self: flex-end;
   padding: 0.2rem;
