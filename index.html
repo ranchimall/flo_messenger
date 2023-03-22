@@ -1366,29 +1366,25 @@
                     getRef('contact_initial').setAttribute('style', `--contact-color: var(${contactColor(floID)})`)
                     getRef('contact_name').value = getContactName(floID) === floID ? 'Unnamed' : getContactName(floID)
                     if (floIdType === 'pipeline') {
-                        // Get pipeline origin multisig address
-                        let floChatID = floCrypto.toFloID(floID);
-                        let btcChatID = btcOperator.convert.legacy2bech(floChatID);
-                        Promise.all([messenger.getChat(floChatID), messenger.getChat(btcChatID)])
-                            .then(async ([floChat, btcChat]) => {
-                                const transaction = mergeSortedArrays(Object.values(floChat), Object.values(btcChat), 'time')
-                                    .find(message => message.tx_hex)
-                                if (transaction) {
-                                    const { type, tx_hex } = transaction
-                                    let details
-                                    switch (messenger.pipeline[floID].model) {
-                                        case 'flo_multisig':
-                                            details = await floBlockchainAPI.parseTransaction(tx_hex)
-                                            break;
-                                        case 'btc_multisig':
-                                            details = await btcOperator.parseTransaction(tx_hex)
-                                            break;
-                                    }
-                                    getRef('contact_flo_id').value = details.inputs[0].address
+                        try {
+                            // Get pipeline origin multisig address
+                            getTxHex(floID).then(async tx_hex => {
+                                let details
+                                switch (messenger.pipeline[floID].model) {
+                                    case 'flo_multisig':
+                                        details = await floBlockchainAPI.parseTransaction(tx_hex)
+                                        break;
+                                    case 'btc_multisig':
+                                        details = await btcOperator.parseTransaction(tx_hex)
+                                        break;
                                 }
-                            }).catch(error => {
-                                console.error(error)
+                                getRef('contact_flo_id').value = details.inputs[0].address
+                            }).catch(e => {
+                                console.error(e)
                             })
+                        } catch (e) {
+                            console.error(e)
+                        }
                     } else {
                         getRef('contact_flo_id').value = floCrypto.toFloID(floID)
                     }
@@ -3078,6 +3074,31 @@
                 j++
             }
             return merged
+        }
+        const memoizedTxHex = {}
+        function getTxHex(chatID) {
+            return new Promise((resolve, reject) => {
+                if (memoizedTxHex[chatID]) {
+                    resolve(memoizedTxHex[chatID])
+                }
+                let floChatID = floCrypto.toFloID(chatID);
+                let btcChatID = btcOperator.convert.legacy2bech(floChatID);
+                Promise.all([messenger.getChat(floChatID), messenger.getChat(btcChatID)])
+                    .then(async ([floChat, btcChat]) => {
+                        const transaction = mergeSortedArrays(Object.values(floChat), Object.values(btcChat), 'time')
+                            .reverse()
+                            .find(message => message.tx_hex)
+                        if (transaction) {
+                            memoizedTxHex[chatID] = transaction.tx_hex
+                            resolve(transaction.tx_hex)
+                        } else {
+                            reject('No transaction found')
+                        }
+                    }).catch(error => {
+                        console.error(error)
+                        reject(error)
+                    })
+            })
         }
 
         function renderGroupUI(data) {
