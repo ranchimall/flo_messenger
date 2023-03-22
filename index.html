@@ -3164,10 +3164,6 @@
                     if (!floCrypto.isSameAddr(chatAddress, topChatCard.dataset.floAddress)) {
                         const cloneContact = chatCard.cloneNode(true)
                         chatCard.remove()
-                        getRef('chats_list').animate([
-                            { transform: 'translateY(-2rem)' },
-                            { transform: 'none' },
-                        ], animOptions)
                         getRef('chats_list').prepend(cloneContact)
                         await cloneContact.animate([
                             {
@@ -3179,6 +3175,7 @@
                                 opacity: 1
                             },
                         ], animOptions).finished
+                        getRef('chats_list').scroll({ top: 0, behavior: 'smooth' })
                     }
                 } else {
                     const chatType = floID ? 'chat' : groupID ? 'group' : 'pipeline'
