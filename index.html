@@ -701,7 +701,8 @@
             <h4>Add contact</h4>
         </header>
         <sm-form>
-            <sm-input id="add_contact_floID" floId placeholder="FLO/BTC address" animate autofocus required></sm-input>
+            <sm-input id="add_contact_floID" data-flo-address placeholder="FLO/BTC address" error-text="Invalid address"
+                animate autofocus required></sm-input>
             <sm-input id="add_contact_name" placeholder="Name" animate required></sm-input>
             <button class="button button--primary" id="add_contact_button" type="submit" disabled>Add</button>
         </sm-form>
@@ -3844,7 +3845,7 @@
         function addContact() {
             let addressToSave = getRef('add_contact_floID').value.trim();
             let name = getRef('add_contact_name').value.trim();
-            if (addressToSave === floDapps.user.id) {
+            if (floCrypto.isSameAddr(addressToSave, floDapps.user.id)) {
                 notify(`you can't add your own FLO/BTC address as contact`, 'error')
                 return
             }
