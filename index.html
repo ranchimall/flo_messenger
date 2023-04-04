@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <script id="floGlobals">
         /* Constants for FLO blockchain operations !!Make sure to add this at beginning!! */
         const floGlobals = {
@@ -222,7 +221,7 @@
                 <path class="e" d="M325,314.13c21,4.22,36.85,12.82,36.85,25.8a69.7,69.7,0,0,1-41.09,63.58" />
             </svg>
             <div class="shadow"></div>
-            <h4 class="page__tag-line margin-block-1">Getting everything ready, Hang on.</h4>
+            <h4 class="page__tag-line margin-block-1">Getting everything ready, hang on.</h4>
             <button class="button" onclick="clearCredentials()">Reset</button>
         </div>
     </div>
@@ -3140,7 +3139,6 @@
                     }
                     // remove encryption badge if it exists
                     if (!groupID && floDapps.user.get_pubKey(activeChat.address) && floID !== floDapps.user.id) {
-                        console.log('removing encryption badge')
                         if (document.getElementById('warn_no_encryption')) {
                             document.getElementById('warn_no_encryption').after(
                                 html.node`
@@ -4068,6 +4066,7 @@
                 lastSender = ''
                 // fix issue with encryption
                 renderMessages(floID).then(async () => {
+                    console.log('rendered messages', activeChat)
                     if (activeChat.type === 'pipeline') {
                         if (!messenger.pipeline[floID].disabled && floGlobals.pipeSigns[floID] && !floGlobals.pipeSigns[floID].has(floDapps.user.id)) {
                             getRef('messages_container').append(html.node`
@@ -4097,13 +4096,16 @@
                                 }
                                 const { inputs, outputs, fee, floData } = details
                                 const { s: signsDone, r: minSignsRequired, t: totalMembers } = inputs[0]?.signed || {}
-                                const pendingSigns = minSignsRequired - signsDone
-                                if (minSignsRequired) {
-                                    if ($('#transaction_details')) $('#transaction_details').remove()
-                                    getRef('messages_container').prepend(html.node`
+                                const pendingSigns = minSignsRequired - signsDone || 0
+                                if ($('#transaction_details')) $('#transaction_details').remove()
+                                getRef('messages_container').prepend(html.node`
                                         <details id="transaction_details" class="grid gap-1 card" open>
                                             <summary>
-                                                <h4>Transaction is waiting for ${pendingSigns} more signature${pendingSigns > 1 ? 's' : ''}</h4>
+                                                ${pendingSigns === 0 ? html`
+                                                    <h4>Required signatures are done</h4>
+                                                    `: html`
+                                                    <h4>Transaction is waiting for ${pendingSigns} more signature${pendingSigns > 1 ? 's' : ''}</h4>
+                                                `}
                                                 <svg class="icon down-arrow" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M24 24H0V0h24v24z" fill="none" opacity=".87"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z"/></svg>
                                             </summary>
                                             <div class="grid margin-bottom-1">
@@ -4129,10 +4131,9 @@
                                                     <h5>FLO data</h5>
                                                     <p>${floData}</p>
                                                 </div>`: ''
-                                        }
+                                    }
                                         </details>
                                     `)
-                                }
                             } catch (err) {
                                 notify(err, 'error')
                             }
