@@ -2727,9 +2727,14 @@
                                 </div>`
                             break;
                         case 'BROADCAST':
+                            // render appropriate UI when transaction is broadcasted
                             if ($('#transaction_details'))
                                 $('#transaction_details').remove()
+                            // disable chatting
                             getRef('chat_footer').classList.add('hidden')
+                            const chatCard = getChatCard(activeChat.address)
+                            if (chatCard)
+                                chatCard.querySelector('.tag').textContent += ' - Completed'
                             let redirectTo = `https://live.blockcypher.com/btc/tx/`
                             if (messenger.pipeline[activeChat.address].model === 'flo_multisig')
                                 redirectTo = `https://flosight.ranchimall.net/tx/`
@@ -3047,7 +3052,6 @@
                 document.title = `New mail(s)`
                 addNotificationBadge('#mail_page_button', Object.keys(data.mails).length)
             }
-            // console.log(data.requests, data.responses)
             messenger.list_request_received({ completed: false }).then(requests => addNotificationBadge('#notification_panel_button', Object.keys(requests).length, { replace: true }))
             updateMessageUI(data.messages)
             renderMailList(data.mails, true)
@@ -3123,16 +3127,15 @@
                 easing: 'ease',
                 fill: 'forwards'
             }
+            console.log('updateMessageUI', messagesData)
             for (let messageId in messagesData) {
                 const { category, floID, time, message, sender, groupID, admin, name, pipeID, unconfirmed, type } = messagesData[messageId]
                 const chatAddress = floID || groupID || pipeID
                 // code to run if a chat is opened
                 if (activeChat && floCrypto.isSameAddr(activeChat.address, chatAddress)) {
-                    if (!sentByMe && (type && type !== 'TRANSACTION') && sender && floCrypto.isSameAddr(sender, floDapps.user.id)) {
-                        // if message is sent by me, then dont add it to the chat
-                    } else {
+                    if (sentByMe || type === 'TRANSACTION' || !sender || !floCrypto.isSameAddr(sender, floDapps.user.id)) {
                         const messageBody = render.messageBubble(messagesData[messageId]);
-                        getRef('messages_container').append(messageBody)
+                        getRef('messages_container').append(messageBody);
                     }
                     if (!chatScrollInfo['isScrolledUp']) {
                         scrollToBottom()
@@ -4066,7 +4069,6 @@
                 lastSender = ''
                 // fix issue with encryption
                 renderMessages(floID).then(async () => {
-                    console.log('rendered messages', activeChat)
                     if (activeChat.type === 'pipeline') {
                         if (!messenger.pipeline[floID].disabled && floGlobals.pipeSigns[floID] && !floGlobals.pipeSigns[floID].has(floDapps.user.id)) {
                             getRef('messages_container').append(html.node`
