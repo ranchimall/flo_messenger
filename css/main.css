@@ -1840,6 +1840,7 @@ sm-chip .badge {
 }
 .message .message-body a {
   color: inherit;
+  text-decoration: underline;
 }
 .message .message-body .text-emoji {
   align-self: center;
