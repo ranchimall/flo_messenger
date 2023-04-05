@@ -1094,14 +1094,14 @@ ol li::before {
   font-weight: 500;
   justify-self: flex-start;
 }
-.contact.no-message.chat, .contact.no-message.group {
+.contact.collapsed.chat, .contact.collapsed.group {
   grid-template-areas: "dp name menu";
   grid-template-rows: 1fr;
 }
-.contact.no-message.pipeline {
+.contact.collapsed.pipeline {
   grid-template-areas: "dp tag tag" "dp name menu";
 }
-.contact.no-message .name {
+.contact.collapsed .name {
   margin-bottom: 0;
 }
 .contact .name {

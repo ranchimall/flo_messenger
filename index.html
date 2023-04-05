@@ -2588,7 +2588,7 @@
                             `;
                             chatCard.append(html.node`${timeAndOptions}`)
                             if (time)
-                                chatCard.classList.remove('no-message')
+                                chatCard.classList.remove('collapsed')
                         }
                     }).catch(error => console.error(error))
                     if (prepend) {
@@ -2600,7 +2600,7 @@
                 if (type === 'pipeline' && messenger.pipeline[contactAddress].model === 'flo_multisig') {
                     tag = 'FLO'
                 }
-                const className = `contact ${type !== 'contact' ? type : ''} ${markUnread ? 'unread' : ''} interactive no-message`
+                const className = `contact ${type !== 'contact' ? type : ''} ${markUnread ? 'unread' : ''} interactive collapsed`
                 return html.for(ref, contactAddress)`
                     <div class="${className}" .dataset=${{ floAddress: contactAddress }} style=${`--contact-color: var(${contactColor(contactAddress)})`}>
                         <div class="initial flex align-center">
@@ -2732,9 +2732,6 @@
                                 $('#transaction_details').remove()
                             // disable chatting
                             getRef('chat_footer').classList.add('hidden')
-                            const chatCard = getChatCard(activeChat.address)
-                            if (chatCard)
-                                chatCard.querySelector('.tag').textContent += ' - Completed'
                             let redirectTo = `https://live.blockcypher.com/btc/tx/`
                             if (messenger.pipeline[activeChat.address].model === 'flo_multisig')
                                 redirectTo = `https://flosight.ranchimall.net/tx/`
@@ -3179,6 +3176,10 @@
                         ], animOptions).finished
                         getRef('chats_list').scroll({ top: 0, behavior: 'smooth' })
                     }
+                    if (type && type === 'BROADCAST') {
+                        chatCard.querySelector('.tag').textContent += ' - Completed'
+                        chatCard.classList.add('collapsed')
+                    }
                 } else {
                     const chatType = floID ? 'chat' : groupID ? 'group' : 'pipeline'
                     if (floID) {
@@ -3200,7 +3201,7 @@
                     finalMessage = message
                 if (chatCard.querySelector('.last-message')) {
                     chatCard.querySelector('.last-message').textContent = finalMessage
-                    chatCard.classList.remove('no-message')
+                    chatCard.classList.remove('collapsed')
                 }
                 if (chatCard.querySelector('.time'))
                     chatCard.querySelector('.time').textContent = getFormattedTime(time, 'relative')
@@ -3221,6 +3222,7 @@
                     getChatCard(chatAddress).classList.add('unread')
                 }
             }
+
         }
         getRef('feature_mode').addEventListener('change', e => {
             const sections = ['dm', 'multisig', 'requests'];

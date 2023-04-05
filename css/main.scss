@@ -1112,7 +1112,7 @@ ol {
     font-weight: 500;
     justify-self: flex-start;
   }
-  &.no-message {
+  &.collapsed {
     &.chat,
     &.group {
       grid-template-areas: "dp name menu";
