@@ -3124,11 +3124,11 @@
                 fill: 'forwards'
             }
             for (let messageId in messagesData) {
-                const { category, floID, time, message, sender, groupID, admin, name, pipeID, unconfirmed } = messagesData[messageId]
+                const { category, floID, time, message, sender, groupID, admin, name, pipeID, unconfirmed, type } = messagesData[messageId]
                 const chatAddress = floID || groupID || pipeID
                 // code to run if a chat is opened
                 if (activeChat && floCrypto.isSameAddr(activeChat.address, chatAddress)) {
-                    if (!sentByMe && sender && floCrypto.isSameAddr(sender, floDapps.user.id)) {
+                    if (!sentByMe && (type && type !== 'TRANSACTION') && sender && floCrypto.isSameAddr(sender, floDapps.user.id)) {
                         // if message is sent by me, then dont add it to the chat
                     } else {
                         const messageBody = render.messageBubble(messagesData[messageId]);
