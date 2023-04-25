@@ -4907,14 +4907,14 @@
         function handleFeeSelector(e) {
             switch (e.target.value) {
                 case 'custom':
-                    getRef('send_fee').readOnly = false;
-                    getRef('send_fee').placeholder = 'Fee';
-                    renderElem(getRef('selected_fee_tip'), html`Set custom fee`)
+                    $('#send_fee').readOnly = false;
+                    $('#send_fee').placeholder = 'Fee';
+                    renderElem($('#selected_fee_tip'), html`Set custom fee`)
                     feeMemo.memoized = false;
                     break;
                 case 'suggested':
                     calculateFees();
-                    getRef('send_fee').readOnly = true;
+                    $('#send_fee').readOnly = true;
                     break;
             }
         }
@@ -4937,50 +4937,53 @@
             })
         }
         async function calculateBtcFees() {
-            const [senders, privKeys, receivers, amounts] = await getTransactionInputs().catch(e => {
+            const [sender, receivers, amounts, redeemScript] = await getTransactionInputs().catch(e => {
                 console.error(e)
                 return
             });
-            // if (!senders.length || !privKeys.length || !receivers.length || !amounts.length) return;
-            return btcOperator.createSignedTx(senders, privKeys, receivers, amounts)
+            return btcOperator.createMultiSigTx(sender, redeemScript, receivers, amounts)
         }
         async function getTransactionInputs() {
-            const privateKey = await floDapps.user.private.catch(err => console.error(err));
-            const privKeys = btcOperator.convert.wif(privateKey);
-            const senders = floGlobals.myBtcID;
-            const receivers = [...getRef('receiver_container').querySelectorAll('.receiver-input')].filter(input => input.value.trim() !== '').map(input => input.value.trim());
-            const amounts = [...getRef('receiver_container').querySelectorAll('.amount-input')].filter(input => input.value.trim() !== '').map(input => {
-                return parseFloat(input.value.trim())
-            });
-            return [senders, privKeys, receivers, amounts]
+            try {
+                const sender = getRef('selected_multisig').textContent;
+                const receivers = [...getRef('receiver_container').querySelectorAll('.receiver-input')].filter(input => input.value.trim() !== '').map(input => input.value.trim());
+                const amounts = [...getRef('receiver_container').querySelectorAll('.amount-input')].filter(input => input.value.trim() !== '').map(input => {
+                    return parseFloat(input.value.trim())
+                });
+                const multisigList = await messenger.multisig.listAddress()
+                const redeemScript = multisigList[sender].redeemScript;
+                return [sender, receivers, amounts, redeemScript]
+            } catch (err) {
+                console.error(err)
+            }
         }
         let feeMemo = {
             memoized: false,
             memoizedFee: 0
         };
         function calculateFees() {
-            if (getRef('fees_selector').value === 'custom') return;
+            if ($('#fees_selector').value === 'custom') return;
             if (getRef('receiver_container').children.length === 0) return;
             const allValid = [...getRef('receiver_container').querySelectorAll('sm-input')].every(input => input.isValid)
             if (!allValid && feeMemo.memoized) return;
-            getRef('fees_selector').children[0].click();
-            getRef('fees_selector').classList.remove('hidden')
+            $('#fees_selector').children[0].click();
+            $('#fees_selector').classList.remove('hidden')
             getRef('initiate_transaction').disabled = true;
-            getRef('send_fee').value = '';
-            getRef('send_fee_loader').classList.remove('hidden')
+            $('#send_fee').value = '';
+            $('#send_fee_loader').classList.remove('hidden')
             const animOptions = {
                 duration: 200,
                 easing: 'ease',
                 fill: 'forwards'
             }
-            getRef('send_fee_loader').animate(fadeIn, animOptions)
+            $('#send_fee_loader').animate(fadeIn, animOptions)
             getRef('fees_section').classList.remove('hidden')
             getRef('error_section').classList.add('hidden')
             if (allValid) {
-                getRef('send_fee').placeholder = 'Fee'
+                $('#send_fee').placeholder = 'Fee'
                 calculateBtcFees().then(({ fee }) => {
-                    getRef('send_fee').value = fee.toFixed(8);
-                    renderElem(getRef('selected_fee_tip'), html``)
+                    $('#send_fee').value = fee.toFixed(8);
+                    renderElem($('#selected_fee_tip'), html``)
                     getRef('initiate_transaction').disabled = false;
                 }).catch(e => {
                     getRef('fees_section').classList.add('hidden')
@@ -4993,27 +4996,27 @@
                     `)
                     console.error(e)
                 }).finally(_ => {
-                    getRef('send_fee_loader').animate(fadeOut, animOptions).onfinish = _ =>
-                        getRef('send_fee_loader').classList.add('hidden')
+                    $('#send_fee_loader').animate(fadeOut, animOptions).onfinish = _ =>
+                        $('#send_fee_loader').classList.add('hidden')
 
                 })
                 feeMemo.memoized = false;
             } else {
-                getRef('send_fee').placeholder = 'Approximate fee'
-                renderElem(getRef('selected_fee_tip'), html` <p style="opacity: 0.8;">*Fill out all fields for exact fee!</p> `)
+                $('#send_fee').placeholder = 'Approximate fee'
+                renderElem($('#selected_fee_tip'), html` <p style="opacity: 0.8;">*Fill out all fields for exact fee!</p> `)
                 if (feeMemo.memoized) {
-                    getRef('send_fee').value = feeMemo.memoizedFee.toFixed(8);
+                    $('#send_fee').value = feeMemo.memoizedFee.toFixed(8);
                     return;
                 }
                 calculateApproxFee().then(fee => {
-                    getRef('send_fee').value = fee.toFixed(8);
+                    $('#send_fee').value = fee.toFixed(8);
                     feeMemo.memoizedFee = fee;
                 }).catch(e => {
-                    getRef('fees_selector').children[1].click();
-                    getRef('fees_selector').classList.add('hidden')
+                    $('#fees_selector').children[1].click();
+                    $('#fees_selector').classList.add('hidden')
                 }).finally(_ => {
-                    getRef('send_fee_loader').animate(fadeOut, animOptions).onfinish = _ =>
-                        getRef('send_fee_loader').classList.add('hidden')
+                    $('#send_fee_loader').animate(fadeOut, animOptions).onfinish = _ =>
+                        $('#send_fee_loader').classList.add('hidden')
                 })
                 feeMemo.memoized = true;
             }
@@ -5032,7 +5035,7 @@
                 const { redeemScript } = allMultiSigs[selectedMultisigAddress]
                 let result
                 if (multisigMode === 'btc') {
-                    const fee = parseFloat(getRef('send_fee').value.trim());
+                    const fee = parseFloat($('#send_fee').value.trim());
                     console.debug(selectedMultisigAddress, receivers, amounts, fee);
                     result = await messenger.multisig.createTx_BTC(selectedMultisigAddress, redeemScript, receivers, amounts, fee)
                 } else if (multisigMode === 'flo') {
