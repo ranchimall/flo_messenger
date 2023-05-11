@@ -1056,13 +1056,14 @@
                 return reject("Not an valid address");
             let last_key = `${floGlobals.application}|${user_floID}`;
             compactIDB.readData("lastTx", last_key, floDapps.root).then(lastTx => {
-                floBlockchainAPI.readData(user_floID, {
-                    ignoreOld: lastTx,
-                    pattern: floGlobals.application,
-                    tx: true //need tx-time and txid for key construction
-                }).then(result => {
-                    for (var i = result.data.length - 1; i >= 0; i--) {
-                        let tx = result.data[i],
+                var query_options = { pattern: floGlobals.application, tx: true };
+                if (typeof lastTx == 'number')  //lastTx is tx count (*backward support)
+                    query_options.ignoreOld = lastTx;
+                else if (typeof lastTx == 'string') //lastTx is txid of last tx
+                    query_options.after = lastTx;
+                floBlockchainAPI.readData(user_floID, query_options).then(result => {
+                    for (var i = result.items.length - 1; i >= 0; i--) {
+                        let tx = result.items[i],
                             content = JSON.parse(tx.data)[floGlobals.application];
                         if (!(content instanceof Object))
                             continue;
@@ -1073,7 +1074,7 @@
                             data: content
                         }, key);
                     }
-                    compactIDB.writeData("lastTx", result.totalTxs, last_key, floDapps.root);
+                    compactIDB.writeData("lastTx", result.lastItem, last_key, floDapps.root);
                     resolve(true);
                 }).catch(error => reject(error))
             }).catch(error => reject(error))
