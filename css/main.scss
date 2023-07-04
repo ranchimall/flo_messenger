@@ -748,12 +748,6 @@ ol {
   }
 }
 
-.flo-icon {
-  margin-right: 0.3rem;
-  height: 1.5rem;
-  width: 1.5rem;
-}
-
 #secondary_pages {
   display: flex;
   flex-direction: column;
@@ -808,28 +802,20 @@ ol {
   color: var(--error-color);
 }
 
-.logo-section {
+.app-brand{
   display: flex;
-  position: relative;
+  gap: 0.3rem;
   align-items: center;
-  height: max-content;
-  margin: 0.5rem 0;
-
-  h5 {
-    font-size: 1.1rem !important;
+  .icon{
+    height: 1.7rem;
+    width: 1.7rem;
+  }
+}
+.app-name{
+  &__company{
+    font-size: 0.8rem;
     font-weight: 500;
-  }
-
-  .main-logo {
-    height: 1.4rem;
-    margin-right: 0.4rem;
-    fill: rgba(var(--text-color), 1);
-    stroke: none;
-  }
-
-  img {
-    width: 2rem;
-    margin-right: 0.5rem;
+    color: rgba(var(--text-color), 0.8);
   }
 }
 
@@ -890,10 +876,6 @@ ol {
       }
     }
   }
-}
-
-.logo-section {
-  padding: 1.5rem;
 }
 
 #landing_illustration {
