@@ -377,7 +377,7 @@ window.customElements.define('idb-support', class extends HTMLElement {
             };
             request.onsuccess = function (event) {
                 // IndexedDB is allowed and successfully opened the database
-                // thisComponent.remove();
+                thisComponent.remove();
             };
         } else {
             // IndexedDB is not supported in this browser
