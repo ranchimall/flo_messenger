@@ -2701,6 +2701,7 @@
                 return new Promise((resolve, reject) => {
                     Promise.all([messenger.multisig.listAddress(), compactIDB.readAllData('multisigLabels')])
                         .then(([addresses, labels]) => {
+                            renderElem(getRef('select_multisig_list'), html``)
                             const list = Object.keys(addresses).map(address => render.multisigAddressCard(address, addresses[address], labels[address], multisigMode)) || []
                             renderElem(getRef('select_multisig_list'), html`${list}`)
                             resolve()
