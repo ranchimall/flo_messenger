@@ -532,7 +532,9 @@ ol {
 .margin-right-auto {
   margin-right: auto;
 }
-
+.margin-top-1 {
+  margin-top: 1rem;
+}
 .margin-bottom-0-5 {
   margin-bottom: 0.5rem;
 }
@@ -802,17 +804,17 @@ ol {
   color: var(--error-color);
 }
 
-.app-brand{
+.app-brand {
   display: flex;
   gap: 0.3rem;
   align-items: center;
-  .icon{
+  .icon {
     height: 1.7rem;
     width: 1.7rem;
   }
 }
-.app-name{
-  &__company{
+.app-name {
+  &__company {
     font-size: 0.8rem;
     font-weight: 500;
     color: rgba(var(--text-color), 0.8);

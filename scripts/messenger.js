@@ -96,10 +96,12 @@
                 .catch(error => reject(error))
         })
     }
+    messenger.sendRaw = sendRaw;
 
     function encrypt(value, key = _loaded.appendix.AESKey) {
         return Crypto.AES.encrypt(value, key)
     }
+    messenger.encrypt = encrypt;
 
     function decrypt(value, key = _loaded.appendix.AESKey) {
         return Crypto.AES.decrypt(value, key)
