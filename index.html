@@ -2702,7 +2702,8 @@
                     </li>
                 `
             },
-            multisigAddresses(multisigMode = 'btc') {
+            multisigAddresses() {
+                const multisigMode = getRef('multisig_mode_selector').value || 'btc'
                 return new Promise((resolve, reject) => {
                     Promise.all([messenger.multisig.listAddress(), compactIDB.readAllData('multisigLabels')])
                         .then(([addresses, labels]) => {
@@ -4615,7 +4616,7 @@
         }
 
         function handleMultisigModeChange(e) {
-            render.multisigAddresses(e.target.value)
+            render.multisigAddresses()
         }
 
         async function checkBalance(e) {
