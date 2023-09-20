@@ -1969,6 +1969,7 @@ sm-chip .badge {
   border-radius: 2rem;
   justify-self: center;
   padding: 0.3rem;
+  view-transition-name: chat-header-details;
 }
 
 #receiver_name {

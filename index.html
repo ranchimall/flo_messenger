@@ -4553,62 +4553,68 @@
 
         function updateChatHeaderName(name) {
             if (!floGlobals.isMobileView) {
-                const animOptions = {
-                    duration: 200,
-                    easing: 'ease',
-                    fill: 'forwards'
-                };
-                let originalName = getRef('receiver_name').textContent
-                getRef('chat_details_button').style.overflow = 'initial'
-                const originalWidth = getRef('chat_details_button').getBoundingClientRect().width;
-                getRef('receiver_name').textContent = name
-                const changedWidth = getRef('chat_details_button').getBoundingClientRect().width;
-                const widthDelta = changedWidth - originalWidth
-                const leftMove = -widthDelta / 2;
-                const rightMove = widthDelta / 2;
-                const scale = (changedWidth / (originalWidth || 1)).toFixed(2) || 1;
-                getRef('receiver_name').textContent = originalName
-                getRef('pseudo_background').animate([
-                    {
-                        width: `${originalWidth}px`
-                    }, {
-                        width: `${changedWidth}px`
-                    }
-                ], animOptions).onfinish = (e) => {
-                    getRef('chat_details_button').style.overflow = 'hidden'
-                    e.target.cancel()
-                }
-                getRef('chat_details_button').querySelector('#receiver_initial').animate([
-                    {
-                        transform: `none`
-                    },
-                    {
-                        transform: `translateX(${leftMove}px)`
-                    },
-                ], animOptions).onfinish = e => {
-                    e.target.cancel()
-                }
-                getRef('chat_details_button').children[2].animate([
-                    {
-                        transform: `none`
-                    },
-                    {
-                        transform: `translateX(${rightMove}px)`
-                    },
-                ], animOptions).onfinish = e => {
-                    e.target.cancel()
-                }
-                getRef('chat_details_button').querySelector('#receiver_name').animate([
-                    {
-                        transform: `none`,
-                        opacity: 1,
-                    }, {
-                        transform: `scaleX(${scale})`,
-                        opacity: 0,
-                    }
-                ], animOptions).onfinish = e => {
-                    e.target.cancel()
+                if (document.startViewTransition) {
+                    document.startViewTransition(() => {
+                        getRef('receiver_name').textContent = name
+                    })
+                } else {
+                    const animOptions = {
+                        duration: 200,
+                        easing: 'ease',
+                        fill: 'forwards'
+                    };
+                    let originalName = getRef('receiver_name').textContent
+                    getRef('chat_details_button').style.overflow = 'initial'
+                    const originalWidth = getRef('chat_details_button').getBoundingClientRect().width;
                     getRef('receiver_name').textContent = name
+                    const changedWidth = getRef('chat_details_button').getBoundingClientRect().width;
+                    const widthDelta = changedWidth - originalWidth
+                    const leftMove = -widthDelta / 2;
+                    const rightMove = widthDelta / 2;
+                    const scale = (changedWidth / (originalWidth || 1)).toFixed(2) || 1;
+                    getRef('receiver_name').textContent = originalName
+                    getRef('pseudo_background').animate([
+                        {
+                            width: `${originalWidth}px`
+                        }, {
+                            width: `${changedWidth}px`
+                        }
+                    ], animOptions).onfinish = (e) => {
+                        getRef('chat_details_button').style.overflow = 'hidden'
+                        e.target.cancel()
+                    }
+                    getRef('chat_details_button').querySelector('#receiver_initial').animate([
+                        {
+                            transform: `none`
+                        },
+                        {
+                            transform: `translateX(${leftMove}px)`
+                        },
+                    ], animOptions).onfinish = e => {
+                        e.target.cancel()
+                    }
+                    getRef('chat_details_button').children[2].animate([
+                        {
+                            transform: `none`
+                        },
+                        {
+                            transform: `translateX(${rightMove}px)`
+                        },
+                    ], animOptions).onfinish = e => {
+                        e.target.cancel()
+                    }
+                    getRef('chat_details_button').querySelector('#receiver_name').animate([
+                        {
+                            transform: `none`,
+                            opacity: 1,
+                        }, {
+                            transform: `scaleX(${scale})`,
+                            opacity: 0,
+                        }
+                    ], animOptions).onfinish = e => {
+                        e.target.cancel()
+                        getRef('receiver_name').textContent = name
+                    }
                 }
             } else {
                 getRef('receiver_name').textContent = name
