@@ -2020,16 +2020,19 @@ sm-chip {
   border-radius: 2rem;
   justify-self: center;
   padding: 0.3rem;
-  view-transition-name: chat-header-details;
-}
-#receiver_name {
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  transition: opacity 0.15s;
 }
 
+#receiver_name {
+  display: grid;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  place-content: center;
+  place-items: center;
+  > * {
+    grid-area: 1/1/2/2;
+  }
+}
 #scroll_to_bottom {
   position: absolute;
   display: flex;
