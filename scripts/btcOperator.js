@@ -1,4 +1,4 @@
-(function (EXPORTS) { //btcOperator v1.1.3b
+(function (EXPORTS) { //btcOperator v1.1.3c
     /* BTC Crypto and API Operator */
     const btcOperator = EXPORTS;
 
@@ -92,6 +92,9 @@
         },
         bech32Address: {
             value: key => coinjs.bech32Address(btcOperator.pubkey(key)).address
+        },
+        bech32mAddress: {
+            value: key => segwit_addr.encode("bc", 1, key)
         }
     });
 
@@ -107,6 +110,8 @@
                 return btcOperator.segwitAddress(key) === addr;
             case "bech32":
                 return btcOperator.bech32Address(key) === addr;
+            case "bech32m":
+                return btcOperator.bech32mAddress(key) === addr; // Key is a byte array of 32 bytes    
             default:
                 return null;
         }
@@ -116,7 +121,7 @@
         if (!addr)
             return undefined;
         let type = coinjs.addressDecode(addr).type;
-        if (["standard", "multisig", "bech32", "multisigBech32"].includes(type))
+        if (["standard", "multisig", "bech32", "multisigBech32", "bech32m"].includes(type))
             return type;
         else
             return false;
@@ -281,6 +286,7 @@
         BECH32_OUTPUT_SIZE = 23,
         BECH32_MULTISIG_OUTPUT_SIZE = 34,
         SEGWIT_OUTPUT_SIZE = 23;
+    BECH32M_OUTPUT_SIZE = 35; // Check this later
 
     function _redeemScript(addr, key) {
         let decode = coinjs.addressDecode(addr);
@@ -291,10 +297,15 @@
                 return key ? coinjs.segwitAddress(btcOperator.pubkey(key)).redeemscript : null;
             case "bech32":
                 return decode.redeemscript;
+            case "'multisigBech32":
+                return decode.redeemscript; //Multisig-edit-fee-change1
+            case "bech32m":
+                return decode.outstring; //Maybe the redeemscript will come when input processing happens for bech32m   
             default:
                 return null;
         }
     }
+    btcOperator._redeemScript = _redeemScript;
 
     function _sizePerInput(addr, rs) {
         switch (coinjs.addressDecode(addr).type) {
@@ -328,6 +339,8 @@
                 return BASE_OUTPUT_SIZE + BECH32_MULTISIG_OUTPUT_SIZE;
             case "multisig":
                 return BASE_OUTPUT_SIZE + SEGWIT_OUTPUT_SIZE;
+            case "bech32m":
+                return BASE_OUTPUT_SIZE + BECH32M_OUTPUT_SIZE;
             default:
                 return null;
         }
@@ -379,6 +392,7 @@
         //return
         return parameters;
     }
+    btcOperator.validateTxParameters = validateTxParameters;
 
     function createTransaction(senders, redeemScripts, receivers, amounts, fee, change_address, fee_from_receiver) {
         return new Promise((resolve, reject) => {
@@ -417,6 +431,7 @@
             }).catch(error => reject(error))
         })
     }
+    btcOperator.createTransaction = createTransaction;
 
     function addInputs(tx, senders, redeemScripts, total_amount, fee, output_size, fee_from_receiver) {
         return new Promise((resolve, reject) => {
@@ -441,6 +456,7 @@
             }
         })
     }
+    btcOperator.addInputs = addInputs;
 
     function addUTXOs(tx, senders, redeemScripts, required_amount, fee_rate, rec_args = {}) {
         return new Promise((resolve, reject) => {
@@ -495,6 +511,7 @@
             }).catch(error => reject(error))
         })
     }
+    btcOperator.addUTXOs = addUTXOs;
 
     function addOutputs(tx, receivers, amounts, change_address) {
         let size = 0;
@@ -506,6 +523,7 @@
         size += _sizePerOutput(change_address);
         return size;
     }
+    btcOperator.addOutputs = addOutputs;
 
     /*
     function autoFeeCalc(tx) {
@@ -553,7 +571,19 @@
             } else resolve(deserializeTx(tx));
         })
     }
+    btcOperator.tx_fetch_for_editing = tx_fetch_for_editing;
 
+    const extractLastHexStrings = btcOperator.extractLastHexStrings = function (arr) {
+        const result = [];
+        for (let i = 0; i < arr.length; i++) {
+            const innerArray = arr[i];
+            if (innerArray.length > 0) {
+                const lastHexString = innerArray[innerArray.length - 1];
+                result.push(lastHexString);
+            }
+        }
+        return result;
+    }
 
     btcOperator.editFee = function (tx_hex, new_fee, private_keys, change_only = true) {
         return new Promise((resolve, reject) => {
@@ -644,10 +674,119 @@
         })
     }
 
+    btcOperator.editFee_corewallet = function(tx_hex, new_fee, private_keys, change_only = true) {
+    return new Promise((resolve, reject) => {
+        if (!Array.isArray(private_keys))
+            private_keys = [private_keys];
+        tx_fetch_for_editing(tx_hex).then(tx => {
+            parseTransaction(tx).then(tx_parsed => {
+                if (tx_parsed.fee >= new_fee)
+                    return reject("Fees can only be increased");
+
+                //editable addresses in output values (for fee increase)
+                var edit_output_address = new Set();
+                if (change_only === true) //allow only change values (ie, sender address) to be edited to inc fee
+                    tx_parsed.inputs.forEach(inp => edit_output_address.add(inp.address));
+                else if (change_only === false) //allow all output values to be edited
+                    tx_parsed.outputs.forEach(out => edit_output_address.add(out.address));
+                else if (typeof change_only == 'string') // allow only given receiver id output to be edited
+                    edit_output_address.add(change_only);
+                else if (Array.isArray(change_only)) //allow only given set of receiver id outputs to be edited
+                    change_only.forEach(id => edit_output_address.add(id));
+
+                //edit output values to increase fee
+                let inc_fee = util.BTC_to_Sat(new_fee - tx_parsed.fee);
+                if (inc_fee < MIN_FEE_UPDATE)
+                    return reject(`Insufficient additional fee. Minimum increment: ${MIN_FEE_UPDATE}`);
+                for (let i = tx.outs.length - 1; i >= 0 && inc_fee > 0; i--) //reduce in reverse order
+                    if (edit_output_address.has(tx_parsed.outputs[i].address)) {
+                        let current_value = tx.outs[i].value;
+                        if (current_value instanceof BigInteger) //convert BigInteger class to inv value
+                            current_value = current_value.intValue();
+                        //edit the value as required
+                        if (current_value > inc_fee) {
+                            tx.outs[i].value = current_value - inc_fee;
+                            inc_fee = 0;
+                        } else {
+                            inc_fee -= current_value;
+                            tx.outs[i].value = 0;
+                        }
+                    }
+                if (inc_fee > 0) {
+                    let max_possible_fee = util.BTC_to_Sat(new_fee) - inc_fee; //in satoshi
+                    return reject(`Insufficient output values to increase fee. Maximum fee possible: ${util.Sat_to_BTC(max_possible_fee)}`);
+                }
+                tx.outs = tx.outs.filter(o => o.value >= DUST_AMT); //remove all output with value less than DUST amount
+
+                //remove existing signatures and reset the scripts
+                let wif_keys = [];
+                let witness_position = 0;
+                for (let i in tx.ins) {
+                    var addr = tx_parsed.inputs[i].address,
+                        value = util.BTC_to_Sat(tx_parsed.inputs[i].value);
+                    let addr_decode = coinjs.addressDecode(addr);
+
+                    //find the correct key for addr
+                    var privKey = private_keys.find(pk => verifyKey(addr, pk));
+                    if (!privKey)
+                        return reject(`Private key missing for ${addr}`);
+                    //find redeemScript (if any)
+                    const rs = _redeemScript(addr, privKey);
+                    rs === false ? wif_keys.unshift(privKey) : wif_keys.push(privKey); //sorting private-keys (wif)
+                    //reset the script for re-signing
+                    var script;
+                    if (!rs || !rs.length) {
+                        //legacy script (derive from address)
+                        let s = coinjs.script();
+                        s.writeOp(118); //OP_DUP
+                        s.writeOp(169); //OP_HASH160
+                        s.writeBytes(addr_decode.bytes);
+                        s.writeOp(136); //OP_EQUALVERIFY
+                        s.writeOp(172); //OP_CHECKSIG
+                        script = Crypto.util.bytesToHex(s.buffer);
+                    } else if (((rs.match(/^00/) && rs.length == 44)) || (rs.length == 40 && rs.match(/^[a-f0-9]+$/gi))) {
+                        //redeemScript for segwit/bech32 
+                        let s = coinjs.script();
+                        s.writeBytes(Crypto.util.hexToBytes(rs));
+                        s.writeOp(0);
+                        s.writeBytes(coinjs.numToBytes(value.toFixed(0), 8));
+                        script = Crypto.util.bytesToHex(s.buffer);
+                        if (addr_decode == "bech32") {witness_position = witness_position + 1;} //bech32 has witness
+                    } else if (addr_decode.type === 'multisigBech32') {
+                        var rs_array = [];
+                        rs_array = btcOperator.extractLastHexStrings(tx.witness);
+                        let redeemScript = rs_array[witness_position];
+                        witness_position = witness_position + 1;
+                   
+                        //redeemScript multisig (bech32)
+                        let s = coinjs.script();
+                        s.writeBytes(Crypto.util.hexToBytes(redeemScript));
+                        s.writeOp(0);
+                        s.writeBytes(coinjs.numToBytes(value.toFixed(0), 8));
+                        script = Crypto.util.bytesToHex(s.buffer);
+                    } else //redeemScript for multisig (segwit)
+                        script = rs;
+                    tx.ins[i].script = coinjs.script(script);
+                }
+                tx.witness = false; //remove all witness signatures
+                console.debug("Unsigned:", tx.serialize());
+                //re-sign the transaction
+                new Set(wif_keys).forEach(key => tx.sign(key, 1 /*sighashtype*/ )); //Sign the tx using private key WIF
+                if (btcOperator.checkSigned(tx)) {
+                      resolve(tx.serialize());
+                    } else {
+                      reject("All private keys not present");
+                    }
+            }).catch(error => reject(error))
+        }).catch(error => reject(error))
+    })
+}
+
+
     btcOperator.sendTx = function (senders, privkeys, receivers, amounts, fee = null, options = {}) {
         return new Promise((resolve, reject) => {
             createSignedTx(senders, privkeys, receivers, amounts, fee, options).then(result => {
-                debugger;
+                // debugger;
                 broadcastTx(result.transaction.serialize())
                     .then(txid => resolve(txid))
                     .catch(error => reject(error));
@@ -760,7 +899,7 @@
         })
     }
 
-    function deserializeTx(tx) {
+    const deserializeTx = btcOperator.deserializeTx = function (tx) {
         if (typeof tx === 'string' || Array.isArray(tx)) {
             try {
                 tx = coinjs.transaction().deserialize(tx);
@@ -905,7 +1044,7 @@
         }).catch(error => reject(error))
     });
 
-    getTx.hex = txid => new Promise((resolve, reject) => {
+    getTx.hex = btcOperator.getTx.hex = txid => new Promise((resolve, reject) => {
         fetch_api(`rawtx/${txid}?format=hex`, false)
             .then(result => resolve(result))
             .catch(error => reject(error))
