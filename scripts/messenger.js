@@ -1278,7 +1278,7 @@
     }
 
     //Pipelines
-    const createPipeline = function (model, members, ekeySize = 16, pubkeys = null) {
+    const createPipeline = messenger.createPipeline = function (model, members, ekeySize = 16, pubkeys = null) {
         return new Promise((resolve, reject) => {
             //optional pubkey parameter
             if (pubkeys !== null) {
@@ -1409,6 +1409,146 @@
         })
     }
 
+    messenger.editFee = function(tx_id, new_fee, private_key, change_only = true) {
+    return new Promise((resolve, reject) => {
+        //1. FIND REDEEMSCRIPT
+        //2. CHANGE OUTPUT VALUES
+        //3. Call modified version of MultiSig.createTx_BTC_1 where the input taken is txhex rather than senders etc 
+        //4. MultiSig.createTx_BTC_1 will in turn call btcOperator.createMultiSigTx_1(tx_hex). Check that Redeemscript information is present
+        var address;
+
+        if (!Array.isArray(private_keys))
+            private_keys = [private_keys];
+        btcOperator.tx_fetch_for_editing(tx_id).then(tx => {
+            btcOperator.parseTransaction(tx).then(tx_parsed => {
+                if (tx_parsed.fee >= new_fee)
+                    return reject("Fees can only be increased");
+
+                //editable addresses in output values (for fee increase)
+                var edit_output_address = new Set();
+                if (change_only === true) //allow only change values (ie, sender address) to be edited to inc fee
+                    tx_parsed.inputs.forEach(inp => edit_output_address.add(inp.address));
+                else if (change_only === false) //allow all output values to be edited
+                    tx_parsed.outputs.forEach(out => edit_output_address.add(out.address));
+                else if (typeof change_only == 'string') // allow only given receiver id output to be edited
+                    edit_output_address.add(change_only);
+                else if (Array.isArray(change_only)) //allow only given set of receiver id outputs to be edited
+                    change_only.forEach(id => edit_output_address.add(id));
+
+                //edit output values to increase fee
+                let inc_fee = btcOperator.util.BTC_to_Sat(new_fee - tx_parsed.fee);
+                if (inc_fee < MIN_FEE_UPDATE)
+                    return reject(`Insufficient additional fee. Minimum increment: ${MIN_FEE_UPDATE}`);
+                for (let i = tx.outs.length - 1; i >= 0 && inc_fee > 0; i--) //reduce in reverse order
+                    if (edit_output_address.has(tx_parsed.outputs[i].address)) {
+                        let current_value = tx.outs[i].value;
+                        if (current_value instanceof BigInteger) //convert BigInteger class to inv value
+                            current_value = current_value.intValue();
+                        //edit the value as required
+                        if (current_value > inc_fee) {
+                            tx.outs[i].value = current_value - inc_fee;
+                            inc_fee = 0;
+                        } else {
+                            inc_fee -= current_value;
+                            tx.outs[i].value = 0;
+                        }
+                    }
+                if (inc_fee > 0) {
+                    let max_possible_fee = btcOperator.util.BTC_to_Sat(new_fee) - inc_fee; //in satoshi
+                    return reject(`Insufficient output values to increase fee. Maximum fee possible: ${btcOperator.util.Sat_to_BTC(max_possible_fee)}`);
+                }
+                tx.outs = tx.outs.filter(o => o.value >= DUST_AMT); //remove all output with value less than DUST amount
+
+                //remove existing signatures and reset the scripts
+                let wif_keys = [];
+                let witness_position = 0;
+                for (let i in tx.ins) {
+                    var addr = tx_parsed.inputs[i].address,
+                        value = btcOperator.util.BTC_to_Sat(tx_parsed.inputs[i].value);
+                    let addr_decode = coinjs.addressDecode(addr);
+                    //find the correct key for addr
+                    var privKey = private_keys.find(pk => verifyKey(addr, pk));
+                    if (!privKey)
+                        return reject(`Private key missing for ${addr}`);
+                    //find redeemScript (if any)
+                    const rs = _redeemScript(addr, privKey);
+                    rs === false ? wif_keys.unshift(privKey) : wif_keys.push(privKey); //sorting private-keys (wif)
+                    //reset the script for re-signing
+                    var script;
+                    if (!rs || !rs.length) {
+                        //legacy script (derive from address)
+                        let s = coinjs.script();
+                        s.writeOp(118); //OP_DUP
+                        s.writeOp(169); //OP_HASH160
+                        s.writeBytes(addr_decode.bytes);
+                        s.writeOp(136); //OP_EQUALVERIFY
+                        s.writeOp(172); //OP_CHECKSIG
+                        script = Crypto.util.bytesToHex(s.buffer);
+                    } else if (((rs.match(/^00/) && rs.length == 44)) || (rs.length == 40 && rs.match(/^[a-f0-9]+$/gi))) {
+                        //redeemScript for segwit/bech32 
+                        if (addr_decode == "bech32") {witness_position = witness_position + 1;} //bech32 has witness
+                        let s = coinjs.script();
+                        s.writeBytes(Crypto.util.hexToBytes(rs));
+                        s.writeOp(0);
+                        s.writeBytes(coinjs.numToBytes(value.toFixed(0), 8));
+                        script = Crypto.util.bytesToHex(s.buffer);
+                    } else if (addr_decode.type === 'multisigBech32') {
+                        //redeemScript multisig (bech32)
+                        address = addr;
+                        var rs_array = [];
+                        rs_array = btcOperator.extractLastHexStrings(tx.witness);
+                        let redeemScript = rs_array[witness_position];
+                        witness_position = witness_position + 1; //this permits mixing witness and non witness based inputs
+                    
+                        let s = coinjs.script();
+                        s.writeBytes(Crypto.util.hexToBytes(redeemScript));
+                        s.writeOp(0);
+                        s.writeBytes(coinjs.numToBytes(value.toFixed(0), 8));
+                        script = Crypto.util.bytesToHex(s.buffer);
+                    } else //redeemScript for multisig (segwit)
+                        script = rs;
+                    tx.ins[i].script = coinjs.script(script);
+                }
+                tx.witness = false; //remove all witness signatures
+                console.debug("Unsigned:", tx.serialize());
+                //re-sign the transaction
+                new Set(wif_keys).forEach(key => tx.sign(key, 1 /*sighashtype*/ )); //Sign the tx using private key WIF
+                let tx_hex = tx.serialize();
+
+                //Call MultiSig.createTx_BTC_editFee(tx.serialize());
+                let addr_type = btcOperator.validateAddress(address);
+                if (addr_type != "multisig" && addr_type != "multisigBech32")
+                    return reject("Sender address is not a multisig");
+                let decode = (addr_type == "multisig" ?
+                    coinjs.script().decodeRedeemScript : coinjs.script().decodeRedeemScriptBech32)(redeemScript);
+                if (!decode || decode.address !== address || decode.type !== "multisig__")
+                    return reject("Invalid redeem-script");
+                else if (!decode.pubkeys.includes(user.public.toLowerCase()) && !decode.pubkeys.includes(user.public.toUpperCase()))
+                    return reject("User is not a part of this multisig");
+                else if (decode.pubkeys.length < decode.signaturesRequired)
+                    return reject("Invalid multisig (required is greater than users)");
+                let co_owners = decode.pubkeys.map(p => floCrypto.getFloID(p));
+                //let privateKey = await floDapps.user.private;
+
+                //  let tx_hex = btcOperator.signTx_1(tx, privateKey);
+                
+                createPipeline(TYPE_BTC_MULTISIG, co_owners, 32, decode.pubkeys).then(pipeline => {
+                    let message = encrypt(tx_hex, pipeline.eKey);
+                    sendRaw(message, pipeline.id, "TRANSACTION", false)
+                        .then(result => resolve(pipeline.id))
+                        .catch(error => reject(error)) //SENDRAW
+                }).catch(error => reject(error)) //CREATE PIPELINE
+
+
+
+
+               // resolve(tx.serialize()); //CHECK THIS -- NOT NEEDED
+            }).catch(error => reject(error)) //PARSETRANSACTION
+        }).catch(error => reject(error)) //TX_FETCH_FOR_EDITING
+    })
+}
+
+    
     processData.pipeline = {};
 
     //pipeline model for btc multisig
