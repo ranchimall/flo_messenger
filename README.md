@@ -72,7 +72,6 @@ Do not lose the private key. Copy and save it securely. Once a private key is lo
 - [Product Overview](docs/product-overview.md)
 - [Features](docs/features.md)
 - [Usage](docs/usage.md)
-- [Technical Documentation](docs/technical-documentation.md)
 - [Functions](docs/functions.md)
 - [Technical Architecture](docs/technical-architecture.md)
 - [Additional Resources](docs/additional-resources.md)
