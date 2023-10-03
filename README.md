@@ -11,6 +11,19 @@ Do not lose the private key. Copy and save it securely. Once a private key is lo
 ### Live URL for FLO Messenger:
 *https://ranchimall.github.io/messenger/*  
 
+## Messenger Architecture
+### Product Pipelines
+1. The core feature of the product is pipelines. A pipeline is created by invloking inbuilt models
+2. Right now we have models for Multisig creation for Bitcoin and FLO Multisigs. 
+3. What is pipeline ?
+• It has an ID
+• It has model like TYPE_BTC_MULTISIG
+• It has members like different Bitcoin IDs or FLO IDs
+• It has an encryption key unique to the pipeline, and known just to members of that pipeline
+4. A pipeline sends custom messages defined as per a model to an attached group
+5. Pipeline ID could be a recipient of a message. Then every Bitcoin or FLO Address will get the message with the action needed for that pipeline
+6. Details of the technical functions are available here- [Functions](docs/functions.md)
+
 ## How to use Messenger  
 ### General messaging  
 1. Go to the homepage of Messenger
@@ -53,4 +66,16 @@ Do not lose the private key. Copy and save it securely. Once a private key is lo
 ### Requests  
 1. Multisig owners will get a notification under the "Request" tab for multisig transaction approvals
 2. They can approve or deny a multisig transaction request
+
+# Messenger Documentation
+
+- [Product Overview](docs/product-overview.md)
+- [Features](docs/features.md)
+- [Usage](docs/usage.md)
+- [Technical Documentation](docs/technical-documentation.md)
+- [Functions](docs/functions.md)
+- [Technical Architecture](docs/technical-architecture.md)
+- [Additional Resources](docs/additional-resources.md)
+- [Changelog](docs/changelog.md)
+
       
