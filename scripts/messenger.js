@@ -1409,18 +1409,26 @@
         })
     }
 
-    messenger.editFee = function(tx_id, new_fee, private_key, change_only = true) {
-    return new Promise((resolve, reject) => {
-        //1. FIND REDEEMSCRIPT
-        //2. CHANGE OUTPUT VALUES
-        //3. Call modified version of MultiSig.createTx_BTC_1 where the input taken is txhex rather than senders etc 
-        //4. MultiSig.createTx_BTC_1 will in turn call btcOperator.createMultiSigTx_1(tx_hex). Check that Redeemscript information is present
-        var address;
+    messenger.editFee = function (tx_id, new_fee, private_key, change_only = true) {
+        return new Promise(async (resolve, reject) => {
+            //? what to do about private_key param? It's not used in anywhere in the function
+            //1. FIND REDEEMSCRIPT
+            //2. CHANGE OUTPUT VALUES
+            //3. Call modified version of MultiSig.createTx_BTC_1 where the input taken is txhex rather than senders etc 
+            //4. MultiSig.createTx_BTC_1 will in turn call btcOperator.createMultiSigTx_1(tx_hex). Check that Redeemscript information is present
+            var address;
 
-        if (!Array.isArray(private_keys))
-            private_keys = [private_keys];
-        btcOperator.tx_fetch_for_editing(tx_id).then(tx => {
-            btcOperator.parseTransaction(tx).then(tx_parsed => {
+            if (!Array.isArray(private_keys))
+                private_keys = [private_keys];
+            try {
+                let tx, tx_parsed;
+
+                if (typeof tx_id === 'string') {
+                    tx = await btcOperator.tx_fetch_for_editing(tx_id)
+                    tx_parsed = await btcOperator.parseTransaction(tx)
+                } else if (tx_id.inputs) {
+                    tx_parsed = tx_id
+                }
                 if (tx_parsed.fee >= new_fee)
                     return reject("Fees can only be increased");
 
@@ -1486,7 +1494,7 @@
                         script = Crypto.util.bytesToHex(s.buffer);
                     } else if (((rs.match(/^00/) && rs.length == 44)) || (rs.length == 40 && rs.match(/^[a-f0-9]+$/gi))) {
                         //redeemScript for segwit/bech32 
-                        if (addr_decode == "bech32") {witness_position = witness_position + 1;} //bech32 has witness
+                        if (addr_decode == "bech32") { witness_position = witness_position + 1; } //bech32 has witness
                         let s = coinjs.script();
                         s.writeBytes(Crypto.util.hexToBytes(rs));
                         s.writeOp(0);
@@ -1499,7 +1507,7 @@
                         rs_array = btcOperator.extractLastHexStrings(tx.witness);
                         let redeemScript = rs_array[witness_position];
                         witness_position = witness_position + 1; //this permits mixing witness and non witness based inputs
-                    
+
                         let s = coinjs.script();
                         s.writeBytes(Crypto.util.hexToBytes(redeemScript));
                         s.writeOp(0);
@@ -1512,7 +1520,7 @@
                 tx.witness = false; //remove all witness signatures
                 console.debug("Unsigned:", tx.serialize());
                 //re-sign the transaction
-                new Set(wif_keys).forEach(key => tx.sign(key, 1 /*sighashtype*/ )); //Sign the tx using private key WIF
+                new Set(wif_keys).forEach(key => tx.sign(key, 1 /*sighashtype*/)); //Sign the tx using private key WIF
                 let tx_hex = tx.serialize();
 
                 //Call MultiSig.createTx_BTC_editFee(tx.serialize());
@@ -1531,24 +1539,21 @@
                 //let privateKey = await floDapps.user.private;
 
                 //  let tx_hex = btcOperator.signTx_1(tx, privateKey);
-                
+
                 createPipeline(TYPE_BTC_MULTISIG, co_owners, 32, decode.pubkeys).then(pipeline => {
                     let message = encrypt(tx_hex, pipeline.eKey);
                     sendRaw(message, pipeline.id, "TRANSACTION", false)
                         .then(result => resolve(pipeline.id))
                         .catch(error => reject(error)) //SENDRAW
                 }).catch(error => reject(error)) //CREATE PIPELINE
+                // resolve(tx.serialize()); //CHECK THIS -- NOT NEEDED
+            } catch (error) {
+                reject(error);
+            }
+        })
+    }
 
 
-
-
-               // resolve(tx.serialize()); //CHECK THIS -- NOT NEEDED
-            }).catch(error => reject(error)) //PARSETRANSACTION
-        }).catch(error => reject(error)) //TX_FETCH_FOR_EDITING
-    })
-}
-
-    
     processData.pipeline = {};
 
     //pipeline model for btc multisig

@@ -708,6 +708,10 @@ ol li::before {
 #prompt_popup .flex {
   margin-top: 1rem;
 }
+#confirmation_popup sm-input,
+#prompt_popup sm-input {
+  margin-top: 2rem;
+}
 
 .popup__header {
   position: relative;

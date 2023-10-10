@@ -85,7 +85,7 @@
         <h4 id="prompt_title"></h4>
         <p id="prompt_message"></p>
         <sm-form>
-            <sm-input id="prompt_input"></sm-input>
+            <sm-input id="prompt_input" required></sm-input>
             <div class="flex align-center gap-0-5 margin-left-auto">
                 <button class="button cancel-button">Cancel</button>
                 <button class="button confirm-button button--primary" type="submit">OK</button>
@@ -1111,7 +1111,7 @@
     </template>
 
 
-    <script src="scripts/components.js"></script>
+    <script src="scripts/components.min.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <script>
         /*jshint esversion: 8 */
@@ -1526,14 +1526,21 @@
         }
         // displays a popup for asking user input. Use this instead of JS prompt
         function getPromptInput(title, message = '', options = {}) {
-            let { placeholder = '', isPassword = false, cancelText = 'Cancel', confirmText = 'OK' } = options
+            let { placeholder = '', isPassword = false, cancelText = 'Cancel', confirmText = 'OK', attributes = {} } = options
             getRef('prompt_title').innerText = title;
             getRef('prompt_message').innerText = message;
             const cancelButton = getRef('prompt_popup').querySelector('.cancel-button');
             const confirmButton = getRef('prompt_popup').querySelector('.confirm-button')
+            // remove all attribute except id
+            while (getRef('prompt_input').attributes.length > 0 && getRef('prompt_input').attributes[0].name !== 'id') {
+                getRef('prompt_input').removeAttribute(getRef('prompt_input').attributes[0].name)
+            }
             if (isPassword) {
                 placeholder = 'Password'
                 getRef('prompt_input').setAttribute("type", "password")
+            }
+            for (const attr in attributes) {
+                getRef('prompt_input').setAttribute(attr, attributes[attr])
             }
             getRef('prompt_input').setAttribute("placeholder", placeholder)
             getRef('prompt_input').focusIn()
@@ -1543,7 +1550,7 @@
             return new Promise((resolve, reject) => {
                 cancelButton.addEventListener('click', () => {
                     closePopup()
-                    return null
+                    resolve(null)
                 }, { once: true })
                 confirmButton.addEventListener('click', () => {
                     closePopup()
@@ -1633,7 +1640,13 @@
         window.addEventListener('hashchange', e => routeTo(window.location.hash))
         window.addEventListener("load", () => {
             document.body.classList.remove('hidden')
-            document.querySelectorAll('sm-input[data-flo-address]').forEach(input => input.customValidation = floCrypto.validateAddr)
+            document.querySelectorAll('sm-input[data-flo-address]').forEach(input => input.customValidation = (value) => {
+                if (!value) return { isValid: false, errorText: 'Please enter a FLO address' }
+                return {
+                    isValid: floCrypto.validateAddr(value),
+                    errorText: `Invalid FLO address.<br> It usually starts with "F"`
+                }
+            })
             document.addEventListener('keyup', (e) => {
                 if (e.key === 'Escape') {
                     closePopup()
@@ -2301,7 +2314,13 @@
                         floGlobals.isPrivKeySecured = false;
                         getRef('private_key_field').dataset.privateKey = ''
                         getRef('private_key_field').setAttribute('placeholder', 'FLO/BTC private key');
-                        getRef('private_key_field').customValidation = floCrypto.getPubKeyHex;
+                        getRef('private_key_field').customValidation = (value) => {
+                            if (!value) return { isValid: false, errorText: 'Please enter a private key' }
+                            return {
+                                isValid: floCrypto.getPubKeyHex(value),
+                                errorText: `Invalid private key.<br> It's a long string of random characters usually starting with 'R'.`
+                            }
+                        };
                     }
                     if (!generalPages.find(page => window.location.hash.includes(page))) {
                         location.hash = floGlobals.isPrivKeySecured ? '#/sign_in' : `#/landing`;
@@ -3861,6 +3880,32 @@
                 }
             })
         }
+        async function initFeeIncrease(parsedTx, currentPipeID, e) {
+            const button = e.target.closest('button')
+            const { fee } = parsedTx;
+            try {
+                const newFee = await getPromptInput('Increase transaction fee', `Current fee: ${fee} BTC.\n *This will create a new group and disable current one.`, {
+                    confirmText: 'Increase',
+                    placeholder: 'New BTC transaction fee',
+                    attributes: {
+                        type: 'number',
+                        min: fee,
+                        step: '0.00000001',
+                        'error-text': `New fee should be greater than ${fee} BTC`,
+                    }
+                })
+                if (newFee <= fee)
+                    return notify('New fee should be greater than current fee', 'error')
+                buttonLoader(button, true)
+                const newPipeID = await messenger.editFee(parsedTx, newFee)
+                highlightNewGroup(newPipeID)
+                await messenger.disablePipeline(currentPipeID)
+                notify('Created a new multisig group. Please collect required signs again.', 'success')
+            } catch (error) {
+                notify(error, 'error')
+                buttonLoader(button, false)
+            }
+        }
 
         let chatLazyLoader
         function renderMessages(floID) {
@@ -3971,21 +4016,45 @@
                         }
                         if (floGlobals.pipelineTxHex) {
                             try {
-                                let details, currency
+                                let parsedTx, currency
                                 switch (messenger.pipeline[floID].model) {
                                     case 'flo_multisig':
                                         currency = 'FLO'
-                                        details = await floBlockchainAPI.parseTransaction(floGlobals.pipelineTxHex)
+                                        parsedTx = await floBlockchainAPI.parseTransaction(floGlobals.pipelineTxHex)
                                         break;
                                     case 'btc_multisig':
                                         currency = 'BTC'
-                                        details = await btcOperator.parseTransaction(floGlobals.pipelineTxHex)
+                                        parsedTx = await btcOperator.parseTransaction(floGlobals.pipelineTxHex)
                                         break;
                                 }
-                                const { inputs, outputs, fee, floData } = details
+                                const { inputs, outputs, fee, floData } = parsedTx
                                 const { s: signsDone, r: minSignsRequired, t: totalMembers } = inputs[0]?.signed || {}
                                 const pendingSigns = minSignsRequired - signsDone || 0;
                                 if ($('#transaction_details')) $('#transaction_details').remove()
+                                let retrySection = ''
+                                if (pendingSigns === 0 && !messenger.pipeline[floID].disabled) {
+                                    switch (messenger.pipeline[floID].model) {
+                                        case 'flo_multisig':
+                                            retrySection = html`
+                                            <div class="grid gap-0-5 margin-top-1">
+                                                <strong> The transaction was not completed. Retry the transaction by clicking the button below.</strong>
+                                                <div class="multi-state-button margin-right-auto">
+                                                    <button class="button button--primary cta" onclick="${(e) => broadcastTx(floID, e)}">Retry</button>
+                                                </div>
+                                            </div>
+                                        `
+                                            break;
+                                        case 'btc_multisig':
+                                            retrySection = html`
+                                                <div class="grid gap-0-5 margin-top-1">
+                                                    <strong> If transaction is taking too long to confirm, increase transaction fee.</strong>
+                                                    <div class="multi-state-button margin-right-auto">
+                                                        <button class="button button--primary cta" onclick="${(e) => initFeeIncrease(parsedTx, floID, e)}">Increase fee</button>
+                                                    </div>
+                                                </div>`
+                                            break;
+                                    }
+                                }
                                 getRef('messages_container').prepend(html.node`
                                         <details id="transaction_details" class="grid gap-1 card" open>
                                             <summary>
@@ -4018,16 +4087,9 @@
                                                 <div class="grid">
                                                     <h5>FLO data</h5>
                                                     <p>${floData}</p>
-                                                </div>`: ''
-                                    }
-                                            ${messenger.pipeline[floID].model === 'flo_multisig' && pendingSigns === 0 && !messenger.pipeline[floID].disabled ? html`
-                                                <div class="grid gap-0-5 margin-top-1">
-                                                    <strong> The transaction was not completed. Retry the transaction by clicking the button below.</strong>
-                                                    <div class="multi-state-button margin-right-auto">
-                                                        <button class="button button--primary cta" onclick="${(e) => broadcastTx(floID, e)}">Retry</button>
-                                                    </div>
                                                 </div>
                                             `: ''}
+                                            ${retrySection}
                                         </details>
                                     `)
                             } catch (err) {
@@ -4787,12 +4849,24 @@
             if (multisigMode === 'flo') {
                 getRef('receiver_container').querySelectorAll('.receiver-input').forEach(input => {
                     input.setAttribute('error-text', 'Invalid FLO address')
-                    input.customValidation = floCrypto.validateFloID
+                    input.customValidation = (value) => {
+                        if (!value) return { isValid: false, errorText: 'Please enter a FLO address' }
+                        return {
+                            isValid: floCrypto.validateFloID(value),
+                            errorText: `Invalid FLO address.<br> It usually starts with "F"`
+                        }
+                    }
                 })
             } else if (multisigMode === 'btc') {
                 getRef('receiver_container').querySelectorAll('.receiver-input').forEach(input => {
                     input.setAttribute('error-text', 'Invalid BTC address')
-                    input.customValidation = btcOperator.validateAddress
+                    input.customValidation = (value) => {
+                        if (!value) return { isValid: false, errorText: 'Please enter a BTC address' }
+                        return {
+                            isValid: btcOperator.validateAddr(value),
+                            errorText: `Invalid BTC address.<br> It usually starts with '1', '3' or 'bc1'`
+                        }
+                    }
                 })
             }
         }
@@ -4938,17 +5012,20 @@
                 notify('New multisig group created', 'success')
                 closePopup();
                 getRef('send_tx').reset()
-                getRef('feature_mode').firstElementChild.click();
-                const createdPipelineCard = getRef('chats_list').querySelector(`[data-flo-address="${result}"]`)
-                if (createdPipelineCard) {
-                    createdPipelineCard.scrollIntoView({ behavior: 'smooth' })
-                    createdPipelineCard.classList.add('highlight')
-                    setTimeout(_ => createdPipelineCard.classList.remove('highlight'), 2000)
-                }
+                highlightNewGroup(result)
             } catch (err) {
                 notify(`Error intiating transaction \n ${err}`, 'error');
             } finally {
                 buttonLoader('initiate_transaction', false)
+            }
+        }
+        function highlightNewGroup(address) {
+            getRef('feature_mode').firstElementChild.click();
+            const createdPipelineCard = getRef('chats_list').querySelector(`[data-flo-address="${address}"]`)
+            if (createdPipelineCard) {
+                createdPipelineCard.scrollIntoView({ behavior: 'smooth' })
+                createdPipelineCard.classList.add('highlight')
+                setTimeout(_ => createdPipelineCard.classList.remove('highlight'), 2000)
             }
         }
 
