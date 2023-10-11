@@ -1409,9 +1409,8 @@
         })
     }
 
-    messenger.editFee = function (tx_id, new_fee, private_key, change_only = true) {
+    messenger.editFee = function (tx_id, new_fee, private_keys, change_only = true) {
         return new Promise(async (resolve, reject) => {
-            //? what to do about private_key param? It's not used in anywhere in the function
             //1. FIND REDEEMSCRIPT
             //2. CHANGE OUTPUT VALUES
             //3. Call modified version of MultiSig.createTx_BTC_1 where the input taken is txhex rather than senders etc 
@@ -1422,13 +1421,8 @@
                 private_keys = [private_keys];
             try {
                 let tx, tx_parsed;
-
-                if (typeof tx_id === 'string') {
-                    tx = await btcOperator.tx_fetch_for_editing(tx_id)
-                    tx_parsed = await btcOperator.parseTransaction(tx)
-                } else if (tx_id.inputs) {
-                    tx_parsed = tx_id
-                }
+                tx = await btcOperator.tx_fetch_for_editing(tx_id)
+                tx_parsed = await btcOperator.parseTransaction(tx)
                 if (tx_parsed.fee >= new_fee)
                     return reject("Fees can only be increased");
 

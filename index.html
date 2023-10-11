@@ -3881,6 +3881,7 @@
             })
         }
         async function initFeeIncrease(parsedTx, currentPipeID, e) {
+            if (!floGlobals.pipelineTxID) return notify('No transaction found', 'error')
             const button = e.target.closest('button')
             const { fee } = parsedTx;
             try {
@@ -3897,9 +3898,8 @@
                 if (newFee <= fee)
                     return notify('New fee should be greater than current fee', 'error')
                 buttonLoader(button, true)
-                const newPipeID = await messenger.editFee(parsedTx, newFee)
+                const newPipeID = await messenger.editFee(floGlobals.pipelineTxID, newFee, await floDapps.user.private)
                 highlightNewGroup(newPipeID)
-                await messenger.disablePipeline(currentPipeID)
                 notify('Created a new multisig group. Please collect required signs again.', 'success')
             } catch (error) {
                 notify(error, 'error')
@@ -3940,11 +3940,18 @@
                             if (!floGlobals.pipeSigns[floID])
                                 floGlobals.pipeSigns[floID] = new Set()
                             for (const key in chat) {
-                                const { type, sender, tx_hex } = chat[key]
-                                if (type === 'TRANSACTION') {
-                                    floGlobals.pipeSigns[floID].add(sender)
-                                    if (tx_hex)
-                                        floGlobals.pipelineTxHex = tx_hex
+                                const { type, sender, tx_hex, txid } = chat[key]
+                                switch (type) {
+                                    case 'TRANSACTION':
+                                        floGlobals.pipeSigns[floID].add(sender)
+                                        if (tx_hex)
+                                            floGlobals.pipelineTxHex = tx_hex
+                                        break;
+                                    case 'BROADCAST':
+                                        if (txid) {
+                                            floGlobals.pipelineTxID = txid
+                                        }
+                                        break;
                                 }
                             }
                         }
@@ -4044,8 +4051,14 @@
                                             </div>
                                         `
                                             break;
+                                    }
+                                }
+                                if (messenger.pipeline[floID].disabled) {
+                                    switch (messenger.pipeline[floID].model) {
                                         case 'btc_multisig':
-                                            retrySection = html`
+                                            const { block, confirmations } = await btcOperator.getTx(floGlobals.pipelineTxID)
+                                            if (!block || confirmations === 0)
+                                                retrySection = html`
                                                 <div class="grid gap-0-5 margin-top-1">
                                                     <strong> If transaction is taking too long to confirm, increase transaction fee.</strong>
                                                     <div class="multi-state-button margin-right-auto">
