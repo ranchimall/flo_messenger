@@ -3885,7 +3885,7 @@
             const button = e.target.closest('button')
             const { fee } = parsedTx;
             try {
-                const newFee = await getPromptInput('Increase transaction fee', `Current fee: ${fee} BTC.\n *This will create a new group and disable current one.`, {
+                let newFee = await getPromptInput('Increase transaction fee', `Current fee: ${fee} BTC.\n *This will create a new group and disable current one.`, {
                     confirmText: 'Increase',
                     placeholder: 'New BTC transaction fee',
                     attributes: {
@@ -3895,6 +3895,7 @@
                         'error-text': `New fee should be greater than ${fee} BTC`,
                     }
                 })
+                newFee = parseFloat(newFee)
                 if (newFee <= fee)
                     return notify('New fee should be greater than current fee', 'error')
                 buttonLoader(button, true)
@@ -4053,13 +4054,22 @@
                                             break;
                                     }
                                 }
-                                if (messenger.pipeline[floID].disabled) {
+                                if (messenger.pipeline[floID].disabled && floGlobals.pipelineTxID) {
+                                    floGlobals.pipelineTxID = '59cfadecad052faacd7dae0d82915d3d8f68e71a79bf6a625eb6449173394701'
                                     switch (messenger.pipeline[floID].model) {
                                         case 'btc_multisig':
                                             const { block, confirmations } = await btcOperator.getTx(floGlobals.pipelineTxID)
                                             if (!block || confirmations === 0)
                                                 retrySection = html`
-                                                <div class="grid gap-0-5 margin-top-1">
+                                                <div class="grid gap-1 margin-top-1">
+                                                    <div class="grid">
+                                                        <h5>Transaction ID</h5>
+                                                        <sm-copy value=${floGlobals.pipelineTxID}>
+                                                            <a href=${`https://ranchimall.github.io/btcwallet/#/check_details?query=${floGlobals.pipelineTxID}`} target="_blank">
+                                                                ${floGlobals.pipelineTxID}
+                                                            </a>
+                                                        </sm-copy>
+                                                    </div>
                                                     <strong> If transaction is taking too long to confirm, increase transaction fee.</strong>
                                                     <div class="multi-state-button margin-right-auto">
                                                         <button class="button button--primary cta" onclick="${(e) => initFeeIncrease(parsedTx, floID, e)}">Increase fee</button>
