@@ -4055,7 +4055,6 @@
                                     }
                                 }
                                 if (messenger.pipeline[floID].disabled && floGlobals.pipelineTxID) {
-                                    floGlobals.pipelineTxID = '59cfadecad052faacd7dae0d82915d3d8f68e71a79bf6a625eb6449173394701'
                                     switch (messenger.pipeline[floID].model) {
                                         case 'btc_multisig':
                                             const { block, confirmations } = await btcOperator.getTx(floGlobals.pipelineTxID)
