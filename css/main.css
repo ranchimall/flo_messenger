@@ -130,7 +130,7 @@ button,
   font-weight: 500;
   white-space: nowrap;
   padding: 0.8rem;
-  border-radius: 0.3rem;
+  border-radius: 0.5rem;
   justify-content: center;
 }
 button:focus-visible,
@@ -147,6 +147,7 @@ button:not(:disabled),
   border: solid thin rgba(var(--text-color), 0.06);
 }
 .button--primary {
+  padding: 0.6rem 1rem;
   color: rgba(var(--background-color), 1);
   background-color: var(--accent-color);
 }
@@ -166,18 +167,16 @@ button:not(:disabled),
 .button--danger .icon {
   fill: var(--danger-color);
 }
-.button--filled {
-  background-color: rgba(var(--text-color), 0.06);
-}
 .button--small {
   padding: 0.4rem 0.6rem;
 }
-.button--rounded {
-  border-radius: 4em !important;
-}
 .button--outlined {
-  border: solid rgba(var(--text-color), 0.3) 0.1rem;
-  background-color: rgba(var(--foreground-color), 1);
+  border: solid var(--accent-color) 1px;
+  background-color: transparent;
+  color: var(--accent-color);
+}
+.button--outlined .icon {
+  fill: var(--accent-color);
 }
 .button--transparent {
   background-color: transparent;
@@ -1973,6 +1972,13 @@ sm-chip .badge {
   border-radius: 2rem;
   justify-self: center;
   padding: 0.3rem;
+  view-transition-name: chat-button;
+}
+
+::view-transition-old(chat-button),
+::view-transition-new(chat-button) {
+  height: 100%;
+  width: 100%;
 }
 
 #receiver_name {

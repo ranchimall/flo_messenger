@@ -1032,6 +1032,7 @@
                     UI.chats(getChatOrder());
                     UI.mails(data.mails);
                     UI.marked(data.marked);
+                    resolve('Loaded local data')
                     //request data from cloud
                     let promises = [];
                     promises.push(requestDirectInbox());

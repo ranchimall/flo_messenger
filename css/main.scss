@@ -139,7 +139,7 @@ button,
   font-weight: 500;
   white-space: nowrap;
   padding: 0.8rem;
-  border-radius: 0.3rem;
+  border-radius: 0.5rem;
   justify-content: center;
   &:focus-visible {
     outline: var(--accent-color) solid medium;
@@ -154,6 +154,7 @@ button,
   background-color: rgba(var(--text-color), 0.02);
   border: solid thin rgba(var(--text-color), 0.06);
   &--primary {
+    padding: 0.6rem 1rem;
     color: rgba(var(--background-color), 1);
     background-color: var(--accent-color);
 
@@ -174,18 +175,18 @@ button,
       fill: var(--danger-color);
     }
   }
-  &--filled {
-    background-color: rgba(var(--text-color), 0.06);
-  }
+
   &--small {
     padding: 0.4rem 0.6rem;
   }
-  &--rounded {
-    border-radius: 4em !important;
-  }
+
   &--outlined {
-    border: solid rgba(var(--text-color), 0.3) 0.1rem;
-    background-color: rgba(var(--foreground-color), 1);
+    border: solid var(--accent-color) 1px;
+    background-color: transparent;
+    color: var(--accent-color);
+    .icon {
+      fill: var(--accent-color);
+    }
   }
   &--transparent {
     background-color: transparent;
@@ -269,7 +270,6 @@ sm-textarea {
   font-size: 0.9rem;
   --border-radius: 0.5rem;
   --background-color: rgba(var(--foreground-color), 1);
-
   button {
     .icon {
       fill: var(--accent-color);
@@ -2023,6 +2023,12 @@ sm-chip {
   border-radius: 2rem;
   justify-self: center;
   padding: 0.3rem;
+  view-transition-name: chat-button;
+}
+::view-transition-old(chat-button),
+::view-transition-new(chat-button) {
+  height: 100%;
+  width: 100%;
 }
 
 #receiver_name {
