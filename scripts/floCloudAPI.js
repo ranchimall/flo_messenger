@@ -403,7 +403,7 @@
                 });
             hash[0] != checksum[0] || hash[1] != checksum[1] || hash[2] != checksum[2] || hash[3] != checksum[3] ?
                 bytes = undefined : bytes.shift();
-        } else if (address.length == 42 || address.length == 62) { //bech encoding
+        } else if (!address.startsWith("0x") && address.length == 42 || address.length == 62) { //bech encoding
             if (typeof coinjs !== 'function')
                 throw "library missing (lib_btc.js)";
             let decode = coinjs.bech32_decode(address);
@@ -418,11 +418,11 @@
             bytes = ripemd160(Crypto.SHA256(Crypto.util.hexToBytes(address), {
                 asBytes: true
             }));
-        } else if ((address.length == 42 && address.startsWith("0x")) || (address.length == 40 && !address.startsWith("0x"))){ //Ethereum Address
-            if (address.startsWith("0x")) { address = address.substring(2);}
+        } else if ((address.length == 42 && address.startsWith("0x")) || (address.length == 40 && !address.startsWith("0x"))) { //Ethereum Address
+            if (address.startsWith("0x")) { address = address.substring(2); }
             bytes = Crypto.util.hexToBytes(address);
         }
-      
+
         if (!bytes)
             throw "Invalid address: " + address;
         else {

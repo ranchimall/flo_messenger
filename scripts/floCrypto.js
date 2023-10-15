@@ -299,6 +299,8 @@
                 return true;
             else
                 return false;
+        } else if (raw.type === 'ethereum') {
+            return true
         } else //unknown
             return false;
     }
@@ -414,7 +416,7 @@
                 hex: Crypto.util.bytesToHex(bytes),
                 bytes
             }
-        } else if (address.length == 42 || address.length == 62) { //bech encoding
+        } else if (!address.startsWith("0x") && address.length == 42 || address.length == 62) { //bech encoding
             let decode = coinjs.bech32_decode(address);
             if (decode) {
                 let bytes = decode.data;
@@ -428,6 +430,11 @@
                 }
             } else
                 return null;
+        } else if ((address.length == 42 && address.startsWith("0x")) || (address.length == 40 && !address.startsWith("0x"))) { //Ethereum Address
+            return {
+                hex: address,
+                type: 'ethereum'
+            }
         }
     }
 
