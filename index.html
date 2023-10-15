@@ -40,6 +40,7 @@
                 console.log(result)
                 floGlobals.myFloID = floCrypto.toFloID(floDapps.user.id);
                 floGlobals.myBtcID = btcOperator.convert.legacy2bech(floGlobals.myFloID)
+                floGlobals.myEthID = floEthereum.ethAddressFromCompressedPublicKey(floDapps.user.public)
                 document.querySelectorAll('.user-profile-id').forEach(el => el.textContent = floGlobals.myFloID)
                 //load messages from IDB and render them
                 console.log(`Loading Data! Please Wait...`)
@@ -766,6 +767,10 @@
                     <h5>BTC address</h5>
                     <sm-copy id="contact_btc_id"></sm-copy>
                 </div>
+                <div class="popup-section hidden">
+                    <h5>Eth address</h5>
+                    <sm-copy id="contact_eth_id"></sm-copy>
+                </div>
                 <div id="group_description_card" class="hidden">
                     <h5>Group description</h5>
                     <text-field id="group_description"></text-field>
@@ -1383,8 +1388,13 @@
                     if (floIdType === 'plain') {
                         getRef('contact_btc_id').value = btcOperator.convert.legacy2bech(floCrypto.toFloID(floID))
                         getRef('contact_btc_id').parentNode.classList.remove('hidden')
+                        if (floGlobals.pubKeys[floID]) {
+                            getRef('contact_eth_id').value = floEthereum.ethAddressFromCompressedPublicKey(floGlobals.pubKeys[floID])
+                            getRef('contact_eth_id').parentNode.classList.remove('hidden')
+                        }
                     } else {
                         getRef('contact_btc_id').parentNode.classList.add('hidden')
+                        getRef('contact_eth_id').parentNode.classList.add('hidden')
                     }
                     break;
                 case 'contacts_popup':
@@ -2788,6 +2798,10 @@
                         <div class="grid gap-0-5">
                             <b>My Bitcoin address</b>
                             <sm-copy class="user-btc-id" clip-text value=${floGlobals.myBtcID}></sm-copy>
+                        </div>
+                        <div class="grid gap-0-5">
+                            <b>My Ethereum address</b>
+                            <sm-copy class="user-eth-id" clip-text value=${floGlobals.myEthID}></sm-copy>
                         </div>
                         <button class="button button--danger justify-self-start" onclick="signOut()">Sign out</button>
                     </div>
