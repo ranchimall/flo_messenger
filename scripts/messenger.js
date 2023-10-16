@@ -61,7 +61,7 @@
         }
     });
 
-    var directConnID, groupConnID = {},
+    var directConnID = [], groupConnID = {},
         pipeConnID = {};
     messenger.conn = {};
     Object.defineProperties(messenger.conn, {
@@ -324,6 +324,7 @@
             if (unparsed.message instanceof Object && "secret" in unparsed.message)
                 unparsed.message = floDapps.user.decrypt(unparsed.message);
             let vc = unparsed.vectorClock;
+            console.debug(unparsed);
             switch (unparsed.type) {
                 case "MESSAGE": { //process as message
                     let dm = {
@@ -332,6 +333,7 @@
                         category: "received",
                         message: encrypt(unparsed.message)
                     }
+                    console.debug(dm, `${dm.floID}|${vc}`);
                     compactIDB.addData("messages", Object.assign({}, dm), `${dm.floID}|${vc}`)
                     _loaded.chats[dm.floID] = parseInt(vc)
                     compactIDB.writeData("chats", parseInt(vc), dm.floID)
@@ -431,9 +433,9 @@
     }
 
     function requestDirectInbox() {
-        if (directConnID) { //close existing request connection (if any)
-            floCloudAPI.closeRequest(directConnID);
-            directConnID = undefined;
+        if (directConnID.length) { //close existing request connection (if any)
+            directConnID.forEach(id => floCloudAPI.closeRequest(id));
+            directConnID = [];
         }
         const parseData = processData.direct();
         let callbackFn = function (dataSet, error) {
@@ -464,12 +466,20 @@
             UI.direct(newInbox)
         }
         return new Promise((resolve, reject) => {
-            floCloudAPI.requestApplicationData(null, {
-                receiverID: user.id,
-                lowerVectorClock: _loaded.appendix.lastReceived + 1,
-                callback: callbackFn
-            }).then(conn_id => {
-                directConnID = conn_id;
+            const promises = [
+                floCloudAPI.requestApplicationData(null, {
+                    receiverID: user.id,
+                    lowerVectorClock: _loaded.appendix.lastReceived + 1,
+                    callback: callbackFn
+                }),
+                floCloudAPI.requestApplicationData(null, {
+                    receiverID: floEthereum.ethAddressFromCompressedPublicKey(user.public),
+                    lowerVectorClock: _loaded.appendix.lastReceived + 1,
+                    callback: callbackFn
+                })
+            ]
+            Promise.all(promises).then(connectionIds => {
+                directConnID = [...directConnID, ...connectionIds];
                 resolve("Direct Inbox connected");
             }).catch(error => reject(error))
         })

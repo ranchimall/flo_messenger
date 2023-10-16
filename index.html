@@ -38,7 +38,7 @@
             //invoke the startup functions
             floDapps.launchStartUp().then(result => {
                 console.log(result)
-                floGlobals.myFloID = floCrypto.toFloID(floDapps.user.id);
+                floGlobals.myFloID = floCrypto.getFloID(floDapps.user.public);
                 floGlobals.myBtcID = btcOperator.convert.legacy2bech(floGlobals.myFloID)
                 floGlobals.myEthID = floEthereum.ethAddressFromCompressedPublicKey(floDapps.user.public)
                 document.querySelectorAll('.user-profile-id').forEach(el => el.textContent = floGlobals.myFloID)
@@ -752,49 +752,7 @@
                 </svg>
             </button>
         </header>
-        <section id="contact_details_section">
-            <div>
-                <div class="flex flex-direction-column align-center">
-                    <div id="contact_initial" class="initial flex align-center"></div>
-                    <text-field id="contact_name"></text-field>
-                    <p id="last_interaction_time"></p>
-                </div>
-                <div class="popup-section">
-                    <h5 id="flo_id_type"></h5>
-                    <sm-copy id="contact_flo_id"></sm-copy>
-                </div>
-                <div class="popup-section hidden">
-                    <h5>BTC address</h5>
-                    <sm-copy id="contact_btc_id"></sm-copy>
-                </div>
-                <div class="popup-section hidden">
-                    <h5>Eth address</h5>
-                    <sm-copy id="contact_eth_id"></sm-copy>
-                </div>
-                <div id="group_description_card" class="hidden">
-                    <h5>Group description</h5>
-                    <text-field id="group_description"></text-field>
-                </div>
-                <fieldset id="contact_options"></fieldset>
-            </div>
-            <div id="group_members_card" class="hidden">
-                <div class="flex align-center">
-                    <h4 class="h4">Members</h4>
-                    <button id="edit_group_button" class="button hidden justify-right"
-                        onclick="editGroupMembers()">Edit</button>
-                </div>
-                <p id="group_members_tip" class="tip">Select members to remove or add new
-                    members</p>
-                <div id="member_options" class="flex hidden">
-                    <button id="remove_members_button" class="button button--danger hidden"
-                        onclick="removeGroupMembers()">
-                        Remove selected</button>
-                    <button id="init_add_members_button" class="button" onclick="openPopup('contacts_popup')">Add
-                        member</button>
-                </div>
-                <div id="group_members_list"></div>
-            </div>
-        </section>
+        <section id="contact_details_section"></section>
     </sm-popup>
 
     <sm-popup id="new_message_popup">
@@ -1137,7 +1095,6 @@
     </script>
     <script id="standard_UI_functions">
         const { html, render: renderElem } = uhtml;
-        const domRefs = {};
         const uiGlobals = {
             // Use to store global variables
         }
@@ -1156,22 +1113,7 @@
         })
         // Use instead of document.getElementById
         function getRef(elementId) {
-            if (!domRefs.hasOwnProperty(elementId)) {
-                domRefs[elementId] = {
-                    count: 1,
-                    ref: null,
-                };
-                return document.getElementById(elementId);
-            } else {
-                if (domRefs[elementId].count < 3) {
-                    domRefs[elementId].count = domRefs[elementId].count + 1;
-                    return document.getElementById(elementId);
-                } else {
-                    if (!domRefs[elementId].ref)
-                        domRefs[elementId].ref = document.getElementById(elementId);
-                    return domRefs[elementId].ref;
-                }
-            }
+            return document.getElementById(elementId)
         }
         // implement querySelector as $ function
         function $(selector) {
@@ -1260,26 +1202,34 @@
             else return 'plain';
         }
 
-        document.addEventListener('popupopened', async e => {
+        document.addEventListener('popupopened', async (e) => {
             getRef('main_page').setAttribute('inert', '')
             //pushes popup as septate entry in history
             history.pushState({ type: 'popup' }, null, null)
             switch (e.target.id) {
                 case 'contact_details_popup':
-                    const floID = floGlobals.activeFloID;
-                    const floIdType = getFloIdType(floID);
-                    let isAdmin = false
-                    if (floIdType === 'group')
-                        isAdmin = messenger.groups[floID].admin === floDapps.user.id
+                    const chatAddress = floGlobals.viewingDetailsOfAddress;
+                    const addressType = getFloIdType(chatAddress);
+                    let isAdmin = false;
+                    let contactInitial = '';
+                    let disableContactName = false;
+                    let groupDescription = ''
+                    let lastInteraction = '';
+                    let floAddressType = '';
+                    let contactFloAddress;
+                    let contactBtcAddress;
+                    let contactEthAddress;
+                    if (addressType === 'group')
+                        isAdmin = messenger.groups[chatAddress].admin === floDapps.user.id;
                     let addAsContact
-                    if (!floGlobals.contacts.hasOwnProperty(floID) && floIdType === 'plain')
+                    if (!floGlobals.contacts.hasOwnProperty(chatAddress) && addressType === 'plain')
                         addAsContact = html`
-                                <button id="add_as_contact_option" class="option" onclick="addAsContact()">
-                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <path d="M20,9V6h-2v3h-3v2h3v3h2v-3h3V9H20z M9,12c2.21,0,4-1.79,4-4c0-2.21-1.79-4-4-4S5,5.79,5,8C5,10.21,6.79,12,9,12z M9,6 c1.1,0,2,0.9,2,2c0,1.1-0.9,2-2,2S7,9.1,7,8C7,6.9,7.9,6,9,6z M15.39,14.56C13.71,13.7,11.53,13,9,13c-2.53,0-4.71,0.7-6.39,1.56 C1.61,15.07,1,16.1,1,17.22V20h16v-2.78C17,16.1,16.39,15.07,15.39,14.56z M15,18H3v-0.78c0-0.38,0.2-0.72,0.52-0.88 C4.71,15.73,6.63,15,9,15c2.37,0,4.29,0.73,5.48,1.34C14.8,16.5,15,16.84,15,17.22V18z" /> </g> </svg>
-                                    Add as contact
-                                </button>`;
+                            <button id="add_as_contact_option" class="option" onclick="addAsContact()">
+                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <path d="M20,9V6h-2v3h-3v2h3v3h2v-3h3V9H20z M9,12c2.21,0,4-1.79,4-4c0-2.21-1.79-4-4-4S5,5.79,5,8C5,10.21,6.79,12,9,12z M9,6 c1.1,0,2,0.9,2,2c0,1.1-0.9,2-2,2S7,9.1,7,8C7,6.9,7.9,6,9,6z M15.39,14.56C13.71,13.7,11.53,13,9,13c-2.53,0-4.71,0.7-6.39,1.56 C1.61,15.07,1,16.1,1,17.22V20h16v-2.78C17,16.1,16.39,15.07,15.39,14.56z M15,18H3v-0.78c0-0.38,0.2-0.72,0.52-0.88 C4.71,15.73,6.63,15,9,15c2.37,0,4.29,0.73,5.48,1.34C14.8,16.5,15,16.84,15,17.22V18z" /> </g> </svg>
+                                Add as contact
+                            </button>`;
                     let markReadUnread
-                    if (messenger.marked[floID] && messenger.marked[floID].includes('unread')) {
+                    if (messenger.marked[chatAddress] && messenger.marked[chatAddress].includes('unread')) {
                         markReadUnread = html`
                             <button id="mark_read_option" class="option" onclick="markAsRead()">
                                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> <path d="M12,18l-6,0l-4,4V4c0-1.1,0.9-2,2-2h16c1.1,0,2,0.9,2,2v7l-2,0V4H4v12l8,0V18z M23,14.34l-1.41-1.41l-4.24,4.24l-2.12-2.12 l-1.41,1.41L17.34,20L23,14.34z" /> </g> </svg>
@@ -1295,7 +1245,7 @@
                             `;
                     }
                     let blockUnblock
-                    if (messenger.blocked.has(floID)) {
+                    if (messenger.blocked.has(chatAddress)) {
                         blockUnblock = html`
                                 <button class="option" onclick="unblockUser()">
                                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7 11v2h10v-2H7zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
@@ -1312,7 +1262,7 @@
                     }
 
                     let deleteChat
-                    if (floIdType === 'plain') {
+                    if (addressType === 'plain') {
                         deleteChat = html`
                             <button id="delete_chat_option" class="option option--danger" onclick="deleteChat()">
                                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0V0z" fill="none" /> <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" /> </svg>
@@ -1320,54 +1270,31 @@
                             </button>
                             `
                     }
-                    renderElem(getRef('contact_options'), html`
-                            ${addAsContact}
-                            ${markReadUnread}
-                            ${blockUnblock}
-                            <button class="option option--danger" onclick="clearChat()">
-                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <g> <path d="M16,11h-1V3c0-1.1-0.9-2-2-2h-2C9.9,1,9,1.9,9,3v8H8c-2.76,0-5,2.24-5,5v7h18v-7C21,13.24,18.76,11,16,11z M11,3h2v8h-2V3 z M19,21h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H9v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H5 v-5c0-1.65,1.35-3,3-3h8c1.65,0,3,1.35,3,3V21z" /> </g> </g> </svg>
-                                Clear this chat
-                            </button>
-                            ${deleteChat}
-                        `)
-                    if (floIdType === 'group') {
-                        const { description, created } = messenger.groups[floID]
-                        getRef("contact_initial").innerHTML = ` <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg> `
-                        getRef("last_interaction_time").textContent = `Created ${getFormattedTime(created)}`;
-                        getRef("group_description").value = description === '' ? 'Add group description' : description;
-                        render.groupMembers(floID)
+                    if (addressType === 'group') {
+                        const { description, created } = messenger.groups[chatAddress]
+                        contactInitial = html.node`<svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M13.61,28.09c-1.63,0-4.72-2.35-5.33-3.58a21.65,21.65,0,0,1-1.35-7.32s-.26-6.07,6.68-6.07a6.38,6.38,0,0,1,6.69,6.07A21.65,21.65,0,0,1,19,24.51c-.62,1.23-3.7,3.58-5.34,3.58"/><path d="M50.39,28.09c-1.64,0-4.72-2.35-5.34-3.58a21.9,21.9,0,0,1-1.35-7.32s-.26-6.07,6.69-6.07a6.37,6.37,0,0,1,6.68,6.07,21.65,21.65,0,0,1-1.35,7.32c-.61,1.23-3.7,3.58-5.33,3.58"/><path d="M32,31.74c-2.21,0-6.37-3.17-7.2-4.83A29.3,29.3,0,0,1,23,17s-.35-8.21,9-8.21c8.68,0,9,8.21,9,8.21a29.3,29.3,0,0,1-1.83,9.88c-.82,1.66-5,4.83-7.2,4.83"/><path d="M48.29,38.58c-4.16-1.83-8.57-3.08-10.34-6.4a12,12,0,0,1-6,3.73,12,12,0,0,1-5.95-3.73c-1.77,3.32-6.18,4.57-10.34,6.4-1.7.71-3.11,9.88-1.13,9.88A33.06,33.06,0,0,0,31.23,53h1.54a33.06,33.06,0,0,0,16.65-4.53C51.4,48.46,50,39.29,48.29,38.58Z"/><path d="M14.82,36.57c.76-.33,1.54-.65,2.3-1,2.49-1,4.85-2,6.22-3.44C21.07,31.23,19,30.25,18,28.41a8.83,8.83,0,0,1-4.41,2.76,8.83,8.83,0,0,1-4.4-2.76c-1.31,2.46-4.58,3.38-7.66,4.74-1.26.52-2.3,7.31-.84,7.31a24.55,24.55,0,0,0,10.86,3.31C11.89,40.81,12.86,37.39,14.82,36.57Z"/><path d="M62.45,33.15c-3.08-1.36-6.35-2.28-7.66-4.74a8.83,8.83,0,0,1-4.4,2.76A8.83,8.83,0,0,1,46,28.41c-1,1.84-3,2.82-5.32,3.76,1.37,1.43,3.73,2.41,6.22,3.44.76.31,1.54.63,2.26,1,2,.83,3,4.25,3.29,7.21a24.55,24.55,0,0,0,10.86-3.31C64.75,40.46,63.71,33.67,62.45,33.15Z"/></svg>`
+                        lastInteraction = `Created ${getFormattedTime(created)}`;
+                        disableContactName = !isAdmin
+                        groupDescription = description === '' ? isAdmin ? 'Add group description' : null : description
                         getRef('contact_details_popup').classList.add('is-group');
-                        removeClass(['#group_members_card', '#group_description_card'], 'hidden')
-                        getRef('edit_group_button').dataset.groupId = floID;
-                        getRef('flo_id_type').textContent = 'Group FLO address'
-                        toggleAttr(getRef('contact_name'), !isAdmin, 'disabled')
-                        toggleAttr(getRef('group_description'), !isAdmin, 'disabled')
-                        conditionalClass(getRef('edit_group_button'), !isAdmin, 'hidden')
-                    } else if (floIdType === 'pipeline') {
-                        const { model, members } = messenger.pipeline[floID]
-                        getRef("contact_initial").innerHTML = ` <svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"></rect></g><g><g><path d="M6,15c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S4.9,15,6,15 M6,13c-2.2,0-4,1.8-4,4s1.8,4,4,4s4-1.8,4-4S8.2,13,6,13z M12,5 c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S10.9,5,12,5 M12,3C9.8,3,8,4.8,8,7s1.8,4,4,4s4-1.8,4-4S14.2,3,12,3z M18,15 c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S16.9,15,18,15 M18,13c-2.2,0-4,1.8-4,4s1.8,4,4,4s4-1.8,4-4S20.2,13,18,13z"></path></g></g></svg>`
-                        render.pipelineMembers(floID)
+                        floAddressType = 'Group FLO address'
+                    } else if (addressType === 'pipeline') {
+                        const { model, members } = messenger.pipeline[chatAddress]
+                        contactInitial = html.node`<svg class="icon group-icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"></rect></g><g><g><path d="M6,15c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S4.9,15,6,15 M6,13c-2.2,0-4,1.8-4,4s1.8,4,4,4s4-1.8,4-4S8.2,13,6,13z M12,5 c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S10.9,5,12,5 M12,3C9.8,3,8,4.8,8,7s1.8,4,4,4s4-1.8,4-4S14.2,3,12,3z M18,15 c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S16.9,15,18,15 M18,13c-2.2,0-4,1.8-4,4s1.8,4,4,4s4-1.8,4-4S20.2,13,18,13z"></path></g></g></svg>`
                         getRef('contact_details_popup').classList.add('is-group');
-                        removeClass(['#group_members_card'], 'hidden')
-                        addClass(['#group_members_tip', '#group_description_card'], 'hidden')
-                        getRef('flo_id_type').textContent = `${messenger.pipeline[floID].model === 'flo_multisig' ? 'FLO' : 'BTC'} Multisig address`
-                        getRef("last_interaction_time").textContent = ``;
+                        floAddressType = `${messenger.pipeline[chatAddress].model === 'flo_multisig' ? 'FLO' : 'BTC'} Multisig address`;
                     } else {
-                        getRef('flo_id_type').textContent = 'FLO address'
-                        getRef('contact_name').disabled = false
-                        getRef('contact_initial').textContent = getContactName(floID).charAt(0)
-                        getRef("last_interaction_time").textContent = ``;
+                        disableContactName = false;
+                        contactInitial = getContactName(chatAddress).charAt(0);
+                        floAddressType = 'FLO address';
                         getRef('contact_details_popup').classList.remove('is-group');
-                        addClass(['#group_members_card', '#group_description_card'], 'hidden')
                     }
-                    getRef('contact_initial').setAttribute('style', `--contact-color: var(${contactColor(floID)})`)
-                    getRef('contact_name').value = getContactName(floID) === floID ? 'Unnamed' : getContactName(floID)
-                    if (floIdType === 'pipeline') {
+                    if (addressType === 'pipeline') {
                         try {
                             // Get pipeline origin multisig address
-                            getTxHex(floID).then(async tx_hex => {
+                            getTxHex(chatAddress).then(async tx_hex => {
                                 let details
-                                switch (messenger.pipeline[floID].model) {
+                                switch (messenger.pipeline[chatAddress].model) {
                                     case 'flo_multisig':
                                         details = await floBlockchainAPI.parseTransaction(tx_hex)
                                         break;
@@ -1375,7 +1302,7 @@
                                         details = await btcOperator.parseTransaction(tx_hex)
                                         break;
                                 }
-                                getRef('contact_flo_id').value = details.inputs[0].address
+                                contactFloAddress = details.inputs[0].address
                             }).catch(e => {
                                 console.error(e)
                             })
@@ -1383,18 +1310,90 @@
                             console.error(e)
                         }
                     } else {
-                        getRef('contact_flo_id').value = floCrypto.toFloID(floID)
+                        contactFloAddress = validateEthAddress(chatAddress) ? floCrypto.getFloID(floGlobals.pubKeys[chatAddress]) : floCrypto.toFloID(chatAddress);
                     }
-                    if (floIdType === 'plain') {
-                        getRef('contact_btc_id').value = btcOperator.convert.legacy2bech(floCrypto.toFloID(floID))
-                        getRef('contact_btc_id').parentNode.classList.remove('hidden')
-                        if (floGlobals.pubKeys[floID]) {
-                            getRef('contact_eth_id').value = floEthereum.ethAddressFromCompressedPublicKey(floGlobals.pubKeys[floID])
-                            getRef('contact_eth_id').parentNode.classList.remove('hidden')
-                        }
+                    if (addressType === 'plain') {
+                        if (contactFloAddress)
+                            contactBtcAddress = btcOperator.convert.legacy2bech(contactFloAddress);
+                        if (validateEthAddress(chatAddress))
+                            contactEthAddress = chatAddress;
+                        else if (floGlobals.pubKeys[chatAddress])
+                            contactEthAddress = floEthereum.ethAddressFromCompressedPublicKey(floGlobals.pubKeys[chatAddress])
+                    }
+                    const contactName = getContactName(chatAddress) === chatAddress ? 'Unnamed' : getContactName(chatAddress);
+                    renderElem(getRef('contact_details_section'), html`
+                        <div>
+                            <div class="flex flex-direction-column align-center">
+                                <div id="contact_initial" class="initial flex align-center" style=${`--contact-color: var(${contactColor(chatAddress)})`}>
+                                    ${contactInitial}    
+                                </div>
+                                <text-field id="contact_name" value=${contactName} onchange=${(e) => changeContactName(e.target.value.trim())} ?disabled=${disableContactName}></text-field>
+                                <p id="last_interaction_time">${lastInteraction}</p>
+                            </div>
+                            ${contactFloAddress ? html`
+                                <div class="popup-section">
+                                    <h5>${floAddressType}</h5>
+                                    <sm-copy value=${contactFloAddress}></sm-copy>
+                                </div>
+                            `: ''}
+                            ${contactBtcAddress ? html`
+                                <div class="popup-section">
+                                    <h5>BTC address</h5>
+                                    <sm-copy value=${contactBtcAddress}></sm-copy>
+                                </div>
+                            `: ''}
+                            ${contactEthAddress ? html`
+                                <div class="popup-section">
+                                    <h5>Eth address</h5>
+                                    <sm-copy value=${contactEthAddress}></sm-copy>
+                                </div>
+                            `: ''}
+                            ${addressType === 'group' && groupDescription ? html`
+                                <div class="popup-section">
+                                    <h5>Group description</h5>
+                                    <text-field value=${groupDescription} onchange=${e => handleGroupDescriptionChange(e)} ?disabled=${!isAdmin}></text-field>
+                                </div>
+                            ` : ''}
+                            <fieldset id="contact_options">
+                                ${addAsContact}
+                                ${markReadUnread}
+                                ${blockUnblock}
+                                <button class="option option--danger" onclick="clearChat()">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <g> <path d="M16,11h-1V3c0-1.1-0.9-2-2-2h-2C9.9,1,9,1.9,9,3v8H8c-2.76,0-5,2.24-5,5v7h18v-7C21,13.24,18.76,11,16,11z M11,3h2v8h-2V3 z M19,21h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H9v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H5 v-5c0-1.65,1.35-3,3-3h8c1.65,0,3,1.35,3,3V21z" /> </g> </g> </svg>
+                                    Clear this chat
+                                </button>
+                                ${deleteChat}    
+                            </fieldset>
+                        </div>
+                        ${addressType !== 'plain' ? html`
+                            <div id="group_members_card">
+                                <div class="flex align-center">
+                                    <h4 class="h4">Members</h4>
+                                    ${isAdmin ? html`
+                                        <button id="edit_group_button" class="button justify-right" onclick=${() => editGroupMembers(chatAddress)}>
+                                            Edit
+                                        </button>
+                                    `: ''}
+                                </div>
+                                ${isAdmin ? html`
+                                    <p id="group_members_tip" class=${`tip`}>Select members to remove or add new members</p>
+                                `: ''}
+                                <div id="member_options" class="flex hidden">
+                                    <button id="remove_members_button" class="button button--danger hidden"
+                                        onclick="removeGroupMembers()">
+                                        Remove selected</button>
+                                    <button id="init_add_members_button" class="button" onclick="openPopup('contacts_popup')">Add
+                                        member</button>
+                                </div>
+                                <div id="group_members_list" onchange=${e => selectMemberToRemove(e.target.value)}></div>
+                            </div>
+                        `: ''}
+                    `);
+                    if (addressType === 'group') {
+                        render.groupMembers(chatAddress)
+                    } else if (addressType === 'pipeline') {
+                        render.pipelineMembers(chatAddress)
                     } else {
-                        getRef('contact_btc_id').parentNode.classList.add('hidden')
-                        getRef('contact_eth_id').parentNode.classList.add('hidden')
                     }
                     break;
                 case 'contacts_popup':
@@ -1420,12 +1419,10 @@
                     renderCreationList()
                     break;
                 }
-                case 'multisig_tx_popup':
-                    break;
                 case 'compose_mail_popup':
                     const mailingContacts = []
-                    for (const floID in floGlobals.contacts) {
-                        mailingContacts.push(render.contactOnly(floID))
+                    for (const chatAddress in floGlobals.contacts) {
+                        mailingContacts.push(render.contactOnly(chatAddress))
                     }
                     renderElem(getRef('mail_contact_list'), html`${mailingContacts}`)
                     break;
@@ -1438,16 +1435,17 @@
         document.addEventListener('popupclosed', e => {
             switch (e.target.id) {
                 case 'contact_details_popup':
-                    getRef('contact_name').revert()
-                    if (messenger.groups.hasOwnProperty(floGlobals.activeFloID)) {
-                        isGroupEditable = true
-                        editGroupMembers()
+                    if (messenger.groups.hasOwnProperty(floGlobals.viewingDetailsOfAddress)) {
+                        isGroupEditable = true;
                     }
                     break;
                 case 'contacts_popup':
                     renderElem(getRef('popup_contacts_container'), html``)
                     isRemovingMember = true
                     membersToAdd.clear()
+                    break;
+                case 'new_message_popup':
+                    getRef('search_contacts').value = ''
                     break;
                 case 'creation_popup':
                     showChildElement('creation_process', 0)
@@ -1654,7 +1652,7 @@
         window.addEventListener('hashchange', e => routeTo(window.location.hash))
         window.addEventListener("load", () => {
             document.body.classList.remove('hidden')
-            document.querySelectorAll('sm-input[data-flo-address]').forEach(input => input.customValidation = (value) => {
+            document.querySelectorAll('sm-input[data-address]').forEach(input => input.customValidation = (value) => {
                 if (!value) return { isValid: false, errorText: 'Please enter a FLO address' }
                 return {
                     isValid: floCrypto.validateAddr(value),
@@ -1778,15 +1776,15 @@
                     getRef('keys_generator').generateKeys()
                     break;
                 case 'chat_page':
-                    if (subPageId1 && params.floId) {
+                    if (subPageId1 && params.address) {
                         getRef('chats_list').querySelectorAll('.active').forEach(child => child.classList.remove('active'))
-                        const targetChatCard = getChatCard(params.floId)
+                        const targetChatCard = getChatCard(params.address)
                         if (targetChatCard) {
                             targetChatCard.classList.remove('unread')
                             document.title = `RanchiMall Messenger`
                             targetChatCard.classList.add('active')
                         }
-                        await viewConversation(params.floId)
+                        await viewConversation(params.address)
                         getRef('messages_container').animate([
                             { opacity: 0 },
                             { opacity: 1 },
@@ -1802,7 +1800,7 @@
                         getRef('main_navbar').classList.add('hide-on-mobile')
                     } else {
                         if (activeChat.address && !floGlobals.isMobileView) {
-                            history.replaceState(null, null, `#/chat_page/messages?floId=${activeChat.address}`);
+                            history.replaceState(null, null, `#/chat_page/messages?address=${activeChat.address}`);
                         } else {
                             history.replaceState(null, null, '#/chat_page');
                             getRef('chat_view').classList.add('hidden')
@@ -2490,7 +2488,7 @@
                 }
                 const className = `contact ${type !== 'contact' ? type : ''} ${markUnread ? 'unread' : ''} interactive collapsed`
                 return html.for(ref, contactAddress)`
-                    <div class="${className}" .dataset=${{ floAddress: contactAddress }} style=${`--contact-color: var(${contactColor(contactAddress)})`}>
+                    <div class="${className}" .dataset=${{ address: contactAddress }} style=${`--contact-color: var(${contactColor(contactAddress)})`}>
                         <div class="initial flex align-center">
                             ${initial}
                         </div>
@@ -2504,7 +2502,7 @@
                 const name = getContactName(floID)
                 const initial = name.charAt(0)
                 return html`
-                    <label class="flex align-center selectable-contact interactive" data-flo-address=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
+                    <label class="flex align-center selectable-contact interactive" data-address=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
                         <div class="initial flex align-center"> ${initial} </div>
                         <div class="grid gap-0-3">
                             <h4 class="name">${name}</h4>
@@ -2518,7 +2516,7 @@
                 const name = getContactName(floID)
                 const initial = name.charAt(0)
                 return html`
-                    <div class="flex align-center selectable-contact" data-flo-address=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
+                    <div class="flex align-center selectable-contact" data-address=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
                         <div class="initial flex align-center"> ${initial} </div>
                         <div class="grid gap-0-3">
                             <h4 class="name">${name}</h4>
@@ -2542,7 +2540,7 @@
                     let senderName = null
                     if (sender) {
                         if (sender !== floDapps.user.id && lastSender !== sender)
-                            senderName = html.node`<a href="${`#/chat_page/messages?floId=${sender}`}" class="sender-name" style=${`color: var(${contactColor(sender)})`}>${getContactName(sender)}</a>`
+                            senderName = html.node`<a href="${`#/chat_page/messages?address=${sender}`}" class="sender-name" style=${`color: var(${contactColor(sender)})`}>${getContactName(sender)}</a>`
                         lastSender = sender
                     }
                     let messageContent = document.createDocumentFragment()
@@ -2616,8 +2614,8 @@
                             break;
                         case 'BROADCAST':
                             // render appropriate UI when transaction is broadcasted
-                            if ($('#transaction_details'))
-                                $('#transaction_details').remove()
+                            if (getRef('transaction_details'))
+                                getRef('transaction_details').remove()
                             // disable chatting
                             getRef('chat_footer').classList.add('hidden')
                             let redirectTo = `https://ranchimall.github.io/btcwallet/#/check_details?query=`
@@ -2649,7 +2647,7 @@
                             groupMembersCards.push(render.selectableContact(floID))
                     } else {
                         groupMembersCards.push(html`
-                            <div class="group-member" .dataset=${{ floAddress: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
+                            <div class="group-member" .dataset=${{ address: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
                                 <div class="initial flex align-center">
                                     ${initial}
                                 </div>
@@ -2668,7 +2666,7 @@
                     let name = getContactName(floID)
                     let initial = name.charAt(0)
                     groupMembersCards.push(html`
-                            <div class="group-member" .dataset=${{ floAddress: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
+                            <div class="group-member" .dataset=${{ address: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
                                 <div class="initial flex align-center"> ${initial} </div>
                                 <h4 class="name wrap-around">${name}</h4>
                             </div>
@@ -2681,7 +2679,7 @@
                     const name = getContactName(floID)
                     const initial = name.charAt(0)
                     return html`
-                    <li class="flex align-center interactive blocked-id" data-flo-address=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
+                    <li class="flex align-center interactive blocked-id" data-address=${floID} style=${`--contact-color: var(${contactColor(floID)})`}>
                         <div class="initial flex align-center"> ${initial} </div>
                         <h4 class="name">${name}</h4>
                         <button class="button margin-left-auto unblock">Unblock</button>
@@ -2694,7 +2692,7 @@
                 const name = getContactName(floID)
                 const initial = name.charAt(0)
                 return html`
-                    <button class="contact-list__item interactive" .dataset=${{ floAddress: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
+                    <button class="contact-list__item interactive" .dataset=${{ address: floID }} style=${`--contact-color: var(${contactColor(floID)})`}>
                         <div class="initial flex align-center"> ${initial} </div>
                         <h4 class="name">${name}</h4>
                     </button>
@@ -2877,6 +2875,16 @@
             })
             return messageBody
         }
+        const isEthereumAddress = new Set()
+        function validateEthAddress(address) {
+            if (isEthereumAddress.has(address)) return true
+            if (address.startsWith('0x') || address.length === 40) {
+                isEthereumAddress.add(address)
+                return true
+            } else {
+                return false
+            }
+        }
         function addNotificationBadge(elem, text, { replace = false } = {}) {
             const animOptions = {
                 duration: 200,
@@ -3020,6 +3028,7 @@
             }
             for (let messageId in messagesData) {
                 const { category, floID, time, message, sender, groupID, admin, name, pipeID, unconfirmed, type } = messagesData[messageId]
+                console.log(messagesData[messageId])
                 const chatAddress = floID || groupID || pipeID
                 // code to run if a chat is opened
                 if (activeChat && floCrypto.isSameAddr(activeChat.address, chatAddress)) {
@@ -3032,8 +3041,8 @@
                     }
                     // remove encryption badge if it exists
                     if (!groupID && floDapps.user.get_pubKey(activeChat.address) && floID !== floDapps.user.id) {
-                        if (document.getElementById('warn_no_encryption')) {
-                            document.getElementById('warn_no_encryption').after(
+                        if (getRef('warn_no_encryption')) {
+                            getRef('warn_no_encryption').after(
                                 html.node`
                                     <strong class="event-card flex align-center">
                                         <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g fill="none"><path d="M0 0h24v24H0V0z"/><path d="M0 0h24v24H0V0z" opacity=".87"/></g><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
@@ -3041,7 +3050,7 @@
                                     </strong>
                                 `
                             )
-                            document.getElementById('warn_no_encryption').remove()
+                            getRef('warn_no_encryption').remove()
                         }
                     }
                 }
@@ -3053,7 +3062,7 @@
                     }
                     // move chat card to top if it is not already there
                     const topChatCard = getRef('chats_list').children[0]
-                    if (!floCrypto.isSameAddr(chatAddress, topChatCard.dataset.floAddress)) {
+                    if (!floCrypto.isSameAddr(chatAddress, topChatCard.dataset.address)) {
                         const cloneContact = chatCard.cloneNode(true)
                         chatCard.remove()
                         getRef('chats_list').prepend(cloneContact)
@@ -3177,7 +3186,7 @@
                         getRef('mail_contact_list').lastElementChild.focus()
                 }
                 if (e.code === 'Enter' || e.code === 'Space') {
-                    getRef('send_mail_to').value = document.activeElement.dataset.floAddress
+                    getRef('send_mail_to').value = document.activeElement.dataset.address
                     getRef('mail_contact_list').classList.add('hidden')
                 }
             }
@@ -3186,7 +3195,7 @@
             getRef('mail_contact_list').classList.remove('hidden')
             if (this.value.trim !== '') {
                 [...getRef('mail_contact_list').children].forEach(child => {
-                    if (getContactName(child.dataset.floAddress).includes(this.value.trim())) {
+                    if (getContactName(child.dataset.address).includes(this.value.trim())) {
                         child.classList.remove('hidden')
                     } else {
                         child.classList.add('hidden')
@@ -3216,7 +3225,7 @@
         getRef('search_chats').addEventListener('input', function (e) {
             const contacts = getRef('chats_list').querySelectorAll('.contact')
             contacts.forEach(child => {
-                if (`${getContactName(child.dataset.floAddress)}${child.dataset.floAddress}`.toLowerCase().includes(this.value.toLowerCase())) {
+                if (`${getContactName(child.dataset.address)}${child.dataset.address}`.toLowerCase().includes(this.value.toLowerCase())) {
                     child.classList.remove('hidden')
                 } else {
                     child.classList.add('hidden')
@@ -3248,9 +3257,9 @@
                 holdTimeout = setTimeout(() => {
                     let contact = e.target.closest(".contact")
                     clickedContact['chatCard'] = contact
-                    clickedContact['floID'] = contact.dataset.floAddress
-                    clickedContact['isGroup'] = messenger.groups.hasOwnProperty(clickedContact['floID'])
-                    floGlobals.activeFloID = clickedContact.floID
+                    clickedContact.address = contact.dataset.address
+                    clickedContact['isGroup'] = messenger.groups.hasOwnProperty(clickedContact.address)
+                    floGlobals.viewingDetailsOfAddress = clickedContact.address
                     openPopup('contact_details_popup')
                 }, 500)
                 getRef('chats_list').addEventListener('touchmove', handleTouchMove)
@@ -3271,13 +3280,13 @@
         })
         floGlobals.uiState = {}
         getRef('chat_details_button').addEventListener('click', e => {
-            floGlobals.activeFloID = activeChat.address
+            floGlobals.viewingDetailsOfAddress = activeChat.address
             openPopup('contact_details_popup')
         })
 
         getRef('mail_contact_list').addEventListener('click', e => {
             if (e.target.closest('.contact-list__item')) {
-                getRef('send_mail_to').value = e.target.closest('.contact-list__item').dataset.floAddress
+                getRef('send_mail_to').value = e.target.closest('.contact-list__item').dataset.address
                 getRef('mail_contact_list').classList.add('hidden')
             }
         })
@@ -3288,19 +3297,19 @@
         delegate(getRef('chats_list'), 'click', '.contact', e => {
             clickedContact = {
                 chatCard: e.delegateTarget,
-                floID: e.delegateTarget.dataset.floAddress,
-                isGroup: messenger.groups.hasOwnProperty(e.delegateTarget.dataset.floAddress)
+                address: e.delegateTarget.dataset.address,
+                isGroup: messenger.groups.hasOwnProperty(e.delegateTarget.dataset.address)
             }
-            if (clickedContact['floID'] === floGlobals.myFloID) return
+            if (clickedContact.address === floGlobals.myFloID) return
             if (e.target.closest(".initial") || e.target.closest(".menu")) {
-                floGlobals.activeFloID = clickedContact.floID
+                floGlobals.viewingDetailsOfAddress = clickedContact.address
                 openPopup('contact_details_popup')
             } else {
-                location.hash = `#/chat_page/messages?floId=${clickedContact.floID}`
+                location.hash = `#/chat_page/messages?address=${clickedContact.address}`
             }
         })
         delegate(getRef('contacts_container'), 'click', '.contact', e => {
-            const floID = e.delegateTarget.dataset.floAddress
+            const floID = e.delegateTarget.dataset.address
             let chatCard = getChatCard(floID)
             if (!chatCard) {
                 getRef('chats_list').prepend(html.node`${render.contactCard(floID, { type: 'chat', ref: getRef('chats_list') })}`);
@@ -3361,13 +3370,13 @@
                 removeSelectedContact(e.target.value)
         })
         delegate(getRef('select_contacts_container'), 'click', '.request-pubkey', e => {
-            const floID = e.delegateTarget.closest('.selectable-contact').dataset.floAddress
+            const floID = e.delegateTarget.closest('.selectable-contact').dataset.address
             messenger.request_pubKey(floID)
             e.delegateTarget.disabled = true;
             e.delegateTarget.textContent = 'Request sent'
         })
         delegate(getRef('selected_contacts_container'), 'click', '.remove-selected', e => {
-            removeSelectedContact(e.target.closest('.contact-preview').dataset.floAddress)
+            removeSelectedContact(e.target.closest('.contact-preview').dataset.address)
         })
         const selectedMembers = new Set();
         function checkSelectedMembers() {
@@ -3387,7 +3396,7 @@
             if (!selectedMembers.has(floID)) {
                 selectedMembers.add(floID)
                 const name = getContactName(floID)
-                const preview = html.node`<div class="contact-preview" .dataset="${{ floAddress: floID }}">
+                const preview = html.node`<div class="contact-preview" .dataset="${{ address: floID }}">
                     <div class="initial flex align-center" style=${`--contact-color: var(${contactColor(floID)})`}>
                         ${name.charAt(0)}
                     </div>
@@ -3412,8 +3421,8 @@
 
         function removeSelectedContact(floID) {
             selectedMembers.delete(floID)
-            const relatedContact = getRef('select_contacts_container').querySelector(`[data-flo-address="${floID}"]`)
-            const relatedPreview = getRef('selected_contacts_container').querySelector(`[data-flo-address="${floID}"]`)
+            const relatedContact = getRef('select_contacts_container').querySelector(`[data-address="${floID}"]`)
+            const relatedPreview = getRef('selected_contacts_container').querySelector(`[data-address="${floID}"]`)
             relatedPreview.animate(
                 slideOutLeft,
                 {
@@ -3452,7 +3461,7 @@
             if (rangeOverflow)
                 e.target.setAttribute('error-text', `Maximum ${selectedMembers.size + 1} allowed`)
         })
-        document.getElementById('create_multisig_button').addEventListener('click', () => {
+        getRef('create_multisig_button').addEventListener('click', () => {
             if (getRef('add_self_check').checked)
                 selectedMembers.add(floDapps.user.id)
             const selctedPubKeys = [...selectedMembers].map(id => {
@@ -3499,7 +3508,7 @@
         })
 
 
-        document.getElementById('create_group_button').addEventListener('click', () => {
+        getRef('create_group_button').addEventListener('click', () => {
             const groupName = getRef('group_name_field').value.trim()
             const groupDescription = getRef('group_description_field').value.trim()
             buttonLoader('create_group_button', true)
@@ -3751,20 +3760,13 @@
                 notify(`Contact already saved`, 'error')
                 return
             }
-            // check whether an equivalent BTC/FLO address is already ssaved
-            if (floCrypto.validateFloID(addressToSave)) {
-                const addrInBtc = btcOperator.convert.legacy2bech(addressToSave)
-                if (floGlobals.contacts.hasOwnProperty(addrInBtc)) {
-                    notify(`Equivalent Bitcoin address is already saved as ${getContactName(addrInBtc)}`, 'error')
-                    return
-
-                }
-            } else {
-                const addrInFlo = floCrypto.toFloID(addressToSave)
-                if (floGlobals.contacts.hasOwnProperty(addrInFlo)) {
-                    notify(`Equivalent FLO address is already saved as ${getContactName(addrInFlo)}`, 'error')
-                    return
-                }
+            // check whether an equivalent BTC/FLO address is already saved
+            const addrInFlo = floCrypto.toFloID(addressToSave);
+            const addrInBtc = btcOperator.convert.legacy2bech(addrInFlo);
+            const addrInEth = floGlobals.pubKeys[addressToSave] ? floEthereum.ethAddressFromCompressedPublicKey(floGlobals.pubKeys[addressToSave]) : null;
+            if (floGlobals.contacts.hasOwnProperty(addrInFlo) || floGlobals.contacts.hasOwnProperty(addrInBtc) || floGlobals.contacts.hasOwnProperty(addrInEth)) {
+                notify(`Equivalent Address is already saved as ${getContactName(addrInFlo)}`, 'error');
+                return;
             }
             messenger.storeContact(addressToSave, name).then(result => {
                 closePopup()
@@ -3820,37 +3822,37 @@
             const mergedChatOrder = []
             // merge equivalent addresses
             chatOrder.forEach(address => {
-                let priorityAddress
-                if (floCrypto.validateFloID(address)) {
-                    const addrInBtc = btcOperator.convert.legacy2bech(address)
-                    if (floGlobals.contacts.hasOwnProperty(address))
-                        priorityAddress = address
-                    else if (floGlobals.contacts.hasOwnProperty(addrInBtc))
-                        priorityAddress = addrInBtc
-                    if (chatOrderLookup.has(addrInBtc)) return
-                } else {
-                    const addrInFlo = floCrypto.toFloID(address)
-                    if (floGlobals.contacts.hasOwnProperty(address))
-                        priorityAddress = address
-                    else if (floGlobals.contacts.hasOwnProperty(addrInFlo))
-                        priorityAddress = addrInFlo
-                    if (chatOrderLookup.has(addrInFlo)) return
+                if (messenger.groups.hasOwnProperty(address))
+                    return mergedChatOrder.push(address)
+                if (messenger.pipeline.hasOwnProperty(address))
+                    return mergedChatOrder.push(address)
+                let priorityAddress = address;
+                const addressPubKey = floGlobals.pubKeys[address];
+                const addrInFlo = validateEthAddress(address) ? (floCrypto.getFloID(addressPubKey) || floCrypto.toFloID(address)) : floCrypto.toFloID(address);
+                const addrInBtc = btcOperator.convert.legacy2bech(addrInFlo);
+                const addrInEth = addressPubKey ? floEthereum.ethAddressFromCompressedPublicKey(addressPubKey) : null;
+                if (floGlobals.contacts.hasOwnProperty(addrInFlo)) {
+                    priorityAddress = addrInFlo;
+                } else if (floGlobals.contacts.hasOwnProperty(addrInBtc)) {
+                    priorityAddress = addrInBtc;
+                } else if (addrInEth && floGlobals.contacts.hasOwnProperty(addrInEth)) {
+                    priorityAddress = addrInEth;
                 }
-                if (!chatOrderLookup.has(priorityAddress || address)) {
-                    mergedChatOrder.push(priorityAddress || address)
-                    chatOrderLookup.add(priorityAddress || address)
+                if (!chatOrderLookup.has(addrInFlo) && !chatOrderLookup.has(addrInBtc) && !chatOrderLookup.has(addrInEth)) {
+                    mergedChatOrder.push(priorityAddress)
+                    chatOrderLookup.add(priorityAddress)
                 }
-            })
-            const chats = mergedChatOrder.map(floID => {
-                const markUnread = messenger.marked[floID] ? messenger.marked[floID].includes('unread') : false;
+            });
+            const chats = mergedChatOrder.map(address => {
+                const markUnread = messenger.marked[address] ? messenger.marked[address].includes('unread') : false;
                 let type
-                if (messenger.chats[floID])
+                if (messenger.chats[address])
                     type = 'chat'
-                else if (messenger.groups[floID])
+                else if (messenger.groups[address])
                     type = 'group'
-                else if (messenger.pipeline[floID])
+                else if (messenger.pipeline[address])
                     type = 'pipeline'
-                return render.contactCard(floID, { type, markUnread, ref: getRef('chats_list') })
+                return render.contactCard(address, { type, markUnread, ref: getRef('chats_list') })
             })
             renderElem(getRef('chats_list'), html`${chats}`)
         }
@@ -3926,13 +3928,19 @@
         }
 
         let chatLazyLoader
-        function renderMessages(floID) {
+        function renderMessages(address) {
             return new Promise(async (resolve, reject) => {
-                let floChatID = floCrypto.toFloID(floID);
+                let floChatID = validateEthAddress(address) ? floCrypto.getFloID(floGlobals.pubKeys[address]) || floCrypto.toFloID(address) : floCrypto.toFloID(address);
                 let btcChatID = btcOperator.convert.legacy2bech(floChatID);
-                Promise.all([messenger.getChat(floChatID), messenger.getChat(btcChatID)])
-                    .then(([floChat, btcChat]) => {
-                        let chat = mergeSortedArrays(Object.values(floChat), Object.values(btcChat), 'time')
+                const promises = [messenger.getChat(floChatID), messenger.getChat(btcChatID)]
+                if (validateEthAddress(address))
+                    promises.push(messenger.getChat(address))
+                Promise.all(promises)
+                    .then(([floChat, btcChat, ethChat = []]) => {
+                        const floBtcMerged = mergeSortedArrays(Object.values(floChat), Object.values(btcChat), 'time')
+                        const floBtcEthMerged = mergeSortedArrays(floBtcMerged, Object.values(ethChat), 'time')
+                        let chat = floBtcEthMerged
+                        console.log(chat)
                         if (chatLazyLoader) {
                             chatLazyLoader.update(chat)
                         } else {
@@ -3954,14 +3962,14 @@
                             });
                         }
                         chatLazyLoader.init()
-                        if (getFloIdType(floID) === 'pipeline') {
-                            if (!floGlobals.pipeSigns[floID])
-                                floGlobals.pipeSigns[floID] = new Set()
+                        if (getFloIdType(address) === 'pipeline') {
+                            if (!floGlobals.pipeSigns[address])
+                                floGlobals.pipeSigns[address] = new Set()
                             for (const key in chat) {
                                 const { type, sender, tx_hex, txid } = chat[key]
                                 switch (type) {
                                     case 'TRANSACTION':
-                                        floGlobals.pipeSigns[floID].add(sender)
+                                        floGlobals.pipeSigns[address].add(sender)
                                         if (tx_hex)
                                             floGlobals.pipelineTxHex = tx_hex
                                         break;
@@ -4027,6 +4035,7 @@
                 }
                 lastSender = ''
                 renderMessages(floID).then(async () => {
+                    scrollToBottom()
                     if (activeChat.type === 'pipeline') {
                         if (!messenger.pipeline[floID].disabled && floGlobals.pipeSigns[floID] && !floGlobals.pipeSigns[floID].has(floDapps.user.id)) {
                             getRef('messages_container').append(html.node`
@@ -4057,7 +4066,7 @@
                                 const { inputs, outputs, fee, floData } = parsedTx
                                 const { s: signsDone, r: minSignsRequired, t: totalMembers } = inputs[0]?.signed || {}
                                 const pendingSigns = minSignsRequired - signsDone || 0;
-                                if ($('#transaction_details')) $('#transaction_details').remove()
+                                if (getRef('transaction_details')) getRef('transaction_details').remove()
                                 let retrySection = ''
                                 if (pendingSigns === 0 && !messenger.pipeline[floID].disabled) {
                                     switch (messenger.pipeline[floID].model) {
@@ -4337,20 +4346,16 @@
                 }
             }
         }
-
-        getRef('contact_name').addEventListener('change', e => {
-            changeContactName(e.target.value.trim())
-        })
-        getRef('group_description').addEventListener('change', e => {
-            messenger.changeGroupDescription(floGlobals.activeFloID, e.detail.value.trim())
+        function handleGroupDescriptionChange(e) {
+            messenger.changeGroupDescription(floGlobals.viewingDetailsOfAddress, e.detail.value.trim())
                 .then(res => {
                     notify('Changed group description', 'success')
                 })
                 .catch(error => notify(error, "error"));
-        })
+        }
 
         async function changeContactName(name) {
-            const floID = floGlobals.activeFloID
+            const floID = floGlobals.viewingDetailsOfAddress
             const type = getFloIdType(floID)
             if (type === 'group') {
                 messenger.changeGroupName(floID, name).then(res => {
@@ -4369,49 +4374,51 @@
 
         function updateChatCards({ name, floID }) {
             const type = getFloIdType(floID)
-            if (activeChat.address && activeChat.address === clickedContact.floID) {
+            if (activeChat.address && activeChat.address === clickedContact.address) {
                 updateChatHeaderName(name)
             }
             if (type === 'plain') {
                 getRef('contact_initial').textContent = name.charAt(0)
-                if (activeChat.address && activeChat.address === clickedContact.floID) {
+                if (activeChat.address && activeChat.address === clickedContact.address) {
                     getRef('receiver_initial').textContent = name.charAt(0)
                 }
-                document.querySelectorAll(`.contact[data-flo-address="${floID}"]`).forEach(contact => {
+                document.querySelectorAll(`.contact[data-address="${floID}"]`).forEach(contact => {
                     contact.querySelector('.initial').textContent = name.charAt(0)
                     contact.querySelector('.name').textContent = name
                 })
             }
         }
 
-        function getChatCard(floID) {
-            floID = floCrypto.toFloID(floID)
+        function getChatCard(address) {
+            const addressPubKey = floGlobals.pubKeys[address];
+            const floID = validateEthAddress(address) ? (floCrypto.getFloID(addressPubKey) || floCrypto.toFloID(address)) : floCrypto.toFloID(address);
             const btcID = btcOperator.convert.legacy2bech(floID)
-            return getRef('chats_list').querySelector(`[data-flo-address="${floID}"], [data-flo-address="${btcID}"]`)
+            const ethID = addressPubKey ? floEthereum.ethAddressFromCompressedPublicKey(addressPubKey) : address
+            return getRef('chats_list').querySelector(`[data-address="${floID}"], [data-address="${btcID}"], [data-address="${ethID}"]`)
         }
 
         function addAsContact() {
             openPopup('add_contact_popup')
-            getRef('add_contact_floID').value = clickedContact.floID
+            getRef('add_contact_floID').value = clickedContact.address
         }
 
         function markAsUnread() {
-            getChatCard(floGlobals.activeFloID).classList.add('unread')
-            messenger.addMark(floGlobals.activeFloID, 'unread')
+            getChatCard(floGlobals.viewingDetailsOfAddress).classList.add('unread')
+            messenger.addMark(floGlobals.viewingDetailsOfAddress, 'unread')
             closePopup()
         }
 
         function markAsRead() {
-            getChatCard(floGlobals.activeFloID).classList.remove('unread')
-            messenger.removeMark(floGlobals.activeFloID, 'unread')
+            getChatCard(floGlobals.viewingDetailsOfAddress).classList.remove('unread')
+            messenger.removeMark(floGlobals.viewingDetailsOfAddress, 'unread')
             closePopup()
         }
 
         function blockUser() {
             getConfirmation('Block this address?', { message: `Are you sure to block this address?`, confirmText: 'Block', cancelText: 'Cancel' }).then(confirmed => {
                 if (confirmed) {
-                    messenger.blockUser(floGlobals.activeFloID).then(result => {
-                        getChatCard(floGlobals.activeFloID).querySelector('.last-message').textContent = 'This user is blocked'
+                    messenger.blockUser(floGlobals.viewingDetailsOfAddress).then(result => {
+                        getChatCard(floGlobals.viewingDetailsOfAddress).querySelector('.last-message').textContent = 'This user is blocked'
                         closePopup()
                         notify('Address blocked', 'success')
                     })
@@ -4421,9 +4428,9 @@
         function unblockUser(floID) {
             getConfirmation('Unblock this address?', { message: `Are you sure to unblock this address?`, confirmText: 'Unblock', cancelText: 'Cancel' }).then(confirmed => {
                 if (confirmed) {
-                    messenger.unblockUser(floID || floGlobals.activeFloID).then(result => {
-                        const chatCard = getChatCard(floID || floGlobals.activeFloID);
-                        getLastMessage(floGlobals.activeFloID).then(({ lastText }) => {
+                    messenger.unblockUser(floID || floGlobals.viewingDetailsOfAddress).then(result => {
+                        const chatCard = getChatCard(floID || floGlobals.viewingDetailsOfAddress);
+                        getLastMessage(floGlobals.viewingDetailsOfAddress).then(({ lastText }) => {
                             chatCard.querySelector('.last-message').textContent = lastText
                         }).catch(error => {
                             console.error(error)
@@ -4439,14 +4446,14 @@
         }
         getRef('blocked_list').addEventListener('click', e => {
             if (e.target.closest('.unblock')) {
-                unblockUser(e.target.closest('.blocked-id').dataset.floAddress)
+                unblockUser(e.target.closest('.blocked-id').dataset.address)
             }
         })
         function clearChat() {
             getConfirmation('Clear chat?', { message: `Are you sure to clear this chat?`, confirmText: 'Clear', cancelText: 'Cancel' }).then(confirmed => {
                 if (confirmed) {
-                    messenger.clearChat(floGlobals.activeFloID).then(result => {
-                        let chatCard = getChatCard(floGlobals.activeFloID);
+                    messenger.clearChat(floGlobals.viewingDetailsOfAddress).then(result => {
+                        let chatCard = getChatCard(floGlobals.viewingDetailsOfAddress);
                         if (chatCard) {
                             chatCard.querySelector('.last-message').textContent = ''
                             chatCard.querySelector('.time').textContent = ''
@@ -4462,11 +4469,11 @@
         function deleteChat() {
             getConfirmation('Delete chat', { message: `Are you sure to delete this chat?`, confirmText: 'Delete', cancelText: 'No' }).then(confirmed => {
                 if (confirmed) {
-                    messenger.rmChat(floGlobals.activeFloID).then(result => {
-                        getChatCard(floGlobals.activeFloID).remove()
+                    messenger.rmChat(floGlobals.viewingDetailsOfAddress).then(result => {
+                        getChatCard(floGlobals.viewingDetailsOfAddress).remove()
                         closePopup()
-                        getRef('chat_view').classList.add('hidden')
-                        getRef('chat_view').nextElementSibling.classList.remove('hidden')
+                        activeChat = {}
+                        location.hash = '#/chat_page'
                         notify('Chat deleted', 'success')
                     }).catch(error => {
                         console.error(error)
@@ -4477,31 +4484,22 @@
 
         let isGroupEditable = false
         let isRemovingMember = false
-        function editGroupMembers() {
-            const groupID = getRef('edit_group_button').dataset.groupId
+        function editGroupMembers(groupID) {
             if (isGroupEditable) {
                 // to-do: make group members non editable
                 render.groupMembers(groupID)
                 membersToRemove.clear()
-                getRef('edit_group_button').textContent = 'Edit';
+                renderElem(getRef('edit_group_button'), 'Edit');
                 addClass(['#group_members_tip', '#member_options'], 'hidden')
-                isGroupEditable = false
-                isRemovingMember = false
             } else {
                 // to-do: make group members selectable except for admin
                 render.groupMembers(groupID, true)
-                getRef('edit_group_button').textContent = 'Done'
+                renderElem(getRef('edit_group_button'), 'Done');
                 removeClass(['#group_members_tip', '#member_options', '#init_add_members_button'], 'hidden')
                 getRef('remove_members_button').classList.add('hidden')
-                isGroupEditable = true
-                isRemovingMember = true
             }
+            isGroupEditable = isRemovingMember = !isGroupEditable
         }
-
-        getRef('group_members_list').addEventListener('change', e => {
-            selectMemberToRemove(e.target.value)
-        })
-
         const membersToRemove = new Set()
         function selectMemberToRemove(floID) {
             if (membersToRemove.has(floID)) {
@@ -4517,7 +4515,7 @@
                 getRef('remove_members_button').classList.add('hidden')
             }
         }
-        document.getElementById('popup_contacts_container').addEventListener('change', e => {
+        getRef('popup_contacts_container').addEventListener('change', e => {
             selectMemberToAdd(e.target.value)
         })
 
@@ -4531,7 +4529,7 @@
             getRef('add_members_button').disabled = !Boolean(membersToAdd.size)
         }
 
-        document.getElementById('add_members_button').addEventListener('click', addGroupMembers)
+        getRef('add_members_button').addEventListener('click', addGroupMembers)
 
         function addGroupMembers() {
             const groupID = getRef('edit_group_button').dataset.groupId
@@ -4549,7 +4547,7 @@
                     const groupID = getRef('edit_group_button').dataset.groupId
                     messenger.rmGroupMembers(groupID, [...membersToRemove])
                         .then(res => {
-                            editGroupMembers()
+                            editGroupMembers(groupID)
                         })
                         .catch(err => console.error(err))
                 }
@@ -4562,7 +4560,7 @@
             document.body.style.setProperty('--accent-color', color);
         })
 
-        document.getElementById('select_bg_image').addEventListener('change', async function (e) {
+        getRef('select_bg_image').addEventListener('change', async function (e) {
             await compactIDB.writeData('userSettings', true, 'hasSelectedBg')
             compactIDB.writeData('userSettings', this.files[0], 'bgImage')
                 .then(async res => {
@@ -4920,14 +4918,14 @@
         function handleFeeSelector(e) {
             switch (e.target.value) {
                 case 'custom':
-                    $('#send_fee').readOnly = false;
-                    $('#send_fee').placeholder = 'Fee';
-                    renderElem($('#selected_fee_tip'), html`Set custom fee`)
+                    getRef('send_fee').readOnly = false;
+                    getRef('send_fee').placeholder = 'Fee';
+                    renderElem(getRef('selected_fee_tip'), html`Set custom fee`)
                     feeMemo.memoized = false;
                     break;
                 case 'suggested':
                     calculateFees();
-                    $('#send_fee').readOnly = true;
+                    getRef('send_fee').readOnly = true;
                     break;
             }
         }
@@ -4975,28 +4973,28 @@
             memoizedFee: 0
         };
         function calculateFees() {
-            if ($('#fees_selector').value === 'custom') return;
+            if (getRef('fees_selector').value === 'custom') return;
             if (getRef('receiver_container').children.length === 0) return;
             const allValid = [...getRef('receiver_container').querySelectorAll('sm-input')].every(input => input.isValid)
             if (!allValid && feeMemo.memoized) return;
-            $('#fees_selector').children[0].click();
-            $('#fees_selector').classList.remove('hidden')
+            getRef('fees_selector').children[0].click();
+            getRef('fees_selector').classList.remove('hidden')
             getRef('initiate_transaction').disabled = true;
-            $('#send_fee').value = '';
-            $('#send_fee_loader').classList.remove('hidden')
+            getRef('send_fee').value = '';
+            getRef('send_fee_loader').classList.remove('hidden')
             const animOptions = {
                 duration: 200,
                 easing: 'ease',
                 fill: 'forwards'
             }
-            $('#send_fee_loader').animate(fadeIn, animOptions)
+            getRef('send_fee_loader').animate(fadeIn, animOptions)
             getRef('fees_section').classList.remove('hidden')
             getRef('error_section').classList.add('hidden')
             if (allValid) {
-                $('#send_fee').placeholder = 'Fee'
+                getRef('send_fee').placeholder = 'Fee'
                 calculateBtcFees().then(({ fee }) => {
-                    $('#send_fee').value = fee.toFixed(8);
-                    renderElem($('#selected_fee_tip'), html``)
+                    getRef('send_fee').value = fee.toFixed(8);
+                    renderElem(getRef('selected_fee_tip'), html``)
                     getRef('initiate_transaction').disabled = false;
                 }).catch(e => {
                     getRef('fees_section').classList.add('hidden')
@@ -5009,27 +5007,27 @@
                     `)
                     console.error(e)
                 }).finally(_ => {
-                    $('#send_fee_loader').animate(fadeOut, animOptions).onfinish = _ =>
-                        $('#send_fee_loader').classList.add('hidden')
+                    getRef('send_fee_loader').animate(fadeOut, animOptions).onfinish = _ =>
+                        getRef('send_fee_loader').classList.add('hidden')
 
                 })
                 feeMemo.memoized = false;
             } else {
-                $('#send_fee').placeholder = 'Approximate fee'
-                renderElem($('#selected_fee_tip'), html` <p style="opacity: 0.8;">*Fill out all fields for exact fee!</p> `)
+                getRef('send_fee').placeholder = 'Approximate fee'
+                renderElem(getRef('selected_fee_tip'), html` <p style="opacity: 0.8;">*Fill out all fields for exact fee!</p> `)
                 if (feeMemo.memoized) {
-                    $('#send_fee').value = feeMemo.memoizedFee.toFixed(8);
+                    getRef('send_fee').value = feeMemo.memoizedFee.toFixed(8);
                     return;
                 }
                 calculateApproxFee().then(fee => {
-                    $('#send_fee').value = fee.toFixed(8);
+                    getRef('send_fee').value = fee.toFixed(8);
                     feeMemo.memoizedFee = fee;
                 }).catch(e => {
-                    $('#fees_selector').children[1].click();
-                    $('#fees_selector').classList.add('hidden')
+                    getRef('fees_selector').children[1].click();
+                    getRef('fees_selector').classList.add('hidden')
                 }).finally(_ => {
-                    $('#send_fee_loader').animate(fadeOut, animOptions).onfinish = _ =>
-                        $('#send_fee_loader').classList.add('hidden')
+                    getRef('send_fee_loader').animate(fadeOut, animOptions).onfinish = _ =>
+                        getRef('send_fee_loader').classList.add('hidden')
                 })
                 feeMemo.memoized = true;
             }
@@ -5048,11 +5046,11 @@
                 const { redeemScript } = allMultiSigs[selectedMultisigAddress]
                 let result
                 if (multisigMode === 'btc') {
-                    const fee = parseFloat($('#send_fee').value.trim());
+                    const fee = parseFloat(getRef('send_fee').value.trim());
                     console.debug(selectedMultisigAddress, receivers, amounts, fee);
                     result = await messenger.multisig.createTx_BTC(selectedMultisigAddress, redeemScript, receivers, amounts, fee)
                 } else if (multisigMode === 'flo') {
-                    const floData = $('#send_tx__flo_data').value.trim();
+                    const floData = getRef('send_tx__flo_data').value.trim();
                     result = await messenger.multisig.createTx_FLO(floCrypto.toMultisigFloID(selectedMultisigAddress), redeemScript, receivers, amounts, floData)
                 }
                 console.log(result);
@@ -5068,7 +5066,7 @@
         }
         function highlightNewGroup(address) {
             getRef('feature_mode').firstElementChild.click();
-            const createdPipelineCard = getRef('chats_list').querySelector(`[data-flo-address="${address}"]`)
+            const createdPipelineCard = getRef('chats_list').querySelector(`[data-address="${address}"]`)
             if (createdPipelineCard) {
                 createdPipelineCard.scrollIntoView({ behavior: 'smooth' })
                 createdPipelineCard.classList.add('highlight')
@@ -5095,7 +5093,7 @@
                     getRef('messages_container').querySelector('.signing-banner').remove()
                     notify('Transaction signed', 'success')
                     if (messenger.pipeline[pipeID].disabled)
-                        document.getElementById('transaction_details').querySelector('h4').textContent = 'Transaction signatures complete'
+                        getRef('transaction_details').querySelector('h4').textContent = 'Transaction signatures complete'
                 } catch (err) {
                     notify(err, 'error')
                     buttonLoader(button, false)
