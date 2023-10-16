@@ -318,6 +318,7 @@ sm-chip {
 }
 sm-popup {
   &::part(popup) {
+    max-height: calc(100vh - 2rem);
     background-color: rgba(var(--foreground-color), 1);
   }
 }
@@ -2035,12 +2036,15 @@ sm-chip {
 }
 
 #receiver_name {
-  display: grid;
+  &:has(span) {
+    display: grid;
+    place-content: center;
+    place-items: center;
+  }
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
-  place-content: center;
-  place-items: center;
+  overflow: hidden;
   > * {
     grid-area: 1/1/2/2;
   }
@@ -2315,18 +2319,22 @@ sm-chip {
   justify-content: flex-start;
   padding: 0.8rem 0;
   color: var(--accent-color);
-
   .icon {
     fill: var(--accent-color);
-    margin-right: 1rem;
+    margin-right: 0.5rem;
   }
-
   &--danger {
     color: var(--danger-color);
 
     .icon {
       fill: var(--danger-color);
     }
+  }
+}
+#contact_options {
+  .option {
+    justify-content: center;
+    background-color: rgba(var(--text-color), 0.04);
   }
 }
 

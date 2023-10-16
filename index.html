@@ -1254,7 +1254,7 @@
                             `;
                     } else {
                         blockUnblock = html`
-                                <button class="option option--danger" onclick="blockUser()">
+                                <button class="option" onclick="blockUser()">
                                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z"/></svg>
                                     Block
                                 </button>
@@ -1266,7 +1266,7 @@
                         deleteChat = html`
                             <button id="delete_chat_option" class="option option--danger" onclick="deleteChat()">
                                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0V0z" fill="none" /> <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" /> </svg>
-                                Delete this chat
+                                Delete chat
                             </button>
                             `
                     }
@@ -1330,6 +1330,18 @@
                                 <text-field id="contact_name" value=${contactName} onchange=${(e) => changeContactName(e.target.value.trim())} ?disabled=${disableContactName}></text-field>
                                 <p id="last_interaction_time">${lastInteraction}</p>
                             </div>
+                            <fieldset id="contact_options" class="flex flex-direction-column gap-0-3">
+                                ${addAsContact}
+                                ${markReadUnread}
+                                ${blockUnblock}
+                                <div class="flex gap-0-3">
+                                    <button class="option option--danger" onclick="clearChat()">
+                                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <g> <path d="M16,11h-1V3c0-1.1-0.9-2-2-2h-2C9.9,1,9,1.9,9,3v8H8c-2.76,0-5,2.24-5,5v7h18v-7C21,13.24,18.76,11,16,11z M11,3h2v8h-2V3 z M19,21h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H9v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H5 v-5c0-1.65,1.35-3,3-3h8c1.65,0,3,1.35,3,3V21z" /> </g> </g> </svg>
+                                        Clear chat
+                                    </button>
+                                    ${deleteChat}    
+                                </div>
+                            </fieldset>
                             ${contactFloAddress ? html`
                                 <div class="popup-section">
                                     <h5>${floAddressType}</h5>
@@ -1354,16 +1366,6 @@
                                     <text-field value=${groupDescription} onchange=${e => handleGroupDescriptionChange(e)} ?disabled=${!isAdmin}></text-field>
                                 </div>
                             ` : ''}
-                            <fieldset id="contact_options">
-                                ${addAsContact}
-                                ${markReadUnread}
-                                ${blockUnblock}
-                                <button class="option option--danger" onclick="clearChat()">
-                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <g> <path d="M16,11h-1V3c0-1.1-0.9-2-2-2h-2C9.9,1,9,1.9,9,3v8H8c-2.76,0-5,2.24-5,5v7h18v-7C21,13.24,18.76,11,16,11z M11,3h2v8h-2V3 z M19,21h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3h-2v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H9v-3c0-0.55-0.45-1-1-1s-1,0.45-1,1v3H5 v-5c0-1.65,1.35-3,3-3h8c1.65,0,3,1.35,3,3V21z" /> </g> </g> </svg>
-                                    Clear this chat
-                                </button>
-                                ${deleteChat}    
-                            </fieldset>
                         </div>
                         ${addressType !== 'plain' ? html`
                             <div id="group_members_card">
@@ -1435,6 +1437,7 @@
         document.addEventListener('popupclosed', e => {
             switch (e.target.id) {
                 case 'contact_details_popup':
+                    renderElem(getRef('contact_details_section'), html``)
                     if (messenger.groups.hasOwnProperty(floGlobals.viewingDetailsOfAddress)) {
                         isGroupEditable = true;
                     }
@@ -1787,7 +1790,6 @@
                         await viewConversation(params.address)
                         setTimeout(() => {
                             if (!chatScrollInfo.isScrolledUp) {
-                                console.log('scrolling to bottom')
                                 scrollToBottom()
                             }
                         }, 0);
@@ -2611,7 +2613,7 @@
                 } else if (type) {
                     switch (type) {
                         case 'TRANSACTION':
-                            return html.node`<div class="pipeline-event pipeline-event--signed event-card flex align-center">
+                            return html.node`<div class="pipeline-event pipeline-event--signed event-card flex align-center wrap-around">
                                     <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M23,12l-2.44-2.79l0.34-3.69l-3.61-0.82L15.4,1.5L12,2.96L8.6,1.5L6.71,4.69L3.1,5.5L3.44,9.2L1,12l2.44,2.79l-0.34,3.7 l3.61,0.82L8.6,22.5l3.4-1.47l3.4,1.46l1.89-3.19l3.61-0.82l-0.34-3.69L23,12z M10.09,16.72l-3.8-3.81l1.48-1.48l2.32,2.33 l5.85-5.87l1.48,1.48L10.09,16.72z"/></g></svg>
                                     <div class="grid gap-0-3">
                                         <time class="time">${getFormattedTime(timestamp)}</time>
@@ -2628,7 +2630,7 @@
                             let redirectTo = `https://ranchimall.github.io/btcwallet/#/check_details?query=`
                             if (messenger.pipeline[activeChat.address].model === 'flo_multisig')
                                 redirectTo = `https://blockbook.ranchimall.net/tx/`
-                            return html.node`<div class="pipeline-event pipeline-event--signed event-card flex align-center">
+                            return html.node`<div class="pipeline-event pipeline-event--signed event-card flex align-center wrap-around">
                                 <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M23,12l-2.44-2.79l0.34-3.69l-3.61-0.82L15.4,1.5L12,2.96L8.6,1.5L6.71,4.69L3.1,5.5L3.44,9.2L1,12l2.44,2.79l-0.34,3.7 l3.61,0.82L8.6,22.5l3.4-1.47l3.4,1.46l1.89-3.19l3.61-0.82l-0.34-3.69L23,12z M10.09,16.72l-3.8-3.81l1.48-1.48l2.32,2.33 l5.85-5.87l1.48,1.48L10.09,16.72z"/></g></svg>
                                 <div class="grid">
                                     <time class="time">${getFormattedTime(timestamp)}</time>
@@ -3983,7 +3985,8 @@
         let chatLazyLoader
         function renderMessages(address) {
             return new Promise(async (resolve, reject) => {
-                (getAddressType(address) === 'plain' ? getMergedChat(address) : messenger.getChat).then(chat => {
+                (getAddressType(address) === 'plain' ? getMergedChat(address) : messenger.getChat(address)).then(chat => {
+                    chat = Object.values(chat)
                     if (chatLazyLoader) {
                         chatLazyLoader.update(chat)
                     } else {
@@ -4495,7 +4498,7 @@
             }
         })
         function clearChat() {
-            getConfirmation('Clear chat?', { message: `Are you sure to clear this chat?`, confirmText: 'Clear', cancelText: 'Cancel' }).then(confirmed => {
+            getConfirmation('Clear chat?', { message: `Are you sure to clear this chat?`, confirmText: 'Clear', cancelText: 'Cancel', danger: true }).then(confirmed => {
                 if (confirmed) {
                     messenger.clearChat(floGlobals.viewingDetailsOfAddress).then(result => {
                         let chatCard = getChatCard(floGlobals.viewingDetailsOfAddress);
@@ -4512,7 +4515,7 @@
         }
 
         function deleteChat() {
-            getConfirmation('Delete chat', { message: `Are you sure to delete this chat?`, confirmText: 'Delete', cancelText: 'No' }).then(confirmed => {
+            getConfirmation('Delete chat', { message: `Are you sure to delete this chat?`, confirmText: 'Delete', cancelText: 'Cancel', danger: true }).then(confirmed => {
                 if (confirmed) {
                     messenger.rmChat(floGlobals.viewingDetailsOfAddress).then(result => {
                         getChatCard(floGlobals.viewingDetailsOfAddress).remove()
