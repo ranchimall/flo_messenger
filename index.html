@@ -254,7 +254,7 @@
                 <div id="chat_sections">
                     <div class="flex flex-direction-column gap-0-5" style="overflow: hidden;">
                         <div class="flex align-center gap-0-5" style="padding: 0 1rem;">
-                            <sm-input id="search_chats" type="search" placeholder="Search FLO/BTC address or name">
+                            <sm-input id="search_chats" type="search" placeholder="FLO/BTC/ETH address or name">
                                 <svg slot="icon" class="icon" xmlns="http://www.w3.org/2000/svg" height="24px"
                                     viewBox="0 0 24 24" width="24px" fill="#000000">
                                     <path d="M0 0h24v24H0V0z" fill="none" />
@@ -691,8 +691,8 @@
             <h4>Add contact</h4>
         </header>
         <sm-form>
-            <sm-input id="add_contact_floID" data-flo-address placeholder="FLO/BTC address" error-text="Invalid address"
-                animate autofocus required></sm-input>
+            <sm-input id="add_contact_floID" data-flo-address placeholder="FLO/BTC/ETH address"
+                error-text="Invalid address" animate autofocus required></sm-input>
             <sm-input id="add_contact_name" placeholder="Name" animate required></sm-input>
             <button class="button button--primary" id="add_contact_button" type="submit" disabled>Add</button>
         </sm-form>
@@ -799,7 +799,7 @@
                 <div id="contacts_container" class="observe-empty-state"></div>
                 <div class="empty-state">
                     <h4 class="margin-bottom-0-5">No saved contacts</h4>
-                    <p>Use 'Add contact' to add new FLO/BTC address as a contact.</p>
+                    <p>Use 'Add contact' to add new FLO/BTC/ETH address as a contact.</p>
                 </div>
             </div>
         </div>
@@ -839,7 +839,7 @@
                     <div id="select_contacts_container" class="observe-empty-state"></div>
                     <div class="empty-state">
                         <h4 class="margin-bottom-0-5">No saved contacts.</h4>
-                        <p class="margin-bottom-1">Use 'Add contact' to add new FLO/BTC address as a contact.</p>
+                        <p class="margin-bottom-1">Use 'Add contact' to add new FLO/BTC/ETH address as a contact.</p>
                         <button class="button interactive" onclick="openPopup('add_contact_popup')">
                             <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg"
                                 enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
@@ -1194,7 +1194,7 @@
             popupStack.peek().popup.hide(options)
         }
 
-        function getFloIdType(floID) {
+        function getAddressType(floID) {
             if (messenger.groups.hasOwnProperty(floID))
                 return 'group';
             else if (messenger.pipeline.hasOwnProperty(floID))
@@ -1209,7 +1209,7 @@
             switch (e.target.id) {
                 case 'contact_details_popup':
                     const chatAddress = floGlobals.viewingDetailsOfAddress;
-                    const addressType = getFloIdType(chatAddress);
+                    const addressType = getAddressType(chatAddress);
                     let isAdmin = false;
                     let contactInitial = '';
                     let disableContactName = false;
@@ -1310,7 +1310,7 @@
                             console.error(e)
                         }
                     } else {
-                        contactFloAddress = validateEthAddress(chatAddress) ? floCrypto.getFloID(floGlobals.pubKeys[chatAddress]) : floCrypto.toFloID(chatAddress);
+                        contactFloAddress = validateEthAddress(chatAddress) ? floCrypto.getFloID(floGlobals.pubKeys[chatAddress] || getEthPubKey(chatAddress)) : floCrypto.toFloID(chatAddress);
                     }
                     if (addressType === 'plain') {
                         if (contactFloAddress)
@@ -1580,7 +1580,7 @@
                     break;
                 case 'error':
                     icon = `<svg class="icon icon--error" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z"/></svg>`
-                    options.pinned = true
+                    options.timeout = 15000
                     break;
             }
             if (mode === 'error') {
@@ -1785,6 +1785,12 @@
                             targetChatCard.classList.add('active')
                         }
                         await viewConversation(params.address)
+                        setTimeout(() => {
+                            if (!chatScrollInfo.isScrolledUp) {
+                                console.log('scrolling to bottom')
+                                scrollToBottom()
+                            }
+                        }, 0);
                         getRef('messages_container').animate([
                             { opacity: 0 },
                             { opacity: 1 },
@@ -2089,6 +2095,7 @@
                     }
                     this.lazyContainer.innerHTML = ``;
                 }
+                this.updateStartIndex = Math.max(this.updateStartIndex, 0)
                 this.lastScrollHeight = this.lazyContainer.scrollHeight
                 this.lastScrollTop = this.lazyContainer.scrollTop
                 this.arrayOfElements.slice(this.updateStartIndex, this.updateEndIndex).forEach((element, index) => {
@@ -2827,12 +2834,19 @@
 
         function getLastMessage(floID) {
             return new Promise((resolve, reject) => {
+                let chatGetter
                 let type
-                if (messenger.chats[floID])
+                if (messenger.chats[floID]) {
                     type = 'chat'
-                else if (messenger.groups[floID])
-                    type = 'group'
-                messenger.getChat(floID).then(chat => {
+                    chatGetter = getMergedChat
+                } else {
+                    if (messenger.groups[floID])
+                        type = 'group'
+                    if (messenger.pipeline[floID])
+                        type = 'pipeline'
+                    chatGetter = messenger.getChat
+                }
+                chatGetter(floID).then(chat => {
                     let lastMessage = Object.values(chat).reverse().find(({ message }) => message) || { message: '', time: 0 }
                     let { message, time, sender, category } = lastMessage
                     if (type === 'group' && time === 0)
@@ -2883,6 +2897,16 @@
                 return true
             } else {
                 return false
+            }
+        }
+        const ethPubKeyLookup = new Map()
+        function getEthPubKey(ethAddress) {
+            if (ethPubKeyLookup.has(ethAddress)) return ethPubKeyLookup.get(ethAddress)
+            for (const address in floGlobals.pubKeys) {
+                if (floEthereum.ethAddressFromCompressedPublicKey(floGlobals.pubKeys[address]) === ethAddress) {
+                    ethPubKeyLookup.set(address, floGlobals.pubKeys[address])
+                    return floGlobals.pubKeys[address]
+                }
             }
         }
         function addNotificationBadge(elem, text, { replace = false } = {}) {
@@ -3028,10 +3052,9 @@
             }
             for (let messageId in messagesData) {
                 const { category, floID, time, message, sender, groupID, admin, name, pipeID, unconfirmed, type } = messagesData[messageId]
-                console.log(messagesData[messageId])
                 const chatAddress = floID || groupID || pipeID
                 // code to run if a chat is opened
-                if (activeChat && floCrypto.isSameAddr(activeChat.address, chatAddress)) {
+                if (activeChat && floCrypto.isSameAddr(activeChat.address, chatAddress) || floCrypto.isSameAddr(floCrypto.getFloID(getEthPubKey(activeChat.address)), chatAddress)) {
                     if (sentByMe || type === 'TRANSACTION' || !sender || !floCrypto.isSameAddr(sender, floDapps.user.id)) {
                         const messageBody = render.messageBubble(messagesData[messageId]);
                         getRef('messages_container').append(messageBody);
@@ -3040,7 +3063,7 @@
                         scrollToBottom()
                     }
                     // remove encryption badge if it exists
-                    if (!groupID && floDapps.user.get_pubKey(activeChat.address) && floID !== floDapps.user.id) {
+                    if (!groupID && (floDapps.user.get_pubKey(activeChat.address) || getEthPubKey(activeChat.address)) && floID !== floDapps.user.id) {
                         if (getRef('warn_no_encryption')) {
                             getRef('warn_no_encryption').after(
                                 html.node`
@@ -3062,7 +3085,7 @@
                     }
                     // move chat card to top if it is not already there
                     const topChatCard = getRef('chats_list').children[0]
-                    if (!floCrypto.isSameAddr(chatAddress, topChatCard.dataset.address)) {
+                    if (!floCrypto.isSameAddr(chatAddress, topChatCard.dataset.address) && !floCrypto.isSameAddr(floCrypto.getFloID(getEthPubKey(chatAddress)), topChatCard.dataset.address)) {
                         const cloneContact = chatCard.cloneNode(true)
                         chatCard.remove()
                         getRef('chats_list').prepend(cloneContact)
@@ -3108,7 +3131,7 @@
                 if (chatCard.querySelector('.time'))
                     chatCard.querySelector('.time').textContent = getFormattedTime(time, 'relative')
 
-                if (activeChat.address === chatAddress) {
+                if (floCrypto.isSameAddr(activeChat.address, chatAddress) || floCrypto.isSameAddr(floCrypto.getFloID(getEthPubKey(activeChat.address)), chatAddress)) {
                     if (chatScrollInfo.isScrolledUp)
                         getRef('scroll_to_bottom').classList.add('new-message')
                     else {
@@ -3752,8 +3775,8 @@
         function addContact() {
             let addressToSave = getRef('add_contact_floID').value.trim();
             let name = getRef('add_contact_name').value.trim();
-            if (floCrypto.isSameAddr(addressToSave, floDapps.user.id)) {
-                notify(`you can't add your own FLO/BTC address as contact`, 'error')
+            if (floCrypto.isSameAddr(addressToSave, floDapps.user.id) || floCrypto.myEthID === addressToSave) {
+                notify(`you can't add your own FLO/BTC/ETH address as contact`, 'error')
                 return
             }
             if (floGlobals.contacts.hasOwnProperty(addressToSave)) {
@@ -3784,7 +3807,7 @@
                 if (popupStack.items.find(elem => elem.popup.id === 'new_message_popup')) {
                     renderContactList()
                 }
-                if (activeChat.address === addressToSave)
+                if (floCrypto.isSameAddr(activeChat.address, addressToSave))
                     updateChatHeaderName(name)
             }).catch(error => notify(error, "error"));
         }
@@ -3806,7 +3829,7 @@
                 skipSendingRequest.add(sentRequests[key].floID)
             }
             for (const floID in floGlobals.contacts) {
-                if (getFloIdType(floID) !== 'plain') continue;
+                if (getAddressType(floID) !== 'plain') continue;
                 if (floDapps.user.get_pubKey(floID)) {
                     contacts.push(render.selectableContact(floID))
                 } else {
@@ -3826,19 +3849,26 @@
                     return mergedChatOrder.push(address)
                 if (messenger.pipeline.hasOwnProperty(address))
                     return mergedChatOrder.push(address)
-                let priorityAddress = address;
-                const addressPubKey = floGlobals.pubKeys[address];
-                const addrInFlo = validateEthAddress(address) ? (floCrypto.getFloID(addressPubKey) || floCrypto.toFloID(address)) : floCrypto.toFloID(address);
-                const addrInBtc = btcOperator.convert.legacy2bech(addrInFlo);
-                const addrInEth = addressPubKey ? floEthereum.ethAddressFromCompressedPublicKey(addressPubKey) : null;
-                if (floGlobals.contacts.hasOwnProperty(addrInFlo)) {
-                    priorityAddress = addrInFlo;
-                } else if (floGlobals.contacts.hasOwnProperty(addrInBtc)) {
-                    priorityAddress = addrInBtc;
-                } else if (addrInEth && floGlobals.contacts.hasOwnProperty(addrInEth)) {
-                    priorityAddress = addrInEth;
+                let priorityAddress;
+                let equivalentFloAddress;
+                let equivalentBtcAddress;
+                let equivalentEthAddress;
+                const addressPubKey = floGlobals.pubKeys[address] || getEthPubKey(address);
+                //if address id ethereuem address get equivalent flo address from pubKey if available
+                equivalentFloAddress = validateEthAddress(address) ? floCrypto.getFloID(addressPubKey) : floCrypto.toFloID(address); //
+                if (equivalentFloAddress)
+                    equivalentBtcAddress = btcOperator.convert.legacy2bech(equivalentFloAddress);
+                equivalentEthAddress = addressPubKey ? floEthereum.ethAddressFromCompressedPublicKey(addressPubKey) : null;
+                if (equivalentFloAddress && floGlobals.contacts.hasOwnProperty(equivalentFloAddress)) {
+                    priorityAddress = equivalentFloAddress;
+                } else if (equivalentBtcAddress && floGlobals.contacts.hasOwnProperty(equivalentBtcAddress)) {
+                    priorityAddress = equivalentBtcAddress;
+                } else if (equivalentEthAddress && floGlobals.contacts.hasOwnProperty(equivalentEthAddress)) {
+                    priorityAddress = equivalentEthAddress;
+                } else {
+                    priorityAddress = address;
                 }
-                if (!chatOrderLookup.has(addrInFlo) && !chatOrderLookup.has(addrInBtc) && !chatOrderLookup.has(addrInEth)) {
+                if (!chatOrderLookup.has(equivalentFloAddress) && !chatOrderLookup.has(equivalentBtcAddress) && !chatOrderLookup.has(equivalentEthAddress)) {
                     mergedChatOrder.push(priorityAddress)
                     chatOrderLookup.add(priorityAddress)
                 }
@@ -3927,65 +3957,77 @@
             }
         }
 
-        let chatLazyLoader
-        function renderMessages(address) {
-            return new Promise(async (resolve, reject) => {
-                let floChatID = validateEthAddress(address) ? floCrypto.getFloID(floGlobals.pubKeys[address]) || floCrypto.toFloID(address) : floCrypto.toFloID(address);
-                let btcChatID = btcOperator.convert.legacy2bech(floChatID);
-                const promises = [messenger.getChat(floChatID), messenger.getChat(btcChatID)]
+        function getMergedChat(address) {
+            return new Promise((resolve, reject) => {
+                let floChatAddress
+                let btcChatAddress
+                const promises = []
+                floChatAddress = validateEthAddress(address) ? floCrypto.getFloID(floGlobals.pubKeys[address] || getEthPubKey(address)) : floCrypto.toFloID(address);
+                if (floChatAddress) {
+                    btcChatAddress = btcOperator.convert.legacy2bech(floChatAddress);
+                    promises.push(messenger.getChat(floChatAddress), messenger.getChat(btcChatAddress))
+                }
                 if (validateEthAddress(address))
                     promises.push(messenger.getChat(address))
                 Promise.all(promises)
-                    .then(([floChat, btcChat, ethChat = []]) => {
-                        const floBtcMerged = mergeSortedArrays(Object.values(floChat), Object.values(btcChat), 'time')
-                        const floBtcEthMerged = mergeSortedArrays(floBtcMerged, Object.values(ethChat), 'time')
-                        let chat = floBtcEthMerged
-                        console.log(chat)
-                        if (chatLazyLoader) {
-                            chatLazyLoader.update(chat)
-                        } else {
-                            chatLazyLoader = new LazyLoader('#messages_container', chat, render.messageBubble, {
-                                bottomFirst: true,
-                                batchSize: 20,
-                                onEnd: () => {
-                                    if (activeChat.type === 'plain') {
-                                        if (floDapps.user.get_pubKey(activeChat.address)) {
-                                            getRef('messages_container').prepend(html.node`<strong class="event-card flex align-center">
-                                                <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g fill="none"><path d="M0 0h24v24H0V0z"/><path d="M0 0h24v24H0V0z" opacity=".87"/></g><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
-                                                Conversation is encrypted
-                                            </strong>`)
-                                        } else {
-                                            getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption" class="event-card">Conversation is not encrypted until receiver replies</strong>`)
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                        chatLazyLoader.init()
-                        if (getFloIdType(address) === 'pipeline') {
-                            if (!floGlobals.pipeSigns[address])
-                                floGlobals.pipeSigns[address] = new Set()
-                            for (const key in chat) {
-                                const { type, sender, tx_hex, txid } = chat[key]
-                                switch (type) {
-                                    case 'TRANSACTION':
-                                        floGlobals.pipeSigns[address].add(sender)
-                                        if (tx_hex)
-                                            floGlobals.pipelineTxHex = tx_hex
-                                        break;
-                                    case 'BROADCAST':
-                                        if (txid) {
-                                            floGlobals.pipelineTxID = txid
-                                        }
-                                        break;
-                                }
-                            }
-                        }
-                        resolve()
+                    .then((chats) => {
+                        // recursively merge chats using mergeSortedArrays
+                        const mergedChat = chats.reduce((acc, chat) => mergeSortedArrays(acc, Object.values(chat), 'time'), [])
+                        resolve(mergedChat)
                     }).catch(error => {
-                        console.error(error)
                         reject(error)
                     })
+            })
+        }
+
+        let chatLazyLoader
+        function renderMessages(address) {
+            return new Promise(async (resolve, reject) => {
+                (getAddressType(address) === 'plain' ? getMergedChat(address) : messenger.getChat).then(chat => {
+                    if (chatLazyLoader) {
+                        chatLazyLoader.update(chat)
+                    } else {
+                        chatLazyLoader = new LazyLoader('#messages_container', chat, render.messageBubble, {
+                            bottomFirst: true,
+                            batchSize: 20,
+                            onEnd: () => {
+                                if (activeChat.type === 'plain') {
+                                    if (floDapps.user.get_pubKey(activeChat.address) || getEthPubKey(activeChat.address)) {
+                                        getRef('messages_container').prepend(html.node`<strong class="event-card flex align-center">
+                                            <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g fill="none"><path d="M0 0h24v24H0V0z"/><path d="M0 0h24v24H0V0z" opacity=".87"/></g><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
+                                            Conversation is encrypted
+                                        </strong>`)
+                                    } else {
+                                        getRef('messages_container').prepend(html.node`<strong id="warn_no_encryption" class="event-card">Conversation is not encrypted until receiver replies</strong>`)
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    chatLazyLoader.init()
+                    if (getAddressType(address) === 'pipeline') {
+                        if (!floGlobals.pipeSigns[address])
+                            floGlobals.pipeSigns[address] = new Set()
+                        for (const key in chat) {
+                            const { type, sender, tx_hex, txid } = chat[key]
+                            switch (type) {
+                                case 'TRANSACTION':
+                                    floGlobals.pipeSigns[address].add(sender)
+                                    if (tx_hex)
+                                        floGlobals.pipelineTxHex = tx_hex
+                                    break;
+                                case 'BROADCAST':
+                                    if (txid) {
+                                        floGlobals.pipelineTxID = txid
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                    resolve()
+                }).catch(error => {
+                    reject(error)
+                })
             })
         }
 
@@ -4004,7 +4046,7 @@
                 // restore typed message if any
                 getRef('type_message').value = floGlobals.typedMessages[floID] || ''
                 activeChat.address = floID
-                activeChat.type = getFloIdType(floID)
+                activeChat.type = getAddressType(floID)
                 updateChatHeaderName(getContactName(floID));
                 const chatCard = getChatCard(floID);
                 if (chatCard) {
@@ -4027,7 +4069,7 @@
                     chatScrollInfo['isScrolledUp'] = false
                     getRef('scroll_to_bottom').classList.remove('no-transformations')
                 }
-                const floIdType = getFloIdType(floID)
+                const floIdType = getAddressType(floID)
                 if (floIdType === 'pipeline' && messenger.pipeline[floID].disabled) {
                     getRef('chat_footer').classList.add('hidden')
                 } else {
@@ -4035,7 +4077,6 @@
                 }
                 lastSender = ''
                 renderMessages(floID).then(async () => {
-                    scrollToBottom()
                     if (activeChat.type === 'pipeline') {
                         if (!messenger.pipeline[floID].disabled && floGlobals.pipeSigns[floID] && !floGlobals.pipeSigns[floID].has(floDapps.user.id)) {
                             getRef('messages_container').append(html.node`
@@ -4106,7 +4147,7 @@
                                     }
                                 }
                                 getRef('messages_container').prepend(html.node`
-                                        <details id="transaction_details" class="grid gap-1 card" open>
+                                        <details id="transaction_details" class="grid gap-1 card">
                                             <summary>
                                                 ${pendingSigns === 0 ? html`
                                                     <h4>Required signatures are done</h4>
@@ -4356,7 +4397,7 @@
 
         async function changeContactName(name) {
             const floID = floGlobals.viewingDetailsOfAddress
-            const type = getFloIdType(floID)
+            const type = getAddressType(floID)
             if (type === 'group') {
                 messenger.changeGroupName(floID, name).then(res => {
                     updateChatCards({ name, floID })
@@ -4373,13 +4414,13 @@
         }
 
         function updateChatCards({ name, floID }) {
-            const type = getFloIdType(floID)
-            if (activeChat.address && activeChat.address === clickedContact.address) {
+            const type = getAddressType(floID)
+            if (activeChat.address && floCrypto.isSameAddr(activeChat.address, clickedContact.address)) {
                 updateChatHeaderName(name)
             }
             if (type === 'plain') {
                 getRef('contact_initial').textContent = name.charAt(0)
-                if (activeChat.address && activeChat.address === clickedContact.address) {
+                if (activeChat.address && floCrypto.isSameAddr(activeChat.address, clickedContact.address)) {
                     getRef('receiver_initial').textContent = name.charAt(0)
                 }
                 document.querySelectorAll(`.contact[data-address="${floID}"]`).forEach(contact => {
@@ -4390,11 +4431,15 @@
         }
 
         function getChatCard(address) {
-            const addressPubKey = floGlobals.pubKeys[address];
-            const floID = validateEthAddress(address) ? (floCrypto.getFloID(addressPubKey) || floCrypto.toFloID(address)) : floCrypto.toFloID(address);
-            const btcID = btcOperator.convert.legacy2bech(floID)
-            const ethID = addressPubKey ? floEthereum.ethAddressFromCompressedPublicKey(addressPubKey) : address
-            return getRef('chats_list').querySelector(`[data-address="${floID}"], [data-address="${btcID}"], [data-address="${ethID}"]`)
+            let floAddress
+            let btcAddress
+            let ethAddress
+            const addressPubKey = floGlobals.pubKeys[address] || getEthPubKey(address);
+            floAddress = validateEthAddress(address) ? floCrypto.getFloID(addressPubKey) : floCrypto.toFloID(address)
+            if (floAddress)
+                btcAddress = btcOperator.convert.legacy2bech(floAddress)
+            ethAddress = addressPubKey ? floEthereum.ethAddressFromCompressedPublicKey(addressPubKey) : null;
+            return getRef('chats_list').querySelector(`[data-address="${floAddress}"], [data-address="${btcAddress}"], [data-address="${ethAddress}"], [data-address="${address}"]`)
         }
 
         function addAsContact() {

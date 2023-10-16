@@ -324,7 +324,6 @@
             if (unparsed.message instanceof Object && "secret" in unparsed.message)
                 unparsed.message = floDapps.user.decrypt(unparsed.message);
             let vc = unparsed.vectorClock;
-            console.debug(unparsed);
             switch (unparsed.type) {
                 case "MESSAGE": { //process as message
                     let dm = {

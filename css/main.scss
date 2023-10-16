@@ -1835,11 +1835,13 @@ sm-chip {
 #transaction_details {
   position: sticky;
   top: 0;
-  z-index: 1;
-  background-color: rgba(var(--background-color), 0.9);
+  z-index: 2;
+  background-color: rgba(var(--foreground-color), 1);
   border: solid thin rgba(var(--text-color), 0.2);
+  color: rgba(var(--text-color), 0.8);
   margin: 1.5rem auto;
   backdrop-filter: blur(1rem);
+  box-shadow: 0 1rem 1.5rem rgba(0 0 0 / 0.1);
 }
 
 .message {
@@ -2189,12 +2191,6 @@ sm-chip {
 }
 
 .has-bg-image {
-  .received,
-  .group-event-card,
-  .date-card {
-    background: rgba(var(--foreground-color), 1);
-  }
-
   .received::after {
     border-color: transparent rgba(var(--foreground-color), 0.6) transparent
       transparent;
