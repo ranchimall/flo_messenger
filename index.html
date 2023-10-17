@@ -1328,7 +1328,7 @@
                                     ${contactInitial}    
                                 </div>
                                 <text-field id="contact_name" value=${contactName} onchange=${(e) => changeContactName(e.target.value.trim())} ?disabled=${disableContactName}></text-field>
-                                <p id="last_interaction_time">${lastInteraction}</p>
+                                <p id="last_interaction_time" style="margin-bottom: 1rem;">${lastInteraction}</p>
                             </div>
                             <fieldset id="contact_options" class="flex flex-direction-column gap-0-3">
                                 ${addAsContact}
@@ -2346,7 +2346,10 @@
                         location.hash = floGlobals.isPrivKeySecured ? '#/sign_in' : `#/landing`;
                     }
                     getRef('sign_in_button').onclick = () => {
-                        resolve(getRef('private_key_field').value.trim());
+                        let privateKey = getRef('private_key_field').value.trim();
+                        if (/^[0-9a-fA-F]{64}$/.test(privateKey)) //if hex private key might be ethereum
+                            privateKey = coinjs.privkey2wif(privateKey);
+                        resolve(privateKey);
                         getRef('private_key_field').value = '';
                         routeTo('loading');
                     };
