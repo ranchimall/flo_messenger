@@ -13,7 +13,7 @@
 
     <script src="https://unpkg.com/uhtml@3.0.1/es.js"></script>
     <script>
-        const { html, render } = uhtml;
+        const { html, render : renderElem } = uhtml;
 
         // Data to be displayed
         const items = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
@@ -34,7 +34,7 @@
         // render is defined and exported from uhtml. html is also define and exported from uhtml
         // Create html first, and then render it
         // Creates actual HTML when render is applied to something that creates html
-        render(appElement, renderItems(items));
+        renderElem(appElement, renderItems(items));
     </script>
 </body>
 
