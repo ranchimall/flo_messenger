@@ -270,7 +270,8 @@ getRef(elementId) Function:
 ### There are two meanings of render in the UI of messenger application
 
 1. In class lazyloader, this.render() is a method internal to lazyloader based objects
-2. In uhtml invocations, render creates actual html when `html` parameter is fed to it  
+2. In uhtml invocations, render creates actual html when `html` parameter is fed to it
+3. Sometimes in apps like BTCWallet, render is an object with collection of functions like addressDetails, and txDetails. However, its not used in messenger.  
 
 ### Example of uhtml html creation
 
