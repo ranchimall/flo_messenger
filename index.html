@@ -4960,7 +4960,7 @@
                     input.customValidation = (value) => {
                         if (!value) return { isValid: false, errorText: 'Please enter a BTC address' }
                         return {
-                            isValid: btcOperator.validateAddr(value),
+                            isValid: btcOperator.validateAddress(value),
                             errorText: `Invalid BTC address.<br> It usually starts with '1', '3' or 'bc1'`
                         }
                     }
