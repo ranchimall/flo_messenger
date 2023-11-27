@@ -466,7 +466,7 @@
                 <div id="mail_container"></div>
                 <div class="flex">
                     <button class="button" id="prev_mail">View Previous Mail</button>
-                    <button class="button" id="show_reply_popup">reply</button>
+                    <button class="button" id="show_reply_popup" onclick="openPopup('reply_mail_popup')">reply</button>
                 </div>
             </div>
         </section>
@@ -738,7 +738,7 @@
         <sm-form>
             <sm-input id="subject_of_reply_mail" placeholder="Subject" animate></sm-input>
             <sm-textarea id="reply_mail_content" placeholder="Type a mail" id="" rows="10" required></sm-textarea>
-            <button id="reply_mail_button" class="button button--primary" disabled>Send</button>
+            <button id="reply_mail_button" class="button button--primary" type="submit" disabled>Send</button>
         </sm-form>
     </sm-popup>
     <!-- Contact popup -->
@@ -1428,6 +1428,10 @@
                         mailingContacts.push(render.contactOnly(chatAddress))
                     }
                     renderElem(getRef('mail_contact_list'), html`${mailingContacts}`)
+                    break;
+                case 'reply_mail_popup':
+                    const { subject } = getRef('reply_mail_popup').dataset
+                    getRef('subject_of_reply_mail').value = subject.startsWith("Re: ") ? subject : `Re: ${subject}`;
                     break;
                 case 'profile_popup':
                     renderElem(getRef('profile_popup__content'), render.profile())
@@ -3688,10 +3692,6 @@
 
         getRef('add_contact_button').addEventListener("click", addContact)
 
-        getRef('show_reply_popup').addEventListener("click", () => {
-            openPopup('reply_mail_popup')
-        })
-
         getRef('reply_mail_button').addEventListener("click", replyMail)
 
         getRef("backup_data").addEventListener("click", function (e) {
@@ -4268,8 +4268,7 @@
                 if (newView) {
                     getRef('reply_mail_popup').dataset["to"] = (from === floDapps.user.id ? to.join(',') : from)
                     getRef('reply_mail_popup').dataset["prev"] = mailRef;
-                    getRef('subject_of_reply_mail').value = subject.startsWith("Re: ") ? subject : `Re: ${subject}`;
-                    getRef("show_reply_popup").classList.remove("hidden");
+                    getRef('reply_mail_popup').dataset["subject"] = subject.startsWith("Re: ") ? subject : `Re: ${subject}`;
                 }
                 messenger.removeMark(mailRef, "unread");
                 location.hash = `#/mail_page/${getRef("mail_type_selector").value}/mail`
@@ -4303,12 +4302,11 @@
         })
 
         function replyMail() {
-            let recipient = getRef('reply_mail_popup').dataset.to;
+            let { to: recipient, prev } = getRef('reply_mail_popup').dataset;
             if (recipient.includes(','))
                 recipient = recipient.split(',')
             let subject = getRef('subject_of_reply_mail').value;
             let content = getRef('reply_mail_content').value;
-            let prev = getRef('reply_mail_popup').dataset.prev;
             messenger.sendMail(subject, content, recipient, prev).then(result => {
                 notify(`Mail replied!`);
                 renderMailList(result)
